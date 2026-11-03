@@ -1,0 +1,5 @@
+lantai:
+  database:
+    file: "file:database?mode=memory"
+  tasks-db:
+    file: "file:tasks?mode=memory"

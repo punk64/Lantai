@@ -1,0 +1,27 @@
+name: lantai
+
+services:
+  lantai:
+    image: lantai:dev
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.slim
+      args:
+        VERSION: ${LANTAI_VERSION:-0.2.15}
+        WITH_KEPUBIFY: "false"
+    container_name: lantai
+    network_mode: host
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: ${LANTAI_PORT:-25600}
+      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true"
+      LANTAI_RUNTIME_AUTO_INSTALL: ""
+      LANTAI_RUNTIME_AUTO_ENABLE: "false"
+      LANTAI_RUNTIME_SOURCE_MODE: "auto"
+      LANTAI_RUNTIME_PACKAGE_DIR: "/packages"
+      LANTAI_RUNTIME_FAIL_FAST: "false"
+    volumes:
+      - ../../RunData/docker/config:/config
+      - ../../RunData/docker/books:/books
+      - ../../RunData/docker/packages:/packages
+    restart: unless-stopped

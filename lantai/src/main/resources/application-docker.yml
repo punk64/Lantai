@@ -1,0 +1,6 @@
+lantai:
+  kobo.kepubify-path: /usr/bin/kepubify
+  jdbc-session-enabled: true
+  online:
+    suwayomi-home: /config/suwayomi
+    suwayomi-downloads-dir: /config/suwayomi/data/downloads

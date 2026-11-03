@@ -1,0 +1,43 @@
+package org.lantai.interfaces.api.rest
+
+import jakarta.validation.ConstraintViolationException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
+import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.multipart.MaxUploadSizeExceededException
+
+@RestControllerAdvice
+class ErrorHandlingControllerAdvice {
+  @ExceptionHandler(ConstraintViolationException::class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  fun onConstraintValidationException(
+    e: ConstraintViolationException,
+  ): ValidationErrorResponse =
+    ValidationErrorResponse(
+      e.constraintViolations.map { Violation(it.propertyPath.toString(), it.message) },
+    )
+
+  @ExceptionHandler(MethodArgumentNotValidException::class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  fun onMethodArgumentNotValidException(
+    e: MethodArgumentNotValidException,
+  ): ValidationErrorResponse =
+    ValidationErrorResponse(
+      e.bindingResult.fieldErrors.map { Violation(it.field, it.defaultMessage) },
+    )
+
+  @ExceptionHandler(MaxUploadSizeExceededException::class)
+  fun handleMaxUploadSizeExceededException(e: MaxUploadSizeExceededException): ProblemDetail = e.body
+}
+
+data class ValidationErrorResponse(
+  val violations: List<Violation> = emptyList(),
+)
+
+data class Violation(
+  val fieldName: String? = null,
+  val message: String? = null,
+)

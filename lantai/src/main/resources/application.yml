@@ -1,0 +1,178 @@
+application.version: ${version}
+
+logging:
+  logback:
+    rollingpolicy:
+      max-history: 7
+      total-size-cap: 1GB
+      clean-history-on-start: true
+      max-file-size: 10MB
+  file:
+    name: \${lantai.config-dir}/logs/lantai.log
+  level:
+    org.apache.activemq.audit: WARN
+    org.apache.fontbox.cff.Type1CharString: ERROR
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
+
+lantai:
+  database:
+    file: \${lantai.config-dir}/database.sqlite
+  lucene:
+    data-directory: \${lantai.config-dir}/lucene
+  fonts:
+    data-directory: \${lantai.config-dir}/fonts
+  config-dir: \${user.home}/.lantai
+  tasks-db:
+    file: \${lantai.config-dir}/tasks.sqlite
+  sessions-db:
+    file: \${lantai.config-dir}/sessions.sqlite
+    pragmas:
+      synchronous: NORMAL
+  jdbc-session-enabled: false
+  read:
+    default-window: 3
+    max-window: 30
+    jpeg-quality: 0.82
+    inline-max-images: 512
+  app:
+    home-limit: 16
+    max-home-limit: 50
+  runtime:
+    auto-install: ""
+    auto-enable: false
+    source-mode: auto
+    package-dir: ""
+    mirror: ""
+    fail-fast: false
+    download-timeout-seconds: 1800
+    uninstall-purge-data-default: false
+
+  online:
+    enabled: false
+    library-name: 在线库
+    root-dir: ""
+    suwayomi-endpoint: http://127.0.0.1:25610
+    suwayomi-username: ""
+    suwayomi-password: ""
+    suwayomi-downloads-dir: ""
+    suwayomi-home: ""
+    suwayomi-auto-start: true
+    suwayomi-auto-install: false
+    suwayomi-launch-timeout-seconds: 120
+    suwayomi-java-path: ""
+    suwayomi-min-version: "2.0.0"
+    suwayomi-max-version: "3.0.0"
+    extension-index-url: https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb
+    extension-index-mirror-url: https://cdn.jsdelivr.net/gh/keiyoushi/extensions@repo/index.pb
+    extension-index-cache-minutes: 720
+    download-timeout-seconds: 180
+    download-poll-millis: 2000
+  scrape:
+    sources:
+      douban:
+        enabled: true
+        base-url: https://book.douban.com
+        min-interval-ms: 2000
+        daily-quota: 100
+      anilist:
+        enabled: true
+        base-url: https://graphql.anilist.co
+        min-interval-ms: 1000
+        daily-quota: 0
+  reading:
+    rollup-enabled: true
+    retention-days: 0
+  update-check:
+    repo: "punk64/Lantai"
+
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 512MB
+      max-request-size: 512MB
+      file-size-threshold: 0
+  session:
+    jdbc:
+      # top of every hour
+      cleanup-cron: "0 0 * * * *"
+      initialize-schema: never
+    timeout: 7d
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/{vendor}
+    mixed: true
+    placeholders:
+      library-file-hashing: \${lantai.file-hashing:true}
+      library-scan-startup: \${lantai.libraries-scan-startup:false}
+      delete-empty-collections: \${lantai.delete-empty-collections:true}
+      delete-empty-read-lists: \${lantai.delete-empty-read-lists:true}
+  thymeleaf:
+    prefix: classpath:/public/
+  mvc:
+    async:
+      request-timeout: 1h
+  web:
+    resources:
+      add-mappings: false
+  jackson:
+    deserialization:
+      FAIL_ON_NULL_FOR_PRIMITIVES: true
+    mapper:
+      accept-case-insensitive-properties: true
+      accept-case-insensitive-values: true
+  config:
+    import:
+      - "optional:file:\${lantai.config-dir}/application.yml"
+      - "optional:file:\${lantai.config-dir}/application.yaml"
+      - "optional:file:\${lantai.config-dir}/application.properties"
+  http:
+    codecs:
+      max-in-memory-size: 10MB
+
+server:
+  forward-headers-strategy: framework
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,text/javascript,application/javascript,application/json,image/svg+xml,text/plain
+    min-response-size: 2048
+  error:
+    include-message: always
+  port: 25600
+  tomcat:
+    relaxed-query-chars:
+      - '{'
+      - '}'
+      - '['
+      - ']'
+
+management:
+  endpoints.web.exposure.include: "*"
+  endpoint:
+    configprops:
+      roles: ADMIN
+      show-values: when_authorized
+    env:
+      roles: ADMIN
+      show-values: when_authorized
+    health:
+      roles: ADMIN
+      show-details: when_authorized
+    shutdown:
+      access: unrestricted
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+  simple:
+    metrics:
+      export:
+        enabled: true
+        step: 24h
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+  paths-to-match: "/api/**"
+  writer-with-order-by-keys: true

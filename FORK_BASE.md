@@ -1,0 +1,80 @@
+# FORK_BASE — 上游基线与差异台账
+
+> 本文件由兰台维护，上游没有。**2026-10-31 起上游同步已终止**（ADR-020 全项目改名），本文只承担两件事：记录基线来源，登记与上游的差异。
+
+## 当前基线
+
+| 项 | 值 |
+|---|---|
+| 本仓库 | [punk64/Lantai](https://github.com/punk64/Lantai)（唯一官方地址） |
+| 上游项目 | [gotson/komga](https://github.com/gotson/komga)（MIT） |
+| 基线版本 | **1.29.2** |
+| 上游 tag | `1.29.2` |
+| 上游 commit SHA | `829f75884b013037a0ed74c6d8966c8857b35d9c` |
+| 上游发布日期 | 2026-10-28 |
+| 本地获取日期 | 2026-10-30 |
+| 获取通道 | `codeload.github.com` 的 tar.gz 源码包 |
+| 改名日期 | 2026-10-31（ADR-020），改名前的完整快照留在 `backup/pre-rename` 分支 |
+
+## 为什么不再同步上游
+
+- ADR-020 把包名、配置前缀、模块目录、类名全换了，3942 行与上游偏离，**git merge 不可能再走通**
+- 项目定位为独立发展：上游只借鉴功能思路，代码按需参考、按需重写
+- 需要看上游新功能时，下载源码包单独阅读，**不落进本仓库**，更不做 merge
+
+## 源码获取通道（实测 2026-10-30，需要参考上游时仍可用）
+
+| 通道 | 结果 |
+|---|---|
+| `https://github.com/...` 直连 | 超时（curl 返回 000，21s 无响应） |
+| 经本机代理访问 github.com | `CONNECT tunnel failed, response 502`（代理不放行） |
+| `https://gitclone.com/github.com/gotson/komga.git` | 可用但仅约 35 KB/s |
+| `https://codeload.github.com/gotson/komga/tar.gz/refs/tags/<tag>` | **可用，6.8 MB/s** |
+| `https://api.github.com/...` | 可用，用于查 tag 列表与 commit SHA |
+
+## 分支约定
+
+| 引用 | 含义 | 纪律 |
+|---|---|---|
+| `lantai/main` | **唯一开发主线** | 所有改动都在这里 |
+| `backup/pre-rename` | 改名前的完整快照（2026-10-31） | 只读，用于回溯改名前的代码 |
+| `main` | 旧上游快照 | 冻结，不再更新 |
+
+## Flyway 迁移号段约定
+
+上游用时间戳式迁移号，例：
+
+```
+lantai/src/flyway/resources/db/migration/sqlite/V20261020111142__recompute_koreader_hash.sql
+```
+
+兰台自定义迁移遵守：
+
+1. **格式跟上游一致**：`V<yyyyMMddHHmmss>__lantai_<描述>.sql`，时间取实际开发时刻
+2. **描述里带 `lantai_` 前缀**，一眼区分自有迁移与上游迁移
+3. **必须确认 Flyway 允许 out-of-order**：上游可能补一个时间戳更早的脚本，`outOfOrder=false` 时会直接启动失败；现状见主文档风险清单第 1 条
+4. **动了表就必须重跑 jOOQ 代码生成**，否则编译期类型对不上
+
+## 差异台账
+
+| 日期 | 文件 | 性质 | 说明 |
+|---|---|---|---|
+| 2026-10-30 | `FORK_BASE.md` | 新增 | 本文件，上游没有 |
+| 2026-10-30 | `lantai/src/main/kotlin/org/lantai/domain/service/BookLifecycle.kt` | **修改上游核心行为** | `markProgression` 边界误判修复（ADR-012）：客户端报的 `progression` 落在资源最后一个 position 之后时，原逻辑因 `after == null` 抛出 `Invalid progression` → 400 丢进度；改为回退到最近的 position，仅保留真正的顺序错乱判定 |
+| 2026-10-31 | `domain/model/Library.kt` · `infrastructure/jooq/main/LibraryDao.kt` · `interfaces/api/rest/dto/LibraryDto.kt` | 上游表加列 | `Library.type`（`LOCAL`/`ONLINE`），三处 DAO 映射与 DTO 透出（ADR-016） |
+| 2026-10-31 | `domain/service/LibraryContentLifecycle.kt` | **修改上游核心行为** | `scanRootFolder` 入口对 `type == ONLINE` 直接返回，避免扫描末尾按 URL 集合把虚拟书整批软删（ADR-016） |
+| 2026-10-31 | `interfaces/api/rest/BookController.kt` | 上游端点插桩 | `getBookById` / `getBookPages` 前置 `onlineReadService.ensurePages(bookId)`；`getBookThumbnail` 前置 `ensureBookThumbnail(bookId)`。本地书两次调用立即返回，零额外查询 |
+| 2026-10-31 | `interfaces/api/CommonBookController.kt` | **修改上游核心行为** | `getBookPageInternal` 在内容限制检查后插入在线页分流：`pageOrNull` 命中即直返 Suwayomi 字节，未命中走原逻辑；故障返 503 + `Retry-After`，越界返 400（ADR-017） |
+| 2026-10-31 | `infrastructure/online/**` · `domain/model/OnlineManga.kt` · `OnlineChapter.kt` · 两个 Repository 与 jOOQ DAO · `interfaces/api/rest/LantaiOnlineController.kt` | 新增 | 在线库全链，含 `OnlineDownloadService`（下载存档，ADR-018） |
+| 2026-10-31 | `lantai/src/main/resources/application.yml` | 新增配置段 | `lantai.online.*`（在线库开关、Suwayomi 连接、下载目录与超时） |
+| 2026-10-31 | `lantai/src/flyway/.../V20261031071500__lantai_online_library.sql` | 新增迁移 | `LIBRARY.TYPE` + `ONLINE_MANGA` + `ONLINE_CHAPTER` |
+| 2026-10-31 | 全仓库 | **全量改名**（ADR-020） | 包 `org.gotson.komga` → `org.lantai`；配置前缀 `komga` → `lantai`；模块目录 `komga`/`komga-webui`/`komga-tray` → `lantai*`；20 个 `Komga*` 类与 24 个前端 plugin 改名；`KOMGA_*` 环境变量 → `LANTAI_*` |
+| 2026-10-31 | `interfaces/api/opds/v1/OpdsController.kt` · `interfaces/api/OpdsGenerator.kt` · `application-dev.yml` · `build.gradle.kts` | 去掉上游站点链接 | OPDS 作者 URI 置空、help 链接改 `/`、dev CORS 去掉上游域名、jreleaser 去掉 homepage；均为死链，指向不存在的站点 |
+| 2026-11-01 | `infrastructure/online/SuwayomiConfigWriter.kt` · `SuwayomiProcessManager.kt` · `ExtensionIndexParser.kt` · `SuwayomiInstaller.kt` · `SuwayomiAdminService.kt` | 新增 | 兰台托管 Suwayomi 进程、生成 `server.conf`、代持凭据、自解析 keiyoushi `index.pb`、发行版下载（ADR-019 / R13 §12） |
+| 2026-11-01 | `infrastructure/online/SuwayomiClient.kt` · `SuwayomiModels.kt` · `OnlineProperties.kt` · `OnlineLibraryService.kt` | 上游/自有代码增强 | 客户端补 `about` / `settings` / `setSettings` / 扩展与仓库操作 / multipart 安装；凭据缺失时从 `server.conf` 懒加载；`ApplicationReadyEvent` 后由 `suwayomi-bootstrap` 守护线程拉起子进程 |
+| 2026-11-01 | `interfaces/api/rest/LantaiSuwayomiController.kt` · `lantai/src/main/resources/application.yml` | 新增 | `api/lantai/v1/suwayomi/**` 全 ADMIN 端点（status / settings / lifecycle / extensions / stores / release / jar / password）；`lantai.online.*` 补 11 个配置键 |
+| 2026-11-01 | `lantai-webui/src/services/lantai-suwayomi.service.ts` · `plugins/lantai-suwayomi.plugin.ts` · `views/SettingsOnline.vue` · `main.ts` · `router.ts` · `views/HomeView.vue` | 新增 | 旧 Vue UI 的「设置 → 在线源」页：运行状态 / 版本与安装 / 参数 / 插件四卡 |
+| 2026-11-01 | 全仓库（Kotlin 13 个 Controller + 旧 UI 10 个 service） | **端点路径变更** | 自有端点 `api/v1/lantai/**` → `api/lantai/v1/**`，旧路径已 404；`SecurityConfiguration` 由 `/api/**` 统一覆盖，仅 `bulk/**` 保留独立 chain |
+| 2026-11-03 | `domain/service/FileSystemScanner.kt` | **修改上游核心行为** | **书库根目录不再作为一个系列**（ADR-022）：`preVisitDirectory` 遇到 `dir == root` 直接跳过建 series；`postVisitDirectory` 对 root 下的散书按文件各建一个 `oneshot` 系列。上游原行为是「以 root 目录名为名建一个系列，收纳 root 下全部散书」 |
+| 2026-11-03 | `infrastructure/runtime/install/RuntimeEnvironment.kt` · `CalibreInstallerAdapter.kt` | 检测逻辑修正 | 新增 `isMusl()`；Calibre 环境自检在 musl（alpine）下直接判定 `libc` 不满足并给出明确结论，不再用系统 `ldconfig` 误报缺 `libQt6Core` / `libxcb-cursor` 等库 |
+| 2026-11-03 | 仓库根 · `lantai/src/main/resources/public/` · `lantai-tray/` | **删除上游内容** | 上游三套前端全部移除：`lantai-webui`（Vue 2）、`next-ui`（Vite）连同 `public/` 下 232 个构建产物；桌面托盘程序 `lantai-tray` 一并删除。`IndexController` 去掉 `/classic` 与 `/next` 两个映射，`/` 固定返回 `index-lantai`；`LantaiSettingsProvider.nextUiAsDefault` 与 `Settings` 枚举项 `NEXTUI_AS_DEFAULT` 删除；`build.gradle.kts` 去掉 `webuiCopyDist` / `webuiCopyIndex` / `nextuiCopyDist` / `nextuiCopyIndex` 四个任务，`settings.gradle` 去掉 `:lantai-tray`。`public/` 现只保留图标、`manifest.json`、`index-lantai.html` 与兰台前端产物 |

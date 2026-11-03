@@ -1,0 +1,64 @@
+### Gradle
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+
+### Kotlin
+.kotlin
+
+### NodeJS
+node_modules
+
+### Logs
+*.log
+*.log.*.gz
+
+### Temporary files
+*.tmp
+*.bak
+
+### SQLite databases
+*.sqlite
+*.sqlite-journal
+
+### STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA
+.idea/*
+!/.idea/codeStyles/
+!/.idea/runConfigurations/
+*.iws
+*.iml
+*.ipr
+
+### IntelliJ Fleet
+.fleet/
+
+### NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+### Lantai
+/config-dir/
+application-oauth2.yml
+/benchmark
+/release_notes
+
+### Lantai 备份范围：只保留本项目代码与 compose，运行数据不入库
+/RunData/
+
+### Conveyor
+output/
+secret/
+
+### Kilo
+/.kilo/

@@ -1,5 +1,6 @@
 package org.lantai.interfaces.api.rest
 
+import io.swagger.v3.oas.annotations.Operation
 import org.lantai.infrastructure.metadata.bulk.BulkPackageResult
 import org.lantai.infrastructure.metadata.bulk.BulkPackageService
 import org.springframework.http.HttpHeaders
@@ -23,6 +24,7 @@ class LantaiBulkPackageController(
   private val bulkPackageService: BulkPackageService,
 ) {
   @PostMapping("package", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+  @Operation(summary = "Import a series metadata package")
   fun upload(
     @RequestParam("file") file: MultipartFile,
     @RequestParam(name = "dryRun", required = false, defaultValue = "true") dryRun: Boolean,
@@ -38,6 +40,7 @@ class LantaiBulkPackageController(
   }
 
   @GetMapping("package/template")
+  @Operation(summary = "Download the metadata package template")
   fun template(): ResponseEntity<ByteArray> {
     val bytes = bulkPackageService.template()
     val fileName = URLEncoder.encode("lantai-metadata-template.zip", Charsets.UTF_8)

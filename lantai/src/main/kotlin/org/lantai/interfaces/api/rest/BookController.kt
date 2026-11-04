@@ -126,10 +126,9 @@ class BookController(
   private val trashBin: TrashBin,
   private val lantaiSettingsProvider: LantaiSettingsProvider,
 ) {
-  @Deprecated("use /v1/books/list instead")
   @PageableAsQueryParam
   @GetMapping("api/v1/books")
-  @Operation(summary = "List books", description = "Use POST /api/v1/books/list instead. Deprecated since 1.19.0.", tags = [OpenApiConfiguration.TagNames.BOOKS, OpenApiConfiguration.TagNames.DEPRECATED])
+  @Operation(summary = "List books", description = "Komga v1 compatible endpoint. Use POST /api/v1/books/list for new integrations.", tags = [OpenApiConfiguration.TagNames.BOOKS])
   fun getAllBooksDeprecated(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @RequestParam(name = "search", required = false) searchTerm: String? = null,

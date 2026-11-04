@@ -81,6 +81,7 @@ class ScrapeEngine(
     source: String,
     score: Double,
     trust: Boolean,
+    scope: Set<String> = emptySet(),
   ): ScrapeOutcome {
     val series = seriesRepository.findByIdOrNull(seriesId) ?: throw ScrapeException("Series $seriesId does not exist")
     val metadata = seriesMetadataRepository.findById(seriesId)
@@ -96,12 +97,14 @@ class ScrapeEngine(
         coverUrl = external.coverUrl,
       ),
       trust,
+      scope,
     )
   }
 
   private fun finish(
     preview: ScrapePreview,
     trust: Boolean,
+    scope: Set<String> = emptySet(),
   ): ScrapeOutcome {
     val conflicts = preview.diff.pendingConflicts()
     val values = valuesOf(preview.diff)
@@ -152,6 +155,7 @@ class ScrapeEngine(
         score = preview.score,
         overwriteConflicts = trust,
         coverUrl = preview.coverUrl,
+        scope = scope,
       )
     return ScrapeOutcome(
       diff = preview.diff,
@@ -166,6 +170,7 @@ class ScrapeEngine(
   fun resolve(
     seriesId: String,
     fields: Set<String>,
+    scope: Set<String> = emptySet(),
   ): ScrapeOutcome {
     val preview = preview(seriesId)
     val chosen = if (fields.isEmpty()) preview.diff.fields.filter { it.decision == ScrapeDecision.FILL || it.decision == ScrapeDecision.CONFLICT } else preview.diff.fields.filter { it.field in fields }
@@ -179,12 +184,60 @@ class ScrapeEngine(
         score = preview.score,
         overwriteConflicts = true,
         coverUrl = preview.coverUrl,
+        scope = scope,
       )
     return ScrapeOutcome(
       diff = preview.diff,
       applied = summary,
       source = preview.source,
       score = preview.score,
+      message = summary.appliedFields.joinToString("、").ifBlank { null },
+      status = "DONE",
+    )
+  }
+
+  fun diffFromExternal(
+    seriesId: String,
+    external: ScrapeValues,
+  ): ScrapeDiff {
+    val metadata = seriesMetadataRepository.findById(seriesId)
+    val current = currentValues(seriesId, metadata)
+    return compare(current, ScrapeValues(), external, null, external, metadata, seriesId)
+  }
+
+  fun resolveExternal(
+    seriesId: String,
+    external: ScrapeValues,
+    source: String,
+    score: Double?,
+    fields: Set<String>,
+    coverUrl: String,
+    scope: Set<String> = emptySet(),
+  ): ScrapeOutcome {
+    val diff = diffFromExternal(seriesId, external)
+    val chosen =
+      if (fields.isEmpty()) {
+        diff.fields.filter { it.decision == ScrapeDecision.FILL || it.decision == ScrapeDecision.CONFLICT }
+      } else {
+        diff.fields.filter { it.field in fields }
+      }
+    val values = valuesOf(chosen) ?: throw ScrapeException("Series $seriesId has no candidate to apply")
+    val summary =
+      applier.applyValues(
+        seriesId = seriesId,
+        values = values,
+        fields = chosen.map { it.field }.toSet(),
+        source = source.ifBlank { "agent" },
+        score = score,
+        overwriteConflicts = true,
+        coverUrl = coverUrl,
+        scope = scope,
+      )
+    return ScrapeOutcome(
+      diff = diff,
+      applied = summary,
+      source = source,
+      score = score,
       message = summary.appliedFields.joinToString("、").ifBlank { null },
       status = "DONE",
     )
@@ -230,8 +283,25 @@ class ScrapeEngine(
     series: Series,
     metadata: SeriesMetadata,
   ): Pair<ScrapeCandidate, Double>? {
-    val query = metadata.title.ifBlank { series.name }.trim()
-    if (query.isEmpty()) return null
+    val base = metadata.title.ifBlank { series.name }.trim()
+    if (base.isEmpty()) return null
+    val primary = bestMatch(base)
+    if (primary != null && primary.second >= ScrapeMatcher.MIN_THRESHOLD) return primary
+    val fallback = bookQuery(series)
+    if (fallback.isBlank() || fallback == base) return null
+    val secondary = bestMatch(fallback)
+    return secondary?.takeIf { it.second >= ScrapeMatcher.MIN_THRESHOLD }
+  }
+
+  private fun bookQuery(series: Series): String =
+    runCatching {
+      val first = bookRepository.findAllBySeriesId(series.id).sortedBy { it.number }.firstOrNull() ?: return@runCatching ""
+      val title = bookMetadataRepository.findByIdOrNull(first.id)?.title.orEmpty()
+      val raw = title.ifBlank { first.name.substringBeforeLast('.', first.name) }
+      raw.substringBefore("作者").replace(Regex("[（(\\[【].*?[)）\\]】]"), " ").trim()
+    }.getOrDefault("")
+
+  private fun bestMatch(query: String): Pair<ScrapeCandidate, Double>? {
     var best: Pair<ScrapeCandidate, Double>? = null
     registry.enabled().forEach { source ->
       val results =
@@ -264,9 +334,7 @@ class ScrapeEngine(
         if (best == null || score > best!!.second) best = candidate to score
       }
     }
-    val found = best ?: return null
-    if (found.second < ScrapeMatcher.MIN_THRESHOLD) return null
-    return found
+    return best
   }
 
   private fun merge(
@@ -317,6 +385,7 @@ class ScrapeEngine(
           chosen.isBlank() -> ScrapeDecision.SAME
           cur.isBlank() -> ScrapeDecision.FILL
           norm(cur) == norm(chosen) -> ScrapeDecision.SAME
+          field == "language" && langKey(cur) == langKey(chosen) -> ScrapeDecision.SAME
           else -> ScrapeDecision.CONFLICT
         }
       changes += ScrapeFieldChange(field, target, cur, emb, cand, chosen, decision)
@@ -385,6 +454,21 @@ class ScrapeEngine(
     value
       .lowercase()
       .replace(Regex("[\\s\\p{Punct}，。、；：！？（）【】《》·—…]"), "")
+
+  private fun langKey(value: String): String {
+    val primary = value.trim().lowercase().replace('_', '-').substringBefore('-')
+    return when (primary) {
+      "zho", "chi", "zh" -> "zh"
+      "eng", "en" -> "en"
+      "jpn", "ja" -> "ja"
+      "kor", "ko" -> "ko"
+      "fra", "fre", "fr" -> "fr"
+      "deu", "ger", "de" -> "de"
+      "spa", "es" -> "es"
+      "rus", "ru" -> "ru"
+      else -> primary
+    }
+  }
 
   companion object {
     private const val SEARCH_LIMIT = 5

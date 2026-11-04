@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.lantai.domain.model.ScrapeQueueItem
 import org.lantai.domain.persistence.ScrapeMatchRepository
+import org.lantai.infrastructure.metadata.scrape.ScrapeBookChoice
+import org.lantai.infrastructure.metadata.scrape.ScrapeBookDto
 import org.lantai.infrastructure.metadata.scrape.ScrapePreview
 import org.lantai.infrastructure.metadata.scrape.ScrapeQueueDto
 import org.lantai.infrastructure.metadata.scrape.ScrapeQueueEnqueueResult
@@ -56,6 +58,12 @@ class LantaiScrapeQueueController(
       when {
         !body.libraryId.isNullOrBlank() -> service.enqueueLibrary(body.libraryId)
         body.missingOnly -> service.enqueueMissing(body.limit ?: DEFAULT_MISSING_LIMIT)
+        body.bookIds.isNotEmpty() ->
+          service.enqueueBooks(
+            body.bookIds,
+            if (body.bookIds.size > 1) ScrapeQueueItem.Origin.MULTI else ScrapeQueueItem.Origin.SERIES,
+          )
+
         body.seriesIds.isNotEmpty() ->
           service.enqueueSeries(
             body.seriesIds,
@@ -126,8 +134,20 @@ class LantaiScrapeQueueController(
     @RequestBody body: ScrapeResolveRequest,
   ): ResponseEntity<ScrapeQueueDto> =
     try {
-      service.resolve(id, body.fields.toSet())?.let { ResponseEntity.ok(it) }
+      service.resolve(id, body.fields.toSet(), body.books)?.let { ResponseEntity.ok(it) }
         ?: ResponseEntity.noContent().build()
+    } catch (e: NoSuchElementException) {
+      throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message, e)
+    }
+
+  @GetMapping("queue/{id}/books")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "List the books of the series behind a queue entry with their current metadata")
+  fun books(
+    @PathVariable id: String,
+  ): List<ScrapeBookDto> =
+    try {
+      service.books(id)
     } catch (e: NoSuchElementException) {
       throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message, e)
     }
@@ -163,6 +183,7 @@ class LantaiScrapeQueueController(
 
 data class ScrapeQueueRequest(
   val seriesIds: List<String> = emptyList(),
+  val bookIds: List<String> = emptyList(),
   val libraryId: String? = null,
   val missingOnly: Boolean = false,
   val limit: Int? = null,
@@ -180,6 +201,7 @@ data class ScrapeQueueClearResult(
 
 data class ScrapeResolveRequest(
   val fields: List<String> = emptyList(),
+  val books: List<ScrapeBookChoice> = emptyList(),
 )
 
 data class ScrapeHistoryDto(

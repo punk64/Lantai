@@ -165,12 +165,18 @@ class EpubExtractor(
       logger.info { "Epub Divina detection failed: book has ${pagesWithImages.size} pages with images, but $pageCount total pages" }
       return emptyList()
     }
+    if (pagesWithImages.any { it.isEmpty() }) {
+      logger.info { "Epub Divina detection failed: book has pages without images" }
+      return emptyList()
+    }
     // Only keep unique image path for each page. KCC sometimes generates HTML pages with 5 times the same image.
     val imagesPath = pagesWithImages.flatMap { it.distinct() }
-    if (imagesPath.size != pageCount) {
+    val multiPerPage = pagesWithImages.any { it.size > 1 }
+    if (!multiPerPage && imagesPath.size != pageCount) {
       logger.info { "Epub Divina detection failed: book has ${imagesPath.size} detected images, but $pageCount total pages" }
       return emptyList()
     }
+    val expectedPages = if (multiPerPage) imagesPath.size else pageCount
 
     val divinaPages =
       imagesPath.mapNotNull { imagePath ->
@@ -190,8 +196,8 @@ class EpubExtractor(
         BookPage(fileName = imagePath, mediaType = mediaType, dimension = dimension, fileSize = fileSize)
       }
 
-    if (divinaPages.size != pageCount) {
-      logger.info { "Epub Divina detection failed: book has ${divinaPages.size} detected divina pages, but $pageCount total pages" }
+    if (divinaPages.size != expectedPages) {
+      logger.info { "Epub Divina detection failed: book has ${divinaPages.size} detected divina pages, but $expectedPages expected pages" }
       return emptyList()
     }
     return divinaPages
@@ -241,6 +247,7 @@ class EpubExtractor(
     resources: List<MediaFile>,
     isFixedLayout: Boolean,
     isKepub: Boolean,
+    divinaPages: List<BookPage> = emptyList(),
   ): List<R2Locator> {
     val readingOrder = resources.filter { it.subType == MediaFile.SubType.EPUB_PAGE }
 
@@ -273,10 +280,14 @@ class EpubExtractor(
     val positions =
       if (isFixedLayout) {
         // for fixed-layout book we create 1 position per page
-        readingOrder.map {
+        val fixedPages =
+          divinaPages.ifEmpty {
+            readingOrder.map { BookPage(it.fileName, it.mediaType ?: "application/octet-stream") }
+          }
+        fixedPages.map {
           R2Locator(
             href = it.fileName,
-            type = it.mediaType ?: "application/octet-stream",
+            type = it.mediaType,
             koboSpan = "kobo.1.1",
             locations = R2Locator.Location(progression = 0F, position = startPosition++),
           )

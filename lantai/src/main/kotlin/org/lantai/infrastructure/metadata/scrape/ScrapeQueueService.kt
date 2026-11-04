@@ -3,7 +3,11 @@ package org.lantai.infrastructure.metadata.scrape
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.lantai.domain.model.DomainEvent
+import org.lantai.domain.model.ScrapeInboxEntry
 import org.lantai.domain.model.ScrapeQueueItem
+import org.lantai.domain.persistence.BookRepository
+import org.lantai.domain.persistence.ScrapeInboxRepository
+import org.lantai.domain.persistence.ScrapeQueueBrief
 import org.lantai.domain.persistence.ScrapeQueueRepository
 import org.lantai.domain.persistence.SeriesMetadataRepository
 import org.lantai.domain.persistence.SeriesRepository
@@ -35,6 +39,7 @@ data class ScrapeQueueDto(
   val progress: Int,
   val result: ScrapeQueueResult?,
   val conflictCount: Int,
+  val bookCount: Int,
   val createdDate: String,
   val lastModifiedDate: String,
   val finishedDate: String?,
@@ -67,7 +72,11 @@ class ScrapeQueueService(
   private val queueRepository: ScrapeQueueRepository,
   private val seriesRepository: SeriesRepository,
   private val seriesMetadataRepository: SeriesMetadataRepository,
+  private val bookRepository: BookRepository,
+  private val bookCatalog: ScrapeBookCatalog,
   private val engine: ScrapeEngine,
+  private val applier: ScrapeApplier,
+  private val inboxRepository: ScrapeInboxRepository,
   private val settings: ScrapeSettingsProvider,
   private val eventPublisher: ApplicationEventPublisher,
   private val objectMapper: ObjectMapper,
@@ -82,25 +91,56 @@ class ScrapeQueueService(
   fun enqueueSeries(
     seriesIds: List<String>,
     origin: ScrapeQueueItem.Origin,
+  ): ScrapeQueueEnqueueResult = enqueue(seriesIds.distinct().associateWith { emptyList() }, origin)
+
+  fun enqueueBooks(
+    bookIds: List<String>,
+    origin: ScrapeQueueItem.Origin,
+  ): ScrapeQueueEnqueueResult {
+    val books = runCatching { bookRepository.findAllByIds(bookIds.distinct()) }.getOrDefault(emptyList())
+    val scope = books.groupBy { it.seriesId }.mapValues { (_, list) -> list.map { it.id }.distinct() }
+    return enqueue(scope, origin)
+  }
+
+  private fun enqueue(
+    scopeBySeries: Map<String, List<String>>,
+    origin: ScrapeQueueItem.Origin,
   ): ScrapeQueueEnqueueResult {
     var added = 0
     var skipped = 0
-    seriesIds.distinct().forEach { seriesId ->
+    scopeBySeries.forEach { (seriesId, scope) ->
       val series = seriesRepository.findByIdOrNull(seriesId)
-      if (series == null || queueRepository.findBySeriesId(seriesId) != null) {
+      if (series == null) {
         skipped++
         return@forEach
       }
       val title =
         seriesMetadataRepository.findByIdOrNull(seriesId)?.title?.takeIf { it.isNotBlank() } ?: series.name
-      queueRepository.insert(
-        ScrapeQueueItem(
-          seriesId = seriesId,
-          seriesTitle = title,
-          origin = origin,
-          libraryId = series.libraryId,
-        ),
-      )
+      val existing = queueRepository.findBySeriesId(seriesId)
+      if (existing == null) {
+        queueRepository.insert(
+          ScrapeQueueItem(
+            seriesId = seriesId,
+            seriesTitle = title,
+            origin = origin,
+            libraryId = series.libraryId,
+            bookIds = scope.distinct(),
+          ),
+        )
+        added++
+        return@forEach
+      }
+      val merged =
+        when {
+          existing.bookIds.isEmpty() -> existing.bookIds
+          scope.isEmpty() -> emptyList()
+          else -> (existing.bookIds + scope).distinct()
+        }
+      if (merged.size == existing.bookIds.size) {
+        skipped++
+        return@forEach
+      }
+      queueRepository.update(existing.copy(bookIds = merged, seriesTitle = title))
       added++
     }
     if (added > 0) publishChanged(null)
@@ -132,18 +172,23 @@ class ScrapeQueueService(
   ): ScrapeQueuePage {
     val safeLimit = limit.coerceIn(1, MAX_PAGE_SIZE)
     val safeOffset = offset.coerceAtLeast(0)
-    val items = queueRepository.findPage(status, safeOffset, safeLimit).map { it.toDto() }
-    val grouped = queueRepository.countGrouped()
+    val pageItems = queueRepository.findPage(status, safeOffset, safeLimit)
+    val brief = queueRepository.findAllBrief()
+    val seriesBookCounts = bookCountMap(brief.map { it.seriesId })
+    fun scopeSize(row: ScrapeQueueBrief) = if (row.bookIds.isNotEmpty()) row.bookIds.size else seriesBookCounts[row.seriesId] ?: 0
+    val items = pageItems.map { it.toDto(if (it.bookIds.isNotEmpty()) it.bookIds.size else seriesBookCounts[it.seriesId] ?: 0) }
+    val byStatus = brief.groupBy { it.status }
+    fun statusCount(state: ScrapeQueueItem.Status) = byStatus[state].orEmpty().sumOf { scopeSize(it) }
     val counts =
       ScrapeQueueCounts(
-        total = grouped.values.sum().toInt(),
-        queued = grouped[ScrapeQueueItem.Status.QUEUED.name]?.toInt() ?: 0,
-        running = grouped[ScrapeQueueItem.Status.RUNNING.name]?.toInt() ?: 0,
-        review = grouped[ScrapeQueueItem.Status.REVIEW.name]?.toInt() ?: 0,
-        failed = grouped[ScrapeQueueItem.Status.FAILED.name]?.toInt() ?: 0,
+        total = brief.sumOf { scopeSize(it) },
+        queued = statusCount(ScrapeQueueItem.Status.QUEUED),
+        running = statusCount(ScrapeQueueItem.Status.RUNNING),
+        review = statusCount(ScrapeQueueItem.Status.REVIEW),
+        failed = statusCount(ScrapeQueueItem.Status.FAILED),
       )
     return ScrapeQueuePage(
-      total = if (status == null) counts.total else queueRepository.countByStatus(status).toInt(),
+      total = if (status == null) brief.size else queueRepository.countByStatus(status).toInt(),
       offset = safeOffset,
       limit = safeLimit,
       counts = counts,
@@ -197,7 +242,7 @@ class ScrapeQueueService(
       )
     queueRepository.update(reset)
     publishChanged(item.seriesId)
-    return reset.toDto()
+    return reset.toDto(scopeCount(reset))
   }
 
   fun remove(id: String) {
@@ -222,27 +267,68 @@ class ScrapeQueueService(
     return before
   }
 
+  private fun externalValues(id: String): Pair<ScrapeInboxEntry, ScrapeValues>? {
+    val entry = inboxRepository.findLatestByQueueId(id) ?: return null
+    if (entry.payload.isBlank()) return null
+    val values = runCatching { ScrapePayloadParser.parse(objectMapper, entry.payload) }.getOrNull() ?: return null
+    return entry to values
+  }
+
   fun preview(id: String): ScrapePreview {
     val item = queueRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Queue item $id does not exist")
+    val external = externalValues(id)
+    if (external != null) {
+      return ScrapePreview(
+        seriesId = item.seriesId,
+        seriesTitle = item.seriesTitle,
+        source = external.first.source,
+        score = item.score,
+        diff = engine.diffFromExternal(item.seriesId, external.second),
+        coverUrl = external.second.coverUrl,
+      )
+    }
     return engine.preview(item.seriesId)
   }
 
-  fun find(id: String): ScrapeQueueDto =
-    queueRepository.findByIdOrNull(id)?.toDto() ?: throw NoSuchElementException("Queue item $id does not exist")
+  fun find(id: String): ScrapeQueueDto {
+    val item = queueRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Queue item $id does not exist")
+    return item.toDto(scopeCount(item))
+  }
+
+  fun books(id: String): List<ScrapeBookDto> {
+    val item = queueRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Queue item $id does not exist")
+    val all = bookCatalog.list(item.seriesId)
+    return if (item.bookIds.isEmpty()) all else all.filter { it.bookId in item.bookIds }
+  }
 
   fun resolve(
     id: String,
     fields: Set<String>,
+    books: List<ScrapeBookChoice> = emptyList(),
   ): ScrapeQueueDto? {
     val item = queueRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Queue item $id does not exist")
-    val outcome = engine.resolve(item.seriesId, fields)
-    val applied = outcome.applied
-    if (applied != null && applied.appliedFields.isNotEmpty()) {
+    var touched = false
+    val scope = item.bookIds.toSet()
+    if (books.isNotEmpty()) {
+      val summary = applier.applyBookValues(item.seriesId, books, item.source.orEmpty().ifBlank { "manual" }, item.score, scope)
+      touched = summary.appliedFields.isNotEmpty()
+    }
+    if (fields.isNotEmpty() || books.isEmpty()) {
+      val external = externalValues(id)
+      val outcome =
+        if (external != null) {
+          engine.resolveExternal(item.seriesId, external.second, external.first.source.orEmpty(), item.score, fields, external.second.coverUrl, scope)
+        } else {
+          engine.resolve(item.seriesId, fields, scope)
+        }
+      if (outcome.applied != null && outcome.applied.appliedFields.isNotEmpty()) touched = true
+    }
+    if (touched) {
       queueRepository.deleteById(id)
       publishChanged(item.seriesId)
       return null
     }
-    return queueRepository.findByIdOrNull(id)?.toDto()
+    return queueRepository.findByIdOrNull(id)?.toDto(scopeCount(item))
   }
 
   private fun process(id: String) {
@@ -250,7 +336,20 @@ class ScrapeQueueService(
     queueRepository.update(item.copy(status = ScrapeQueueItem.Status.RUNNING, progress = 5, message = null, lastError = null))
     publishChanged(item.seriesId)
     try {
-      val outcome = engine.analyze(item.seriesId, settings.trustResult)
+      val outcome =
+        if (item.bookIds.isEmpty()) {
+          engine.analyze(item.seriesId, settings.trustResult)
+        } else {
+          val preview = engine.preview(item.seriesId)
+          ScrapeOutcome(
+            diff = preview.diff,
+            applied = null,
+            source = preview.source,
+            score = preview.score,
+            message = "按册刮削：核对后选择要写入的册",
+            status = "REVIEW",
+          )
+        }
       if (outcome.status == "DONE") {
         queueRepository.deleteById(item.id)
         publishChanged(item.seriesId)
@@ -284,12 +383,24 @@ class ScrapeQueueService(
     }
   }
 
+  private fun scopeCount(item: ScrapeQueueItem): Int =
+    if (item.bookIds.isNotEmpty()) item.bookIds.size else bookCount(item.seriesId)
+
+  private fun bookCount(seriesId: String): Int =
+    runCatching { seriesRepository.findByIdOrNull(seriesId)?.bookCount ?: 0 }.getOrDefault(0)
+
+  private fun bookCountMap(seriesIds: List<String>): Map<String, Int> {
+    val ids = seriesIds.distinct().filter { it.isNotBlank() }
+    if (ids.isEmpty()) return emptyMap()
+    return runCatching { seriesRepository.findAllByIds(ids).associate { it.id to it.bookCount } }.getOrDefault(emptyMap())
+  }
+
   private fun needsFill(seriesId: String): Boolean {
     val metadata = seriesMetadataRepository.findByIdOrNull(seriesId) ?: return true
     return metadata.publisher.isBlank() || metadata.genres.isEmpty() || metadata.summary.isBlank()
   }
 
-  private fun ScrapeQueueItem.toDto(): ScrapeQueueDto {
+  private fun ScrapeQueueItem.toDto(bookCount: Int = 0): ScrapeQueueDto {
     val result =
       result?.takeIf { it.isNotBlank() }?.let {
         runCatching { objectMapper.readValue(it, ScrapeQueueResult::class.java) }.getOrNull()
@@ -313,6 +424,7 @@ class ScrapeQueueService(
       progress = progress,
       result = result,
       conflictCount = conflicts,
+      bookCount = bookCount,
       createdDate = createdDate.toString(),
       lastModifiedDate = lastModifiedDate.toString(),
       finishedDate = finishedDate?.toString(),

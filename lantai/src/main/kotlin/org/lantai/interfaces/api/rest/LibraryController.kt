@@ -139,8 +139,7 @@ class LibraryController(
   @PutMapping("/{libraryId}")
   @PreAuthorize("hasRole('ADMIN')")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @Deprecated("Use PATCH /v1/libraries/{libraryId} instead", ReplaceWith("patchOne"))
-  @Operation(summary = "Update a library", description = "Use PATCH /api/v1/libraries/{libraryId} instead. Deprecated since 1.3.0.", tags = [OpenApiConfiguration.TagNames.DEPRECATED])
+  @Operation(summary = "Update a library", description = "Komga v1 compatible endpoint. Use PATCH /api/v1/libraries/{libraryId} for new integrations.", tags = [OpenApiConfiguration.TagNames.REFERENTIAL])
   fun updateLibraryByIdDeprecated(
     @PathVariable libraryId: String,
     @Valid @RequestBody

@@ -72,6 +72,7 @@ class BookDtoDao(
   private val bt = Tables.BOOK_METADATA_TAG
   private val bl = Tables.BOOK_METADATA_LINK
   private val ne = Tables.BOOK_METADATA_NOTABLE_ENTITIES
+  private val bg = Tables.BOOK_METADATA_GENRE
 
   private val onDeckFields = b.fields() + m.fields() + d.fields() + r.fields() + sd.TITLE
 
@@ -450,6 +451,7 @@ class BookDtoDao(
     lateinit var tags: Map<String, List<String>>
     lateinit var links: Map<String, List<WebLinkDto>>
     lateinit var notableEntities: Map<String, List<NotableEntityDto>>
+    lateinit var genres: Map<String, List<String>>
     dsl.withTempTable(batchSize, bookIds).use { tempTable ->
       authors =
         dsl
@@ -475,6 +477,12 @@ class BookDtoDao(
           .selectFrom(ne)
           .where(ne.BOOK_ID.`in`(tempTable.selectTempStrings()))
           .groupBy({ it.bookId }, { NotableEntityDto(it.kind, it.name) })
+
+      genres =
+        dsl
+          .selectFrom(bg)
+          .where(bg.BOOK_ID.`in`(tempTable.selectTempStrings()))
+          .groupBy({ it.bookId }, { it.genre })
     }
 
     return records
@@ -485,7 +493,7 @@ class BookDtoDao(
         val rr = rec.into(r)
         val seriesTitle = rec.into(sd.TITLE).component1()
 
-        br.toDto(mr.toDto(), dr.toDto(authors[br.id].orEmpty(), tags[br.id].orEmpty().toSet(), links[br.id].orEmpty(), notableEntities[br.id].orEmpty()), if (rr.userId != null) rr.toDto() else null, seriesTitle)
+        br.toDto(mr.toDto(), dr.toDto(authors[br.id].orEmpty(), tags[br.id].orEmpty().toSet(), links[br.id].orEmpty(), notableEntities[br.id].orEmpty(), genres[br.id].orEmpty().toSet()), if (rr.userId != null) rr.toDto() else null, seriesTitle)
       }
   }
 
@@ -529,6 +537,7 @@ class BookDtoDao(
     tags: Set<String>,
     links: List<WebLinkDto>,
     notableEntities: List<NotableEntityDto>,
+    genres: Set<String>,
   ) = BookMetadataDto(
     title = title,
     titleLock = titleLock,
@@ -550,6 +559,12 @@ class BookDtoDao(
     isbnLock = isbnLock,
     links = links,
     linksLock = linksLock,
+    publisher = publisher,
+    publisherLock = publisherLock,
+    genres = genres,
+    genresLock = genresLock,
+    language = language,
+    languageLock = languageLock,
     created = createdDate,
     lastModified = lastModifiedDate,
   )

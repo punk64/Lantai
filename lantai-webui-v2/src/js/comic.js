@@ -26,7 +26,8 @@
     drag: null, ptrs: new Map(), pinch: null,
     wheelAt: 0, offTimer: null, idle: null,
     session: null, beats: 0, hbTimer: null, progTimer: null, started: false,
-    lo: 0, hi: 0, flowObserver: null, scrollTimer: null, tinted: ''
+    lo: 0, hi: 0, flowObserver: null, scrollTimer: null, tinted: '',
+    preTimer: null, preReady: false
   };
 
   function rt() { return window.LantaiRuntime; }
@@ -66,7 +67,8 @@
   function imgUrl(page, w) {
     var ref = CS.refs.get(page);
     if (!ref) return '';
-    return base() + 'api/lantai/v1/read/' + CS.bookId + '/img/' + encodeURIComponent(ref) + '?w=' + (w == null ? imgW() : w) + '&fmt=orig';
+    var ww = w == null ? imgW() : w;
+    return base() + 'api/lantai/v1/read/' + CS.bookId + '/img/' + encodeURIComponent(ref) + '?w=' + ww + '&fmt=' + (ww > 0 ? 'jpeg' : 'orig');
   }
 
   function ensureRef(page) {
@@ -139,6 +141,7 @@
     CS.anns = []; CS.zoom = 1; CS.panX = 0; CS.panY = 0; CS.tinted = '';
     CS.mode = PRE.mode; CS.dir = PRE.dir; CS.fit = PRE.fit; CS.quality = PRE.quality;
     CS.beats = 0; CS.started = false; CS.ptrs.clear(); CS.pinch = null; CS.drag = null;
+    CS.preReady = false; clearTimeout(CS.preTimer); CS.preTimer = null;
     CS.session = {
       id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'cm_' + bookId + '_' + Date.now(),
       book: bookId, dur: 0, pages: CS.page, dev: 'webui', devName: '网页端', start: Date.now(), end: Date.now(), offline: false
@@ -196,7 +199,8 @@
     var id = CS.bookId;
     CS.open = false;
     clearInterval(CS.hbTimer); CS.hbTimer = null;
-    clearTimeout(CS.progTimer); clearTimeout(CS.offTimer); clearTimeout(CS.idle);
+    clearTimeout(CS.progTimer); clearTimeout(CS.offTimer); clearTimeout(CS.idle); clearTimeout(CS.preTimer);
+    CS.preTimer = null; CS.preReady = false;
     if (CS.flowObserver) { CS.flowObserver.disconnect(); CS.flowObserver = null; }
     releaseWake();
     var r = $('cm');
@@ -256,7 +260,7 @@
     return out;
   }
 
-  function pageBox(page, inFlow) {
+  function pageBox(page, inFlow, defer) {
     var box = el('div', 'cm-page');
     box.dataset.p = page;
     var img = el('img', 'cm-img');
@@ -274,10 +278,10 @@
         sk.style.minHeight = Math.round(fw * 1.42) + 'px';
       }
       box.insertBefore(sk, img);
-      ensureRef(page).then(function () {
+      if (defer) box.dataset.defer = '1';
+      else ensureRef(page).then(function () {
         if (!box.isConnected) return;
         setSrc(box, page);
-        preload();
       }).catch(function (e) {
         if (!box.isConnected) return;
         if (sk.parentNode) sk.remove();
@@ -302,6 +306,7 @@
       if (sk && sk.parentNode) sk.remove();
       paintPageAnns(box, page);
       if (CS.mode !== 'webtoon' && page === CS.page) tint(img);
+      markReady(page);
     };
     img.onerror = function () {
       img.classList.remove('ready');
@@ -336,11 +341,12 @@
 
   function renderAll() {
     if (!CS.open || !CS.started) return;
+    CS.preReady = false;
     if (CS.mode === 'webtoon' || CS.mode === 'paged') renderFlow();
     else renderPaged();
     paintBot();
     paintThumbs();
-    preload();
+    schedulePreload(3000);
   }
 
   function renderPaged() {
@@ -372,7 +378,7 @@
     flow.innerHTML = '';
     var st = $('cmStage');
     if (st) st.innerHTML = '';
-    for (var p = from; p <= to; p++) flow.appendChild(pageBox(p, true));
+    for (var p = from; p <= to; p++) flow.appendChild(pageBox(p, true, Math.abs(p - anchor) > 1));
     bindFlow();
     requestAnimationFrame(function () {
       var target = flow.querySelector('[data-p="' + anchor + '"]');
@@ -429,6 +435,7 @@
   }
 
   function preload() {
+    if (!CS.open || !CS.preReady) return;
     var n = PRE.preload || 0;
     if (!n || CS.mode === 'webtoon' || CS.mode === 'paged') return;
     var pages = spreadPages(CS.page);
@@ -436,9 +443,39 @@
     for (var i = 1; i <= n; i++) { list.push(pages[pages.length - 1] + i); list.push(pages[0] - i); }
     list.forEach(function (p) {
       if (p < 1 || p > CS.total) return;
-      ensureRef(p).then(function (ref) {
+      ensureRef(p).then(function () {
         var im = new Image();
-        im.src = base() + 'api/lantai/v1/read/' + CS.bookId + '/img/' + encodeURIComponent(ref) + '?w=' + imgW() + '&fmt=orig';
+        im.src = imgUrl(p);
+      }).catch(function () { });
+    });
+  }
+
+  function schedulePreload(delay) {
+    clearTimeout(CS.preTimer);
+    CS.preTimer = setTimeout(function () {
+      CS.preTimer = null;
+      preload();
+    }, delay == null ? 80 : delay);
+  }
+
+  function markReady(page) {
+    if (CS.preReady) return;
+    if (Math.abs(page - CS.page) > 1) return;
+    CS.preReady = true;
+    flushDeferred();
+    schedulePreload(60);
+  }
+
+  function flushDeferred() {
+    var flow = $('cmFlow');
+    if (!flow) return;
+    [].slice.call(flow.querySelectorAll('[data-defer]')).forEach(function (box) {
+      if (!box.isConnected) return;
+      delete box.dataset.defer;
+      var p = +box.dataset.p;
+      ensureRef(p).then(function () {
+        if (!box.isConnected) return;
+        setSrc(box, p);
       }).catch(function () { });
     });
   }

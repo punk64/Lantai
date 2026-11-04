@@ -1,6 +1,7 @@
 package org.lantai.interfaces.sse
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.swagger.v3.oas.annotations.Operation
 import org.lantai.application.tasks.TasksRepository
 import org.lantai.domain.model.DomainEvent
 import org.lantai.domain.model.LantaiUser
@@ -44,6 +45,7 @@ class SseController(
   private val emitters = Collections.synchronizedMap(HashMap<SseEmitter, LantaiUser>())
 
   @GetMapping("sse/v1/events")
+  @Operation(summary = "Stream server-sent events")
   fun sse(
     @AuthenticationPrincipal principal: LantaiPrincipal,
   ): SseEmitter {

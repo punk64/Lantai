@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>兰台 Lantai</title>
 <link rel="icon" href="favicon.ico">
-<link rel="stylesheet" href="css/lantai.538840aa40.css" th:href="@{/css/lantai.538840aa40.css}">
+<link rel="stylesheet" href="css/lantai.b1e2b7473f.css" th:href="@{/css/lantai.b1e2b7473f.css}">
 <script th:inline="javascript">window.resourceBaseUrl = /*[[${baseUrl}]]*/ '/';</script>
 
 </head>
@@ -96,6 +96,10 @@
     <div class="side-foot">
       <div class="pulse"><i class="dot" id="dServer"></i><span id="svText">25600 · 运行中</span></div>
       <div class="pulse"><i class="dot idle" id="dSwy"></i><span id="swyText">在线源服务未启动</span></div>
+      <div class="side-tools">
+        <button class="btn ghost sm" id="aboutBtn" title="关于" data-i18n-title="nav.about"><svg class="ic"><use href="#i-info"/></svg><span class="lb" data-i18n="nav.about">关于</span></button>
+        <button class="btn ghost sm" id="notifyBtn" title="通知" data-i18n-title="nav.notify"><svg class="ic"><use href="#i-bell"/></svg><span class="lb" data-i18n="nav.notify">通知</span><i class="ndot" id="notifyDot" style="display:none"></i></button>
+      </div>
       <button class="btn ghost sm blk" id="collapseBtn"><svg class="ic"><use href="#i-left"/></svg><span class="lb">收起导航</span></button>
     </div>
   </aside>
@@ -109,7 +113,8 @@
       </div>
       <div class="top-right">
         <div id="liveReading"></div>
-        <button class="icon-btn" id="taskBtn" title="任务队列" data-i18n-title="top.tasks"><svg><use href="#i-bell"/></svg></button>
+        <button class="icon-btn" id="taskBtn" title="任务队列" data-i18n-title="top.tasks"><svg><use href="#i-bolt"/></svg></button>
+        <button class="icon-btn" id="notifyTop" title="通知" data-i18n-title="nav.notify"><svg><use href="#i-bell"/></svg><i class="ndot" id="notifyDotTop" style="display:none"></i></button>
         <button class="icon-btn" id="themeBtn" title="切换主题" data-i18n-title="top.theme"><svg><use href="#i-sun"/></svg></button>
         <div class="userchip" id="userChip">
           <span class="avatar" id="uAvatar">林</span>
@@ -163,6 +168,13 @@
   </g>
 </symbol>
 </svg>
-<script src="js/lantai.1a6b70bb8d.js" th:src="@{/js/lantai.1a6b70bb8d.js}"></script>
+<script>window.__LANTAI_CHUNKS__ = {"reader":"js/reader.4fdbcefbcd.js","docs":"js/docs.7a87cb151c.js","sysx":"js/sysx.8563ebf7fa.js"};</script>
+<script>window.__LANTAI_LANGS__ = {"en":"js/lang-en.d4c63fc9f1.js","zh-Hant":"js/lang-zh-Hant.674797bb07.js","ja":"js/lang-ja.9bdb51491b.js","ko":"js/lang-ko.1881325e51.js","fr":"js/lang-fr.5119a78bcf.js","de":"js/lang-de.80cd57a5fc.js","es":"js/lang-es.1bc786db2e.js","it":"js/lang-it.88a7397ab5.js","pt-BR":"js/lang-pt-BR.b54cb492c3.js","ru":"js/lang-ru.cb8fdc0f79.js","vi":"js/lang-vi.73da1fb4f9.js","ar":"js/lang-ar.04b5839449.js","bg":"js/lang-bg.a3bdb768b7.js","ca":"js/lang-ca.76468b4d85.js","cs":"js/lang-cs.3a4d2f36b8.js","da":"js/lang-da.8607d90bac.js","el":"js/lang-el.43d6c81894.js","eo":"js/lang-eo.952a4b9283.js","fa":"js/lang-fa.3b2c1ad264.js","fi":"js/lang-fi.327e7b8ec3.js","gl":"js/lang-gl.a80b8b002b.js","he":"js/lang-he.3675e31471.js","hr":"js/lang-hr.d17eab8be0.js","hu":"js/lang-hu.2355fe2942.js","id":"js/lang-id.1c7f6ea77e.js","ml":"js/lang-ml.8677e32665.js","nb":"js/lang-nb.00d78fdd44.js","nl":"js/lang-nl.ffbececd97.js","pl":"js/lang-pl.91e9bfd903.js","pt":"js/lang-pt.00f61cad8c.js","sk":"js/lang-sk.aa400b2472.js","sl":"js/lang-sl.7850ae4254.js","sv":"js/lang-sv.09d5dc36e0.js","ta":"js/lang-ta.77dcaa207a.js","th":"js/lang-th.4534b7e686.js","ti":"js/lang-ti.eba2b19681.js","tr":"js/lang-tr.0b8a0a254b.js","uk":"js/lang-uk.992e93c238.js"};</script>
+<script>(function () {
+  var m = window.__LANTAI_LANGS__, k = 'zh-Hans';
+  try { var s = localStorage.getItem('lantai.lang'); if (s && m[s]) k = s; } catch (e) { }
+  if (k !== 'zh-Hans') document.write('<script src="' + m[k] + '"><\/script>');
+})();</script>
+<script src="js/lantai.fb1e991050.js" th:src="@{/js/lantai.fb1e991050.js}"></script>
 </body>
 </html>

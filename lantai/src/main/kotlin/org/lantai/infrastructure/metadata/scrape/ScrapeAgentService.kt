@@ -6,13 +6,13 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.lantai.domain.model.DomainEvent
 import org.lantai.domain.model.ScrapeInboxEntry
 import org.lantai.domain.model.ScrapeQueueItem
+import org.lantai.domain.persistence.BookMetadataAggregationRepository
 import org.lantai.domain.persistence.ScrapeInboxRepository
 import org.lantai.domain.persistence.ScrapeQueueRepository
 import org.lantai.domain.persistence.SeriesMetadataRepository
 import org.lantai.domain.persistence.SeriesRepository
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 private val logger = KotlinLogging.logger {}
@@ -25,6 +25,7 @@ data class ScrapeAgentTask(
   val attempt: Int,
   val createdDate: String,
   val lastError: String?,
+  val bookIds: List<String> = emptyList(),
 )
 
 data class ScrapeAgentDetail(
@@ -41,6 +42,7 @@ data class ScrapeAgentDetail(
   val hasCover: Boolean,
   val embeddedAuthors: List<String>,
   val embeddedPublisher: String,
+  val books: List<ScrapeBookDto> = emptyList(),
   val external: JsonNode?,
 )
 
@@ -67,8 +69,11 @@ class ScrapeAgentService(
   private val seriesMetadataRepository: SeriesMetadataRepository,
   private val embeddedReader: ScrapeEmbeddedReader,
   private val engine: ScrapeEngine,
+  private val applier: ScrapeApplier,
+  private val bookCatalog: ScrapeBookCatalog,
   private val settings: ScrapeSettingsProvider,
   private val thumbnailsSeriesRepository: org.lantai.domain.persistence.ThumbnailSeriesRepository,
+  private val aggregationRepository: BookMetadataAggregationRepository,
   private val eventPublisher: ApplicationEventPublisher,
   private val objectMapper: ObjectMapper,
 ) {
@@ -90,7 +95,7 @@ class ScrapeAgentService(
           "review" to (grouped[ScrapeQueueItem.Status.REVIEW.name] ?: 0),
           "failed" to (grouped[ScrapeQueueItem.Status.FAILED.name] ?: 0),
         ),
-      "items" to items.map { ScrapeAgentTask(it.id, it.seriesId, it.seriesTitle, it.status.name, it.attempt, it.createdDate.toString(), it.lastError) },
+      "items" to items.map { ScrapeAgentTask(it.id, it.seriesId, it.seriesTitle, it.status.name, it.attempt, it.createdDate.toString(), it.lastError, it.bookIds) },
     )
   }
 
@@ -98,6 +103,7 @@ class ScrapeAgentService(
     val item = queueRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Queue item $id does not exist")
     val series = seriesRepository.findByIdOrNull(item.seriesId) ?: throw NoSuchElementException("Series ${item.seriesId} does not exist")
     val metadata = seriesMetadataRepository.findByIdOrNull(item.seriesId)
+    val aggregation = runCatching { aggregationRepository.findByIdOrNull(item.seriesId) }.getOrNull()
     val embedded = runCatching { embeddedReader.read(series) }.getOrNull() ?: EmbeddedRead()
     val external =
       inboxRepository.findLatestByQueueId(id)?.payload?.let { runCatching { objectMapper.readTree(it) }.getOrNull() }
@@ -110,11 +116,16 @@ class ScrapeAgentService(
       libraryId = item.libraryId,
       summary = metadata?.summary.orEmpty(),
       publisher = metadata?.publisher.orEmpty(),
-      authors = embedded.firstBookValues().authors,
+      authors = aggregation?.authors?.map { it.name }.orEmpty(),
       genres = metadata?.genres?.sorted().orEmpty(),
       hasCover = runCatching { thumbnailsSeriesRepository.findSelectedBySeriesIdOrNull(item.seriesId) != null }.getOrDefault(false),
       embeddedAuthors = embedded.firstBookValues().authors,
       embeddedPublisher = embedded.series.publisher,
+      books =
+        runCatching {
+          val all = bookCatalog.list(item.seriesId)
+          if (item.bookIds.isEmpty()) all else all.filter { it.bookId in item.bookIds }
+        }.getOrDefault(emptyList()),
       external = external,
     )
   }
@@ -125,11 +136,17 @@ class ScrapeAgentService(
     tokenId: String?,
     sourceName: String,
   ): ScrapeAgentSubmitResult {
-    val item = queueRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Queue item $id does not exist")
+    val item = queueRepository.findByIdOrNull(id)
+    val seriesId =
+      item?.seriesId
+        ?: id.takeIf { candidate -> seriesRepository.findByIdOrNull(candidate) != null }
+        ?: throw NoSuchElementException("Neither a queue entry nor a series matches $id")
+    val overwrite = item == null
+    val pending = item ?: queueRepository.findBySeriesId(seriesId)
     val entry =
       ScrapeInboxEntry(
-        queueId = item.id,
-        seriesId = item.seriesId,
+        queueId = pending?.id ?: seriesId,
+        seriesId = seriesId,
         payload = rawPayload,
         tokenId = tokenId,
         source = sourceName,
@@ -138,39 +155,61 @@ class ScrapeAgentService(
 
     val values =
       try {
-        parse(rawPayload)
+        ScrapePayloadParser.parse(objectMapper, rawPayload)
       } catch (e: Exception) {
         inboxRepository.update(entry.copy(status = ScrapeInboxEntry.Status.REJECTED, message = e.message?.take(300)))
         throw ScrapeException("刮削结果无法解析：${e.message}")
       }
 
     return try {
-      val outcome = engine.externalAnalyze(item.seriesId, values, sourceName.ifBlank { "agent" }, 1.0, settings.trustResult)
+      val scope = pending?.bookIds?.toSet().orEmpty()
+      val bookChoices = runCatching { ScrapePayloadParser.parseBooks(objectMapper, rawPayload) }.getOrDefault(emptyList())
+      val bookApplied =
+        if (bookChoices.isEmpty()) {
+          emptyList()
+        } else {
+          runCatching { applier.applyBookValues(seriesId, bookChoices, sourceName.ifBlank { "agent" }, 1.0, scope).appliedFields }.getOrDefault(emptyList())
+        }
+      val outcome =
+        runCatching { engine.externalAnalyze(seriesId, values, sourceName.ifBlank { "agent" }, 1.0, overwrite || settings.trustResult, scope) }
+          .getOrElse { error ->
+            if (bookApplied.isEmpty()) throw error
+            ScrapeOutcome(
+              diff = ScrapeDiff(),
+              applied = ScrapeApplySummary(bookApplied, emptyList(), false, null),
+              source = sourceName,
+              score = 1.0,
+              message = error.message,
+              status = "DONE",
+            )
+          }
       inboxRepository.update(entry.copy(status = ScrapeInboxEntry.Status.PARSED, message = outcome.message?.take(300)))
-      if (outcome.status == "DONE") {
-        queueRepository.deleteById(item.id)
-      } else {
-        queueRepository.update(
-          item.copy(
-            status = ScrapeQueueItem.Status.REVIEW,
-            progress = 100,
-            diff = engine.serializedDiff(outcome),
-            source = outcome.source,
-            score = outcome.score,
-            message = outcome.message,
-            finishedDate = LocalDateTime.now(),
-          ),
-        )
+      if (pending != null) {
+        if (outcome.status == "DONE") {
+          queueRepository.deleteById(pending.id)
+        } else {
+          queueRepository.update(
+            pending.copy(
+              status = ScrapeQueueItem.Status.REVIEW,
+              progress = 100,
+              diff = engine.serializedDiff(outcome),
+              source = outcome.source,
+              score = outcome.score,
+              message = outcome.message,
+              finishedDate = LocalDateTime.now(),
+            ),
+          )
+        }
       }
-      eventPublisher.publishEvent(DomainEvent.ScrapeQueueChanged(item.seriesId))
+      eventPublisher.publishEvent(DomainEvent.ScrapeQueueChanged(seriesId))
       ScrapeAgentSubmitResult(
         queued = false,
         status = outcome.status,
-        appliedFields = outcome.applied?.appliedFields.orEmpty(),
+        appliedFields = (bookApplied + outcome.applied?.appliedFields.orEmpty()).distinct(),
         message = outcome.message,
       )
     } catch (e: Exception) {
-      logger.warn(e) { "Failed to apply external scrape result for ${item.seriesId}" }
+      logger.warn(e) { "Failed to apply external scrape result for $seriesId" }
       inboxRepository.update(entry.copy(status = ScrapeInboxEntry.Status.REJECTED, message = e.message?.take(300)))
       throw e
     }
@@ -187,51 +226,4 @@ class ScrapeAgentService(
     )
   }
 
-  private fun parse(raw: String): ScrapeValues {
-    val root = objectMapper.readTree(raw)
-    val node = if (root.has("metadata") && root.get("metadata").isObject) root.get("metadata") else root
-    return ScrapeValues(
-      title = text(node, "title"),
-      summary = text(node, "summary").ifBlank { text(node, "description") },
-      publisher = text(node, "publisher"),
-      language = text(node, "language"),
-      ageRating = text(node, "ageRating").toIntOrNull(),
-      genres = list(node, "genres").ifEmpty { list(node, "categories") },
-      authors = list(node, "authors").ifEmpty { list(node, "author") },
-      releaseDate = date(text(node, "releaseDate").ifBlank { text(node, "publishDate") }),
-      isbn = text(node, "isbn"),
-      tags = list(node, "tags"),
-      coverUrl = text(node, "coverUrl").ifBlank { text(node, "cover") },
-    )
-  }
-
-  private fun text(
-    node: JsonNode,
-    field: String,
-  ): String {
-    val value = node.get(field) ?: return ""
-    return when {
-      value.isNull -> ""
-      value.isArray -> value.mapNotNull { it.asText().takeIf { text -> text.isNotBlank() } }.joinToString("、")
-      else -> value.asText().trim()
-    }
-  }
-
-  private fun list(
-    node: JsonNode,
-    field: String,
-  ): List<String> {
-    val value = node.get(field) ?: return emptyList()
-    return when {
-      value.isNull -> emptyList()
-      value.isArray -> value.mapNotNull { it.asText().trim().takeIf { text -> text.isNotEmpty() } }
-      else -> value.asText().split('、', ',', '/').mapNotNull { it.trim().takeIf { text -> text.isNotEmpty() } }
-    }
-  }
-
-  private fun date(value: String): LocalDate? {
-    if (value.isBlank()) return null
-    val trimmed = value.trim().take(10)
-    return runCatching { LocalDate.parse(trimmed) }.getOrNull()
-  }
 }

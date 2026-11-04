@@ -83,8 +83,12 @@
         });
       }
       if (res.status === 204) return null;
-      var ct = res.headers.get('content-type') || '';
-      return ct.indexOf('json') >= 0 ? res.json() : res.text();
+      return res.text().then(function (text) {
+        if (!text) return null;
+        var ct = res.headers.get('content-type') || '';
+        if (ct.indexOf('json') < 0) return text;
+        try { return JSON.parse(text); } catch (e) { return text; }
+      });
     });
   }
 
@@ -130,6 +134,14 @@
 
   function letterIds(letter) {
     return request('api/lantai/v1/series/letter-ids?letter=' + encodeURIComponent(letter)).then(unwrap);
+  }
+
+  function bookLetterIds(letter) {
+    return request('api/lantai/v1/books/letter-ids?letter=' + encodeURIComponent(letter)).then(unwrap);
+  }
+
+  function bookLetterGroups() {
+    return request('api/lantai/v1/books/letter-groups').then(function (r) { return Array.isArray(r) ? r : []; });
   }
 
   function searchBooks(body) {
@@ -201,18 +213,32 @@
 
   function mapBook(b) {
     var media = b.media || {};
+    var md = b.metadata || {};
     var ext = extOf(b.name);
     var profile = media.mediaProfile || ({ pdf: 'PDF', epub: 'EPUB', cbz: 'DIVINA', cbr: 'DIVINA', txt: 'TXT' })[ext] || '';
+    if (!profile && media.mediaType) {
+      var mt = String(media.mediaType).toLowerCase();
+      if (mt.indexOf('epub') >= 0) profile = 'EPUB';
+      else if (mt.indexOf('pdf') >= 0) profile = 'PDF';
+      else if (mt.indexOf('zip') >= 0 || mt.indexOf('rar') >= 0) profile = 'DIVINA';
+      else if (mt.indexOf('text') >= 0) profile = 'TXT';
+    }
+    var fmt = ext || (profile === 'DIVINA' ? 'cbz' : profile === 'EPUB' ? 'epub' : profile === 'PDF' ? 'pdf' : profile === 'TXT' ? 'txt' : '');
     return {
       id: b.id,
       s: b.seriesId,
       num: b.number || 0,
       name: b.name,
-      fmt: ext,
+      mdTitle: md.title || '',
+      mdNum: md.number || '',
+      mdIsbn: md.isbn || '',
+      mdAuthors: (md.authors || []).map(function (a) { return a.name; }).join('、'),
+      fmt: fmt,
       profile: profile,
+      divina: !!media.epubDivinaCompatible,
       pages: media.pagesCount || 0,
       size: b.sizeBytes || 0,
-      pub: (b.metadata && b.metadata.releaseDate) || '',
+      pub: md.releaseDate || '',
       added: b.createdDate || '',
       last: fmtDate(b.lastModified || b.fileLastModified || b.createdDate),
       status: media.status || 'READY',
@@ -297,6 +323,8 @@
         users.forEach(function (u) {
           var uname = u.username || (u.email ? String(u.email).split('@')[0] : '');
           USERS.push({
+            id: u.id,
+            username: uname,
             name: uname,
             email: u.email || '',
             roles: Array.from(u.roles || []),
@@ -408,9 +436,13 @@
     });
   }
 
-  function hydrateCatalog(reuse) {
-    if (reuse && runtime.catalogLoaded) return Promise.resolve(true);
-    if (runtime.catalogLoading) return runtime.catalogLoading;
+  function hydrateCatalog(reuse, force) {
+    if (!force && reuse && runtime.catalogLoaded) return Promise.resolve(true);
+    if (!force && runtime.catalogLoading) return runtime.catalogLoading;
+    if (force) {
+      runtime.catalogLoaded = false;
+      runtime.catalogLoading = null;
+    }
     runtime.catalog = null;
     runtime._more = null;
     runtime.catalogLoading = Promise.all([
@@ -459,8 +491,8 @@
     };
   }
 
-  function hydrate() {
-    return hydrateShell().then(function () { return hydrateCatalog(); });
+  function hydrate(force) {
+    return hydrateShell().then(function () { return hydrateCatalog(false, force); }).then(paintRuntimeDot);
   }
 
   function fetchSeriesBooks(id) {
@@ -573,9 +605,63 @@
     return hydrateShell().then(function () {
       showApp();
       hydrateCatalog();
+      bindWake();
+      watchRuntime();
     }).catch(function (err) {
       showApp();
       if (typeof toast === 'function') toast('数据载入失败，当前显示示例数据', 'err');
+    });
+  }
+
+  function paintRuntimeDot() {
+    if (typeof paintRuntime === 'function') paintRuntime();
+  }
+
+  function pullRuntimes() {
+    return request('api/lantai/v1/runtimes')
+      .then(function (list) {
+        if (!Array.isArray(list)) return;
+        var map = {};
+        list.forEach(function (r) { if (r && r.kind) map[r.kind] = r; });
+        runtime.runtimes = map;
+        live.runtimes = true;
+      })
+      .catch(function () { })
+      .then(paintRuntimeDot);
+  }
+
+  function swyRunning() {
+    var st = (runtime.runtimes || {}).suwayomi;
+    return !!(st && st.running);
+  }
+
+  var watchTimer = null;
+  var WATCH_DELAYS = [3000, 8000, 15000, 25000, 40000];
+
+  function watchRuntime() {
+    if (watchTimer) { clearTimeout(watchTimer); watchTimer = null; }
+    if (swyRunning()) return;
+    var i = 0;
+    var step = function () {
+      watchTimer = null;
+      if (swyRunning()) return;
+      pullRuntimes().then(function () {
+        if (swyRunning() || i + 1 >= WATCH_DELAYS.length) return;
+        i++;
+        watchTimer = setTimeout(step, WATCH_DELAYS[i]);
+      });
+    };
+    watchTimer = setTimeout(step, WATCH_DELAYS[0]);
+  }
+
+  var wakeBound = false;
+
+  function bindWake() {
+    if (wakeBound || !document.addEventListener) return;
+    wakeBound = true;
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) return;
+      pullRuntimes().then(function () { if (!swyRunning()) watchRuntime(); });
     });
   }
 
@@ -683,6 +769,8 @@
     requestEtag: requestEtag,
     searchSeries: searchSeries,
     letterIds: letterIds,
+    bookLetterIds: bookLetterIds,
+    bookLetterGroups: bookLetterGroups,
     searchBooks: searchBooks,
     seriesGroups: seriesGroups,
     refData: refData,

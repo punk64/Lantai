@@ -117,10 +117,12 @@ class ScrapeApplier(
     score: Double?,
     overwriteConflicts: Boolean,
     coverUrl: String,
+    scope: Set<String> = emptySet(),
   ): ScrapeApplySummary {
     val series = seriesRepository.findByIdOrNull(seriesId) ?: throw ScrapeException("Series $seriesId does not exist")
     val metadata = seriesMetadataRepository.findById(seriesId)
     val ids = bookIds(seriesId)
+    val targets = if (scope.isEmpty()) ids else ids.filter { it in scope }
     val bookSnapshots =
       bookMetadataRepository.findAllByIds(ids).map {
         BookSnapshot(
@@ -144,6 +146,7 @@ class ScrapeApplier(
         coverThumbnailId = thumbnailsSeriesRepository.findSelectedBySeriesIdOrNull(seriesId)?.id,
       )
 
+    val bookScoped = scope.isNotEmpty()
     var updated = metadata
     val applied = mutableListOf<String>()
     val skipped = mutableListOf<String>()
@@ -162,13 +165,17 @@ class ScrapeApplier(
       applied += field
     }
 
-    writeSeries("title", metadata.titleLock) { it.copy(title = values.title, titleSort = values.title) }
-    writeSeries("summary", metadata.summaryLock) { it.copy(summary = values.summary) }
-    writeSeries("publisher", metadata.publisherLock) { it.copy(publisher = values.publisher) }
-    writeSeries("language", metadata.languageLock) { it.copy(language = values.language) }
-    writeSeries("genres", metadata.genresLock) { it.copy(genres = values.genres.toSet()) }
-    if ("ageRating" in fields && values.ageRating != null) {
-      if (metadata.ageRatingLock) skipped += "ageRating" else { updated = updated.copy(ageRating = values.ageRating); applied += "ageRating" }
+    if (bookScoped) {
+      listOf("title", "summary", "publisher", "language", "genres", "ageRating").forEach { if (it in fields) skipped += it }
+    } else {
+      writeSeries("title", metadata.titleLock) { it.copy(title = values.title, titleSort = values.title) }
+      writeSeries("summary", metadata.summaryLock) { it.copy(summary = values.summary) }
+      writeSeries("publisher", metadata.publisherLock) { it.copy(publisher = values.publisher) }
+      writeSeries("language", metadata.languageLock) { it.copy(language = values.language) }
+      writeSeries("genres", metadata.genresLock) { it.copy(genres = values.genres.toSet()) }
+      if ("ageRating" in fields && values.ageRating != null) {
+        if (metadata.ageRatingLock) skipped += "ageRating" else { updated = updated.copy(ageRating = values.ageRating); applied += "ageRating" }
+      }
     }
 
     if (updated !== metadata) {
@@ -176,10 +183,14 @@ class ScrapeApplier(
       publishUpdate(seriesId)
     }
 
-    val bookFields = listOf("authors", "releaseDate", "isbn", "tags").filter { it in fields }
+    val bookFields =
+      (
+        listOf("authors", "releaseDate", "isbn", "tags") +
+          (if (bookScoped) listOf("title", "summary", "publisher", "genres", "language") else emptyList())
+      ).filter { it in fields }
     if (bookFields.isNotEmpty()) {
       var changed = false
-      ids.forEach { bookId ->
+      targets.forEach { bookId ->
         val current = bookMetadataRepository.findByIdOrNull(bookId) ?: return@forEach
         var next = current
         if ("authors" in bookFields && values.authors.isNotEmpty() && !current.authorsLock) {
@@ -194,6 +205,21 @@ class ScrapeApplier(
         if ("tags" in bookFields && values.tags.isNotEmpty() && !current.tagsLock) {
           if (current.tags.isEmpty() || overwriteConflicts) next = next.copy(tags = current.tags + values.tags)
         }
+        if ("title" in bookFields && values.title.isNotBlank() && !current.titleLock) {
+          if (current.title.isBlank() || overwriteConflicts) next = next.copy(title = values.title)
+        }
+        if ("summary" in bookFields && values.summary.isNotBlank() && !current.summaryLock) {
+          if (current.summary.isBlank() || overwriteConflicts) next = next.copy(summary = values.summary)
+        }
+        if ("publisher" in bookFields && values.publisher.isNotBlank() && !current.publisherLock) {
+          if (current.publisher.isBlank() || overwriteConflicts) next = next.copy(publisher = values.publisher)
+        }
+        if ("genres" in bookFields && values.genres.isNotEmpty() && !current.genresLock) {
+          if (current.genres.isEmpty() || overwriteConflicts) next = next.copy(genres = values.genres.toSet())
+        }
+        if ("language" in bookFields && values.language.isNotBlank() && !current.languageLock) {
+          if (current.language.isBlank() || overwriteConflicts) next = next.copy(language = values.language)
+        }
         if (next !== current) {
           bookMetadataRepository.update(next)
           changed = true
@@ -206,7 +232,16 @@ class ScrapeApplier(
       }
     }
 
-    val coverApplied = if ("cover" in fields && coverUrl.isNotBlank()) applyCover(seriesId, coverUrl) else false
+    val coverApplied =
+      when {
+        "cover" !in fields -> false
+        bookScoped -> {
+          skipped += "cover"
+          false
+        }
+        coverUrl.isNotBlank() -> applyCover(seriesId, coverUrl)
+        else -> false
+      }
     if (coverApplied) applied += "cover"
 
     val matchId =
@@ -243,8 +278,123 @@ class ScrapeApplier(
     return ScrapeApplySummary(appliedFields = applied, skippedFields = skipped, coverApplied = coverApplied, matchId = matchId)
   }
 
-  fun skip(matchId: String): ScrapeApplyResult {
-    val match = matchRepository.findByIdOrNull(matchId) ?: throw ScrapeException("Match $matchId does not exist")
+  fun applyBookValues(
+    seriesId: String,
+    choices: List<ScrapeBookChoice>,
+    source: String,
+    score: Double?,
+    scope: Set<String> = emptySet(),
+  ): ScrapeApplySummary {
+    val series = seriesRepository.findByIdOrNull(seriesId) ?: throw ScrapeException("Series $seriesId does not exist")
+    val metadata = seriesMetadataRepository.findById(seriesId)
+    val ids = bookIds(seriesId)
+    val allowed = if (scope.isEmpty()) ids.toSet() else ids.toSet().intersect(scope)
+    val snapshot =
+      ScrapeSnapshot(
+        title = metadata.title,
+        titleSort = metadata.titleSort,
+        summary = metadata.summary,
+        publisher = metadata.publisher,
+        language = metadata.language,
+        genres = metadata.genres.sorted(),
+        ageRating = metadata.ageRating,
+        books = bookSnapshots(ids),
+      )
+    val applied = linkedSetOf<String>()
+    val skipped = mutableListOf<String>()
+    var changed = false
+
+    choices.filter { it.bookId.isNotBlank() && it.bookId in allowed }.forEach { choice ->
+      val current = bookMetadataRepository.findByIdOrNull(choice.bookId) ?: return@forEach
+      val fields = choice.fields.toSet()
+      var next = current
+      var touched = false
+
+      fun write(
+        name: String,
+        locked: Boolean,
+        block: () -> Unit,
+      ) {
+        if (name !in fields) return
+        if (locked) {
+          skipped += name
+          return
+        }
+        block()
+        applied += name
+        touched = true
+      }
+
+      write("title", current.titleLock) { if (choice.title.isNotBlank()) next = next.copy(title = choice.title.trim()) }
+      write("number", current.numberLock) { if (choice.number.isNotBlank()) next = next.copy(number = choice.number.trim()) }
+      write("summary", current.summaryLock) { if (choice.summary.isNotBlank()) next = next.copy(summary = choice.summary.trim()) }
+      write("publisher", current.publisherLock) { if (choice.publisher.isNotBlank()) next = next.copy(publisher = choice.publisher.trim()) }
+      write("language", current.languageLock) { if (choice.language.isNotBlank()) next = next.copy(language = choice.language.trim()) }
+      write("genres", current.genresLock) { if (choice.genres.isNotEmpty()) next = next.copy(genres = choice.genres.toSet()) }
+      write("authors", current.authorsLock) {
+        if (choice.authors.isNotEmpty()) next = next.copy(authors = choice.authors.map { Author(it, "writer") })
+      }
+      write("isbn", current.isbnLock) { if (choice.isbn.isNotBlank()) next = next.copy(isbn = choice.isbn.trim()) }
+      write("tags", current.tagsLock) {
+        if (choice.tags.isNotEmpty()) next = next.copy(tags = current.tags + choice.tags)
+      }
+      val date = parseIsoDate(choice.releaseDate)
+      if (date != null) write("releaseDate", current.releaseDateLock) { next = next.copy(releaseDate = date) }
+
+      if (touched && next !== current) {
+        bookMetadataRepository.update(next)
+        changed = true
+      }
+    }
+
+    if (changed) {
+      runCatching { aggregationRepository.update(metadataAggregator.aggregate(bookMetadataRepository.findAllByIds(ids))) }
+      publishUpdate(seriesId)
+    }
+
+    val matchId =
+      if (changed) {
+        runCatching {
+          val match =
+            ScrapeMatch(
+              seriesId = seriesId,
+              seriesTitle = metadata.title.ifBlank { series.name },
+              source = source.ifBlank { "manual" },
+              sourceId = seriesId,
+              score = score ?: 1.0,
+              status = ScrapeMatch.Status.APPLIED,
+              candidate = ScrapeCandidate(source = source.ifBlank { "manual" }, sourceId = seriesId, title = ""),
+              snapshot = objectMapper.writeValueAsString(snapshot),
+              appliedFields = applied.toSet(),
+            )
+          matchRepository.insert(match)
+          match.id
+        }.getOrNull()
+      } else {
+        null
+      }
+
+    return ScrapeApplySummary(appliedFields = applied.toList(), skippedFields = skipped.distinct(), coverApplied = false, matchId = matchId)
+  }
+
+  private fun bookSnapshots(ids: List<String>): List<BookSnapshot> =
+    bookMetadataRepository.findAllByIds(ids).map {
+      BookSnapshot(
+        bookId = it.bookId,
+        authors = it.authors.map { author -> AuthorSnapshot(author.name, author.role) },
+        releaseDate = it.releaseDate,
+        isbn = it.isbn,
+        tags = it.tags.sorted(),
+        publisher = it.publisher,
+        genres = it.genres.sorted(),
+        language = it.language,
+      )
+    }
+
+  private fun parseIsoDate(value: String): LocalDate? =
+    value.trim().take(10).takeIf { it.isNotBlank() }?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+
+  fun skip(matchId: String): ScrapeApplyResult {    val match = matchRepository.findByIdOrNull(matchId) ?: throw ScrapeException("Match $matchId does not exist")
     matchRepository.update(match.copy(status = ScrapeMatch.Status.SKIPPED))
     return ScrapeApplyResult(matchId, ScrapeMatch.Status.SKIPPED.name, emptyList(), emptyList())
   }
@@ -274,6 +424,9 @@ class ScrapeApplier(
           releaseDate = book.releaseDate,
           isbn = book.isbn,
           tags = book.tags.toSet(),
+          publisher = book.publisher,
+          genres = book.genres.toSet(),
+          language = book.language,
         ),
       )
     }
@@ -362,6 +515,9 @@ class ScrapeApplier(
     val releaseDate: LocalDate? = null,
     val isbn: String = "",
     val tags: List<String> = emptyList(),
+    val publisher: String = "",
+    val genres: List<String> = emptyList(),
+    val language: String = "",
   )
 
   data class ScrapeSnapshot(

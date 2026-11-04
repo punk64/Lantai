@@ -9,6 +9,7 @@ data class ScrapeQueueItem(
   val status: Status = Status.QUEUED,
   val origin: Origin = Origin.SERIES,
   val libraryId: String? = null,
+  val bookIds: List<String> = emptyList(),
   val matchId: String? = null,
   val score: Double? = null,
   val source: String? = null,

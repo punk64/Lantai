@@ -127,8 +127,7 @@ class SeriesController(
   private val trashBin: TrashBin,
   private val lantaiSettingsProvider: LantaiSettingsProvider,
 ) {
-  @Operation(summary = "List series", description = "Use POST /api/v1/series/list instead. Deprecated since 1.19.0.", tags = [OpenApiConfiguration.TagNames.SERIES, OpenApiConfiguration.TagNames.DEPRECATED])
-  @Deprecated("use /v1/series/list instead")
+  @Operation(summary = "List series", description = "Komga v1 compatible endpoint. Use POST /api/v1/series/list for new integrations.", tags = [OpenApiConfiguration.TagNames.SERIES])
   @PageableAsQueryParam
   @AuthorsAsQueryParam
   @Parameters(
@@ -261,8 +260,7 @@ class SeriesController(
       .map { it.restrictUrl(!principal.user.isAdmin) }
   }
 
-  @Operation(summary = "List series groups", description = "Use POST /api/v1/series/list/alphabetical-groups instead. Deprecated since 1.19.0.", tags = [OpenApiConfiguration.TagNames.SERIES, OpenApiConfiguration.TagNames.DEPRECATED])
-  @Deprecated("use /v1/series/list/alphabetical-groups instead")
+  @Operation(summary = "List series groups", description = "Komga v1 compatible endpoint. Use POST /api/v1/series/list/alphabetical-groups for new integrations.", tags = [OpenApiConfiguration.TagNames.SERIES])
   @AuthorsAsQueryParam
   @Parameters(
     Parameter(
@@ -585,8 +583,7 @@ class SeriesController(
     } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
   }
 
-  @Operation(summary = "List series' books", description = "Use POST /api/v1/books/list instead. Deprecated since 1.19.0.", tags = [OpenApiConfiguration.TagNames.SERIES, OpenApiConfiguration.TagNames.DEPRECATED])
-  @Deprecated("use /v1/books/list instead")
+  @Operation(summary = "List series' books", description = "Komga v1 compatible endpoint. Use POST /api/v1/books/list for new integrations.", tags = [OpenApiConfiguration.TagNames.SERIES])
   @PageableAsQueryParam
   @AuthorsAsQueryParam
   @GetMapping("v1/series/{seriesId}/books")

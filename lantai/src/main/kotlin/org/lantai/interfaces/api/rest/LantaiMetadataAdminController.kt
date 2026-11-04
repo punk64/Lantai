@@ -1,5 +1,6 @@
 package org.lantai.interfaces.api.rest
 
+import io.swagger.v3.oas.annotations.Operation
 import org.lantai.infrastructure.metadata.bulk.BulkMetadataService
 import org.lantai.infrastructure.metadata.bulk.BulkResult
 import org.springframework.security.access.prepost.PreAuthorize
@@ -16,11 +17,13 @@ class LantaiMetadataAdminController(
   private val bulkMetadataService: BulkMetadataService,
 ) {
   @PostMapping("export", produces = ["text/plain;charset=UTF-8"])
+  @Operation(summary = "Export series metadata as a text file")
   fun export(
     @RequestBody body: BulkExportRequest,
   ): String = bulkMetadataService.sheet(body.seriesIds)
 
   @PostMapping("bulk", consumes = ["text/plain"], produces = ["application/json"])
+  @Operation(summary = "Apply bulk series metadata from a text payload")
   fun bulk(
     @RequestParam(name = "dryRun", required = false, defaultValue = "true") dryRun: Boolean,
     @RequestBody text: String,

@@ -55,7 +55,7 @@ class AuditInterceptor(
 
   private companion object {
     val AUDITABLE_METHODS = setOf("POST", "PUT", "PATCH", "DELETE")
-    val EXCLUDED_PATHS = listOf("/api/logout", "/api/v1/claim")
+    val EXCLUDED_PATHS = listOf("/api/logout")
     const val MAX_QUERY_LENGTH = 512
     const val MAX_USER_AGENT_LENGTH = 256
   }

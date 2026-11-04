@@ -127,8 +127,6 @@ class SecurityConfiguration(
 
         it
           .requestMatchers(
-            // to claim server before any account is created
-            "/api/v1/claim",
             // used by webui
             "/api/v1/oauth2/providers",
             // used by webui, we check for authorization within the controller method directly and filter results from there

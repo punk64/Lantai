@@ -73,6 +73,9 @@ function loadSources(force) {
 
 const USERS = [];
 
+const PROFILES = {};
+let profileBusy = false;
+
 const DEVICES = [];
 
 const READLISTS = [];
@@ -99,6 +102,7 @@ const S = {
   scrape: { stage: 'pick', picks: {}, fields: {}, bTab: 'fmt', bHelp: false },
   reader: null, annTbSel: null, paletteSel: 0, statsRange: 30, statsTab: 'trend',
   settingsTab: 'libraries', searchQ: '', sessionExtra: 0, demoFast: true, palItems: [], palSel: 0,
+  navFold: {},
   ext: { q: '', lang: 'all', nsfw: false },
   rt: {}, rtTimers: {}
 };
@@ -179,29 +183,60 @@ const NAV = [
   { p: '/readlists', i: 'readlist', t: 'nav.readlists', n: () => READLISTS.length },
   { g: 'nav.gLantai' },
   { p: '/online', i: 'globe', t: 'nav.online', n: () => SERIES.filter(s => s.online).length },
-  { p: '/scrape', i: 'wand', t: 'nav.scrape', n: () => scPage && scPage.counts ? (scPage.counts.queued + scPage.counts.running + scPage.counts.review) : 0 },
+  { p: '/scrape', i: 'wand', t: 'nav.scrape', n: () => scPage && scPage.counts ? (scPage.counts.total || 0) : 0 },
   { p: '/annotations', i: 'marker', t: 'nav.annotations', n: () => ANNOTATIONS.length },
   { p: '/stats', i: 'chart', t: 'nav.stats' },
   { g: 'nav.gSystem' },
   { p: '/tasks', i: 'bolt', t: 'nav.tasks', n: () => TASKS.filter(t => t.state === 'run' || t.state === 'queued').length },
-  { p: '/inspect', i: 'layers', t: 'nav.inspect' },
-  { p: '/trash', i: 'trash', t: 'nav.trash' },
   { p: '/settings', i: 'settings', t: 'nav.settings' },
   { p: '/extensions', i: 'puzzle', t: 'nav.extensions', n: () => Object.keys(RT_META).filter(k => { const r = S.rt[k]; return r && r.detect && !r.detect.installed; }).length },
+  { g: 'nav.gMore', fold: 'more' },
   { p: '/users', i: 'user', t: 'nav.users' },
   { p: '/logs', i: 'list', t: 'nav.logs' },
   { p: '/opds', i: 'toc', t: 'nav.opds' },
   { p: '/kobo', i: 'sync', t: 'nav.kobo' },
   { p: '/devices', i: 'grid', t: 'nav.devices' },
+  { p: '/inspect', i: 'layers', t: 'nav.inspect' },
+  { p: '/trash', i: 'trash', t: 'nav.trash' },
   { p: '/system', i: 'info', t: 'nav.system' },
   { p: '/protocol', i: 'server', t: 'nav.protocol', admin: true }
 ];
+function navGroups() {
+  const out = [];
+  let cur = { g: null, fold: null, items: [] };
+  NAV.filter(it => !it.admin || isAdmin()).forEach(it => {
+    if (it.g) { out.push(cur); cur = { g: it.g, fold: it.fold || null, items: [] }; return; }
+    cur.items.push(it);
+  });
+  out.push(cur);
+  return out.filter(x => x.g || x.items.length);
+}
+function navItemHtml(it) {
+  return '<a data-go="' + it.p + '" class="' + (S.route === it.p || S.route.startsWith(it.p + '/') ? 'on' : '') + '"' +
+    (S.collapsed ? ' title="' + esc(L.t(it.t)) + '"' : '') + '>' +
+    ico(it.i) + '<span class="lb">' + L.t(it.t) + '</span>' + (it.n ? '<span class="tag">' + it.n() + '</span>' : '') + '</a>';
+}
 function renderNav() {
-  $('#nav').innerHTML = NAV.filter(it => !it.admin || isAdmin()).map(it => it.g
-    ? '<div class="nav-grp">' + esc(S.collapsed ? '·' : L.t(it.g)) + '</div>'
-    : '<a data-go="' + it.p + '" class="' + (S.route === it.p || S.route.startsWith(it.p + '/') ? 'on' : '') + '">' +
-    ico(it.i) + '<span class="lb">' + L.t(it.t) + '</span>' + (it.n ? '<span class="tag">' + it.n() + '</span>' : '') + '</a>').join('');
+  const groups = navGroups();
+  const inGroup = g => g.items.some(it => S.route === it.p || S.route.startsWith(it.p + '/'));
+  S.navFold = S.navFold || {};
+  $('#nav').innerHTML = groups.map(g => {
+    if (!g.g) return g.items.map(navItemHtml).join('');
+    if (!g.fold) return '<div class="nav-grp">' + (S.collapsed ? '' : esc(L.t(g.g))) + '</div>' + g.items.map(navItemHtml).join('');
+    const touched = Object.prototype.hasOwnProperty.call(S.navFold, g.fold);
+    const open = S.collapsed || (touched ? !!S.navFold[g.fold] : inGroup(g));
+    return '<div class="nav-grp fold' + (open ? ' open' : '') + '" data-navfold="' + g.fold + '">' +
+      '<span>' + (S.collapsed ? '' : esc(L.t(g.g))) + '</span>' +
+      ico('down', 'chev') + '</div>' +
+      (open ? g.items.map(navItemHtml).join('') : '');
+  }).join('');
   $$('#nav a').forEach(a => a.onclick = () => go(a.dataset.go));
+  $$('#nav [data-navfold]').forEach(el => el.onclick = () => {
+    const k = el.dataset.navfold;
+    S.navFold[k] = !el.classList.contains('open');
+    savePrefs({ navFold: S.navFold });
+    renderNav();
+  });
 }
 
 /* ---- 路由 ---- */
@@ -210,7 +245,6 @@ function go(p, replace) {
   if (S.reader && p.indexOf('/read/') !== 0) closeReader(false);
   if (window.ComicReader && ComicReader.isOpen() && p.indexOf('/read/') !== 0) ComicReader.close(false);
   if (window.EbookReader && EbookReader.isOpen() && p.indexOf('/read/') !== 0) EbookReader.close(false);
-  S.route = p;
   (replace ? history.replaceState : history.pushState).call(history, null, '', '#' + p);
   render();
 }
@@ -237,6 +271,37 @@ function ensureCatalog(kind, view) {
   LantaiRuntime.catalogFull(kind).then(() => { view.removeAttribute('data-catfull'); render(); });
   return true;
 }
+function catalogGap(kind) {
+  const T = catalogTotal();
+  if (kind === 'series' ? T.seriesDone : T.booksDone) return '';
+  const have = kind === 'series' ? SERIES.length : BOOKS.length;
+  const total = kind === 'series' ? T.series : T.books;
+  if (window.LantaiRuntime && LantaiRuntime.catalogFull) {
+    LantaiRuntime.catalogFull(kind).then(() => { if (String(S.route).indexOf('/browse') === 0) render(); });
+  }
+  return '<span class="badge warn">目录载入中 ' + num(have) + ' / ' + num(total) + '</span>';
+}
+const CHUNK_OK = {}, CHUNK_WAIT = {}, CHUNK_FAIL = {};
+function loadChunk(name) {
+  if (CHUNK_OK[name] || CHUNK_FAIL[name]) return Promise.resolve();
+  if (CHUNK_WAIT[name]) return CHUNK_WAIT[name];
+  const rel = (window.__LANTAI_CHUNKS__ || {})[name];
+  if (!rel) { CHUNK_OK[name] = true; return Promise.resolve(); }
+  CHUNK_WAIT[name] = new Promise(function (done) {
+    const el = document.createElement('script');
+    el.src = (window.resourceBaseUrl || '/').replace(/\/?$/, '/') + rel;
+    el.onload = function () { CHUNK_OK[name] = true; CHUNK_WAIT[name] = null; done(); };
+    el.onerror = function () { CHUNK_FAIL[name] = true; CHUNK_WAIT[name] = null; done(); };
+    document.head.appendChild(el);
+  });
+  return CHUNK_WAIT[name];
+}
+function needChunk(key) {
+  if (key === 'read') return 'reader';
+  if (key === 'protocol') return 'docs';
+  if (key === 'system') return 'sysx';
+  return '';
+}
 function render() {
   const { path, qs } = parseHash();
   const routeChanged = S.route !== path;
@@ -249,15 +314,27 @@ function render() {
   const view = $('#view');
   const keepScroll = window.__lantaiKeepScroll === true;
   window.__lantaiKeepScroll = false;
-  if (routeChanged && !keepScroll) view.scrollTop = 0;
-  if ((key === 'browse' || key === 'search') && !catalogReady()) {
-    document.body.classList.remove('has-dock');
-    if (view.getAttribute('data-cat') !== path) {
-      view.setAttribute('data-cat', path);
-      view.innerHTML = '<div class="empty" style="padding-top:120px"><div class="spinner" style="margin:0 auto 14px"></div><h4>正在载入书库…</h4></div>';
-      if (window.LantaiRuntime) LantaiRuntime.hydrateCatalog();
-    }
+  if (routeChanged && !keepScroll) requestAnimationFrame(function () {
+    const el = $('#view');
+    if (el) { el.style.scrollBehavior = 'auto'; el.scrollTop = 0; el.style.scrollBehavior = ''; }
+  });
+  const need = needChunk(key);
+  if (need && !CHUNK_OK[need] && !CHUNK_FAIL[need]) {
+    view.innerHTML = '<div class="empty" style="padding-top:120px"><div class="spinner" style="margin:0 auto 14px"></div><h4>正在载入模块…</h4></div>';
+    loadChunk(need).then(() => render());
     return;
+  }
+  if ((key === 'browse' || key === 'search') && !catalogReady()) {
+    if (!SERIES.length && !BOOKS.length) {
+      document.body.classList.remove('has-dock');
+      if (view.getAttribute('data-cat') !== path) {
+        view.setAttribute('data-cat', path);
+        view.innerHTML = '<div class="empty" style="padding-top:120px"><div class="spinner" style="margin:0 auto 14px"></div><h4>正在载入书库…</h4></div>';
+        if (window.LantaiRuntime) LantaiRuntime.hydrateCatalog();
+      }
+      return;
+    }
+    if (window.LantaiRuntime && !LantaiRuntime.catalogLoading) LantaiRuntime.hydrateCatalog();
   }
   view.removeAttribute('data-cat');
   view.innerHTML = '';
@@ -459,7 +536,22 @@ const PAL_CMDS = [
   { g: '操作', t: '立即结算所有阅读会话', run: () => flushSessions() },
   { g: '操作', t: '收起 / 展开导航', run: () => toggleCollapse() }
 ];
-function toggleCollapse() { S.collapsed = !S.collapsed; savePrefs({ collapsed: S.collapsed }); $('#app').classList.toggle('collapsed', S.collapsed); }
+function toggleCollapse() {
+  S.collapsed = !S.collapsed;
+  savePrefs({ collapsed: S.collapsed });
+  $('#app').classList.toggle('collapsed', S.collapsed);
+  applyCollapseBtn();
+  renderNav();
+}
+function applyCollapseBtn() {
+  const b = $('#collapseBtn');
+  if (!b) return;
+  const label = S.collapsed ? '展开导航' : '收起导航';
+  const lb = b.querySelector('.lb');
+  if (lb) lb.textContent = label;
+  b.setAttribute('title', label);
+  b.setAttribute('aria-label', label);
+}
 function openPalette() {
   $('#palette').classList.add('on'); $('#palInput').value = ''; S.palInput = ''; palPaint(''); $('#palInput').focus();
 }
@@ -568,12 +660,16 @@ function bestProgress(sid) {
   booksOf(sid).forEach(b => { const p = prog(b.id); if (p && (!best || p.at > best.p.at)) best = { b, p, pct: p.pages ? Math.round(p.page / p.pages * 100) : 0 }; });
   return best;
 }
-function bookRow(b) {
+function bookRow(b, pickSel) {
   const p = prog(b.id), pct = p && p.pages ? Math.round(p.page / p.pages * 100) : 0;
-  return '<tr class="click" data-book="' + b.id + '"><td style="width:44px">' +
-    '<div class="thumb" style="background:' + gradOf(b.name) + '">' + thumbImg('book', isOnlineBook(b) ? '' : b.id) + '</div></td>' +
-    '<td><div style="font-size:13px">' + esc(b.name) + '</div>' +
-    '<div class="mini mono">' + (PROFILE_CN[b.profile] || b.profile) + ' · ' + (b.pages ? num(b.pages) + (b.profile === 'TXT' || b.profile === 'EPUB' ? ' 章' : ' 页') : '—') + ' · ' + bytes(b.size) +
+  const t = bookTitle(b), sub = bookFileSub(b), nb = bookNumCn(b);
+  const cell = (pickSel === undefined || pickSel === null) ? ''
+    : '<td style="width:36px"><span class="pkbox' + (pickSel ? ' on' : '') + '" style="position:static" data-pick-b="' + b.id + '" title="选择">' + (pickSel ? '✓' : '') + '</span></td>';
+  return '<tr class="click" data-book="' + b.id + '">' + cell + '<td style="width:44px">' +
+    '<div class="thumb" style="background:' + gradOf(t) + '">' + thumbImg('book', isOnlineBook(b) ? '' : b.id) + '</div></td>' +
+    '<td><div style="font-size:13px">' + esc(t) + (nb ? ' <span class="badge">' + nb + '</span>' : '') + '</div>' +
+    (sub ? '<div class="mini mono-sm">' + esc(sub) + '</div>' : '') +
+    '<div class="mini mono">' + (PROFILE_CN[b.profile] || b.profile) + ' · ' + (b.pages ? num(b.pages) + (((b.profile === 'TXT' || b.profile === 'EPUB') && !b.divina) ? ' 章' : ' 页') : '—') + ' · ' + bytes(b.size) +
     (b.enc ? ' · ' + b.enc : '') + '</div></td>' +
     '<td>' + statusBadge(b) + '</td>' +
     '<td style="width:150px">' + (p ? '<div class="pbar"><i class="' + (p.completed ? 'done' : '') + '" style="width:' + pct + '%"></i></div><div class="mini mono">' + p.page + '/' + p.pages + ' · ' + deviceCn(p.device) + '</div>' : '<span class="mini">未读</span>') + '</td>' +
@@ -1026,6 +1122,8 @@ function loadRef() {
 }
 
 let groupCache = { key: '', list: null, busy: false };
+let bookGroupCache = { list: null, busy: false };
+let bookLetterCache = { letter: '', ids: null, busy: false };
 function loadGroups(B) {
   const key = (B.q || '') + '\u0000' + (B.sstate || 'all') + '\u0000' + (B.genre || 'all') + '\u0000' + (B.year || 'all');
   if (groupCache.key === key) return;
@@ -1058,36 +1156,122 @@ function deleteLibrary(id) {
       $('#modal [data-ok]').onclick = () => {
         if ($('#dlIn').value.trim() !== '删除') return toast('确认词不对', 'err');
         LantaiRuntime.request('api/v1/libraries/' + id, { method: 'DELETE' })
-          .then(() => { closeModal(); toast('书库已删除', 'ok'); return LantaiRuntime.hydrate(); })
-          .then(() => go('/libraries'))
+          .then(() => { closeModal(); toast('书库已删除', 'ok'); return LantaiRuntime.hydrate(true); })
+          .then(() => { if (S.route === '/libraries') render(); else go('/libraries'); })
           .catch(e => toast('删除失败：' + onlineErrText(e), 'err'));
       };
     }
   });
 }
 
+let etTimer = null, etSeq = 0;
+function etStop() {
+  if (etTimer) { clearTimeout(etTimer); etTimer = null; }
+  etSeq++;
+}
+function etView(html, foot) {
+  const b = $('#mBody');
+  if (!b) return;
+  b.innerHTML = html;
+  if (foot != null) {
+    $('#mFoot').innerHTML = foot;
+    const x = $('#modal [data-x]');
+    if (x) x.onclick = closeModal;
+  }
+}
+function etWaitHtml(label, sec, extra) {
+  return '<div class="rowflex" style="gap:12px;align-items:center"><div class="spinner"></div><div>' +
+    '<div style="font-size:13px">' + esc(label) + '</div>' +
+    '<div class="mini">已等待 ' + sec + ' 秒' + (extra ? ' · ' + esc(extra) : '') + '</div></div></div>';
+}
+function etRefresh() {
+  trashData = null; trashErr = '';
+  LantaiRuntime.hydrate(true).catch(() => {}).then(() => {
+    if (S.route === '/trash') loadTrash();
+    if (String(S.route).indexOf('/settings') === 0) loadLibStats(true);
+    render();
+  });
+}
+function etWatch(id) {
+  const seq = etSeq, started = Date.now();
+  let seen = false, ticks = 0;
+  const sec = () => Math.round((Date.now() - started) / 1000);
+  const done = timeout => {
+    etStop();
+    etRefresh();
+    etView('<div class="note ' + (timeout ? 'gold' : '') + '">' + ico('trash') + ' ' + (timeout ? '任务仍在后台进行' : '清空任务已结束') + '</div>' +
+      '<div class="mini" style="margin-top:10px">' + (timeout ? '可先关闭本窗口，稍后到任务页查看进度。' : '回收站与书库数据已刷新。若条目仍在，可在任务页「已完成」里查看失败原因。') + '</div>',
+      '<button class="btn" data-x>关闭</button>');
+    if (!timeout) toast('清空任务已结束', 'ok');
+  };
+  const step = () => {
+    if (seq !== etSeq) return;
+    ticks++;
+    LantaiRuntime.request('api/lantai/v1/tasks?type=EmptyTrash&size=500')
+      .then(d => {
+        if (seq !== etSeq) return;
+        const t = ((d && d.tasks) || []).filter(x => x.libraryId === id).pop();
+        if (t) {
+          seen = true;
+          etView(etWaitHtml(t.owner ? '正在清空回收站…' : '排队中，等待后台任务…', sec(),
+            num(d.running || 0) + ' 进行 / ' + num(d.queued || 0) + ' 排队'), '<button class="btn" data-x>后台进行</button>');
+        } else if (seen || ticks >= 2) {
+          return done(false);
+        }
+        if (sec() > 600) return done(true);
+        etTimer = setTimeout(step, 1200);
+      })
+      .catch(() => {
+        if (seq !== etSeq) return;
+        if (ticks >= 5) {
+          etStop();
+          etView('<div class="note red">' + ico('alert') + ' 读取任务状态失败，清空仍在后台进行</div>' +
+            '<div class="mini" style="margin-top:10px">可到任务页查看进度。</div>', '<button class="btn" data-x>关闭</button>');
+          return;
+        }
+        etTimer = setTimeout(step, 2000);
+      });
+  };
+  step();
+}
 function emptyLibTrash(id) {
   const l = lib(id);
+  etStop();
   openModal({
     title: '清空库回收站', width: 460,
     body: '<div class="note red">清空「' + esc(l ? l.name : id) + '」的回收站目录，其中的文件会被彻底删除，不可恢复。</div>' +
       '<div class="field" style="margin-top:10px"><label>输入「清空」确认</label><input class="inp" id="etIn" autocomplete="off"></div>',
     foot: '<button class="btn" data-x>取消</button><button class="btn danger" data-ok>确认清空</button>',
+    onClose: etStop,
     after() {
       $('#modal [data-x]').onclick = closeModal;
       $('#modal [data-ok]').onclick = () => {
         if ($('#etIn').value.trim() !== '清空') return toast('确认词不对', 'err');
+        const ok = $('#modal [data-ok]');
+        ok.disabled = true;
+        ok.textContent = '提交中…';
         LantaiRuntime.request('api/v1/libraries/' + id + '/empty-trash', { method: 'POST' })
-          .then(() => { closeModal(); toast('已提交清空任务', 'ok'); })
-          .catch(e => toast('提交失败：' + onlineErrText(e), 'err'));
+          .then(() => { etSeq++; etWatch(id); })
+          .catch(e => {
+            ok.disabled = false;
+            ok.textContent = '确认清空';
+            toast('提交失败：' + onlineErrText(e), 'err');
+          });
       };
     }
   });
 }
 
-function bulkBarHtml(n) {
+function pickChipsHtml(B, allPicked, n) {
+  return '<span class="chip' + (B.pick ? ' on' : '') + '" data-bulk-mode>' + (B.pick ? '退出多选' : '多选') + '</span>' +
+    (B.pick ? '<span class="chip' + (allPicked ? ' on' : '') + '" data-bulk-all>' + (allPicked ? '取消全选' : '全选本页') + '</span>' : '') +
+    (B.pick && n ? '<span class="chip" data-bulk-clear>清空 ' + n + '</span>' : '');
+}
+
+function bulkBarHtml(n, mode) {
+  const unit = mode === 'books' ? ' 本书' : ' 个系列';
   return '<div class="bulkbar">' +
-    '<div class="bulkbar-top"><span class="mini">已选 <b>' + n + '</b> 个系列</span><span class="mini" id="bulkProg"></span>' +
+    '<div class="bulkbar-top"><span class="mini">已选 <b>' + n + '</b>' + unit + '</span><span class="mini" id="bulkProg"></span>' +
     '<button class="btn xs ghost" data-bulk="clear" style="margin-left:auto">取消选择</button></div>' +
     '<div class="bulkbar-row">' +
     '<button class="btn sm pri" data-bulk="download">' + ico('dl') + '批量下载</button>' +
@@ -1104,28 +1288,41 @@ function bulkBarHtml(n) {
     '</div></div>';
 }
 
-function bulkAction(kind) {
-  const ids = Object.keys(S.browse.sel).filter(id => series(id));
-  if (!ids.length) return toast('先选系列', 'err');
+function seriesOfBooks(bookIds) {
+  const out = [];
+  bookIds.forEach(id => { const b = book(id); if (b && out.indexOf(b.s) < 0) out.push(b.s); });
+  return out;
+}
+
+function bulkAction(kind, mode) {
+  const byBook = mode === 'books';
+  const ids = Object.keys(S.browse.sel).filter(id => (byBook ? book(id) : series(id)));
+  if (!ids.length) return toast(byBook ? '先选书籍' : '先选系列', 'err');
   if (kind === 'clear') { S.browse.sel = {}; return render(); }
   if (!window.LantaiRuntime) return toast('后端不可用', 'err');
+  const sids = byBook ? seriesOfBooks(ids) : ids;
   if (kind === 'read' || kind === 'unread') {
-    const m = kind === 'read' ? 'POST' : 'DELETE';
-    return Promise.all(ids.map(id => LantaiRuntime.request('api/v1/series/' + id + '/read-progress', { method: m }).catch(() => null)))
+    const list = byBook ? ids : ids;
+    const req = id => byBook
+      ? (kind === 'read'
+        ? LantaiRuntime.request('api/v1/books/' + id + '/read-progress', { method: 'PATCH', body: { completed: true } })
+        : LantaiRuntime.request('api/v1/books/' + id + '/read-progress', { method: 'DELETE' }))
+      : LantaiRuntime.request('api/v1/series/' + id + '/read-progress', { method: kind === 'read' ? 'POST' : 'DELETE' });
+    return Promise.all(list.map(id => req(id).then(() => true).catch(() => null)))
       .then(res => {
         const ok = res.filter(x => x !== null).length;
-        toast('已处理 ' + ok + ' / ' + ids.length + ' 个系列', ok === ids.length ? 'ok' : 'warn');
+        toast('已处理 ' + ok + ' / ' + list.length + (byBook ? ' 本书' : ' 个系列'), ok === list.length ? 'ok' : 'warn');
         S.browse.sel = {};
         return LantaiRuntime.hydrate();
       }).then(() => render());
   }
-  if (kind === 'coll') return pickTarget('coll', ids);
-  if (kind === 'list') return pickTarget('list', ids.flatMap(sid => booksOf(sid).map(b => b.id)));
-  if (kind === 'del') return bulkDelete(ids);
-  if (kind === 'download') return bulkDownload(ids);
-  if (kind === 'reparse') return bulkReparse(ids);
-  if (kind === 'enqueue') return bulkScrape(ids, false);
-  if (kind === 'exclude') return bulkExclude(ids);
+  if (kind === 'coll') return pickTarget('coll', sids);
+  if (kind === 'list') return pickTarget('list', byBook ? ids : ids.flatMap(sid => booksOf(sid).map(b => b.id)));
+  if (kind === 'del') return byBook ? bulkDeleteBooks(ids) : bulkDelete(ids);
+  if (kind === 'download') return byBook ? bulkDownloadBooks(ids) : bulkDownload(ids);
+  if (kind === 'reparse') return bulkReparse(sids);
+  if (kind === 'enqueue') return bulkScrape(sids, false, byBook ? ids : null);
+  if (kind === 'exclude') return bulkExclude(sids);
 }
 
 function bulkProg(text) {
@@ -1181,6 +1378,73 @@ function bulkDownload(ids) {
   });
 }
 
+function bulkDownloadBooks(bookIds) {
+  const items = [];
+  let skipped = 0;
+  bookIds.forEach(id => {
+    const b = book(id);
+    if (!b) return;
+    if (isOnlineBook(b) && b.downloaded === false) { skipped++; return; }
+    items.push(b);
+  });
+  if (!items.length) return toast('所选书籍没有可下载的文件' + (skipped ? '，在线未存档章节需先存档' : ''), 'err', 3600);
+  const LIMIT = 60;
+  const cut = Math.min(items.length, LIMIT);
+  openModal({
+    title: '批量下载', width: 480,
+    body: '<div class="note">按原始格式逐个下载 <b>' + cut + '</b> 个文件（epub / txt / cbz / pdf 原样，图片文件夹打包为 zip）。</div>' +
+      (skipped ? '<div class="note gold" style="margin-top:10px">跳过 ' + skipped + ' 个在线未存档章节，需要先在书籍详情里存档为 CBZ。</div>' : '') +
+      (items.length > LIMIT ? '<div class="note red" style="margin-top:10px">本次选中 ' + items.length + ' 个文件，超过单批上限 ' + LIMIT + '。先下载前 ' + LIMIT + ' 个，其余请分批。</div>' : '') +
+      '<div class="note" style="margin-top:10px">浏览器会询问「允许下载多个文件」，请点允许。</div>',
+    foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>开始下载 ' + cut + ' 个</button>',
+    after() {
+      $('#modal [data-x]').onclick = closeModal;
+      $('#modal [data-ok]').onclick = () => {
+        closeModal();
+        let i = 0;
+        const step = () => {
+          if (i >= cut) { bulkProg(''); toast('已发起 ' + cut + ' 个文件下载', 'ok', 3600); return; }
+          const b = items[i++];
+          bulkProg('下载 ' + i + ' / ' + cut);
+          const a = document.createElement('a');
+          a.href = 'api/v1/books/' + b.id + '/file';
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(step, 420);
+        };
+        step();
+      };
+    }
+  });
+}
+
+function bulkDeleteBooks(bookIds) {
+  openModal({
+    title: '删除书籍文件', width: 460,
+    body: '<div class="note red">把选中 ' + bookIds.length + ' 本书的文件移入回收站，可在回收站恢复。</div>' +
+      '<div class="field" style="margin-top:10px"><label>输入「删除」确认</label><input class="inp" id="bdIn" autocomplete="off"></div>',
+    foot: '<button class="btn" data-x>取消</button><button class="btn danger" data-ok>确认删除</button>',
+    after() {
+      $('#modal [data-x]').onclick = closeModal;
+      $('#modal [data-ok]').onclick = () => {
+        if ($('#bdIn').value.trim() !== '删除') return toast('确认词不对', 'err');
+        const btn = $('#modal [data-ok]');
+        btn.disabled = true;
+        Promise.all(bookIds.map(id => LantaiRuntime.request('api/v1/books/' + id + '/file', { method: 'DELETE' }).catch(() => null)))
+          .then(res => {
+            const ok = res.filter(x => x !== null).length;
+            closeModal();
+            toast('已删除 ' + ok + ' / ' + bookIds.length + ' 本书', ok === bookIds.length ? 'ok' : 'warn');
+            S.browse.sel = {};
+            return LantaiRuntime.hydrate();
+          }).then(() => render());
+      };
+    }
+  });
+}
+
 function bulkReparse(ids) {
   openModal({
     title: '重新解析', width: 480,
@@ -1211,11 +1475,16 @@ function bulkReparse(ids) {
   });
 }
 
-function bulkScrape(ids, run) {
+function bulkScrape(ids, run, bookIds) {
+  const byBook = Array.isArray(bookIds) && bookIds.length > 0;
   const label = run ? '重新刮削' : '加入刮削名单';
+  const scope = byBook
+    ? '已选 <b>' + bookIds.length + '</b> 本书，分属 <b>' + ids.length + '</b> 个系列'
+    : '<b>' + ids.length + '</b> 个系列';
   openModal({
     title: label, width: 480,
-    body: '<div class="note">把 <b>' + ids.length + '</b> 个系列' + (run ? '加入刮削名单并立即开始刮削。' : '加入刮削名单，稍后在刮削页统一开始刮削。') + '</div>' +
+    body: '<div class="note">' + scope + (run ? ' 加入刮削名单并立即开始刮削。' : ' 加入刮削名单，稍后在刮削页统一开始刮削。') + '</div>' +
+      (byBook ? '<div class="note" style="margin-top:10px">只登记选中的 ' + bookIds.length + ' 册：检索仍按系列进行，但写入只落在选中的册上，同系列其余册不受影响。</div>' : '') +
       '<div class="note gold" style="margin-top:10px">' + (run ? '会消耗元数据源配额，已存在的名单项会被跳过。' : '只登记不请求，开始刮削时才消耗配额。') + '</div>',
     foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>' + (run ? '开始刮削' : '加入名单') + '</button>',
     after() {
@@ -1223,13 +1492,14 @@ function bulkScrape(ids, run) {
       $('#modal [data-ok]').onclick = () => {
         const btn = $('#modal [data-ok]');
         btn.disabled = true;
-        LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: { seriesIds: ids, run: run } })
+        LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: byBook ? { bookIds: bookIds, run: run } : { seriesIds: ids, run: run } })
           .then(r => {
             closeModal();
-            scPage = null;
-            toast('已加入 ' + r.added + ' 个' + (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
+            toast('已登记 ' + r.added + ' 个系列' + (byBook ? '、' + bookIds.length + ' 册' : '') +
+              (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
             S.browse.sel = {};
             render();
+            loadScrape();
           })
           .catch(e => { btn.disabled = false; toast('提交失败：' + onlineErrText(e), 'err'); });
       };
@@ -1490,8 +1760,12 @@ function modeBarHtml(B) {
 }
 function wireModeChips(v) {
   v.querySelectorAll('[data-bmode]').forEach(el => el.onclick = () => {
+    if (S.browse.mode === el.dataset.bmode) return;
     S.browse.mode = el.dataset.bmode;
     S.browse.pg = 1;
+    S.browse.letter = '';
+    S.browse.sel = {};
+    bookLetterCache = { letter: '', ids: null, busy: false };
     render();
     $('#view').scrollTop = 0;
   });
@@ -1502,20 +1776,131 @@ function wireModeChips(v) {
     $('#view').scrollTop = 0;
   });
 }
-function bookCard(b) {
+const bookTitle = b => (b.mdTitle && String(b.mdTitle).trim()) ? String(b.mdTitle).trim() : b.name;
+const bookFileSub = b => bookTitle(b) === b.name ? '' : b.name;
+const bookNumCn = b => { const n = String(b.mdNum || '').trim(); return n ? '第 ' + n + ' 册' : ''; };
+function libSourceNames() {
+  return [...new Set(SERIES.filter(s => s.online).map(s => s.publisher).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh'));
+}
+function libRefValues(mode) {
+  if (mode === 'books') {
+    const years = [...new Set(BOOKS.map(b => String(b.pub || '').slice(0, 4) || String(seriesOf(b).year || '')).filter(y => y && y !== 'null'))].sort((a, b) => Number(b) - Number(a));
+    const genres = [...new Set(BOOKS.flatMap(b => seriesOf(b).genres || []))].sort((a, b) => a.localeCompare(b, 'zh'));
+    return { years: years, genres: genres };
+  }
+  const rawYears = refCache.years && refCache.years.length ? refCache.years : SERIES.map(s => s.year).filter(Boolean);
+  const years = [...new Set(rawYears.map(y => String(y).slice(0, 4)).filter(Boolean))].sort((a, b) => Number(b) - Number(a));
+  const genres = refCache.genres && refCache.genres.length ? refCache.genres : [...new Set(SERIES.flatMap(s => s.genres || []))].sort((a, b) => a.localeCompare(b, 'zh'));
+  return { years: years, genres: genres };
+}
+function fchip(attr, key, val, label, B) {
+  return '<span class="chip' + ((B[key] || 'all') === val ? ' on' : '') + '" data-' + attr + '="' + esc(val) + '">' + esc(label) + '</span>';
+}
+function libLetterBarHtml(B, mode) {
+  const raw = mode === 'books' ? (bookGroupCache.list || []) : (groupCache.list || []);
+  const groups = raw.filter(g => g && g.group && g.group !== '#' && g.count > 0);
+  const hash = raw.find(g => g && g.group === '#');
+  if (!groups.length && !hash) return '';
+  const list = groups.concat(hash ? [hash] : []);
+  return '<div class="filters"><span class="lbl" style="margin:0">首字母</span><div class="chips">' +
+    '<span class="chip' + (!B.letter ? ' on' : '') + '" data-bletter="">全部</span>' +
+    list.map(g => '<span class="chip' + (B.letter === g.group ? ' on' : '') + '" data-bletter="' + esc(g.group) + '">' + esc(g.group) +
+      '<span class="mini" style="opacity:.55;margin-left:4px">' + g.count + '</span></span>').join('') + '</div></div>';
+}
+function libFilterHtml(B, mode) {
+  const ref = libRefValues(mode), srcNames = libSourceNames();
+  return '<div class="filters">' +
+    (srcNames.length
+      ? '<span class="lbl" style="margin:0">图源</span><div class="chips">' +
+        '<span class="chip' + (B.src === 'all' ? ' on' : '') + '" data-libsrc="all">全部（' + srcNames.length + '）</span>' +
+        srcNames.map(x => '<span class="chip' + (B.src === x ? ' on' : '') + '" data-libsrc="' + esc(x) + '">' + esc(x) + '</span>').join('') +
+        '</div><span class="sep"></span>'
+      : '') +
+    '<span class="lbl" style="margin:0">格式</span><div class="chips">' +
+    fchip('bfmt', 'fmt', 'all', '全部', B) + ['cbx', 'epub', 'pdf', 'txt'].map(x => fchip('bfmt', 'fmt', x, SCAN_CN[x], B)).join('') + '</div>' +
+    '<span class="sep"></span><span class="lbl" style="margin:0">连载</span><div class="chips">' +
+    fchip('bstate', 'sstate', 'all', '全部', B) + ['ONGOING', 'COMPLETED', 'HIATUS'].map(x => fchip('bstate', 'sstate', x, SERIES_STATUS_CN[x], B)).join('') + '</div>' +
+    '<span class="sep"></span><span class="lbl" style="margin:0">年份</span><div class="chips">' +
+    fchip('byear', 'year', 'all', '全部', B) + (ref.years.length ? ref.years.map(y => fchip('byear', 'year', String(y), String(y), B)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
+    '<span class="sep"></span><span class="lbl" style="margin:0">风格</span><div class="chips">' +
+    fchip('bgenre', 'genre', 'all', '全部', B) + (ref.genres.length ? ref.genres.slice(0, 12).map(g => fchip('bgenre', 'genre', g, g, B)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
+    '</div>';
+}
+function libSortBarHtml(B, mode, extra) {
+  const sorts = mode === 'books'
+    ? [['updated', '按更新'], ['title', '按标题'], ['series', '按系列']]
+    : [['updated', '按更新'], ['title', '按标题'], ['count', '按册数']];
+  return '<div class="filters">' +
+    '<span class="lbl" style="margin:0">排序</span><div class="chips">' +
+    sorts.map(x => '<span class="chip' + ((B.sort || 'updated') === x[0] ? ' on' : '') + '" data-bsort="' + x[0] + '">' + x[1] + '</span>').join('') + '</div>' +
+    '<span class="sep"></span><div class="chips">' + (extra || '') + '</div>' +
+    '<input class="inp" style="width:190px;height:31px;margin-left:auto" placeholder="' + (mode === 'books' ? '搜索书名或系列…' : '搜索标题或作者…') + '" value="' + esc(B.q) + '" data-q>' +
+    '<div class="seg"><button class="' + (B.view === 'grid' ? 'on' : '') + '" data-view="grid">' + ico('grid') + '</button><button class="' + (B.view === 'list' ? 'on' : '') + '" data-view="list">' + ico('list') + '</button></div>' +
+    '</div>';
+}
+function wireLibFilters(v, B) {
+  v.querySelectorAll('[data-bfmt]').forEach(el => el.onclick = () => { B.fmt = el.dataset.bfmt; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bstate]').forEach(el => el.onclick = () => { B.sstate = el.dataset.bstate; B.pg = 1; render(); });
+  v.querySelectorAll('[data-byear]').forEach(el => el.onclick = () => { B.year = el.dataset.byear; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bgenre]').forEach(el => el.onclick = () => { B.genre = el.dataset.bgenre; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bletter]').forEach(el => el.onclick = () => {
+    B.letter = el.dataset.bletter || '';
+    B.pg = 1;
+    if (B.mode === 'books') bookLetterCache = { letter: B.letter, ids: null, busy: false };
+    else { groupCache.key = ''; }
+    render();
+  });
+  v.querySelectorAll('[data-bsort]').forEach(el => el.onclick = () => { B.sort = el.dataset.bsort; B.pg = 1; render(); });
+}
+function bookCard(b, pickSel) {
   const s = seriesOf(b), p = prog(b.id), pct = p && p.pages ? Math.round(p.page / p.pages * 100) : 0;
-  return '<div class="cv" data-book="' + b.id + '">' +
-    coverArt((s.t || '') + b.name, b.name, { id: b.id, kind: 'book', fmt: b.profile, vert: false, badge: isOnlineBook(b) ? '<span class="badge gold">在线</span>' : '' }) +
-    '<div class="cv-meta"><div class="t">' + esc(b.name) + '</div>' +
+  const t = bookTitle(b), n = bookNumCn(b);
+  const box = (pickSel === undefined || pickSel === null) ? ''
+    : '<span class="pkbox' + (pickSel ? ' on' : '') + '" data-pick-b="' + b.id + '" title="选择">' + (pickSel ? '✓' : '') + '</span>';
+  return '<div class="cv pk-wrap" data-book="' + b.id + '">' + box +
+    coverArt((s.t || '') + t, t, { id: b.id, kind: 'book', fmt: b.profile, vert: false, badge: isOnlineBook(b) ? '<span class="badge gold">在线</span>' : (n ? '<span class="st-badge">' + n + '</span>' : '') }) +
+    '<div class="cv-meta"><div class="t">' + esc(t) + '</div>' +
     '<div class="s"><span>' + esc(s.t || '—') + '</span><span style="margin-left:auto">' + bytes(b.size) + '</span></div>' +
     (p ? '<div class="pbar"><i class="' + (p.completed ? 'done' : '') + '" style="width:' + pct + '%"></i></div>' : '') + '</div></div>';
 }
+function runBookLetter(B) {
+  const letter = B.letter || '';
+  if (!letter) return null;
+  if (bookLetterCache.letter === letter) return bookLetterCache.ids;
+  if (!bookLetterCache.busy) {
+    bookLetterCache = { letter: letter, ids: null, busy: true };
+    LantaiRuntime.bookLetterIds(letter)
+      .catch(() => [])
+      .then(ids => {
+        if (bookLetterCache.letter !== letter) return;
+        bookLetterCache.ids = ids || [];
+        bookLetterCache.busy = false;
+        if (String(S.route).indexOf('/browse') === 0) render();
+      });
+  }
+  return null;
+}
+function loadBookGroups() {
+  if (bookGroupCache.busy || (bookGroupCache.list && bookGroupCache.list.length) || !LantaiRuntime.bookLetterGroups) return;
+  bookGroupCache.busy = true;
+  LantaiRuntime.bookLetterGroups()
+    .catch(() => [])
+    .then(list => {
+      bookGroupCache.list = list || [];
+      bookGroupCache.busy = false;
+      if (String(S.route).indexOf('/browse') === 0) render();
+    });
+}
 function renderBooksPage(v, l) {
   const B = S.browse;
-  if (l && ensureCatalog('series', v)) return;
-  if (ensureCatalog('books', v)) return;
+  const gapBooks = catalogGap('books');
+  const gapSeries = catalogGap('series');
+  loadBookGroups();
   if (B.fmt !== 'all' && ['cbx', 'epub', 'pdf', 'txt'].indexOf(B.fmt) < 0) B.fmt = FMT_GROUP(B.fmt) || 'all';
   const CT2 = catalogTotal();
+  const srcNames = libSourceNames();
+  if (B.src !== 'all' && srcNames.indexOf(B.src) < 0) B.src = 'all';
+  const letterIds = runBookLetter(B);
   let list = (l
     ? BOOKS.filter(b => { const s = series(b.s); return !!s && s.lib === l.id; })
     : BOOKS.slice()).filter(b => {
@@ -1523,10 +1908,15 @@ function renderBooksPage(v, l) {
       if (B.bsrc === 'online') return isOnlineBook(b);
       return true;
     });
+  if (B.src !== 'all') list = list.filter(b => (seriesOf(b).publisher || '') === B.src);
   if (B.fmt !== 'all') list = list.filter(b => FMT_GROUP(b.profile) === B.fmt);
-  if (B.q) list = list.filter(b => b.name.indexOf(B.q) >= 0 || seriesOf(b).t.indexOf(B.q) >= 0);
+  if (B.sstate !== 'all') list = list.filter(b => seriesOf(b).status === B.sstate);
+  if (B.year !== 'all') list = list.filter(b => (String(b.pub || '').slice(0, 4) || String(seriesOf(b).year || '')) === B.year);
+  if (B.genre !== 'all') list = list.filter(b => (seriesOf(b).genres || []).indexOf(B.genre) >= 0);
+  if (B.q) list = list.filter(b => bookTitle(b).indexOf(B.q) >= 0 || b.name.indexOf(B.q) >= 0 || seriesOf(b).t.indexOf(B.q) >= 0);
+  if (letterIds) { const set = new Set(letterIds); list = list.filter(b => set.has(b.id)); }
   const sk = b => String(b.last || b.added || '');
-  list.sort((a, b) => B.sort === 'title' ? a.name.localeCompare(b.name, 'zh')
+  list.sort((a, b) => B.sort === 'title' ? bookTitle(a).localeCompare(bookTitle(b), 'zh')
     : B.sort === 'series' ? (seriesOf(a).t + '\u0000' + String(a.num || '')).localeCompare(seriesOf(b).t + '\u0000' + String(b.num || ''), 'zh')
       : sk(b).localeCompare(sk(a)));
 
@@ -1536,56 +1926,71 @@ function renderBooksPage(v, l) {
   B.pg = clamp(Number(B.pg) || 1, 1, pgMax);
   const pageList = pgAll ? list : list.slice((B.pg - 1) * pgSize, (B.pg - 1) * pgSize + pgSize);
   const sizeAll = list.reduce((a, b) => a + b.size, 0);
+  const letterNote = (B.letter && !letterIds) ? '<span class="badge">检索中</span>' : '';
   const head = l
     ? '<div class="crumb"><a data-go="/browse">书库</a><i>/</i><b>' + esc(l.name) + '</b></div>' +
-      '<div class="ph"><div><h1>' + esc(l.name) + ' <span class="badge ' + (l.type === 'ONLINE' ? 'gold' : 'moss') + '">' + (TYPE_CN[l.type] || l.type) + '</span></h1>' +
+      '<div class="ph"><div><h1>' + esc(l.name) + ' <span class="badge ' + (l.type === 'ONLINE' ? 'gold' : 'moss') + '">' + (TYPE_CN[l.type] || l.type) + '</span>' + gapBooks + '</h1>' +
       '<div class="sub mono">' + esc(l.root) + ' · ' + (INTERVAL_CN[l.interval] || l.interval) + '扫描 · ' + num(list.length) + ' 册 · ' + bytes(sizeAll) + '</div></div>' +
       '<div class="acts">' + (l.type === 'ONLINE'
         ? '<span class="badge warn">' + ico('shield') + ' 受管库 · 扫描入口已隐藏</span><button class="btn" data-go="/online">' + ico('globe') + '在线源入口</button>'
         : '<button class="btn" data-act="scanlib" data-id="' + l.id + '">' + ico('sync') + '扫描库</button><button class="btn" data-editlib="' + l.id + '">' + ico('edit') + '编辑</button>') +
       '<button class="btn pri" data-act="addbook">' + ico('plus') + '导入书籍</button></div></div>'
-    : '<div class="ph"><div><h1>书库</h1><div class="sub">全部 ' + num(CT2.series) + ' 系列 · ' + num(CT2.books) + ' 册 · ' + bytes(sizeAll) + '</div></div>' +
+    : '<div class="ph"><div><h1>书库 ' + letterNote + gapBooks + gapSeries + '</h1><div class="sub">全部 ' + num(CT2.series) + ' 系列 · ' + num(CT2.books) + ' 册 · ' + bytes(sizeAll) + '</div></div>' +
       '<div class="acts"><button class="btn pri" data-go="/scrape">' + ico('wand') + '刮削与元数据</button><button class="btn" data-go="/libraries">' + ico('settings') + '书库设置</button></div></div>';
 
+  const sel = B.sel || (B.sel = {});
+  const picked = Object.keys(sel).filter(id => book(id));
+  const allPicked = pageList.length > 0 && pageList.every(b => sel[b.id]);
+
   v.innerHTML = head + modeBarHtml(B) +
-    '<div class="filters"><span class="lbl" style="margin:0">格式</span><div class="chips">' +
-    '<span class="chip' + (B.fmt === 'all' ? ' on' : '') + '" data-bfmt="all">全部</span>' +
-    ['cbx', 'epub', 'pdf', 'txt'].map(x => '<span class="chip' + (B.fmt === x ? ' on' : '') + '" data-bfmt="' + x + '">' + SCAN_CN[x] + '</span>').join('') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">排序</span><div class="chips">' +
-    '<span class="chip' + (B.sort !== 'title' && B.sort !== 'series' ? ' on' : '') + '" data-bsort="updated">按更新</span>' +
-    '<span class="chip' + (B.sort === 'title' ? ' on' : '') + '" data-bsort="title">按标题</span>' +
-    '<span class="chip' + (B.sort === 'series' ? ' on' : '') + '" data-bsort="series">按系列</span></div>' +
-    '<input class="inp" style="width:190px;height:31px;margin-left:auto" placeholder="搜索书名或系列…" value="' + esc(B.q) + '" data-q>' +
-    '<div class="seg"><button class="' + (B.view === 'grid' ? 'on' : '') + '" data-view="grid">' + ico('grid') + '</button><button class="' + (B.view === 'list' ? 'on' : '') + '" data-view="list">' + ico('list') + '</button></div>' +
-    '</div>';
+    libLetterBarHtml(B, 'books') +
+    libFilterHtml(B, 'books') +
+    libSortBarHtml(B, 'books', pickChipsHtml(B, allPicked, picked.length));
 
   if (!pageList.length) {
-    v.insertAdjacentHTML('beforeend', '<div class="empty"><svg><use href="#i-book"/></svg><h4>没有符合条件的书籍</h4><p>换一个格式或关键词，或切回按系列。</p></div>');
+    const msg = (B.letter || B.fmt !== 'all' || B.sstate !== 'all' || B.year !== 'all' || B.genre !== 'all' || B.src !== 'all' || B.q)
+      ? '<div class="empty"><svg><use href="#i-book"/></svg><h4>没有符合条件的书籍</h4><p>换一个筛选条件，或切回按系列。</p></div>'
+      : '<div class="empty"><svg><use href="#i-book"/></svg><h4>还没有书籍</h4><p>导入或扫描书库后这里会出现全部书籍。</p></div>';
+    v.insertAdjacentHTML('beforeend', msg);
   } else if (B.view === 'grid') {
-    const ck = chunkList(pageList, b => bookCard(b));
+    const ck = chunkList(pageList, b => bookCard(b, B.pick ? !!sel[b.id] : null));
     v.insertAdjacentHTML('beforeend', '<div class="shelf" data-chunk>' + ck.head + '</div>');
     mountChunked(v, ck);
   } else {
-    const ck = chunkList(pageList, b => bookRow(b));
-    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody data-chunk>' + ck.head + '</tbody></table></div>');
+    const ck = chunkList(pageList, b => bookRow(b, B.pick ? !!sel[b.id] : null));
+    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr>' + (B.pick ? '<th></th>' : '') + '<th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody data-chunk>' + ck.head + '</tbody></table></div>');
     mountChunked(v, ck);
   }
   v.setAttribute('data-total', String(list.length));
   v.insertAdjacentHTML('beforeend', pagerHtml(B, list.length));
   wirePager(v, B);
+
+  if (B.pick && picked.length) v.insertAdjacentHTML('beforeend', bulkBarHtml(picked.length, 'books'));
+
   wire(v);
-  v.querySelectorAll('[data-bfmt]').forEach(el => el.onclick = () => { B.fmt = el.dataset.bfmt; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bsort]').forEach(el => el.onclick = () => { B.sort = el.dataset.bsort; B.pg = 1; render(); });
+  wireLibFilters(v, B);
   wireModeChips(v);
+
+  const bm = v.querySelector('[data-bulk-mode]');
+  if (bm) bm.onclick = () => { B.pick = !B.pick; if (!B.pick) B.sel = {}; render(); };
+  v.querySelectorAll('[data-bulk]').forEach(el => el.onclick = () => bulkAction(el.dataset.bulk, 'books'));
+  v.querySelectorAll('[data-pick-b]').forEach(el => el.onclick = e => {
+    e.stopPropagation();
+    const id = el.dataset.pickB;
+    if (B.sel[id]) delete B.sel[id]; else B.sel[id] = 1;
+    render();
+  });
+  const allBtn = v.querySelector('[data-bulk-all]');
+  if (allBtn) allBtn.onclick = () => { pageList.forEach(b => { if (allPicked) delete B.sel[b.id]; else B.sel[b.id] = 1; }); render(); };
+  const clr = v.querySelector('[data-bulk-clear]');
+  if (clr) clr.onclick = () => { B.sel = {}; render(); };
 }
 function renderAllSeries(v) {
   const B = S.browse;
   if (B.mode === 'books') return renderBooksPage(v, null);
   const sel = B.sel;
-  if (B.q || B.letter || B.fmt !== 'all' || B.sstate !== 'all' || B.year !== 'all' || B.genre !== 'all') {
-    if (ensureCatalog('series', v)) return;
-    if (B.fmt !== 'all' && ensureCatalog('books', v)) return;
-  }
+  const gapSeries = catalogGap('series');
+  const gapBooks = B.fmt !== 'all' ? catalogGap('books') : '';
   runBrowseSearch(B);
   loadRef();
   loadGroups(B);
@@ -1613,65 +2018,25 @@ function renderAllSeries(v) {
   B.pg = clamp(Number(B.pg) || 1, 1, pgMax);
   const pageList = pgAll ? list : list.slice((B.pg - 1) * pgSize, (B.pg - 1) * pgSize + pgSize);
 
-  const rawYears = refCache.years && refCache.years.length ? refCache.years : SERIES.map(s => s.year).filter(Boolean);
-  const years = [...new Set(rawYears.map(y => String(y).slice(0, 4)).filter(Boolean))].sort((a, b) => Number(b) - Number(a));
-  const genres = refCache.genres && refCache.genres.length ? refCache.genres : [...new Set(SERIES.flatMap(s => s.genres || []))].sort((a, b) => a.localeCompare(b, 'zh'));
   const CT2 = catalogTotal();
   const picked = Object.keys(sel).filter(id => series(id));
   const allPicked = pageList.length > 0 && pageList.every(s => sel[s.id]);
 
-  const chip = (attr, key, val, label) =>
-    '<span class="chip' + ((B[key] || 'all') === val ? ' on' : '') + '" data-' + attr + '="' + esc(val) + '">' + esc(label) + '</span>';
-
-  const gmap = {};
-  (groupCache.list || []).forEach(g => { gmap[g.group] = g.count; });
-  const groups = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(a => gmap[a]).map(a => ({ group: a, count: gmap[a] }));
-  if (gmap['#']) groups.push({ group: '#', count: gmap['#'] });
-  const letterBar = groups.length
-    ? '<div class="filters"><span class="lbl" style="margin:0">首字母</span><div class="chips">' +
-    '<span class="chip' + (!B.letter ? ' on' : '') + '" data-bletter="">全部</span>' +
-    groups.map(g => '<span class="chip' + (B.letter === g.group ? ' on' : '') + '" data-bletter="' + esc(g.group) + '">' + esc(g.group) +
-      '<span class="mini" style="opacity:.55;margin-left:4px">' + g.count + '</span></span>').join('') + '</div></div>'
-    : '';
   const searchState = (B.q || B.letter)
     ? (browseCache.key === browseKey(B) && browseCache.ids ? '<span class="badge ok">服务端检索</span>'
       : browseCache.busy ? '<span class="badge">检索中</span>' : '<span class="badge warn">本地匹配</span>')
     : '';
 
   v.innerHTML =
-    '<div class="ph"><div><h1>书库 ' + searchState + '</h1><div class="sub">全部 ' + CT2.series + ' 系列 · ' + CT2.books + ' 册' + (CT2.booksDone ? ' · ' + bytes(BOOKS.reduce((a, b) => a + b.size, 0)) : ' · 统计随加载更新') + '</div></div>' +
+    '<div class="ph"><div><h1>书库 ' + searchState + gapSeries + gapBooks + '</h1><div class="sub">全部 ' + CT2.series + ' 系列 · ' + CT2.books + ' 册' + (CT2.booksDone ? ' · ' + bytes(BOOKS.reduce((a, b) => a + b.size, 0)) : ' · 统计随加载更新') + '</div></div>' +
     '<div class="acts">' +
     '<button class="btn pri" data-go="/scrape">' + ico('wand') + '刮削与元数据</button>' +
     '<button class="btn" data-go="/libraries">' + ico('settings') + '书库设置</button>' +
     '</div></div>' +
     modeBarHtml(B) +
-    letterBar +
-    '<div class="filters">' +
-    (srcNames.length
-      ? '<span class="lbl" style="margin:0">图源</span><div class="chips">' +
-        '<span class="chip' + (B.src === 'all' ? ' on' : '') + '" data-libsrc="all">全部（' + srcNames.length + '）</span>' +
-        srcNames.map(x => '<span class="chip' + (B.src === x ? ' on' : '') + '" data-libsrc="' + esc(x) + '">' + esc(x) + '</span>').join('') +
-        '</div><span class="sep"></span>'
-      : '') +
-    '<span class="lbl" style="margin:0">格式</span><div class="chips">' +
-    chip('bfmt', 'fmt', 'all', '全部') + ['cbx', 'epub', 'pdf', 'txt'].map(x => chip('bfmt', 'fmt', x, SCAN_CN[x])).join('') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">连载</span><div class="chips">' +
-    chip('bstate', 'sstate', 'all', '全部') + ['ONGOING', 'COMPLETED', 'HIATUS'].map(x => chip('bstate', 'sstate', x, SERIES_STATUS_CN[x])).join('') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">年份</span><div class="chips">' +
-    chip('byear', 'year', 'all', '全部') + (years.length ? years.map(y => chip('byear', 'year', String(y), String(y))).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">风格</span><div class="chips">' +
-    chip('bgenre', 'genre', 'all', '全部') + (genres.length ? genres.slice(0, 12).map(g => chip('bgenre', 'genre', g, g)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
-    '</div>' +
-    '<div class="filters">' +
-    '<span class="lbl" style="margin:0">排序</span><div class="chips">' +
-    chip('bsort', 'sort', 'updated', '按更新') + chip('bsort', 'sort', 'title', '按标题') + chip('bsort', 'sort', 'count', '按册数') + '</div>' +
-    '<span class="sep"></span><div class="chips">' +
-    '<span class="chip' + (B.pick ? ' on' : '') + '" data-bulk-mode>' + (B.pick ? '退出多选' : '多选') + '</span>' +
-    (B.pick ? '<span class="chip' + (allPicked ? ' on' : '') + '" data-bulk-all>' + (allPicked ? '取消全选' : '全选本页') + '</span>' : '') +
-    (B.pick && picked.length ? '<span class="chip" data-bulk-clear>清空 ' + picked.length + '</span>' : '') + '</div>' +
-    '<input class="inp" style="width:190px;height:31px;margin-left:auto" placeholder="搜索标题或作者…" value="' + esc(B.q) + '" data-q>' +
-    '<div class="seg"><button class="' + (B.view === 'grid' ? 'on' : '') + '" data-view="grid">' + ico('grid') + '</button><button class="' + (B.view === 'list' ? 'on' : '') + '" data-view="list">' + ico('list') + '</button></div>' +
-    '</div>';
+    libLetterBarHtml(B, 'series') +
+    libFilterHtml(B, 'series') +
+    libSortBarHtml(B, 'series', pickChipsHtml(B, allPicked, picked.length));
 
   v.setAttribute('data-total', String(list.length));
   if (!pageList.length) {
@@ -1704,20 +2069,15 @@ function renderAllSeries(v) {
   v.insertAdjacentHTML('beforeend', pagerHtml(B, list.length));
   wirePager(v, B);
 
-  if (B.pick && picked.length) v.insertAdjacentHTML('beforeend', bulkBarHtml(picked.length));
+  if (B.pick && picked.length) v.insertAdjacentHTML('beforeend', bulkBarHtml(picked.length, 'series'));
 
   wire(v);
 
   const bm = v.querySelector('[data-bulk-mode]');
   if (bm) bm.onclick = () => { B.pick = !B.pick; if (!B.pick) S.browse.sel = {}; render(); };
 
-  v.querySelectorAll('[data-bulk]').forEach(el => el.onclick = () => bulkAction(el.dataset.bulk));
-  v.querySelectorAll('[data-bfmt]').forEach(el => el.onclick = () => { B.fmt = el.dataset.bfmt; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bstate]').forEach(el => el.onclick = () => { B.sstate = el.dataset.bstate; B.pg = 1; render(); });
-  v.querySelectorAll('[data-byear]').forEach(el => el.onclick = () => { B.year = el.dataset.byear; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bgenre]').forEach(el => el.onclick = () => { B.genre = el.dataset.bgenre; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bletter]').forEach(el => el.onclick = () => { B.letter = el.dataset.bletter || ''; B.pg = 1; groupCache.key = ''; render(); });
-  v.querySelectorAll('[data-bsort]').forEach(el => el.onclick = () => { B.sort = el.dataset.bsort; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bulk]').forEach(el => el.onclick = () => bulkAction(el.dataset.bulk, 'series'));
+  wireLibFilters(v, B);
   v.querySelectorAll('[data-pick-s]').forEach(el => el.onclick = e => {
     e.stopPropagation();
     const id = el.dataset.pickS;
@@ -1926,6 +2286,8 @@ function editBookMeta(bid) {
       '<div class="grid g-2" style="gap:0 14px">' + mField('出版日期', 'bmDate', md.releaseDate, 'YYYY-MM-DD') + mField('ISBN', 'bmIsbn', md.isbn) + '</div>' +
       mArea('简介', 'bmSummary', md.summary) +
       mField('作者', 'bmAuthors', (md.authors || []).map(a => a.name).join(', '), '逗号分隔') +
+      '<div class="grid g-2" style="gap:0 14px">' + mField('出版社', 'bmPublisher', md.publisher) + mField('语言', 'bmLanguage', md.language) + '</div>' +
+      mField('分类', 'bmGenres', Array.from(md.genres || []).join(', '), '逗号分隔') +
       mField('标签', 'bmTags', Array.from(md.tags || []).join(', '), '逗号分隔'),
       () => {
         const body = {};
@@ -1938,6 +2300,10 @@ function editBookMeta(bid) {
         if (d) body.releaseDate = d;
         const au = mList(mVal('bmAuthors'));
         if (au.length) body.authors = au.map(n => ({ name: n }));
+        put('publisher', mVal('bmPublisher'));
+        put('language', mVal('bmLanguage'));
+        const g = mList(mVal('bmGenres'));
+        if (g.length) body.genres = g;
         const t = mList(mVal('bmTags'));
         if (t.length) body.tags = t;
         return LantaiRuntime.request('api/v1/books/' + bid + '/metadata', { method: 'PATCH', body: body })
@@ -2007,10 +2373,64 @@ function coverModal(kind, id, title) {
   }).catch(e => toast('封面读取失败：' + onlineErrText(e), 'err'));
 }
 
+function coverLightbox(kind, id, title) {
+  if (!window.LantaiRuntime || !id) return toast('后端不可用', 'err');
+  const seg = kind === 'series' ? 'series' : 'books';
+  const path = 'api/v1/' + seg + '/' + id;
+  const src = path + '/thumbnail?t=' + Date.now();
+  openModal({
+    title: title || '封面',
+    width: 760,
+    body:
+      '<div style="background:var(--bg-2);border-radius:8px;padding:12px;text-align:center">' +
+      '<img src="' + src + '" alt="" style="max-width:100%;max-height:68vh;object-fit:contain;border-radius:4px">' +
+      '</div>' +
+      '<div class="note" style="margin-top:10px">替换封面只写库内缩略图（USER_UPLOADED），不改动原始文件；自动封面会随扫描重建。</div>',
+    foot: '<button class="btn" data-x>关闭</button>' +
+      '<button class="btn" data-save>' + ico('dl') + '保存原图</button>' +
+      '<button class="btn" data-rep>' + ico('upload') + '替换封面</button>' +
+      '<button class="btn ghost" data-manage>' + ico('layers') + '封面管理</button>',
+    after() {
+      $('#modal [data-x]').onclick = closeModal;
+      $('#modal [data-save]').onclick = () => {
+        const a = document.createElement('a');
+        a.href = path + '/thumbnail';
+        a.download = String(title || kind) + '.jpg';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast('已开始下载原图', 'ok');
+      };
+      $('#modal [data-rep]').onclick = () => {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/*';
+        inp.onchange = () => {
+          if (!inp.files || !inp.files[0]) return;
+          const fd = new FormData();
+          fd.append('file', inp.files[0]);
+          fd.append('selected', 'true');
+          fetch(path + '/thumbnails', { method: 'POST', credentials: 'same-origin', body: fd })
+            .then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(t || ('HTTP ' + r.status)))))
+            .then(() => {
+              closeModal();
+              toast('封面已替换', 'ok');
+              return LantaiRuntime.hydrate();
+            })
+            .then(() => render())
+            .catch(e => toast('替换失败：' + onlineErrText(e), 'err'));
+        };
+        inp.click();
+      };
+      $('#modal [data-manage]').onclick = () => { closeModal(); coverModal(kind, id, title); };
+    }
+  });
+}
+
 /* ---- 系列详情 ---- */
 Routes.series = (v, seg) => {
   const s = series(seg[0]); if (!s) return go('/browse');
-  const L = lib(s.lib), st = statOf(s.id), p = bestProgress(s.id);
+  const L = lib(s.lib) || { root: '', type: '', interval: '' }, st = statOf(s.id), p = bestProgress(s.id);
   const online = !!s.online;
   const osub = online && onlineSubs ? onlineSubs.find(x => x.seriesId === s.id) : null;
   const och = onlineChapterCache[s.id];
@@ -2018,7 +2438,7 @@ Routes.series = (v, seg) => {
   v.innerHTML =
     '<div class="crumb"><a data-go="/browse">书库</a><i>/</i><b>' + esc(s.t) + '</b></div>' +
     '<div class="card" style="display:flex;gap:20px;padding:20px;margin-bottom:20px;align-items:flex-start">' +
-    '<div style="width:150px;flex:none;cursor:pointer" data-go="/book/' + (booksOf(s.id)[0] || { id: '' }).id + '">' + coverArt(s.t + 'x', s.t, { id: s.id, kind: 'series' }) + '</div>' +
+    '<div style="width:150px;flex:none;cursor:pointer" data-cov="series:' + s.id + '" data-cov-title="' + esc(s.t) + '" title="点击查看大图">' + coverArt(s.t + 'x', s.t, { id: s.id, kind: 'series' }) + '</div>' +
     '<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
     '<h1 style="font-family:var(--f-disp);font-size:26px;letter-spacing:1.5px">' + esc(s.t) + '</h1>' +
     (online ? '<span class="badge gold">在线 · ' + esc(s.publisher || '在线源') + '</span>' : '<span class="badge">' + (SERIES_STATUS_CN[s.status] || s.status) + '</span>') +
@@ -2059,7 +2479,7 @@ Routes.series = (v, seg) => {
 
   if (!online) {
     v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
-      booksOf(s.id).map(bookRow).join('') + '</tbody></table></div>');
+      booksOf(s.id).map(b => bookRow(b)).join('') + '</tbody></table></div>');
   } else if (!och) {
     v.insertAdjacentHTML('beforeend', '<div class="note">正在加载章节…</div>');
     loadOnlineChapters(s.id);
@@ -2087,7 +2507,7 @@ Routes.series = (v, seg) => {
 Routes.book = (v, seg) => {
   const b = book(seg[0]);
   if (!b) return go('/browse');
-  const s = seriesOf(b), L = lib(s.lib), p = prog(b.id);
+  const s = seriesOf(b), L = lib(s.lib) || { root: '', type: '' }, p = prog(b.id);
   const unsup = b.status === 'UNSUPPORTED';
   const online = isOnlineBook(b);
   const pc = p && p.pages ? (p.page / p.pages * 100) : 0;
@@ -2095,17 +2515,19 @@ Routes.book = (v, seg) => {
   const pathText = (s.online ? '在线库/…/' : L.root.replace(/^.*library\//, '') + '/') + b.name;
   v.innerHTML =
     '<div class="crumb"><a data-go="/browse">书库</a><i>/</i>' +
-    (s.t === b.name ? '' : '<a data-go="/series/' + s.id + '">' + esc(s.t) + '</a><i>/</i>') +
-    '<b>' + esc(b.name) + '</b></div>' +
+    (s.t === bookTitle(b) ? '' : '<a data-go="/series/' + s.id + '">' + esc(s.t) + '</a><i>/</i>') +
+    '<b>' + esc(bookTitle(b)) + '</b></div>' +
     '<div class="bk-head">' +
-    '<div class="bk-side">' + coverArt(s.t + b.id, s.t, { id: online ? '' : b.id, kind: 'book', fmt: b.fmt, status: b.status, vert: true }) + '</div>' +
+    '<div class="bk-side" style="cursor:zoom-in" data-cov="books:' + b.id + '" data-cov-title="' + esc(bookTitle(b)) + '" title="点击查看大图">' + coverArt(s.t + b.id, s.t, { id: online ? '' : b.id, kind: 'book', fmt: b.fmt, status: b.status, vert: true }) + '</div>' +
     '<div class="bk-body">' +
-    '<div class="bk-title"><h1>' + esc(b.name) + '</h1>' + statusBadge(b) +
-    '<span class="badge">' + (PROFILE_CN[b.profile] || b.profile) + '</span></div>' +
+    '<div class="bk-title"><h1>' + esc(bookTitle(b)) + '</h1>' + statusBadge(b) +
+    '<span class="badge">' + (PROFILE_CN[b.profile] || b.profile) + '</span>' +
+    (bookNumCn(b) ? '<span class="badge">' + bookNumCn(b) + '</span>' : '') + '</div>' +
+    (bookFileSub(b) ? '<div class="mini mono-sm" id="bkFileSub" style="margin:-2px 0 8px">文件名：' + esc(bookFileSub(b)) + '</div>' : '') +
     (b.note ? '<div class="note" style="margin:8px 0 0">' + esc(b.note) + '</div>' : '') +
-    '<div class="kv-grid">' +
+    '<div class="kv-grid" id="bkFileGrid">' +
     kvSpan('格式', fmtCn(b.fmt)) + kvSpan('大小', bytes(b.size)) +
-    kvSpan('页数 / 章节', num(b.pages) + (b.profile === 'TXT' ? ' 章' : '')) +
+    kvSpan('页数 / 章节', b.pages ? num(b.pages) + ((b.profile === 'EPUB' && !b.divina) || b.profile === 'TXT' ? ' 章' : ' 页') : '—') +
     kvSpan('尺寸', b.w ? b.w + ' × ' + b.h : (b.chs ? b.chs + ' 章' : '—')) +
     kvSpan('编码', b.enc || (b.profile === 'EPUB' ? 'UTF-8' : '—')) +
     kvSpan('来源', online ? (b.downloaded ? '在线订阅 · 已存档' : '在线代取') : '本地扫描') +
@@ -2127,6 +2549,12 @@ Routes.book = (v, seg) => {
     '<button class="btn sm ghost danger" data-bdel="' + b.id + '">' + ico('trash') + '删除文件</button>' +
     '</div>' +
     '</div></div>' +
+
+    '<div class="card" id="bkMetaCard"><div class="card-h">' +
+    '<h3>' + ico('info') + ' 书籍信息</h3>' +
+    '<div class="r"><span class="mini" id="bkMetaState">读取中…</span>' +
+    '<button class="btn sm ghost" data-bmeta="' + b.id + '">' + ico('edit') + '编辑元数据</button></div></div>' +
+    '<div id="bkMetaBody"><div class="mini" style="padding:6px 0">正在读取元数据…</div></div></div>' +
 
     '<div class="bk-pair">' +
     (p ? '<div class="card bk-mini"><div class="card-h"><h3>' + ico('clock') + ' 阅读进度</h3>' +
@@ -2152,8 +2580,118 @@ Routes.book = (v, seg) => {
     '<div id="tocPager" class="toc-pager"></div></div>';
   wire(v);
   openBookToc(b);
+  loadBookMeta(b);
   bookReadingTime(b.id);
 };
+
+const META_LOCK_CN = {
+  title: '书名', summary: '简介', number: '序号', numberSort: '排序序号', releaseDate: '出版日期',
+  authors: '作者', tags: '标签', isbn: 'ISBN', links: '链接', notableEntities: '显著实体'
+};
+
+const META_ROLE_CN = {
+  writer: '作者', author: '作者', artist: '画师', penciller: '铅笔', inker: '勾线',
+  colorist: '上色', letterer: '嵌字', cover: '封面', editor: '编辑', translator: '翻译'
+};
+
+function metaDate(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return String(v);
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function metaUrl(u) {
+  const v = String(u || '').trim();
+  return /^https?:\/\//i.test(v) ? v : '';
+}
+
+function loadBookMeta(b) {
+  if (!window.LantaiRuntime) return;
+  LantaiRuntime.request('api/v1/books/' + b.id).then(raw => {
+    const box = $('#bkMetaBody');
+    if (box) paintBookMeta(b, raw || {});
+  }).catch(e => {
+    const box = $('#bkMetaBody'), st = $('#bkMetaState');
+    if (st) st.textContent = '读取失败';
+    if (box) box.innerHTML = '<div class="mini" style="padding:6px 0">元数据读取失败：' + esc(onlineErrText(e)) + '</div>';
+  });
+}
+
+function paintBookMeta(b, raw) {
+  const box = $('#bkMetaBody');
+  if (!box || !box.isConnected) return;
+  const md = raw.metadata || {};
+  const s = seriesOf(b);
+  const st = $('#bkMetaState');
+  if (st) st.textContent = '';
+  const val = v => (v === undefined || v === null || String(v).trim() === '') ? '—' : String(v);
+  const row = (k, v, cls) => '<div class="kv' + (cls ? ' ' + cls : '') + '"><span class="k">' + esc(k) + '</span><span class="v">' + esc(v) + '</span></div>';
+  const authors = (md.authors || []).map(a => {
+    const role = META_ROLE_CN[String(a.role || '').toLowerCase()] || a.role;
+    return role ? a.name + '（' + role + '）' : a.name;
+  }).join('、');
+  const notable = (md.notableEntities || []).map(e => (e.kind ? e.kind + '：' : '') + e.name).join('、');
+  const tags = Array.from(new Set([].concat(Array.from(md.tags || []), Array.from(s.tags || []))));
+  const genres = Array.from(new Set(Array.from((md.genres && md.genres.length) ? md.genres : (s.genres || []))));
+  const links = (md.links || []).filter(l => metaUrl(l.url));
+  const locked = Object.keys(META_LOCK_CN).filter(k => md[k + 'Lock']).map(k => META_LOCK_CN[k]);
+  const summary = String(md.summary || '').trim();
+
+  box.innerHTML =
+    '<div class="kv-grid" style="grid-template-columns:repeat(auto-fit,minmax(128px,1fr))">' +
+    row('书名', val(md.title || b.name), 'span2') +
+    row('序号', val(md.number)) +
+    row('排序序号', val(md.numberSort)) +
+    row('出版日期', val(md.releaseDate)) +
+    row('ISBN', val(md.isbn)) +
+    row('作者', val(authors), 'span2') +
+    row('出版社', val(md.publisher || s.publisher)) +
+    row('语言', val(md.language || s.lang)) +
+    row('丛书状态', val(SERIES_STATUS_CN[s.status] || s.status)) +
+    row('分类', val(genres.join(' / ')), 'span2') +
+    row('标签', val(tags.join('、')), 'span2') +
+    row('显著实体', val(notable), 'span2') +
+    row('元数据更新', metaDate(md.lastModified)) +
+    row('锁定字段', locked.length ? locked.join('、') : '无', 'span2') +
+    '</div>' +
+    '<div class="mini" style="margin:14px 0 4px">简介</div>' +
+    (summary ? '<div class="note ser-sum" data-sum title="点击展开或收起">' + esc(summary) + '</div>' : '<div class="mini">—</div>') +
+    '<div class="mini" style="margin:14px 0 6px">链接</div>' +
+    (links.length
+      ? '<div style="display:flex;gap:8px;flex-wrap:wrap">' + links.map(l =>
+        '<a class="badge" href="' + esc(metaUrl(l.url)) + '" target="_blank" rel="noreferrer noopener">' +
+        ico('ext') + esc(l.label || l.url) + '</a>').join('') + '</div>'
+      : '<div class="mini">—</div>');
+
+  box.querySelectorAll('[data-sum]').forEach(el => el.onclick = () => el.classList.toggle('open'));
+
+  const fg = $('#bkFileGrid');
+  if (fg) {
+    const media = raw.media || {};
+    fg.insertAdjacentHTML('beforeend',
+      row('媒体类型', val(media.mediaType)) +
+      row('入库时间', metaDate(raw.created)) +
+      row('文件修改', metaDate(raw.fileLastModified)) +
+      row('文件哈希', val(raw.fileHash), 'span2 mono-sm'));
+  }
+
+  const title = String(md.title || '').trim();
+  if (title && title !== b.name) {
+    const h1 = $('#view .bk-title h1');
+    if (h1) h1.textContent = title;
+    if (!$('#bkFileSub')) {
+      const sub = document.createElement('div');
+      sub.id = 'bkFileSub';
+      sub.className = 'mini mono-sm';
+      sub.style.margin = '-2px 0 8px';
+      sub.textContent = '文件名：' + b.name;
+      const head = $('#view .bk-title');
+      if (head && head.parentNode) head.parentNode.insertBefore(sub, head.nextSibling);
+    }
+  }
+}
 
 const TOC = { id: '', page: 1, win: 100, full: false, busy: false, err: '', total: 0, entries: [], volumes: [], scroll: false };
 
@@ -2553,7 +3091,7 @@ Routes.readlists = (v, seg) => {
     v.innerHTML = crumb + '<div class="ph"><div><h1>' + esc(r.name) + '</h1><div class="sub">' + (r.desc || ids.length + ' 册') + '</div></div>' +
       '<div class="acts"><button class="btn danger" data-dellist>删除清单</button></div></div>' +
       (ids.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
-        ids.map(book).filter(Boolean).map(bookRow).join('') + '</tbody></table></div>'
+        ids.map(book).filter(Boolean).map(b => bookRow(b)).join('') + '</tbody></table></div>'
         : '<div class="empty"><h4>清单是空的</h4><p>可在新建时选择书籍。</p></div>');
     v.querySelector('[data-dellist]').onclick = () => {
       openModal({
@@ -2651,7 +3189,7 @@ Routes.search = (v, seg, qs) => {
     (total === 0 && !loading ? '<div class="empty">' + '<svg><use href="#i-search"/></svg><h4>没有命中</h4><p>换个关键词；全文检索覆盖标题、作者、摘要、标签与系列名。</p></div>' : '') +
     (r.series.length ? '<h2 style="font-size:15px;margin:22px 0 12px;font-family:var(--f-disp);letter-spacing:1px">系列 · ' + r.series.length + '</h2><div class="shelf">' + r.series.map(s => seriesCard(s.id)).join('') + '</div>' : '') +
     (r.online.length ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">在线系列 · ' + r.online.length + '</h2><div class="shelf">' + r.online.map(s => seriesCard(s.id)).join('') + '</div>' : '') +
-    (r.books.length ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">书籍 · ' + r.books.length + '</h2><div class="tbl-wrap"><table class="tbl"><tbody>' + r.books.map(bookRow).join('') + '</tbody></table></div>' : '') +
+    (r.books.length ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">书籍 · ' + r.books.length + '</h2><div class="tbl-wrap"><table class="tbl"><tbody>' + r.books.map(b => bookRow(b)).join('') + '</tbody></table></div>' : '') +
     ((r.coll.length || r.lists.length) ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">合集与清单</h2>' +
       r.coll.map(c => '<div class="list-i" data-coll="' + c.id + '"><span class="gi">' + '<svg width="16" height="16"><use href="#i-collection"/></svg>' + '</span><div><div class="gt">' + esc(c.name) + '</div><div class="gs">合集 · ' + c.n + ' 系列</div></div><div class="gr"><span class="mini">→</span></div></div>').join('') +
       r.lists.map(x => '<div class="list-i" data-list="' + x.id + '"><span class="gi">' + '<svg width="16" height="16"><use href="#i-readlist"/></svg>' + '</span><div><div class="gt">' + esc(x.name) + '</div><div class="gs">阅读清单 · ' + x.n + ' 册</div></div><div class="gr"><span class="mini">→</span></div></div>').join('') : '');
@@ -3888,8 +4426,9 @@ function syncSeries(sid) {
     .catch(e => toast('同步失败：' + onlineErrText(e), 'err', 4200));
 }
 function paintRuntime() {
-  $('#dSwy').className = 'dot ' + (swyRun() ? '' : 'off');
-  $('#swyText').textContent = swyRun() ? L.t('side.onlineUp') : L.t('side.onlineDown');
+  const dot = $('#dSwy'), text = $('#swyText'), run = swyRun();
+  if (dot) dot.className = 'dot ' + (run ? '' : 'off');
+  if (text) text.textContent = run ? L.t('side.onlineUp') : L.t('side.onlineDown');
 }
 
 /* ============================ 批注（R20） ============================ */
@@ -4153,6 +4692,8 @@ function runOfflineSync() {
 
 let scPage = null, scSettings = null, scTokens = null, scErr = '', scBusy = false;
 let scFilter = '', scOffset = 0, scLimit = 50, scOpen = null, scPreview = null, scPicked = {}, scPoll = null;
+let scBooks = null, scBookPick = {};
+let scBookList = null, scBookListFor = '';
 let scSources = null, scSettingsTab = 'general', scSourceBusy = false, scSseRef = null, scAutoSeries = '';
 
 const SC_FIELD_CN = { title: '标题', summary: '简介', publisher: '出版社', language: '语言', genres: '分类', authors: '作者', releaseDate: '出版日期', isbn: 'ISBN', tags: '标签', cover: '封面' };
@@ -4182,6 +4723,7 @@ function loadScrape() {
     if (Array.isArray(out[2])) scTokens = out[2];
     scBusy = false;
     paintScrape();
+    renderNav();
     scWireSse();
   });
 }
@@ -4198,6 +4740,7 @@ function paintScrape() {
   head.innerHTML = scHeadHtml();
   body.innerHTML = scBodyHtml();
   wireScrape();
+  renderNav();
 }
 function scCounts() {
   const p = scPage || {};
@@ -4214,11 +4757,11 @@ function scHeadHtml() {
     '<button class="btn" data-sc-settings>' + ico('settings') + '刮削设置</button>' +
     '</div></div>' +
     '<div class="grid g-kpi" style="margin-bottom:18px">' +
-    kpi('名单总数', (c.total || 0) + '<small>部</small>', '完成即移出名单', c.total > 0) +
-    kpi('待刮', (c.queued || 0) + '<small>部</small>', '尚未开始', c.queued > 0) +
-    kpi('刮削中', (c.running || 0) + '<small>部</small>', '正在处理', c.running > 0) +
-    kpi('待核对', (c.review || 0) + '<small>部</small>', '与现有信息不一致', c.review > 0) +
-    kpi('失败', (c.failed || 0) + '<small>部</small>', '可重试', c.failed > 0) +
+    kpi('名单总数', (c.total || 0) + '<small>册</small>', '完成即移出名单', c.total > 0) +
+    kpi('待刮', (c.queued || 0) + '<small>册</small>', '尚未开始', c.queued > 0) +
+    kpi('刮削中', (c.running || 0) + '<small>册</small>', '正在处理', c.running > 0) +
+    kpi('待核对', (c.review || 0) + '<small>册</small>', '与现有信息不一致', c.review > 0) +
+    kpi('失败', (c.failed || 0) + '<small>册</small>', '可重试', c.failed > 0) +
     '</div>' +
     (scSettings && scSettings.trustResult ? '<div class="note gold" style="margin-bottom:14px">已开启「信任刮削结果」：冲突字段会被自动覆盖，不再进入待核对。</div>' : '') +
     (scErr ? '<div class="note red" style="margin-bottom:14px">' + esc(scErr) + '</div>' : '');
@@ -4227,14 +4770,17 @@ function scBodyHtml() {
   const p = scPage;
   if (!p && scBusy) return '<div class="card"><div class="empty" style="padding:40px"><h4>正在加载名单</h4></div></div>';
   const items = (p && p.items) || [];
-  const filters = [['', '全部'], ['QUEUED', '待刮'], ['REVIEW', '待核对'], ['FAILED', '失败']];
+  const filters = [['', '全部'], ['QUEUED', '待刮'], ['RUNNING', '刮削中'], ['REVIEW', '待核对'], ['FAILED', '失败']];
   let html = '<div class="card"><div class="card-h"><h3>' + ico('list') + ' 刮削名单</h3>' +
     '<div class="r"><div class="seg">' + filters.map(f => '<button class="' + (scFilter === f[0] ? 'on' : '') + '" data-sc-filter="' + f[0] + '">' + f[1] + '</button>').join('') + '</div>' +
+    '<button class="btn xs" data-sc-export>' + ico('dl') + '导出名单</button>' +
+    '<button class="btn xs ghost" data-sc-import>' + ico('upload') + '导入数据</button>' +
+    '<button class="btn xs ghost" data-sc-help>' + ico('file') + '说明</button>' +
     '<button class="btn xs ghost" data-sc-clear="review"' + ((scCounts().review || 0) ? '' : ' disabled') + '>清待核对</button>' +
     '<button class="btn xs danger" data-sc-clear="all"' + ((scCounts().total || 0) ? '' : ' disabled') + '>清空名单</button></div></div>';
   if (!items.length) {
     html += '<div class="empty" style="padding:40px"><svg><use href="#i-list"/></svg><h4>名单是空的</h4>' +
-      '<p>在书库勾选系列点「加入刮削名单」，或在刮削设置里对整库发起刮削。</p>' +
+      '<p>在书库勾选系列或书籍点「加入刮削名单」，或在刮削设置里对整库发起刮削。</p>' +
       '<div style="margin-top:14px"><button class="btn pri sm" data-go="/browse">去书库勾选</button></div></div></div>';
     return html;
   }
@@ -4251,7 +4797,9 @@ function scBodyHtml() {
         : (x.result && x.result.fields && x.result.fields.length ? '已补 ' + x.result.fields.map(f => SC_FIELD_CN[f] || f).join('、') : esc(x.message || '—'));
     const expandable = x.status === 'REVIEW' || x.status === 'FAILED';
     html += '<tr data-sc-row="' + esc(x.id) + '">' +
-      '<td><div style="font-size:13px">' + esc(x.seriesTitle) + '</div><div class="mini">' + esc(SC_ORIGIN[x.origin] || '') + (x.attempt ? ' · 第 ' + (x.attempt + 1) + ' 次' : '') + '</div></td>' +
+      '<td><div style="font-size:13px">' + esc(x.seriesTitle) +
+      (x.bookCount ? ' <span class="badge" style="cursor:pointer" data-sc-books="' + esc(x.id) + '" title="查看这个系列里的具体册">' + x.bookCount + ' 册' + (scBookListFor === x.id ? ' ▴' : ' ▾') + '</span>' : '') +
+      '</div><div class="mini">' + esc(SC_ORIGIN[x.origin] || '') + (x.attempt ? ' · 第 ' + (x.attempt + 1) + ' 次' : '') + '</div></td>' +
       '<td>' + badge + '</td>' +
       '<td class="mini">' + note + '</td>' +
       '<td class="mini">' + esc(x.source || '—') + (x.score != null ? ' · ' + Math.round(x.score * 100) + '%' : '') + '</td>' +
@@ -4264,20 +4812,30 @@ function scBodyHtml() {
     if (scOpen === x.id && scPreview && scPreview.seriesId === x.seriesId) {
       html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scDiffHtml() + '</td></tr>';
     }
+    if (scBookListFor === x.id) {
+      html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scBookListHtml() + '</td></tr>';
+    }
   });
   html += '</tbody></table></div>';
   const total = (p && p.total) || 0;
   const size = (p && p.limit) || scLimit;
-  html += pagerBarHtml({ total: total, page: Math.floor(scOffset / size) + 1, size: size, unit: ' 部', allowAll: false, maxSize: 200 });
+  html += pagerBarHtml({ total: total, page: Math.floor(scOffset / size) + 1, size: size, unit: ' 条', allowAll: false, maxSize: 200 });
   html += '</div>';
   return html;
 }
 function scDiffHtml() {
   const d = scPreview;
-  if (!d) return '<div class="mini" style="padding:16px">正在计算差异…</div>';
+  let html = '<div style="padding:14px 16px">';
+  if (!d) {
+    html += '<div class="mini">正在计算差异…</div>';
+    return html + scBooksHtml() + '</div>';
+  }
   const fields = (d.diff && d.diff.fields) || [];
-  if (!fields.length) return '<div class="mini" style="padding:16px">没有可用的刮削结果。</div>';
-  let html = '<div style="padding:14px 16px"><div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
+  if (!fields.length) {
+    html += '<div class="mini">没有可用的刮削结果。</div>' + scBooksHtml() + '</div>';
+    return html;
+  }
+  html += '<div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
     '<span class="badge">' + esc(d.source || '本地内嵌') + '</span>' +
     (d.score != null ? '<span class="badge">匹配 ' + Math.round(d.score * 100) + '%</span>' : '') +
     '<span class="mini">勾选要写入的字段，默认已选补充与冲突项。</span></div>' +
@@ -4295,13 +4853,98 @@ function scDiffHtml() {
       '<td class="mini">' + esc(f.chosen || '—') + '</td>' +
       '<td><span class="badge ' + meta[0] + '">' + meta[1] + '</span></td></tr>';
   });
-  html += '</tbody></table></div>' +
+  html += '</tbody></table></div>' + scBooksHtml() +
     '<div class="rowflex" style="gap:8px;margin-top:12px">' +
     '<button class="btn pri sm" data-sc-apply>应用选中字段</button>' +
     '<button class="btn sm" data-sc-applyall>全部采用候选</button>' +
     '<button class="btn ghost sm" data-sc-close>收起</button>' +
     '<span class="mini" style="margin-left:auto">应用后该条移出名单</span></div></div>';
   return html;
+}
+function scBookListHtml() {
+  if (!scBookList) return '<div class="mini" style="padding:14px 16px">正在读取册清单…</div>';
+  if (!scBookList.length) return '<div class="mini" style="padding:14px 16px">这个系列没有可读的册记录。</div>';
+  return '<div style="padding:12px 16px">' +
+    '<div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:8px">' +
+    '<span class="badge ok">' + scBookList.length + ' 册</span>' +
+    '<span class="mini">刮削按册写入：书名、序号、作者、出版日期、ISBN 各自独立，不会把一份值抄给全系列</span></div>' +
+    '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
+    '<th style="width:56px">序号</th><th>书名</th><th style="width:170px">作者</th><th style="width:112px">出版日期</th><th style="width:140px">ISBN</th><th>文件名</th>' +
+    '</tr></thead><tbody>' +
+    scBookList.map((b, i) => '<tr>' +
+      '<td class="mono">' + esc(b.number || String(i + 1)) + '</td>' +
+      '<td>' + esc(b.title || '（未填）') + (b.titleLock ? ' <span class="badge">书名锁定</span>' : '') + '</td>' +
+      '<td class="mini">' + esc((b.authors || []).join('、') || '—') + (b.authorsLock ? ' <span class="badge">锁</span>' : '') + '</td>' +
+      '<td class="mini mono">' + esc(b.releaseDate || '—') + '</td>' +
+      '<td class="mini mono">' + esc(b.isbn || '—') + '</td>' +
+      '<td class="mini mono-sm">' + esc(b.fileName || '') + '</td>' +
+      '</tr>').join('') +
+    '</tbody></table></div></div>';
+}
+function scToggleBooks(id) {
+  if (scBookListFor === id) { scBookListFor = ''; scBookList = null; paintScrape(); return; }
+  scOpen = null;
+  scPreview = null;
+  scBooks = null;
+  scBookListFor = id;
+  scBookList = null;
+  paintScrape();
+  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/books')
+    .then(list => { if (scBookListFor === id) { scBookList = list || []; paintScrape(); } })
+    .catch(e => {
+      if (scBookListFor === id) { scBookListFor = ''; scBookList = null; paintScrape(); toast('读取册清单失败：' + onlineErrText(e), 'err'); }
+    });
+}
+function scBooksHtml() {
+  if (!scBooks) return '<div class="mini" style="margin-top:14px">正在读取册清单…</div>';
+  if (!scBooks.length) return '';
+  const picked = scBooks.filter(b => scBookPick[b.bookId]).length;
+  return '<div style="margin-top:16px">' +
+    '<div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:8px">' +
+    '<span class="badge ok">按册写入</span>' +
+    '<span class="mini">共 ' + scBooks.length + ' 册 · 勾选要写入的册，值可直接改（留空表示该字段不写）</span>' +
+    '<button class="btn xs ghost" data-sc-ball>全选本页</button>' +
+    '<button class="btn xs ghost" data-sc-bnone>清空勾选</button>' +
+    '<span class="mini" id="scBookPicked">已选 ' + picked + ' 册</span></div>' +
+    '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:34px"></th><th>册</th><th>书名</th><th style="width:64px">序号</th><th>作者</th><th style="width:118px">出版日期</th><th style="width:126px">ISBN</th></tr></thead><tbody>' +
+    scBooks.map((b, i) => '<tr>' +
+      '<td><input type="checkbox" data-sc-book="' + esc(b.bookId) + '"' + (scBookPick[b.bookId] ? ' checked' : '') + '></td>' +
+      '<td class="mini">第 ' + (i + 1) + ' 册<div class="mini mono-sm">' + esc(b.fileName) + '</div>' + (b.titleLock ? '<span class="badge">书名锁定</span>' : '') + '</td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="title" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.title) + '"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="number" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.number || '') + '"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="authors" data-sc-bid="' + esc(b.bookId) + '" value="' + esc((b.authors || []).join('、')) + '"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="releaseDate" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.releaseDate || '') + '" placeholder="YYYY-MM-DD"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="isbn" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.isbn || '') + '"></td>' +
+      '</tr>').join('') +
+    '</tbody></table></div></div>';
+}
+function scPaintBookPicked() {
+  const el = $('#scBookPicked');
+  if (!el) return;
+  const n = $$('#view [data-sc-book]').filter(x => x.checked).length;
+  el.textContent = '已选 ' + n + ' 册';
+}
+function collectScBooks() {  const out = [];
+  $$('#view [data-sc-book]').forEach(el => {
+    if (!el.checked) return;
+    const bookId = el.dataset.scBook;
+    const row = { bookId: bookId, fields: [] };
+    $$('#view [data-sc-bf][data-sc-bid="' + bookId + '"]').forEach(inp => {
+      const field = inp.dataset.scBf, value = String(inp.value || '').trim();
+      if (!value) return;
+      if (field === 'authors') {
+        const list = value.split(/[、,，\/]/).map(x => x.trim()).filter(Boolean);
+        if (!list.length) return;
+        row.authors = list;
+        row.fields.push('authors');
+        return;
+      }
+      row[field] = value;
+      row.fields.push(field);
+    });
+    if (row.fields.length) out.push(row);
+  });
+  return out;
 }
 function wireScrape() {
   const start = $('#view [data-sc-start]');
@@ -4321,12 +4964,24 @@ function wireScrape() {
   if (rf) rf.onclick = () => loadScrape();
   const cfg = $('#view [data-sc-settings]');
   if (cfg) cfg.onclick = scSettingsModal;
+  const exp = $('#view [data-sc-export]');
+  if (exp) exp.onclick = scExportModal;
+  const imp = $('#view [data-sc-import]');
+  if (imp) imp.onclick = scImportModal;
+  const hlp = $('#view [data-sc-help]');
+  if (hlp) hlp.onclick = () => scHelpModal('feature');
   $$('#view [data-sc-filter]').forEach(el => el.onclick = () => { scFilter = el.dataset.scFilter; scOffset = 0; scOpen = null; scPreview = null; loadScrape(); });
   $$('#view [data-sc-open]').forEach(el => el.onclick = () => scToggle(el.dataset.scOpen));
+  $$('#view [data-sc-books]').forEach(el => el.onclick = () => scToggleBooks(el.dataset.scBooks));
   $$('#view [data-sc-retry]').forEach(el => el.onclick = () => scRetry(el.dataset.scRetry));
   $$('#view [data-sc-del]').forEach(el => el.onclick = () => scRemove(el.dataset.scDel));
   $$('#view [data-sc-clear]').forEach(el => el.onclick = () => scClear(el.dataset.scClear));
   $$('#view [data-sc-field]').forEach(el => el.onchange = () => { scPicked[el.dataset.scField] = el.checked; });
+  $$('#view [data-sc-book]').forEach(el => el.onchange = () => { scBookPick[el.dataset.scBook] = el.checked; scPaintBookPicked(); });
+  const ball = $('#view [data-sc-ball]');
+  if (ball) ball.onclick = () => { $$('#view [data-sc-book]').forEach(el => { el.checked = true; scBookPick[el.dataset.scBook] = true; }); scPaintBookPicked(); };
+  const bnone = $('#view [data-sc-bnone]');
+  if (bnone) bnone.onclick = () => { scBookPick = {}; $$('#view [data-sc-book]').forEach(el => { el.checked = false; }); scPaintBookPicked(); };
   const ap = $('#view [data-sc-apply]');
   if (ap) ap.onclick = () => scResolve(false);
   const apAll = $('#view [data-sc-applyall]');
@@ -4341,14 +4996,38 @@ function wireScrape() {
   });
 }
 function scToggle(id) {
-  if (scOpen === id) { scOpen = null; scPreview = null; paintScrape(); return; }
+  if (scOpen === id) { scOpen = null; scPreview = null; scBooks = null; paintScrape(); return; }
   scOpen = id;
   scPreview = null;
   scPicked = {};
+  scBooks = null;
+  scBookPick = {};
+  scBookListFor = '';
+  scBookList = null;
   paintScrape();
   LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/diff')
-    .then(d => { if (scOpen === id) { scPreview = d; paintScrape(); } })
+    .then(d => {
+      if (scOpen === id) {
+        scPreview = d;
+        scPicked = {};
+        ((d.diff && d.diff.fields) || []).forEach(f => {
+          if (f.decision === 'FILL' || f.decision === 'CONFLICT') scPicked[f.field] = true;
+        });
+        paintScrape();
+      }
+    })
     .catch(e => toast('差异计算失败：' + onlineErrText(e), 'err', 3600));
+  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/books')
+    .then(list => {
+      if (scOpen !== id) return;
+      scBooks = Array.isArray(list) ? list : [];
+      paintScrape();
+    })
+    .catch(() => {
+      if (scOpen !== id) return;
+      scBooks = [];
+      paintScrape();
+    });
 }
 function scRetry(id) {
   LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/retry', { method: 'POST' })
@@ -4380,9 +5059,10 @@ function scResolve(all) {
   if (!scOpen) return;
   const id = scOpen;
   const fields = all ? [] : Object.keys(scPicked).filter(k => scPicked[k]);
-  if (!all && !fields.length) return toast('先勾选至少一个字段', 'err');
-  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/resolve', { method: 'POST', body: { fields: fields } })
-    .then(r => { toast(r ? '已应用所选字段，仍有字段待核对' : '已应用并移出名单', 'ok'); scOpen = null; scPreview = null; loadScrape(); })
+  const books = collectScBooks();
+  if (!all && !fields.length && !books.length) return toast('先勾选至少一个字段或一册', 'err');
+  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/resolve', { method: 'POST', body: { fields: fields, books: books } })
+    .then(r => { toast(r ? '已应用所选内容，仍有字段待核对' : '已应用并移出名单', 'ok'); scOpen = null; scPreview = null; scBooks = null; loadScrape(); })
     .catch(e => toast('应用失败：' + onlineErrText(e), 'err', 3600));
 }
 function scPollStart() {
@@ -4430,9 +5110,10 @@ function paintScSettings() {
     const list = scTokens || [];
     html += '<div class="note">刮削令牌只能读取名单与回传刮削结果，权限写死，访问不了书库其他接口。</div>' +
       (list.length
-        ? '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>名称</th><th>令牌</th><th style="width:70px">调用</th><th style="width:120px">创建</th><th style="width:120px"></th></tr></thead><tbody>' +
+        ? '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>名称</th><th>令牌</th><th style="width:70px">调用</th><th style="width:118px">创建</th><th style="width:118px">到期</th><th style="width:118px"></th></tr></thead><tbody>' +
           list.map(t => '<tr><td>' + esc(t.name) + '</td><td class="mono mini">' + esc(t.value) + '</td><td class="mini">' + (t.useCount || 0) + '</td>' +
-            '<td class="mini mono">' + esc(String(t.createdDate || '').slice(0, 16).replace('T', ' ')) + '</td>' +
+            '<td class="mini mono">' + esc(t.createdDate ? String(t.createdDate).slice(0, 16).replace('T', ' ') : '—') + '</td>' +
+            '<td class="mini mono">' + (t.expiresDate ? esc(String(t.expiresDate).slice(0, 16).replace('T', ' ')) : '<span style="color:var(--tx-3)">不限期</span>') + '</td>' +
             '<td style="text-align:right"><button class="btn xs ghost" data-sc-copy="' + esc(t.value) + '">复制</button>' +
             '<button class="btn xs danger" data-sc-tokdel="' + esc(t.id) + '">吊销</button></td></tr>').join('') + '</tbody></table></div>'
         : '<div class="empty" style="padding:22px"><h4>还没有刮削令牌</h4><p>生成后可用于外部抓取脚本或 AI 回填。</p></div>') +
@@ -4473,10 +5154,48 @@ function paintScSettings() {
   wireScSources();
 }
 function scTokenCreate(rotate) {
-  LantaiRuntime.request('api/lantai/v1/scrape/agent/token', { method: 'POST', body: { rotate: rotate } })
-    .then(t => { toast('已生成刮削令牌', 'ok'); return loadScrape(); })
-    .then(() => { if ($('#scCfg')) paintScSettings(); })
-    .catch(e => toast('生成失败：' + onlineErrText(e), 'err'));
+  const body = '<div class="field"><label>令牌名称</label>' +
+    '<input class="inp" id="tkName" style="width:100%" maxlength="60" placeholder="留空自动生成">' +
+    '<div class="mini" style="margin-top:6px;color:var(--tx-3)">同名令牌不能重复，建议写清用途或机器名。</div></div>' +
+    '<div class="field" style="margin-top:16px"><label>有效期</label>' +
+    '<select class="inp" id="tkDays" style="width:100%">' +
+    '<option value="7" selected>7 天（默认）</option>' +
+    '<option value="30">30 天</option>' +
+    '<option value="90">90 天</option>' +
+    '<option value="180">180 天</option>' +
+    '<option value="custom">自定义天数</option>' +
+    '<option value="0">不限期</option></select>' +
+    '<div id="tkCustomBox" style="display:none;margin-top:10px;align-items:center;gap:8px">' +
+    '<input class="inp mono" id="tkCustom" type="number" min="1" max="3650" value="14" style="width:120px;text-align:right">' +
+    '<span class="mini">天后失效</span></div>' +
+    '<div class="mini" style="margin-top:8px;color:var(--tx-3)">到期后令牌自动作废，已接入的脚本需要换新令牌。</div></div>' +
+    (rotate ? '<div class="note gold" style="margin-top:16px">轮换会同时吊销现有的全部刮削令牌，正在跑的脚本会立刻中断。</div>' : '');
+  openModal({
+    title: rotate ? '轮换刮削令牌' : '生成刮削令牌',
+    width: 460,
+    body: body,
+    foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>' + (rotate ? '轮换' : '生成') + '</button>',
+    after() {
+      const sel = $('#tkDays'), box = $('#tkCustomBox');
+      $('#modal [data-x]').onclick = closeModal;
+      sel.onchange = () => { box.style.display = sel.value === 'custom' ? 'flex' : 'none'; };
+      $('#modal [data-ok]').onclick = () => {
+        const name = ($('#tkName').value || '').trim();
+        const days = sel.value === 'custom' ? Math.floor(Number($('#tkCustom').value)) : Number(sel.value);
+        if (sel.value === 'custom' && !(days >= 1)) return toast('自定义天数需 ≥ 1', 'err');
+        const btn = $('#modal [data-ok]');
+        btn.disabled = true;
+        LantaiRuntime.request('api/lantai/v1/scrape/agent/token', {
+          method: 'POST', body: { rotate: rotate, name: name || null, expiresInDays: days }
+        }).then(() => {
+          closeModal();
+          toast(rotate ? '已轮换刮削令牌' : '已生成刮削令牌', 'ok');
+          return loadScrape();
+        }).then(() => { if ($('#scCfg')) paintScSettings(); })
+          .catch(e => { btn.disabled = false; toast('生成失败：' + onlineErrText(e), 'err'); });
+      };
+    }
+  });
 }
 function scSourceListHtml() {
   const list = scSources || [];
@@ -4733,7 +5452,7 @@ function libCfgSet(l, key, on) {
   else if (key === 'scanOnStartup') l.onStartup = on;
   else l[key] = on;
 }
-const STAB2 = [['libraries', 'set.libraries'], ['online', 'set.online'], ['tokens', 'set.tokens'], ['heartbeat', 'set.heartbeat'], ['appearance', 'set.appearance'], ['cache', 'set.cache'], ['system', 'set.system'], ['upgrade', 'set.upgrade']];
+const STAB2 = [['libraries', 'set.libraries'], ['online', 'set.online'], ['tokens', 'set.tokens'], ['heartbeat', 'set.heartbeat'], ['appearance', 'set.appearance'], ['cache', 'set.cache'], ['backup', 'set.backup'], ['system', 'set.system'], ['upgrade', 'set.upgrade']];
 const ROLES = ['ADMIN', 'PAGE_STREAMING', 'FILE_DOWNLOAD', 'KOBO_SYNC', 'KOREADER_SYNC'];
 const ROLE_DESC = { ADMIN: '书库、用户、设置、刮削与在线订阅', PAGE_STREAMING: '查看页图与阅读器资源（阅读必需）', FILE_DOWNLOAD: '下载书籍原文件', KOBO_SYNC: 'Kobo 设备同步', KOREADER_SYNC: 'KOReader 同步' };
 const TOKEN_SCOPES_DEFAULT = [
@@ -4766,6 +5485,7 @@ Routes.settings = (v, seg) => {
   if (t === 'heartbeat') B.innerHTML = stHeartbeat();
   if (t === 'appearance') B.innerHTML = stAppearance();
   if (t === 'cache') B.innerHTML = stCache();
+  if (t === 'backup') { B.innerHTML = stBackup(); wireBackup(B); }
   if (t === 'system') B.innerHTML = stSystem();
   if (t === 'upgrade') { B.innerHTML = stUpgrade(); wireUpgrade(B); }
   $$('#view [data-st]').forEach(el => el.onclick = () => go('/settings/' + el.dataset.st));
@@ -4786,11 +5506,35 @@ function libScope(u) {
   if (!ids.length) return '未分配';
   return ids.map(id => { const l = LIBS.find(x => x.id === id); return l ? l.name : id; }).join('、');
 }
+function loadProfiles(ids, force, silent) {
+  const want = (ids || []).filter(id => id && (force || !PROFILES[id]));
+  if (!want.length || profileBusy || !window.LantaiRuntime) return;
+  profileBusy = true;
+  LantaiRuntime.request('api/lantai/v1/user-profile/map?' + want.map(id => 'ids=' + encodeURIComponent(id)).join('&'))
+    .then(map => { Object.keys(map || {}).forEach(k => { PROFILES[k] = map[k]; }); })
+    .catch(() => { })
+    .then(() => { profileBusy = false; if (!silent && S.route === '/users') render(); });
+}
+function profileOf(userId) { return PROFILES[userId] || null; }
+function displayName(user) {
+  if (!user) return '';
+  const p = profileOf(user.id);
+  return (p && p.nickname) || user.username || (user.email || '').split('@')[0] || '';
+}
+function avatarHtml(userId, name, cls) {
+  const p = profileOf(userId);
+  const label = 'avatar' + (cls ? ' ' + cls : '');
+  if (p && p.hasAvatar) {
+    return '<img class="' + label + '" alt="" style="object-fit:cover" src="' +
+      esc('api/lantai/v1/user-profile/' + userId + '/avatar?v=' + (p.avatarUpdated || 0)) + '">';
+  }
+  return '<span class="' + label + '">' + esc(((p && p.nickname) || name || '?').slice(0, 1).toUpperCase()) + '</span>';
+}
 function loadAdminUsers() {
   if (!window.LantaiRuntime) { adminErr = '后端不可用'; return; }
   adminBusy = true;
   LantaiRuntime.request('api/lantai/v1/users?size=100')
-    .then(page => { adminUsers = Array.isArray(page.content) ? page.content : []; adminErr = ''; })
+    .then(page => { adminUsers = Array.isArray(page.content) ? page.content : []; adminErr = ''; loadProfiles(adminUsers.map(u => u.id), false, true); })
     .catch(e => { adminUsers = []; adminErr = '用户列表加载失败：' + onlineErrText(e); })
     .then(() => { adminBusy = false; if (S.route === '/users') render(); });
 }
@@ -4817,6 +5561,7 @@ function stKeys() {
 Routes.users = v => {
   if (isAdmin() && adminUsers === null && !adminBusy && !adminErr) loadAdminUsers();
   if (myKeys === null && !myKeysBusy && !myKeysErr && window.LantaiRuntime) loadMyKeys();
+  if (window.LantaiRuntime && LantaiRuntime.me && LantaiRuntime.me.id) loadProfiles([LantaiRuntime.me.id]);
   v.innerHTML = '<div class="ph"><div><h1>用户管理</h1><div class="sub">账户资料 · 角色权限 · 密码与访问密钥</div></div>' +
     '<div class="acts"><button class="btn" data-newkey>' + ico('key') + '生成我的密钥</button></div></div>' +
     stMe() +
@@ -4842,6 +5587,8 @@ function stMe() {
   const roles = (me.roles || []).filter(r => r !== 'USER').map(r => ROLE_CN[r] || r).join(' / ') || '普通用户';
   return '<div class="card" style="margin-bottom:18px"><div class="card-h"><h3>' + ico('user') + ' 我的账户</h3>' +
     '<div class="r"><button class="btn sm" data-editme>' + ico('edit') + '编辑资料</button></div></div>' +
+    '<div class="rowflex" style="gap:14px;margin-bottom:14px">' + avatarHtml(me.id, me.username) +
+    '<div><div style="font-size:15px">' + esc(displayName(me)) + '</div><div class="mini mono">' + esc(me.username || '') + '</div></div></div>' +
     '<div class="grid g-2" style="gap:4px 24px">' +
     kvLine('用户名', me.username || '—') + kvLine('邮箱', me.email || '未设置') +
     kvLine('角色', roles) + kvLine('密码', '不可查看 · 只能修改或重置') +
@@ -4849,12 +5596,46 @@ function stMe() {
     '<div class="note" style="margin-top:10px">登录可用用户名或邮箱；密码以哈希保存，管理员也无法查看明文，忘记只能重置。</div></div>';
 }
 function editProfile(u, self) {
+  if (!u) return openProfileModal(u, self);
+  if (!self || !window.LantaiRuntime) return openProfileModal(u, self);
+  LantaiRuntime.request('api/lantai/v1/user-profile/me')
+    .then(p => { PROFILES[u.id] = p; })
+    .catch(() => { })
+    .then(() => openProfileModal(u, self));
+}
+function compressAvatar(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const side = Math.min(img.width, img.height);
+      const size = Math.min(512, side);
+      const c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+      resolve(c.toDataURL('image/png'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('图片读取失败')); };
+    img.src = url;
+  });
+}
+function openProfileModal(u, self) {
   if (!u) return;
+  const p = profileOf(u.id) || {};
+  const nick = p.nickname && p.nickname !== u.username ? p.nickname : '';
+  let avatar = null;
+  let cleared = false;
   openModal({
     title: self ? '编辑我的资料' : '编辑 ' + (u.username || '用户'),
     width: 520,
     body: '<div class="grid" style="gap:12px">' +
+      (self ? '<div class="rowflex" style="gap:14px;align-items:center"><div id="pfAvaWrap">' + avatarHtml(u.id, u.username) + '</div>' +
+        '<div><button class="btn sm" id="pfAvaPick">选择图片</button><button class="btn sm ghost" id="pfAvaClear" style="margin-left:6px">移除</button>' +
+        '<div class="mini" style="margin-top:6px">支持 PNG / JPG / WebP，自动裁成正方形并缩到 256 像素</div></div>' +
+        '<input type="file" id="pfAvaFile" accept="image/*" style="display:none"></div>' : '') +
       '<div class="field"><label>用户名</label><input id="pfName" class="inp" value="' + esc(u.username || '') + '" placeholder="登录名，必填"></div>' +
+      (self ? '<div class="field"><label>昵称（选填）</label><input id="pfNick" class="inp" value="' + esc(nick) + '" placeholder="留空则显示用户名"></div>' : '') +
       '<div class="field"><label>邮箱（选填）</label><input id="pfMail" class="inp" value="' + esc(u.email || '') + '" placeholder="留空表示不设置"></div>' +
       (self ? '<div class="field"><label>新密码（留空不修改）</label><input id="pfPass" class="inp" type="password" autocomplete="new-password" placeholder="至少 8 位"></div>' : '') +
       (self ? '' : '<div class="note gold">管理员不能查看子账户密码，只能重置；重置后新密码只显示一次。</div>') +
@@ -4865,12 +5646,42 @@ function editProfile(u, self) {
       $('#modal [data-x]').onclick = closeModal;
       const rp = $('#modal [data-reset]');
       if (rp) rp.onclick = () => { closeModal(); resetPassword(u.id); };
+      const pick = $('#pfAvaPick');
+      if (pick) {
+        pick.onclick = () => $('#pfAvaFile').click();
+        $('#pfAvaFile').onchange = e => {
+          const f = e.target.files && e.target.files[0];
+          if (!f) return;
+          compressAvatar(f).then(data => {
+            avatar = data; cleared = false;
+            $('#pfAvaWrap').innerHTML = '<img class="avatar" alt="" style="object-fit:cover" src="' + data + '">';
+          }).catch(() => toast('图片读取失败', 'err'));
+        };
+        $('#pfAvaClear').onclick = () => {
+          avatar = null; cleared = true;
+          $('#pfAvaWrap').innerHTML = '<span class="avatar">' + esc((u.username || '?').slice(0, 1).toUpperCase()) + '</span>';
+        };
+      }
       $('#modal [data-ok]').onclick = () => {
         const username = ($('#pfName').value || '').trim();
         const email = ($('#pfMail').value || '').trim();
         const pass = self ? ($('#pfPass').value || '') : '';
+        const nickEl = self ? $('#pfNick') : null;
+        const nick = nickEl ? nickEl.value.trim() : '';
         if (!username) return toast('用户名不能为空', 'err');
         if (pass && pass.length < 8) return toast('密码至少 8 位', 'err');
+        const saveNickname = () => {
+          if (!self) return Promise.resolve();
+          return LantaiRuntime.request('api/lantai/v1/user-profile/me', { method: 'PUT', body: { nickname: nick } })
+            .then(r => { if (r) PROFILES[u.id] = r; }, () => { });
+        };
+        const saveAvatar = () => {
+          if (!self || (!avatar && !cleared)) return Promise.resolve();
+          const req = avatar
+            ? LantaiRuntime.request('api/lantai/v1/user-profile/me/avatar', { method: 'PUT', body: { data: avatar } })
+            : LantaiRuntime.request('api/lantai/v1/user-profile/me/avatar', { method: 'DELETE' });
+          return req.then(r => { if (r) PROFILES[u.id] = r; });
+        };
         LantaiRuntime.request('api/lantai/v1/users/' + u.id + '/profile', {
           method: 'PUT', body: { username: username, email: email || null }
         }).then(r => {
@@ -4880,9 +5691,11 @@ function editProfile(u, self) {
             toast('资料已保存', 'ok');
             if (isAdmin()) loadAdminUsers(); else render();
           };
-          if (!pass) return done();
+          const finishProfile = () => saveNickname().then(saveAvatar).then(done)
+            .catch(e => toast('资料已存，昵称或头像保存失败：' + onlineErrText(e), 'err', 3600));
+          if (!pass) return finishProfile();
           LantaiRuntime.request('api/v2/users/me/password', { method: 'PATCH', body: { password: pass } })
-            .then(done).catch(e => toast('资料已存，改密失败：' + onlineErrText(e), 'err', 3600));
+            .then(finishProfile).catch(e => toast('资料已存，改密失败：' + onlineErrText(e), 'err', 3600));
         }).catch(e => toast('保存失败：' + onlineErrText(e), 'err', 3600));
       };
     }
@@ -4935,23 +5748,56 @@ function newUserModal() {
   const sel = new Set(['PAGE_STREAMING']);
   openModal({
     title: '新建用户', width: 500,
-    body: '<div class="field"><label>用户名（登录名）</label><input class="inp mono" id="nuName" placeholder="如 reader" spellcheck="false"></div>' +
+    body: '<div class="rowflex" style="gap:14px;align-items:center;margin-bottom:14px"><div id="nuAvaWrap"><span class="avatar">?</span></div>' +
+      '<div><button class="btn sm" id="nuAvaPick">选择头像</button><button class="btn sm ghost" id="nuAvaClear" style="margin-left:6px">不用头像</button>' +
+      '<div class="mini" style="margin-top:6px">选填，自动裁成正方形并缩到 256 像素</div></div>' +
+      '<input type="file" id="nuAvaFile" accept="image/*" style="display:none"></div>' +
+      '<div class="field"><label>用户名（登录名）</label><input class="inp mono" id="nuName" placeholder="如 reader" spellcheck="false"></div>' +
+      '<div class="field" style="margin-top:10px"><label>昵称（选填）</label><input class="inp" id="nuNick" placeholder="留空则显示用户名"></div>' +
       '<div class="field" style="margin-top:10px"><label>邮箱（选填）</label><input class="inp mono" id="nuMail" placeholder="reader@example.com"></div>' +
       '<div class="field" style="margin-top:10px"><label>初始密码</label><input class="inp" type="password" id="nuPass" placeholder="至少 8 位"></div>' +
       '<div class="field" style="margin-top:10px"><label>角色</label><div class="chips">' + ROLES.map(r => '<span class="chip' + (sel.has(r) ? ' on' : '') + '" data-ur="' + r + '">' + (ROLE_CN[r] || r) + '</span>').join('') + '</div></div>' +
       '<div class="note" style="margin-top:10px">用户名必填、全局唯一；邮箱可不填，填了也能用它登录。新用户默认共享全部书库。</div>',
     foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>创建</button>',
     after() {
+      let nuAvatar = null;
       $('#modal [data-x]').onclick = closeModal;
+      $('#nuAvaPick').onclick = () => $('#nuAvaFile').click();
+      $('#nuAvaFile').onchange = e => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        compressAvatar(f).then(data => {
+          nuAvatar = data;
+          $('#nuAvaWrap').innerHTML = '<img class="avatar" alt="" style="object-fit:cover" src="' + data + '">';
+        }).catch(() => toast('图片读取失败', 'err'));
+      };
+      $('#nuAvaClear').onclick = () => {
+        nuAvatar = null;
+        $('#nuAvaWrap').innerHTML = '<span class="avatar">?</span>';
+      };
       $$('#modal [data-ur]').forEach(c => c.onclick = () => { sel.has(c.dataset.ur) ? sel.delete(c.dataset.ur) : sel.add(c.dataset.ur); c.classList.toggle('on'); });
       $('#modal [data-ok]').onclick = () => {
         const name = $('#nuName').value.trim(), email = $('#nuMail').value.trim(), pass = $('#nuPass').value;
+        const nick = ($('#nuNick').value || '').trim();
         if (!name) return toast('请填写用户名', 'err');
         if (!/^[A-Za-z0-9._-]{2,32}$/.test(name)) return toast('用户名只能用字母、数字、点、下划线、短横线，2–32 位', 'err');
         if (email && !/^.+@.+\..+$/.test(email)) return toast('邮箱格式不正确', 'err');
         if (pass.length < 8) return toast('密码至少 8 位', 'err');
         LantaiRuntime.request('api/v2/users', { method: 'POST', body: { username: name, email: email || null, password: pass, roles: [...sel], sharedLibraries: { all: true, libraryIds: [] } } })
-          .then(() => { closeModal(); toast('已创建用户 ' + name, 'ok'); loadAdminUsers(); })
+          .then(u => {
+            const userId = u && u.id;
+            const finish = () => {
+              closeModal();
+              toast('已创建用户 ' + name, 'ok');
+              loadAdminUsers();
+              if (userId) loadProfiles([userId], true, true);
+            };
+            if (!userId || (!nick && !nuAvatar)) return finish();
+            const jobs = [];
+            if (nick) jobs.push(LantaiRuntime.request('api/lantai/v1/user-profile/' + userId, { method: 'PUT', body: { nickname: nick } }).catch(() => { }));
+            if (nuAvatar) jobs.push(LantaiRuntime.request('api/lantai/v1/user-profile/' + userId + '/avatar', { method: 'PUT', body: { data: nuAvatar } }).catch(() => { }));
+            Promise.all(jobs).then(finish).catch(finish);
+          })
           .catch(e => toast('创建失败：' + onlineErrText(e), 'err', 3600));
       };
     }
@@ -5227,7 +6073,7 @@ function loadInspect(force) {
     inspectData.dup = out[0] ? unwrapPage(out[0]) : [];
     inspectData.known = out[1] ? unwrapPage(out[1]) : [];
     inspectData.unknown = out[2] ? unwrapPage(out[2]) : [];
-    inspectData.err = (out[0] || out[1]) ? '' : '巡检数据加载失败，需要管理员权限';
+    inspectData.err = (out[0] || out[1]) ? '' : '查重数据加载失败，需要管理员权限';
   }).then(() => {
     inspectData.busy = false;
     if (S.route === '/inspect') render();
@@ -5238,17 +6084,17 @@ Routes.inspect = v => {
   loadInspect();
   const D = inspectData;
   if (D.known === null) {
-    v.innerHTML = '<div class="ph"><div><h1>巡检</h1><div class="sub">重复文件与重复页面</div></div></div>' +
+    v.innerHTML = '<div class="ph"><div><h1>查重</h1><div class="sub">重复文件与重复页面</div></div></div>' +
       '<div class="card"><div class="empty" style="padding:56px 0">' +
-      (D.err ? '<div class="mini">' + esc(D.err) + '</div>' : '<div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在巡检…</div>') + '</div></div>';
+      (D.err ? '<div class="mini">' + esc(D.err) + '</div>' : '<div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在查重…</div>') + '</div></div>';
     return;
   }
   const groups = {};
   (D.dup || []).forEach(x => { const k = x.fileHash || x.hash || ''; if (!k) return; (groups[k] = groups[k] || []).push(x); });
   const dupGroups = Object.keys(groups).filter(k => groups[k].length > 1);
   const known = D.known || [], unknown = D.unknown || [];
-  v.innerHTML = '<div class="ph"><div><h1>巡检</h1><div class="sub">重复文件与重复页面</div></div>' +
-    '<div class="acts"><button class="btn" data-insrefresh>' + ico('sync') + '重新巡检</button></div></div>' +
+  v.innerHTML = '<div class="ph"><div><h1>查重</h1><div class="sub">重复文件与重复页面</div></div>' +
+    '<div class="acts"><button class="btn" data-insrefresh>' + ico('sync') + '重新查重</button></div></div>' +
     (D.err ? '<div class="note red" style="margin-bottom:14px">' + esc(D.err) + '</div>' : '') +
     '<div class="grid g-kpi" style="margin-bottom:20px">' +
     kpi('重复书组', num(dupGroups.length), '文件哈希相同', dupGroups.length === 0) +
@@ -5521,29 +6367,91 @@ function loadCat(page, force) {
       if (S.route.indexOf('/extensions') === 0) render();
     });
 }
+const EXT_LANG_TOP = 8;
 function extLangLabel(lang) {
-  const codes = String(lang || '').split(',').map(x => x.trim()).filter(Boolean);
-  if (!codes.length) return '—';
-  return codes.map(c => LANG_CN[c.toLowerCase().split('-')[0]] || c.toUpperCase()).join(' / ');
+  return window.LantaiLang ? window.LantaiLang.label(lang) : '—';
+}
+function extLangStats() {
+  const src = rtCatLangs && rtCatLangs.length
+    ? rtCatLangs
+    : [{ code: 'zh', count: 0 }, { code: 'en', count: 0 }, { code: 'ja', count: 0 }];
+  const sum = new Map();
+  src.forEach(x => {
+    if (!x || !x.code) return;
+    const code = String(x.code).toLowerCase() === 'all' ? 'multi' : x.code;
+    sum.set(code, (sum.get(code) || 0) + (x.count || 0));
+  });
+  return [...sum.entries()]
+    .map(([code, count]) => ({ code, label: extLangLabel(code), count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+function extLangChip(code, label, count, on) {
+  const title = code === 'all' ? '' : (window.LantaiLang.alias(code) || '');
+  return '<button class="lgchip' + (on ? ' on' : '') + '" data-extlang="' + esc(code) + '"' +
+    (title ? ' title="' + esc(title) + '"' : '') + '>' + esc(label) +
+    (count ? '<i>' + num(count) + '</i>' : '') + '</button>';
 }
 function extLangChips() {
-  const known = rtCatLangs && rtCatLangs.length
-    ? rtCatLangs.map(x => ({ code: x.code, label: extLangLabel(x.code), count: x.count }))
-    : ['zh', 'en', 'ja'].map(c => ({ code: c, label: LANG_CN[c], count: 0 }));
-  const list = [{ code: 'all', label: '全部语言', count: rtCatTotal }].concat(known);
-  return '<div class="seg" style="flex-wrap:wrap;max-width:100%">' +
-    list.map(x => '<button class="' + (S.ext.lang === x.code ? 'on' : '') + '" data-extlang="' + esc(x.code) + '">' +
-      esc(x.label) + (x.count ? '<span class="mini" style="opacity:.55;margin-left:4px">' + num(x.count) + '</span>' : '') + '</button>').join('') +
+  const all = extLangStats();
+  const cur = S.ext.lang || 'all';
+  const topN = (window.innerWidth || 1200) <= 560 ? 4 : EXT_LANG_TOP;
+  const top = all.slice(0, topN);
+  if (cur !== 'all' && !top.some(x => x.code === cur)) {
+    top.push(all.find(x => x.code === cur) || { code: cur, label: extLangLabel(cur), count: 0 });
+  }
+  const rest = all.length - top.length;
+  return '<div class="lgbar">' +
+    extLangChip('all', L.t('ext.lang.all'), rtCatTotal, cur === 'all') +
+    top.map(x => extLangChip(x.code, x.label, x.count, cur === x.code)).join('') +
+    (rest > 0 ? '<button class="lgchip more" data-extlangpick>' + ico('down') + esc(L.t('ext.lang.more', { n: rest })) + '</button>' : '') +
     '</div>';
+}
+function langPickRows(list, cur, q) {
+  const kw = String(q || '').trim().toLowerCase();
+  const hay = x => {
+    const e = window.LantaiLang.entry(x.code);
+    const out = [x.label, x.code];
+    if (e) out.push(e[0], e[1], e[2], e[2].replace(/文$/, '语'));
+    return out.join(' ').toLowerCase();
+  };
+  const hit = kw ? list.filter(x => hay(x).indexOf(kw) >= 0) : list;
+  if (!hit.length) return '<div class="empty" style="padding:22px"><p>' + esc(L.t('ext.lang.empty')) + '</p></div>';
+  const rows = [{ code: 'all', label: L.t('ext.lang.all'), count: rtCatTotal }].concat(hit);
+  return rows.map(x => '<button class="lgrow' + (cur === x.code ? ' on' : '') + '" data-extlang="' + esc(x.code) + '">' +
+    '<span class="nm">' + esc(x.label) + '</span><span class="cd">' + esc(x.code === 'all' ? '' : x.code) + '</span>' +
+    '<span class="ct">' + (x.count ? num(x.count) : '') + '</span></button>').join('');
+}
+function openLangPicker() {
+  const all = extLangStats();
+  openDrawer({
+    title: L.t('ext.lang.pick'),
+    width: 420,
+    body: '<input class="inp" id="lgPickQ" style="width:100%;margin-bottom:12px" placeholder="' + esc(L.t('ext.lang.search')) + '">' +
+      '<div class="lgpicks" id="lgPickList">' + langPickRows(all, S.ext.lang, '') + '</div>',
+    after: () => {
+      const q = $('#lgPickQ'), list = $('#lgPickList');
+      if (!q || !list) return;
+      q.oninput = () => { list.innerHTML = langPickRows(all, S.ext.lang, q.value); };
+      list.onclick = e => {
+        const b = e.target.closest('[data-extlang]');
+        if (!b) return;
+        S.ext.lang = b.dataset.extlang;
+        closeDrawer();
+        rtCat = null; rtCatTotal = 0; rtCatOffset = 0; rtCatPage = 0;
+        loadCat(0, true);
+        render();
+      };
+      q.focus();
+    }
+  });
 }
 function extPagerBar() {
   const pages = catPages(), cur = rtCatPage + 1;
-  return '<div class="rowflex" style="gap:10px;margin-top:14px;flex-wrap:wrap;align-items:flex-start">' +
-    extLangChips() +
-    '<div class="seg" style="margin-left:auto">' +
-    '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + '上一页</button>' +
+  return '<div class="rowflex" style="gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center;justify-content:flex-end">' +
+    '<div class="seg">' +
+    '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + esc(L.t('ext.page.prev')) + '</button>' +
     '<span class="mini" style="padding:0 6px;line-height:30px">' + cur + ' / ' + pages + '</span>' +
-    '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>下一页' + ico('right') + '</button>' +
+    '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>' + esc(L.t('ext.page.next')) + ico('right') + '</button>' +
     '</div></div>';
 }
 function extIcon(url, name) {
@@ -6019,17 +6927,19 @@ function extSwyPage(v, tab) {
   const installed = rtExts || [], upd = installed.filter(e => e.hasUpdate).length;
   const pages = catPages(), cur = rtCatPage + 1;
   const body = tab === 'catalog'
-    ? '<div class="rowflex" style="gap:10px;margin-bottom:14px;flex-wrap:wrap">' +
-      extLangChips() +
-      '<input class="inp" style="width:210px;height:31px" placeholder="搜索扩展…" value="' + esc(S.ext.q) + '" data-extq>' +
+    ? '<div class="card" style="padding:13px 15px 14px;margin-bottom:14px">' +
+      '<div class="rowflex" style="gap:10px;flex-wrap:wrap;align-items:center">' +
+      '<input class="inp" style="width:220px;height:31px" placeholder="' + esc(L.t('ext.searchPh')) + '" value="' + esc(S.ext.q) + '" data-extq>' +
       '<div class="seg" style="margin-left:auto">' +
-      '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + '上一页</button>' +
+      '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + esc(L.t('ext.page.prev')) + '</button>' +
       '<span class="mini" style="padding:0 6px;line-height:30px">' + cur + ' / ' + pages + '</span>' +
-      '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>下一页' + ico('right') + '</button>' +
+      '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>' + esc(L.t('ext.page.next')) + ico('right') + '</button>' +
       '</div></div>' +
-      '<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>扩展</th><th style="width:66px">语言</th><th style="width:112px">版本</th><th style="width:76px">状态</th><th style="width:152px">操作</th></tr></thead>' +
+      extLangChips() +
+      '</div>' +
+      '<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>' + esc(L.t('ext.col.ext')) + '</th><th style="width:88px">' + esc(L.t('ext.col.lang')) + '</th><th style="width:112px">' + esc(L.t('ext.col.ver')) + '</th><th style="width:76px">' + esc(L.t('ext.col.state')) + '</th><th style="width:152px">' + esc(L.t('ext.col.acts')) + '</th></tr></thead>' +
       '<tbody id="extCat">' + extCatalogRows() + '</tbody></table></div>' +
-      '<div class="mini" style="margin-top:10px">共 ' + num(rtCatTotal) + ' 条 · 第 ' + cur + ' / ' + pages + ' 页 · 本页 ' + num((rtCat || []).length) + ' 条</div></div>' +
+      '<div class="mini" style="margin-top:10px">' + esc(L.t('ext.page.detail', { n: num(rtCatTotal), cur, pages, m: num((rtCat || []).length) })) + '</div></div>' +
       extPagerBar()
     : (rtExtErr ? '<div class="note red" style="margin-bottom:12px">' + esc(rtExtErr) + '</div>' : '') +
       '<div class="grid g-2" id="extGrid">' + (installed.length ? installed.map(extCard).join('')
@@ -6037,7 +6947,8 @@ function extSwyPage(v, tab) {
       (upd ? '<div class="note gold" style="margin-top:14px">' + ico('alert') + ' ' + upd + ' 个插件有可用更新。</div>' : '') +
       '<div class="note" style="margin-top:14px">停用图源不会删除已订阅的存档、进度与书签；要清理内容请到「在线源」订阅列表退订。</div>';
   v.innerHTML = '<div class="ph"><div><h1>图源插件</h1><div class="sub">安装、更新、卸载扩展并控制图源开关</div></div>' +
-    '<div class="acts"><button class="btn" data-extupload>' + ico('up') + '导入插件包</button>' +
+    '<div class="acts"><button class="btn" data-go="/extensions">' + ico('left') + '功能拓展</button>' +
+    '<button class="btn" data-extupload>' + ico('up') + '导入插件包</button>' +
     '<button class="btn" data-extrefresh>' + ico('sync') + '刷新清单</button>' +
     '<button class="btn" data-go="/online">' + ico('globe') + '在线源搜索</button>' +
     '<button class="btn pri" data-extinstall-open>' + ico('plus') + '去清单安装</button>' +
@@ -6212,6 +7123,7 @@ function wireExt(v) {
     rtCat = null; rtCatTotal = 0; rtCatOffset = 0; rtCatPage = 0;
     loadCat(0, true);
   });
+  v.querySelectorAll('[data-extlangpick]').forEach(el => el.onclick = openLangPicker);
   v.querySelectorAll('[data-extpage]').forEach(el => el.onclick = () => {
     const next = el.dataset.extpage === 'prev' ? rtCatPage - 1 : rtCatPage + 1;
     if (next < 0 || next >= catPages()) return;
@@ -6480,7 +7392,10 @@ function wireTaskQueue(v) {
   if (poolEl) poolEl.onchange = () => {
     const n = Math.floor(Number(poolEl.value));
     if (!(n >= 1)) { poolEl.value = sysSettings && sysSettings.taskPoolSize != null ? sysSettings.taskPoolSize : ''; return; }
-    saveSysSetting({ taskPoolSize: Math.min(32, n) }).then(() => { if (S.route === '/tasks') render(); });
+    saveSysSetting({ taskPoolSize: Math.min(32, n) }).then(ok => {
+      if (!ok) { poolEl.value = sysSettings && sysSettings.taskPoolSize != null ? sysSettings.taskPoolSize : ''; return; }
+      if (S.route === '/tasks') render();
+    });
   };
   v.querySelectorAll('[data-tqstate]').forEach(el => el.onclick = () => { taskQ.state = el.dataset.tqstate; taskQ.page = 0; taskQ.data = null; render(); });
   v.querySelectorAll('[data-tqtype]').forEach(el => el.onclick = () => { taskQ.type = el.dataset.tqtype; taskQ.page = 0; taskQ.data = null; render(); });
@@ -6540,16 +7455,34 @@ Routes.tasks = v => {
   wireTaskQueue(v);
   wire(v);
 };
+function paintPoolBadge(n) {
+  const el = document.getElementById('stPoolBadge');
+  if (!el) return;
+  const v = Number(n);
+  el.textContent = (n === '' || n == null || isNaN(v)) ? '—' : v + ' 并发';
+  el.className = 'badge ' + (v > 1 ? 'ok' : 'warn');
+}
 function wireSt(B, t) {
   B.querySelectorAll('[data-hist]').forEach(el => el.onclick = () => historyModal(0));
   B.querySelectorAll('[data-sysset]').forEach(el => {
-    const save = () => {
-      const key = el.dataset.sysset;
+    const key = el.dataset.sysset;
+    const kind = el.dataset.kind;
+    if (key === 'taskPoolSize') {
+      el.oninput = () => paintPoolBadge(el.value);
+    }
+    el.onchange = () => {
+      const prev = sysSettings ? sysSettings[key] : null;
       const patch = {};
-      patch[key] = el.dataset.kind === 'bool' ? el.checked : (el.value === '' ? null : Number(el.value));
-      saveSysSetting(patch);
+      patch[key] = kind === 'bool' ? el.checked : (el.value === '' ? null : Number(el.value));
+      saveSysSetting(patch).then(ok => {
+        if (!ok) {
+          if (kind === 'bool') el.checked = !!prev; else el.value = prev == null ? '' : prev;
+          if (key === 'taskPoolSize') paintPoolBadge(el.value);
+          return;
+        }
+        if (key === 'taskPoolSize') paintPoolBadge(el.value);
+      });
     };
-    el.onchange = save;
   });
   B.querySelectorAll('[data-cfg]').forEach(el => el.onchange = () => {
     const k = el.dataset.cfg, on = el.checked;
@@ -6569,7 +7502,7 @@ function wireSt(B, t) {
     }
     if (k === 'online.enabled') CFG.onlineEnabled = on;
     if (k === 'offline.sync') { CFG.offlineSync = on; savePrefs({ offlineSync: on }); }
-    if (k === 'nav.collapsed') { S.collapsed = on; savePrefs({ collapsed: on }); $('#app').classList.toggle('collapsed', on); }
+    if (k === 'nav.collapsed') { S.collapsed = on; savePrefs({ collapsed: on }); $('#app').classList.toggle('collapsed', on); applyCollapseBtn(); renderNav(); }
     if (k === 'ui.dense') { CFG.dense = on; savePrefs({ dense: on }); document.body.classList.toggle('dense', on); }
   });
   B.querySelectorAll('[data-hb]').forEach(el => el.onclick = () => { CFG.heartbeat = +el.dataset.hb; savePrefs({ heartbeat: CFG.heartbeat }); toast('记录间隔 → ' + el.dataset.hb + ' 秒'); render(); });
@@ -6614,7 +7547,7 @@ function wireSt(B, t) {
         $('#modal [data-ok]').onclick = () => {
           closeModal();
           LantaiRuntime.request('api/v1/libraries/' + l.id, { method: 'DELETE' })
-            .then(() => libReload('已删除 ' + l.name))
+            .then(() => libReload('已删除 ' + l.name, true))
             .catch(e => toast('删除失败：' + onlineErrText(e), 'err'));
         };
       }
@@ -6624,8 +7557,8 @@ function wireSt(B, t) {
 function libPatch(id, body) {
   return LantaiRuntime.request('api/v1/libraries/' + id, { method: 'PATCH', body: body });
 }
-function libReload(msg) {
-  return LantaiRuntime.hydrate().then(() => { if (msg) toast(msg, 'ok'); render(); })
+function libReload(msg, force) {
+  return LantaiRuntime.hydrate(force).then(() => { if (msg) toast(msg, 'ok'); render(); })
     .catch(e => toast('刷新失败：' + onlineErrText(e), 'err'));
 }
 function fsBrowse(host, initial, onPick) {
@@ -6702,7 +7635,7 @@ function stPerfCard() {
   if (!G && !sysSettingsErr) loadSysSettings();
   const pool = G ? G.taskPoolSize : null;
   return '<div class="card" style="margin-bottom:18px"><div class="card-h"><h3>' + ico('bolt') + ' 批量导入性能</h3>' +
-    '<div class="r"><span class="badge ' + (pool && pool > 1 ? 'ok' : 'warn') + '">' + (pool == null ? '—' : pool + ' 并发') + '</span></div></div>' +
+    '<div class="r"><span class="badge ' + (pool && pool > 1 ? 'ok' : 'warn') + '" id="stPoolBadge">' + (pool == null ? '—' : pool + ' 并发') + '</span></div></div>' +
     '<div class="list-i" style="border:0;padding:10px 0"><div style="flex:1;min-width:0"><div class="gt">任务池并发数</div>' +
     '<div class="gs mini">同时运行的后台任务上限。大批量导入建议设为 CPU 核心数（如 NAS 4 核填 4）。</div></div>' +
     '<input class="inp mono" style="width:96px;height:30px;text-align:right" type="number" min="1" data-sysset="taskPoolSize" data-kind="num" value="' + (pool == null ? '' : pool) + '"></div></div>' +
@@ -6840,8 +7773,8 @@ function stUsers() {
     '<div class="r"><span class="badge">' + list.length + ' 个账号</span><button class="btn sm pri" data-newuser>' + ico('plus') + '新建用户</button></div></div>' +
     (list.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>用户</th><th>角色</th><th>库范围</th><th>状态</th><th></th></tr></thead><tbody>' +
       list.map(u => {
-        const me = isMe(u), roles = u.roles || [], name = u.username || (u.email || '').split('@')[0] || '';
-        return '<tr><td><div class="rowflex"><span class="avatar sm">' + esc(name.slice(0, 1).toUpperCase()) + '</span><div><div>' + esc(name) + (me ? ' <span class="badge gold">我</span>' : '') + '</div>' +
+        const me = isMe(u), roles = u.roles || [], name = displayName(u);
+        return '<tr><td><div class="rowflex">' + avatarHtml(u.id, u.username, 'sm') + '<div><div>' + esc(name) + (me ? ' <span class="badge gold">我</span>' : '') + '</div>' +
           '<div class="mini mono">' + esc(u.email || '未设置邮箱') + '</div></div></div></td>' +
           '<td><div class="chips">' + ROLES.map(r => '<span class="chip' + (roles.indexOf(r) >= 0 ? ' on' : '') + '" data-urole="' + esc(u.id + ':' + r) + '">' + (ROLE_CN[r] || r) + '</span>').join('') + '</div></td>' +
           '<td class="mini">' + esc(libScope(u)) + '</td>' +
@@ -6991,20 +7924,21 @@ function loadSysSettings(force, silent) {
     });
 }
 function saveSysSetting(patch) {
-  if (!window.LantaiRuntime) return Promise.resolve();
+  if (!window.LantaiRuntime) return Promise.resolve(false);
   return LantaiRuntime.request('api/v1/settings', { method: 'PATCH', body: patch })
-    .then(() => { sysSettings = Object.assign({}, sysSettings, patch); toast('全局设置已保存', 'ok'); })
-    .catch(e => toast('保存失败：' + onlineErrText(e), 'err'));
+    .then(() => { sysSettings = Object.assign({}, sysSettings, patch); toast('全局设置已保存', 'ok'); return true; })
+    .catch(e => { toast('保存失败：' + onlineErrText(e), 'err'); return false; });
 }
 let upSt = null, upInfo = null, upBusy = false, upErr = '', upApplying = false, upPoll = null;
 let upProg = { phase: '', pct: 0, label: '' };
 function upProgHtml() {
   if (!upProg.phase) return '';
   const indet = upProg.pct < 0;
+  const tag = upProg.phase === 'upload' ? '上传 ' : upProg.phase === 'unzip' ? '解压 ' : '';
   return '<div style="margin-top:14px">' +
     '<div class="rowflex" style="justify-content:space-between;gap:12px;margin-bottom:7px">' +
     '<span class="mini">' + esc(upProg.label || '处理中…') + '</span>' +
-    '<span class="mini mono">' + (indet ? '请稍候' : upProg.pct + '%') + '</span></div>' +
+    '<span class="mini mono">' + (indet ? (upProg.phase === 'verify' ? '校验中' : '请稍候') : tag + upProg.pct + '%') + '</span></div>' +
     '<div class="uprog"><i' + (indet ? ' class="indet"' : ' style="width:' + upProg.pct + '%"') + '></i></div></div>';
 }
 function upPaintProg() {
@@ -7056,46 +7990,15 @@ function waitRestart() {
   }, 6000);
 }
 function upRestartHint(mode) {
-  return mode === 'container'
-    ? '兰台会自行退出，由容器重启策略拉起新版本。页面将在 15 秒后自动重连。'
-    : '兰台会自行退出。请重新双击「启动兰台.bat」启动新版本，之后刷新本页。';
+  return L.t(mode === 'container' ? 'up.restartContainer' : 'up.manualHint');
 }
 function stUpgrade() {
-  if (!upSt) {
-    if (!upErr) loadUpgrade();
-    return '<div class="card"><div class="empty" style="padding:44px 0">' +
-      (upErr ? '<div class="mini">' + esc(upErr) + '</div>' : '<div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在读取升级状态…</div>') +
-      '</div></div>';
+  if (window.LantaiUpdateCenter && LantaiUpdateCenter.html) return LantaiUpdateCenter.html();
+  if (!CHUNK_OK.sysx && !CHUNK_FAIL.sysx) {
+    loadChunk('sysx').then(function () { render(); });
+    return '<div class="card"><div class="empty" style="padding:44px 0"><div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在载入升级模块…</div></div></div>';
   }
-  const S1 = upSt;
-  const ok = S1.jarPath && S1.jarWritable;
-  return '<div id="upResult"></div>' +
-    '<div class="card" style="margin-bottom:16px"><div class="card-h"><h3>' + ico('server') + ' 当前版本</h3>' +
-    '<div class="r"><span class="badge ok">' + esc(S1.version) + '</span></div></div>' +
-    kvMono('运行文件', S1.jarPath || '未识别（可能以解压目录方式运行）') +
-    kvMono('写入权限', S1.jarWritable ? '可替换' : '不可写，无法在线升级') +
-    kvMono('部署形态', S1.containerized ? '容器内' : '裸机 / 桌面') +
-    kvMono('升级后', upRestartHint(S1.restartMode)) +
-    kvMono('可用备份', S1.backupVersion || '无') +
-    (ok ? '' : '<div class="note red" style="margin-top:11px">当前运行环境不允许在线替换 jar。容器部署请确认挂载不是只读，或改用挂载卷内的 jar 启动。</div>') +
-    '</div>' +
-    '<div class="card" style="margin-bottom:16px"><div class="card-h"><h3>' + ico('layers') + ' 导入升级包</h3></div>' +
-    '<div class="note">升级包只包含应用 jar，不含镜像、JDK、配置与数据。上传后先校验，确认无误才替换文件。整个过程中数据库与书籍文件不受影响。</div>' +
-    '<div class="rowflex" style="gap:10px;margin-top:12px;flex-wrap:wrap"><input class="inp" type="file" accept=".zip,.lup" id="upFile" style="flex:1;min-width:240px">' +
-    '<button class="btn pri" data-upcheck' + (ok ? '' : ' disabled') + '>' + ico('check') + '校验</button></div>' +
-    '<div id="upProg"></div>' +
-    (upInfo ? '<div style="margin-top:16px"><div class="note ' + (upApplying ? 'gold' : '') + '">升级包校验通过</div>' +
-      kvMono('目标版本', upInfo.version + '（当前 ' + upInfo.currentVersion + '）') +
-      kvMono('文件', upInfo.fileName + ' · ' + bytes(upInfo.sizeBytes)) +
-      kvMono('SHA-256', upInfo.sha256) +
-      (upInfo.builtAt ? kvMono('构建时间', upInfo.builtAt) : '') +
-      (upInfo.notes ? kvMono('说明', upInfo.notes) : '') +
-      '<div class="rowflex" style="gap:8px;margin-top:14px"><button class="btn pri" data-upapply>' + ico('bolt') + '立即升级并重启</button>' +
-      '<button class="btn ghost" data-updiscard>放弃这个包</button></div></div>' : '') +
-    '</div>' +
-    '<div class="card"><div class="card-h"><h3>' + ico('clock') + ' 回退</h3></div>' +
-    '<div class="note">每次升级前会把当前 jar 备份到配置目录 <span class="mono">upgrade/backup/</span>，只保留一份，更早的备份会自动清理。回退等于把这一份换回去并重启。</div>' +
-    '<div class="rowflex" style="margin-top:12px"><button class="btn danger" data-uprollback' + (S1.backupVersion ? '' : ' disabled') + '>' + ico('sync') + '回退到 ' + esc(S1.backupVersion || '（无备份）') + '</button></div></div>';
+  return '<div class="card"><div class="note red">升级模块没有载入：升级后浏览器可能还缓存着旧页面，脚本文件名已经变了。请按 <span class="mono">Ctrl+F5</span> 强制刷新；仍失败说明当前包的网页文件不完整。</div></div>';
 }
 function upResult(html) {
   const box = $('#upResult');
@@ -7111,70 +8014,7 @@ function doUpgrade(url, onDone) {
     .catch(e => { upApplying = false; upSetProg('', 0, ''); toast('失败：' + onlineErrText(e), 'err', 8000); render(); });
 }
 function wireUpgrade(B) {
-  const file = B.querySelector('#upFile');
-  const btn = B.querySelector('[data-upcheck]');
-  if (btn && file) btn.onclick = () => {
-    const f = file.files && file.files[0];
-    if (!f) return toast('先选择升级包', 'err');
-    const fd = new FormData();
-    fd.append('file', f);
-    btn.disabled = true;
-    upInfo = null;
-    upSetProg('upload', 0, '正在上传 ' + f.name + '（0 B / ' + bytes(f.size) + '）');
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', LantaiRuntime.base + 'api/lantai/v1/system/upgrade/inspect', true);
-    xhr.withCredentials = true;
-    xhr.upload.onprogress = ev => {
-      if (!ev.lengthComputable) return;
-      const pct = Math.min(100, Math.round(ev.loaded / ev.total * 100));
-      upSetProg('upload', pct, '正在上传 ' + f.name + '（' + bytes(ev.loaded) + ' / ' + bytes(ev.total) + '）');
-    };
-    xhr.upload.onload = () => { upSetProg('unzip', 0, '上传完成，正在解压并校验包内容…'); upStartPoll(); };
-    xhr.onload = () => {
-      upStopPoll();
-      let data = null;
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try { data = JSON.parse(xhr.responseText); } catch (_) { data = null; }
-      }
-      if (data) {
-        upInfo = data;
-        upSetProg('', 0, '');
-        toast('校验通过：' + data.version, 'ok');
-        render();
-        return;
-      }
-      upSetProg('', 0, '');
-      btn.disabled = false;
-      const detail = String(xhr.responseText || ('HTTP ' + xhr.status)).slice(0, 400);
-      toast(xhr.status === 401 ? '登录状态已失效，请重新登录。' : '校验失败：' + detail, 'err', 9000);
-    };
-    xhr.onerror = () => { upStopPoll(); upSetProg('', 0, ''); btn.disabled = false; toast('网络错误，上传中断', 'err', 8000); };
-    xhr.onabort = () => { upStopPoll(); upSetProg('', 0, ''); btn.disabled = false; };
-    xhr.send(fd);
-  };
-  const ap = B.querySelector('[data-upapply]');
-  if (ap) ap.onclick = () => {
-    if (!window.confirm('确认用 ' + upInfo.version + ' 替换当前 ' + upInfo.currentVersion + '？替换后兰台会自行退出并重启。')) return;
-    doUpgrade('api/lantai/v1/system/upgrade/apply', d => {
-      upResult('<div class="note gold">已替换为 ' + esc(d.version) + '，' + esc(upRestartHint(d.restartMode)) + '</div>');
-      waitRestart();
-    });
-  };
-  const dc = B.querySelector('[data-updiscard]');
-  if (dc) dc.onclick = () => {
-    LantaiRuntime.request('api/lantai/v1/system/upgrade/staged', { method: 'DELETE' })
-      .then(() => { upInfo = null; toast('已放弃暂存的升级包', 'ok'); render(); })
-      .catch(e => toast('操作失败：' + onlineErrText(e), 'err'));
-  };
-  const rb = B.querySelector('[data-uprollback]');
-  if (rb) rb.onclick = () => {
-    if (!window.confirm('确认回退到 ' + upSt.backupVersion + '？兰台会自行退出并重启。')) return;
-    doUpgrade('api/lantai/v1/system/upgrade/rollback', d => {
-      upResult('<div class="note gold">已回退到 ' + esc(d.version) + '，' + esc(upRestartHint(d.restartMode)) + '</div>');
-      waitRestart();
-    });
-  };
-  upPaintProg();
+  if (window.LantaiUpdateCenter && LantaiUpdateCenter.wire) return LantaiUpdateCenter.wire(B);
 }
 function stSystem() {
   if (!sysSettings) {
@@ -7256,6 +8096,186 @@ function stCache() {
     ['格式转换文件', 'MOBI/AZW3/FB2 的转换产物']].map(r => kvLine(r[0], r[1])).join('') +
     '<div class="hr"></div><div class="rowflex" style="gap:9px"><button class="btn sm" data-go="/trash">' + ico('trash') + '打开回收站</button></div>' +
     '<div class="mini" style="margin-top:10px">回收站里是被删除的原文件，缓存是可重建的中间产物，两者互不影响。</div></div>';
+}
+let bkList = null, bkBusy = false, bkErr = '', bkNote = '', bkRestore = null, bkPick = '';
+let bkJob = null, bkJobBusy = false, bkJobPoll = null, bkJobUsed = '', bkJobErr = '';
+function bkJobHtml() {
+  const j = bkJob;
+  if (!j || !j.running) return '';
+  const pct = Math.max(0, Math.min(100, j.pct || 0));
+  return '<div style="margin-top:12px">' +
+    '<div class="rowflex" style="justify-content:space-between;gap:12px;margin-bottom:7px">' +
+    '<span class="mini">' + esc(j.label || '正在生成备份…') + '</span>' +
+    '<span class="mini mono">' + pct + '%</span></div>' +
+    '<div class="uprog"><i style="width:' + pct + '%"></i></div></div>' +
+    '<div class="mini" style="margin-top:8px">可以离开本页，任务在后台继续；回来或刷新后进度会接着显示。</div>';
+}
+function paintJob() {
+  const box = $('#bkJob');
+  if (box) box.innerHTML = bkJobHtml();
+}
+function stopJobPoll() {
+  if (bkJobPoll) { clearInterval(bkJobPoll); bkJobPoll = null; }
+}
+function checkJobDone() {
+  const j = bkJob;
+  if (!j) return;
+  if (j.error) {
+    bkJobErr = '生成失败：' + j.error;
+    toast(bkJobErr, 'err', 5000);
+  } else if (!j.running && j.result && j.result.name && bkJobUsed !== j.result.name) {
+    bkJobUsed = j.result.name;
+    bkNote = '已生成 ' + j.result.name + '（' + bkSize(j.result.bytes) + '，' + j.result.entries + ' 个文件）';
+    bkList = null;
+    toast('备份已生成', 'ok');
+    loadBackups();
+  }
+  if (String(S.route).indexOf('/settings') === 0 && S.settingsTab === 'backup') render();
+}
+function startJobPoll() {
+  if (bkJobPoll) return;
+  bkJobPoll = setInterval(() => {
+    LantaiRuntime.request('api/lantai/v1/system/archive/export/status')
+      .then(j => {
+        bkJob = j || null;
+        if (bkJob && bkJob.running) { paintJob(); return; }
+        stopJobPoll();
+        checkJobDone();
+      })
+      .catch(() => { });
+  }, 800);
+}
+function loadJob() {
+  if (!window.LantaiRuntime || bkJobBusy) return;
+  bkJobBusy = true;
+  LantaiRuntime.request('api/lantai/v1/system/archive/export/status')
+    .then(j => { bkJob = j || null; bkJobErr = ''; })
+    .catch(e => { bkJobErr = onlineErrText(e); })
+    .then(() => {
+      bkJobBusy = false;
+      if (bkJob && bkJob.running) startJobPoll();
+      if (String(S.route).indexOf('/settings') === 0 && S.settingsTab === 'backup') render();
+    });
+}
+function bkSize(n) {
+  const unit = ['B', 'KB', 'MB', 'GB'];
+  let i = 0, v = n || 0;
+  while (v >= 1024 && i < unit.length - 1) { v /= 1024; i++; }
+  return (i ? v.toFixed(1) : v) + ' ' + unit[i];
+}
+function loadBackups() {
+  if (!window.LantaiRuntime) { bkErr = '后端不可用'; bkList = []; return; }
+  bkBusy = true;
+  Promise.all([
+    LantaiRuntime.request('api/lantai/v1/system/archive/archives').catch(() => []),
+    LantaiRuntime.request('api/lantai/v1/system/archive/restore').catch(() => null)
+  ]).then(r => {
+    bkList = Array.isArray(r[0]) ? r[0] : [];
+    bkRestore = r[1];
+    bkErr = '';
+  }).catch(e => { bkList = []; bkErr = '备份信息加载失败：' + onlineErrText(e); })
+    .then(() => { bkBusy = false; if (S.route.indexOf('/settings') === 0) render(); });
+}
+function stBackup() {
+  if (!isAdmin()) return '<div class="card"><div class="empty" style="padding:28px"><h4>仅管理员可用</h4><p>全量备份与还原会带走全部账户与配置，需要管理员权限。</p></div></div>';
+  if (bkList === null && !bkBusy && !bkErr) loadBackups();
+  if (bkJob === null && !bkJobBusy) loadJob();
+  return (bkRestore && bkRestore.pending
+    ? '<div class="note gold" style="margin-bottom:14px">有一份备份已就位，重启兰台后自动覆盖当前数据；覆盖前会把现有数据库另存为 pre-restore-*，过程记录在配置目录的 restore.log。</div>' : '') +
+    '<div class="card"><div class="card-h"><h3>' + ico('disk') + ' 生成备份</h3>' +
+    '<div class="r"><button class="btn sm pri" data-bkexport' + (bkJob && bkJob.running ? ' disabled' : '') + '>' +
+    (bkJob && bkJob.running ? '<span class="spinner"></span> 生成中' : '立即生成') + '</button></div></div>' +
+    '<div class="note">打包内容：主库、任务库、会话库三个 SQLite 快照，账户昵称与头像，已安装的运行时与插件，配置 yml，以及同级 suwayomi 目录。<b>不含书籍文件</b>，书籍请自行备份各库根目录。</div>' +
+    '<div id="bkJob">' + bkJobHtml() + '</div>' +
+    (bkNote ? '<div class="note gold" style="margin-top:10px">' + esc(bkNote) + '</div>' : '') +
+    (bkJobErr ? '<div class="note red" style="margin-top:10px">' + esc(bkJobErr) + '</div>' : '') + '</div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-h"><h3>' + ico('folder') + ' 已有备份' +
+    (bkList && bkList.length ? ' <span class="badge">' + bkList.length + ' 份</span>' : '') + '</h3>' +
+    '<div class="r"><button class="btn sm" data-bkrefresh>' + ico('sync') + '刷新</button></div></div>' +
+    (bkErr ? '<div class="note red">' + esc(bkErr) + '</div>'
+      : bkList && bkList.length
+        ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>文件</th><th>大小</th><th>创建时间</th><th></th></tr></thead><tbody>' +
+          bkList.map(a => '<tr><td class="mono mini">' + esc(a.name) + '</td><td class="mini">' + bkSize(a.bytes) + '</td>' +
+            '<td class="mini mono">' + esc(uStamp(a.createdAt)) + '</td>' +
+            '<td style="text-align:right;white-space:nowrap"><a class="btn xs" download href="' + esc('api/lantai/v1/system/archive/download/' + encodeURIComponent(a.name)) + '">' + ico('dl') + '下载</a> ' +
+            '<button class="btn xs danger" data-bkdel="' + esc(a.name) + '">' + ico('trash') + '删除</button></td></tr>').join('') +
+          '</tbody></table></div>'
+        : '<div class="note">还没有备份包，点右上角「立即生成」。</div>') + '</div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-h"><h3>' + ico('up') + ' 从备份还原</h3></div>' +
+    '<div class="note red">还原会覆盖当前全部数据：账户与角色、书库记录、刮削结果、插件与运行时会一并换成备份里的状态。</div>' +
+    '<div class="dropzone sm" data-bkdrop tabindex="0" role="button" style="margin-top:12px">' +
+    '<input type="file" accept=".zip" id="bkFile" hidden>' +
+    '<svg class="dz-ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-up"/></svg>' +
+    '<div style="min-width:0"><div class="dz-t">拖入备份包，或点击选择</div><div class="dz-s">只接受 .zip · 上传后不会立即生效，需重启兰台</div></div>' +
+    (bkPick ? '<div class="dz-file">' + ico('check') + esc(bkPick) + '</div>' : '') +
+    '</div>' +
+    '<div class="mini" style="margin-top:9px">重启时先备份当前数据，再覆盖。</div>' +
+    (bkRestore && bkRestore.pending ? '<div class="note gold" style="margin-top:12px">待还原包时间戳：' + esc(bkRestore.staging || '') + '</div>' : '') +
+    '</div>';
+}
+function wireBackup(B) {
+  const ex = B.querySelector('[data-bkexport]');
+  if (ex) ex.onclick = () => {
+    if (ex.disabled) return;
+    ex.disabled = true;
+    ex.innerHTML = '<span class="spinner"></span> 生成中';
+    bkNote = '';
+    bkJobErr = '';
+    LantaiRuntime.request('api/lantai/v1/system/archive/export', { method: 'POST' })
+      .then(j => { bkJob = j || null; ex.disabled = false; startJobPoll(); render(); })
+      .catch(e => { ex.disabled = false; bkJobErr = '无法开始生成：' + onlineErrText(e); toast(bkJobErr, 'err', 4000); render(); });
+  };
+  B.querySelectorAll('[data-bkdel]').forEach(el => el.onclick = () => {
+    const name = el.dataset.bkdel;
+    if (!name) return;
+    if (!window.confirm('删除备份 ' + name + ' ？删除后不可恢复，需要重新生成。')) return;
+    el.disabled = true;
+    LantaiRuntime.request('api/lantai/v1/system/archive/archives/' + encodeURIComponent(name), { method: 'DELETE' })
+      .then(() => { toast('已删除 ' + name, 'ok'); bkList = null; loadBackups(); })
+      .catch(e => { el.disabled = false; toast('删除失败：' + onlineErrText(e), 'err', 3600); });
+  });
+  const rf = B.querySelector('[data-bkrefresh]');
+  if (rf) rf.onclick = () => { bkList = null; bkNote = ''; bkJobErr = ''; loadBackups(); loadJob(); };
+  const dz = B.querySelector('[data-bkdrop]');
+  if (dz) {
+    const inp = dz.querySelector('#bkFile');
+    if (inp) inp.onclick = e => e.stopPropagation();
+    dz.onclick = e => { if (e.target === inp || !inp || bkBusy) return; inp.click(); };
+    dz.onkeydown = e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      if (inp && !bkBusy) inp.click();
+    };
+    if (inp) inp.onchange = () => { if (inp.files && inp.files[0]) uploadBackup(inp.files[0], dz); };
+    dz.ondragover = e => { e.preventDefault(); dz.classList.add('over'); };
+    dz.ondragleave = () => dz.classList.remove('over');
+    dz.ondrop = e => {
+      e.preventDefault();
+      dz.classList.remove('over');
+      if (bkBusy) return;
+      const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) uploadBackup(f, dz);
+    };
+  }
+}
+function uploadBackup(f, dz) {
+  if (bkBusy) return;
+  if (!/\.zip$/i.test(f.name)) return toast('只支持 zip 备份包', 'err');
+  bkBusy = true;
+  dz.classList.add('on');
+  const t = dz.querySelector('.dz-t');
+  const label = t ? t.textContent : '';
+  if (t) t.textContent = '正在上传并校验…';
+  const reset = () => { bkBusy = false; dz.classList.remove('on'); if (t) t.textContent = label; };
+  const fd = new FormData();
+  fd.append('file', f);
+  fetch('api/lantai/v1/system/archive/import', { method: 'POST', body: fd, credentials: 'same-origin' })
+    .then(res => {
+      if (!res.ok) return res.text().then(x => { throw new Error(x || ('HTTP ' + res.status)); });
+      return res.json();
+    })
+    .then(() => { reset(); bkPick = f.name; bkList = null; bkNote = ''; toast('备份已就位，请重启兰台完成还原', 'ok'); loadBackups(); })
+    .catch(e => { reset(); toast('导入失败：' + onlineErrText(e), 'err', 3600); });
 }
 function tokenStamp(v) { return v ? String(v).replace('T', ' ').slice(0, 16) : '—'; }
 function tokenScopeLabel(name) {
@@ -7685,197 +8705,9 @@ function mountLogRun(v) {
 }
 Routes.logs = (v, seg) => logPage(v, seg && seg[0] === 'audit' ? 'audit' : 'run');
 Routes.audit = v => logPage(v, 'audit');
-const API_GROUP_CN = {
-  Deprecation: '已废弃', Libraries: '书库', Series: '系列', Books: '书籍',
-  Collections: '合集', Readlists: '阅读清单', Referential: '参考数据',
-  Users: '用户与权限', Server: '服务端', Integrations: '集成',
-  lantai: '兰台自有', other: '其他'
-};
-const API_VERS = [['all', '全部'], ['lantai', '兰台'], ['v1', 'v1'], ['v2', 'v2']];
-const API_VER_CN = { lantai: '兰台', v1: 'v1', v2: 'v2', other: '—' };
-
-function apiDocState() {
-  if (!S.api) S.api = { doc: null, err: '', busy: false, group: 'all', ver: 'all', q: '', open: {} };
-  return S.api;
-}
-
-function loadApiDoc(attempt) {
-  const P = apiDocState();
-  const n = attempt || 1;
-  if (n === 1 && P.busy) return;
-  P.busy = true;
-  P.err = '';
-  fetch('v3/api-docs', { credentials: 'same-origin', cache: 'no-store' })
-    .then(r => {
-      if (r.status === 401 || r.status === 403) {
-        const err = new Error('需要管理员权限');
-        err.fatal = true;
-        return Promise.reject(err);
-      }
-      return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status));
-    })
-    .then(doc => { P.doc = doc; P.busy = false; if (S.route === '/protocol') render(); })
-    .catch(e => {
-      if (n < 2 && !e.fatal) { setTimeout(() => loadApiDoc(n + 1), 800); return; }
-      P.err = '读取接口文档失败：' + e.message;
-      P.busy = false;
-      if (S.route === '/protocol') render();
-    });
-}
-
-function apiTagMap(doc) {
-  const groups = (doc && (doc['x-tagGroups'] || (doc.info && doc.info['x-tagGroups']))) || [];
-  const map = {}, order = [];
-  groups.forEach(g => {
-    order.push(g.name);
-    (g.tags || []).forEach(t => { map[t] = g.name; });
-  });
-  return { map: map, order: order.concat(['lantai', 'other']) };
-}
-
-function apiOps(doc) {
-  const out = [];
-  if (!doc || !doc.paths) return out;
-  const tagMap = apiTagMap(doc).map;
-  Object.keys(doc.paths).forEach(p => {
-    const item = doc.paths[p] || {};
-    ['get', 'post', 'put', 'patch', 'delete'].forEach(m => {
-      const op = item[m];
-      if (!op) return;
-      const tag = (op.tags && op.tags[0]) || '(untagged)';
-      const group = tagMap[tag] || (/^lantai/i.test(tag) || /^lantai-/i.test(tag) ? 'lantai' : 'other');
-      out.push({ method: m.toUpperCase(), path: p, summary: op.summary || '', tag: tag, group: group, ver: apiVersionOf(p) });
-    });
-  });
-  return out;
-}
-
-function apiVersionOf(p) {
-  if (p.indexOf('/api/lantai/') === 0) return 'lantai';
-  if (p.indexOf('/api/v2/') === 0) return 'v2';
-  if (p.indexOf('/api/v1/') === 0) return 'v1';
-  return 'other';
-}
-
-function apiAuthBlock() {
-  return '<div class="note">所有接口基地址 <span class="mono">' + esc(CFG.host) + '</span>，局域网内其他设备需放行 25600 端口。</div>' +
-    '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th style="width:120px">方式</th><th>用法</th></tr></thead><tbody>' +
-    '<tr><td>Basic Auth</td><td class="mini mono">Authorization: Basic base64(邮箱:密码)</td></tr>' +
-    '<tr><td>API Key</td><td class="mini mono">X-API-Key: 访问密钥</td></tr>' +
-    '<tr><td>Agent Token</td><td class="mini mono">Authorization: Bearer 令牌（<span style="opacity:.7">config-dir/agent-token.txt</span>）</td></tr>' +
-    '<tr><td>会话</td><td class="mini">登录后返回 <span class="mono">LANTAI-SESSION</span> Cookie；加 <span class="mono">X-Auth-Token</span> 头可改用该头传会话</td></tr>' +
-    '</tbody></table></div>' +
-    '<pre class="mono" style="font-size:11.5px;line-height:1.8;background:var(--bg-2);padding:14px;border-radius:8px;margin-top:12px;overflow:auto">' +
-    '# 局域网客户端\ncurl -u 邮箱:密码 http://127.0.0.1:25600/api/v2/users/me\n\n' +
-    '# 用 API Key 调兰台自有接口\ncurl -H "X-API-Key: 密钥" http://127.0.0.1:25600/api/lantai/v1/system\n\n' +
-    '# 用 Agent Token 拉待补全元数据名单\ncurl -H "Authorization: Bearer $(cat agent-token.txt)" \\\n' +
-    '  "http://127.0.0.1:25600/api/lantai/v1/bulk/metadata/pending?limit=20"</pre>';
-}
-
 Routes.protocol = (v) => {
-  if (!isAdmin()) {
-    v.innerHTML = '<div class="ph"><div><h1>API 接口</h1><div class="sub">全部对外接口与鉴权说明</div></div></div>' +
-      '<div class="card"><div class="empty">' + ico('key') + '<h4>需要管理员权限</h4>' +
-      '<p>接口清单包含全部对外端点与鉴权方式，仅管理员账户可查看。<br>请使用管理员账号登录，或联系管理员授予管理员角色。</p></div></div>';
-    return;
-  }
-  const P = apiDocState();
-  if (!P.doc && !P.busy && !P.err) loadApiDoc();
-  const doc = P.doc;
-  const all = apiOps(doc);
-  const tagOrder = apiTagMap(doc).order;
-  const q = (P.q || '').toLowerCase();
-  const filtered = all.filter(o =>
-    (P.ver === 'all' || o.ver === P.ver) &&
-    (P.group === 'all' || o.group === P.group) &&
-    (!q || o.path.toLowerCase().indexOf(q) >= 0 || (o.summary || '').toLowerCase().indexOf(q) >= 0 || o.tag.toLowerCase().indexOf(q) >= 0)
-  );
-  const verScoped = all.filter(o => P.ver === 'all' || o.ver === P.ver);
-  const countBy = g => verScoped.filter(o => o.group === g).length;
-
-  const chips = '<div class="filters" style="margin-bottom:0">' +
-    '<span class="lbl" style="margin:0">功能</span><div class="chips">' +
-    '<span class="chip' + (P.group === 'all' ? ' on' : '') + '" data-apigroup="all">全部 ' + verScoped.length + '</span>' +
-    tagOrder.filter(g => countBy(g) > 0).map(g => '<span class="chip' + (P.group === g ? ' on' : '') + '" data-apigroup="' + esc(g) + '">' + esc(API_GROUP_CN[g] || g) + ' ' + countBy(g) + '</span>').join('') +
-    '</div></div>' +
-    '<div class="filters" style="margin-bottom:20px">' +
-    '<span class="lbl" style="margin:0">版本</span><div class="seg">' +
-    API_VERS.map(x => '<button class="' + (P.ver === x[0] ? 'on' : '') + '" data-apiver="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
-    '<span class="sep"></span><span class="mini">' + filtered.length + ' 个端点</span>' +
-    '<input class="inp" style="width:230px;height:31px;margin-left:auto" placeholder="搜索路径、说明或标签…" value="' + esc(P.q) + '" data-apiq>' +
-    '</div>';
-
-  const body = tagOrder.map(g => {
-    const list = filtered.filter(o => o.group === g);
-    if (!list.length) return '';
-    const open = !!P.open[g];
-    return '<div class="card" style="margin-bottom:14px"><div class="card-h" data-apigrp="' + esc(g) + '" style="cursor:pointer">' +
-      '<h3>' + ico('file') + ' ' + esc(API_GROUP_CN[g] || g) + '</h3>' +
-      '<div class="r"><span class="badge">' + list.length + '</span><span class="mini">' + (open ? '收起' : '展开') + '</span></div></div>' +
-      (open ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:78px">方法</th><th>路径</th><th>说明</th><th style="width:62px">版本</th><th style="width:130px">标签</th></tr></thead><tbody>' +
-        list.map(o => '<tr>' +
-          '<td class="mono" style="font-size:11px;' + (o.method === 'DELETE' ? 'color:var(--cinnabar)' : 'color:var(--acc-2)') + '">' + o.method + '</td>' +
-          '<td class="mono" style="font-size:11.5px;word-break:break-all">' + esc(o.path) + '</td>' +
-          '<td class="mini">' + esc(o.summary || '—') + '</td>' +
-          '<td><span class="badge">' + esc(API_VER_CN[o.ver]) + '</span></td>' +
-          '<td class="mini" style="color:var(--tx-3)">' + esc(o.tag) + '</td></tr>').join('') +
-        '</tbody></table></div>' : '') + '</div>';
-  }).join('');
-
-  v.innerHTML =
-    '<div class="ph"><div><h1>API 接口</h1><div class="sub">全部对外接口 · ' + all.length + ' 个端点 · 基地址 <span class="mono">' + esc(CFG.host) + '</span></div></div>' +
-    '<div class="acts"><button class="btn" data-act="copyapi">' + ico('key') + '复制基地址</button>' +
-    '<button class="btn" data-apijson>' + ico('file') + 'OpenAPI JSON</button>' +
-    '<button class="btn pri" data-go="/users">' + ico('user') + '用户与角色</button></div></div>' +
-    (P.err ? '<div class="note red" style="margin-bottom:16px;display:flex;align-items:center;gap:12px">' + esc(P.err) +
-      '<button class="btn sm" data-apiretry style="margin-left:auto;flex:none">重新加载</button></div>' : '') +
-    (P.busy || !doc ? (P.err ? '' : '<div class="card"><div class="empty" style="padding:48px 0"><div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在读取接口文档…</div></div></div>')
-      : '<div class="card" style="margin-bottom:18px"><div class="card-h" data-apiauth style="cursor:pointer"><h3>' + ico('key') + ' 调用说明</h3>' +
-        '<div class="r"><span class="mini">鉴权与示例</span><span class="mini" id="apiAuthTog">展开</span></div></div>' +
-        '<div id="apiAuth" style="display:none">' + apiAuthBlock() + '</div></div>' +
-        chips + body +
-        '<div class="grid g-2" style="margin-top:20px">' +
-        '<div class="card"><div class="card-h"><h3>' + ico('cpu') + ' 客户端适用内容</h3></div>' +
-        '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>客户端</th><th>适合</th><th>不支持</th></tr></thead><tbody>' +
-        [['Mihon / Tachiyomi 系', '漫画库（在线 + 本地 CBZ）', 'EPUB / TXT'],
-          ['Komelia（KMP 原生）', '漫画 + 合集 + 阅读清单', '电子书重排'],
-          ['KOReader', 'EPUB / PDF / TXT', '—'],
-          ['兰台网页端', '全部格式 + 批注 + 统计 + 在线源', '—'],
-          ['Kobo', 'KEPUB · Kobo 同步（需访问密钥）', '—']]
-          .map(r => '<tr><td>' + esc(r[0]) + '</td><td class="mini">' + esc(r[1]) + '</td><td class="mini" style="color:var(--cinnabar)">' + esc(r[2]) + '</td></tr>').join('') +
-        '</tbody></table></div></div>' +
-        '<div class="card"><div class="card-h"><h3>' + ico('ext') + ' 接入方式</h3></div>' +
-        '<div class="mono mini" style="line-height:1.9;padding:2px 0">地址 ' + esc(CFG.host) + '<br>账号 任一用户的邮箱 + 密码（或访问密钥）<br>局域网访问需放行 25600 端口</div>' +
-        '<div class="rowflex" style="margin-top:12px;gap:8px"><button class="btn sm" data-act="copyapi">' + ico('key') + '复制 ' + esc(CFG.host) + '</button>' +
-        '<span class="mini">客户端与电脑须在同一局域网</span></div>' +
-        '<div class="hr"></div>' + kvLine('OPDS v1.2 / v2', '目录与页图') +
-        kvLine('OPDS-PSE', '支持阅读进度回传') + kvLine('WebPub Manifest', '用于 EPUB / TXT') +
-        kvLine('可用角色', '阅读页 · 下载原文件 · 管理员 · Kobo 同步') + '</div></div>');
-
-  $$('#view [data-apigroup]').forEach(el => el.onclick = () => { P.group = el.dataset.apigroup; render(); });
-  $$('#view [data-apiver]').forEach(el => el.onclick = () => { P.ver = el.dataset.apiver; render(); });
-  $$('#view [data-apigrp]').forEach(el => el.onclick = () => { P.open[el.dataset.apigrp] = !P.open[el.dataset.apigrp]; render(); });
-  const auth = $('#view [data-apiauth]');
-  if (auth) auth.onclick = () => {
-    const box = $('#apiAuth'), tog = $('#apiAuthTog');
-    const open = box.style.display === 'none';
-    box.style.display = open ? '' : 'none';
-    if (tog) tog.textContent = open ? '收起' : '展开';
-  };
-  const js = $('#view [data-apijson]');
-  if (js) js.onclick = () => window.open('v3/api-docs', '_blank');
-  const rt = $('#view [data-apiretry]');
-  if (rt) rt.onclick = () => {
-    P.doc = null; P.err = ''; P.busy = false;
-    loadApiDoc();
-    render();
-  };
-  const qi = $('#view [data-apiq]');
-  if (qi) qi.oninput = () => {
-    P.q = qi.value; clearTimeout(qi._t);
-    qi._t = setTimeout(() => { render(); const f = $('#view [data-apiq]'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 260);
-  };
-  wire(v);
+  if (window.LantaiApiDoc && LantaiApiDoc.render) return LantaiApiDoc.render(v);
+  v.innerHTML = '<div class="card"><div class="note red">API module not loaded, reload the page.</div></div>';
 };
 
 CFG.onlineEnabled = true;
@@ -7964,7 +8796,7 @@ function libModal(l) {
         const req = isNew
           ? LantaiRuntime.request('api/v1/libraries', { method: 'POST', body })
           : LantaiRuntime.request('api/v1/libraries/' + l.id, { method: 'PATCH', body });
-        req.then(() => { closeModal(); return libReload(isNew ? '已建库 ' + name : '已保存 ' + name); })
+        req.then(() => { closeModal(); return libReload(isNew ? '已建库 ' + name : '已保存 ' + name, isNew); })
           .catch(e => toast((isNew ? '建库失败：' : '保存失败：') + onlineErrText(e), 'err'))
           .then(() => { btn.disabled = false; });
       };
@@ -7993,6 +8825,11 @@ function wire(root) {
   root.querySelectorAll('[data-sana]').forEach(el => el.onclick = () => singleTask('series', el.dataset.sana, 'analyze', '重新分析'));
   root.querySelectorAll('[data-bmeta]').forEach(el => el.onclick = () => editBookMeta(el.dataset.bmeta));
   root.querySelectorAll('[data-bcover]').forEach(el => el.onclick = () => coverModal('books', el.dataset.bcover, '书籍封面'));
+  root.querySelectorAll('[data-cov]').forEach(el => el.onclick = e => {
+    e.stopPropagation();
+    const v = String(el.dataset.cov || '').split(':');
+    coverLightbox(v[0], v[1], el.dataset.covTitle || '封面');
+  });
   root.querySelectorAll('[data-bref]').forEach(el => el.onclick = () => singleTask('books', el.dataset.bref, 'metadata/refresh', '刷新元数据'));
   root.querySelectorAll('[data-bana]').forEach(el => el.onclick = () => singleTask('books', el.dataset.bana, 'analyze', '重新分析'));
   root.querySelectorAll('[data-szip]').forEach(el => el.onclick = () => window.open('api/v1/series/' + el.dataset.szip + '/file', '_blank'));
@@ -8109,15 +8946,8 @@ function bootHtml() {
   setTimeout(() => { const el = $('#bIn1').value ? $('#bGo') : $('#bIn1'); if (el) el.focus(); }, 40);
 }
 function applyLang(code) {
-  L.lang(code);
-  L.apply(document);
-  bootHtml();
-  const appEl = $('#app');
-  if (appEl && appEl.style.display !== 'none') {
-    renderNav();
-    paintRuntime();
-    render();
-  }
+  try { localStorage.setItem('lantai.lang', code); } catch (e) { }
+  location.reload();
 }
 function submitLogin() {
   if (window.LantaiRuntime) { LantaiRuntime.login(); return; }
@@ -8166,10 +8996,11 @@ function bootTop() {
   $('#taskBtn').onclick = openTasks;
   $('#userChip').onclick = () => {
     const me = USERS.find(u => u.me);
+    if (me && me.id) loadProfiles([me.id]);
     openDrawer({
       title: '账户', width: 400,
-      body: '<div class="rowflex" style="gap:12px;margin-bottom:14px"><span class="avatar" style="width:44px;height:44px;font-size:17px">' + esc(me.name[0]) + '</span>' +
-        '<div><div style="font-size:15px">' + esc(me.name) + '</div><div class="mini mono">' + esc(me.email ? me.username + ' · ' + me.email : me.username) + '</div></div></div>' +
+      body: '<div class="rowflex" style="gap:12px;margin-bottom:14px">' + avatarHtml(me.id, me.username, 'lg') +
+        '<div><div style="font-size:15px">' + esc(displayName(me)) + '</div><div class="mini mono">' + esc(me.email ? me.username + ' · ' + me.email : me.username) + '</div></div></div>' +
         '<div class="chips" style="margin-bottom:14px">' + me.roles.map(r => '<span class="chip on">' + (ROLE_CN[r] || r) + '</span>').join('') + '</div>' +
         kvLine('库范围', me.libs) + kvLine('登录方式', '密码 / 访问密钥') + kvLine('最近活动', me.last) +
         '<div class="hr"></div><div class="row2" style="margin-bottom:12px"><button class="btn ghost blk" id="goUsers">' + ico('user') + '用户与角色</button>' +
@@ -8215,6 +9046,7 @@ try {
     if (pr.idleCap) CFG.idleCap = +pr.idleCap;
     if (typeof pr.offlineSync === 'boolean') CFG.offlineSync = pr.offlineSync;
     if (typeof pr.collapsed === 'boolean') S.collapsed = pr.collapsed;
+    if (pr.navFold && typeof pr.navFold === 'object') S.navFold = pr.navFold;
     if (pr.dense) { CFG.dense = true; document.body.classList.add('dense'); }
   }
 } catch (e) { }
@@ -8224,6 +9056,7 @@ bootHtml();
 bootTop();
 paintBell();
 if (S.collapsed) $('#app').classList.add('collapsed');
+applyCollapseBtn();
 if (!location.hash) history.replaceState(null, '', '#/home');
 if (window.LantaiRuntime) window.LantaiRuntime.start(); else render();
 startPagePoll();

@@ -96,6 +96,10 @@
     <div class="side-foot">
       <div class="pulse"><i class="dot" id="dServer"></i><span id="svText">25600 · 运行中</span></div>
       <div class="pulse"><i class="dot idle" id="dSwy"></i><span id="swyText">在线源服务未启动</span></div>
+      <div class="side-tools">
+        <button class="btn ghost sm" id="aboutBtn" title="关于" data-i18n-title="nav.about"><svg class="ic"><use href="#i-info"/></svg><span class="lb" data-i18n="nav.about">关于</span></button>
+        <button class="btn ghost sm" id="notifyBtn" title="通知" data-i18n-title="nav.notify"><svg class="ic"><use href="#i-bell"/></svg><span class="lb" data-i18n="nav.notify">通知</span><i class="ndot" id="notifyDot" style="display:none"></i></button>
+      </div>
       <button class="btn ghost sm blk" id="collapseBtn"><svg class="ic"><use href="#i-left"/></svg><span class="lb">收起导航</span></button>
     </div>
   </aside>
@@ -109,7 +113,8 @@
       </div>
       <div class="top-right">
         <div id="liveReading"></div>
-        <button class="icon-btn" id="taskBtn" title="任务队列" data-i18n-title="top.tasks"><svg><use href="#i-bell"/></svg></button>
+        <button class="icon-btn" id="taskBtn" title="任务队列" data-i18n-title="top.tasks"><svg><use href="#i-bolt"/></svg></button>
+        <button class="icon-btn" id="notifyTop" title="通知" data-i18n-title="nav.notify"><svg><use href="#i-bell"/></svg><i class="ndot" id="notifyDotTop" style="display:none"></i></button>
         <button class="icon-btn" id="themeBtn" title="切换主题" data-i18n-title="top.theme"><svg><use href="#i-sun"/></svg></button>
         <div class="userchip" id="userChip">
           <span class="avatar" id="uAvatar">林</span>
@@ -163,6 +168,13 @@
   </g>
 </symbol>
 </svg>
+<script>window.__LANTAI_CHUNKS__ = %%CHUNKS%%;</script>
+<script>window.__LANTAI_LANGS__ = %%LANGS%%;</script>
+<script>(function () {
+  var m = window.__LANTAI_LANGS__, k = 'zh-Hans';
+  try { var s = localStorage.getItem('lantai.lang'); if (s && m[s]) k = s; } catch (e) { }
+  if (k !== 'zh-Hans') document.write('<script src="' + m[k] + '"><\/script>');
+})();</script>
 <script src="%%JS%%"></script>
 </body>
 </html>

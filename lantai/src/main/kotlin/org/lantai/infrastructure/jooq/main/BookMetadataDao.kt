@@ -32,6 +32,7 @@ class BookMetadataDao(
   private val bt = Tables.BOOK_METADATA_TAG
   private val bl = Tables.BOOK_METADATA_LINK
   private val ne = Tables.BOOK_METADATA_NOTABLE_ENTITIES
+  private val bg = Tables.BOOK_METADATA_GENRE
 
   override fun findById(bookId: String): BookMetadata = dslRO.find(listOf(bookId)).first()
 
@@ -75,10 +76,16 @@ class BookMetadataDao(
           .from(ne)
           .where(ne.BOOK_ID.eq(d.BOOK_ID)),
       ).convertFrom { result -> result.into(ne).mapNotNull { NotableEntity(it.kind, it.name) } },
+      // genres
+      multiset(
+        select(bg.GENRE)
+          .from(bg)
+          .where(bg.BOOK_ID.eq(d.BOOK_ID)),
+      ).convertFrom { result -> result.into(bg).mapNotNull { it.genre }.toSet() },
     ).from(d)
     .where(d.BOOK_ID.`in`(bookIds))
     .fetch { record ->
-      record.value1().toDomain(record.value2(), record.value3(), record.value4(), record.value5())
+      record.value1().toDomain(record.value2(), record.value3(), record.value4(), record.value5(), record.value6())
     }
 
   @Transactional
@@ -112,7 +119,35 @@ class BookMetadataDao(
                 d.ISBN,
                 d.ISBN_LOCK,
                 d.LINKS_LOCK,
-              ).values(null as String?, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null),
+                d.PUBLISHER,
+                d.PUBLISHER_LOCK,
+                d.GENRES_LOCK,
+                d.LANGUAGE,
+                d.LANGUAGE_LOCK,
+              ).values(
+                null as String?,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+              ),
           ).also { step ->
             chunk.forEach {
               step.bind(
@@ -133,6 +168,11 @@ class BookMetadataDao(
                 it.isbn,
                 it.isbnLock,
                 it.linksLock,
+                it.publisher,
+                it.publisherLock,
+                it.genresLock,
+                it.language,
+                it.languageLock,
               )
             }
           }.execute()
@@ -142,6 +182,7 @@ class BookMetadataDao(
       dslRW.insertNotableEntities(metadatas)
       dslRW.insertTags(metadatas)
       dslRW.insertLinks(metadatas)
+      dslRW.insertGenres(metadatas)
     }
   }
 
@@ -174,6 +215,11 @@ class BookMetadataDao(
       .set(d.ISBN, metadata.isbn)
       .set(d.ISBN_LOCK, metadata.isbnLock)
       .set(d.LINKS_LOCK, metadata.linksLock)
+      .set(d.PUBLISHER, metadata.publisher)
+      .set(d.PUBLISHER_LOCK, metadata.publisherLock)
+      .set(d.GENRES_LOCK, metadata.genresLock)
+      .set(d.LANGUAGE, metadata.language)
+      .set(d.LANGUAGE_LOCK, metadata.languageLock)
       .set(d.LAST_MODIFIED_DATE, LocalDateTime.now(ZoneId.of("Z")))
       .where(d.BOOK_ID.eq(metadata.bookId))
       .execute()
@@ -194,11 +240,16 @@ class BookMetadataDao(
       .deleteFrom(bl)
       .where(bl.BOOK_ID.eq(metadata.bookId))
       .execute()
+    dslRW
+      .deleteFrom(bg)
+      .where(bg.BOOK_ID.eq(metadata.bookId))
+      .execute()
 
     dslRW.insertAuthors(listOf(metadata))
     dslRW.insertNotableEntities(listOf(metadata))
     dslRW.insertTags(listOf(metadata))
     dslRW.insertLinks(listOf(metadata))
+    dslRW.insertGenres(listOf(metadata))
   }
 
   private fun DSLContext.insertAuthors(metadatas: Collection<BookMetadata>) {
@@ -258,6 +309,25 @@ class BookMetadataDao(
     }
   }
 
+  private fun DSLContext.insertGenres(metadatas: Collection<BookMetadata>) {
+    if (metadatas.any { it.genres.isNotEmpty() }) {
+      metadatas.chunked(batchSize).forEach { chunk ->
+        this
+          .batch(
+            this
+              .insertInto(bg, bg.BOOK_ID, bg.GENRE)
+              .values(null as String?, null),
+          ).also { step ->
+            chunk.forEach { metadata ->
+              metadata.genres.forEach {
+                step.bind(metadata.bookId, it)
+              }
+            }
+          }.execute()
+      }
+    }
+  }
+
   private fun DSLContext.insertLinks(metadatas: Collection<BookMetadata>) {
     if (metadatas.any { it.links.isNotEmpty() }) {
       metadatas.chunked(batchSize).forEach { chunk ->
@@ -283,6 +353,7 @@ class BookMetadataDao(
     dslRW.deleteFrom(ne).where(ne.BOOK_ID.eq(bookId)).execute()
     dslRW.deleteFrom(bt).where(bt.BOOK_ID.eq(bookId)).execute()
     dslRW.deleteFrom(bl).where(bl.BOOK_ID.eq(bookId)).execute()
+    dslRW.deleteFrom(bg).where(bg.BOOK_ID.eq(bookId)).execute()
     dslRW.deleteFrom(d).where(d.BOOK_ID.eq(bookId)).execute()
   }
 
@@ -293,6 +364,7 @@ class BookMetadataDao(
       dslRW.deleteFrom(ne).where(ne.BOOK_ID.`in`(it.selectTempStrings())).execute()
       dslRW.deleteFrom(bt).where(bt.BOOK_ID.`in`(it.selectTempStrings())).execute()
       dslRW.deleteFrom(bl).where(bl.BOOK_ID.`in`(it.selectTempStrings())).execute()
+      dslRW.deleteFrom(bg).where(bg.BOOK_ID.`in`(it.selectTempStrings())).execute()
       dslRW.deleteFrom(d).where(d.BOOK_ID.`in`(it.selectTempStrings())).execute()
     }
   }
@@ -304,6 +376,7 @@ class BookMetadataDao(
     tags: Set<String>,
     links: List<WebLink>,
     notableEntities: List<NotableEntity>,
+    genres: Set<String>,
   ) = BookMetadata(
     title = title,
     summary = summary,
@@ -315,6 +388,9 @@ class BookMetadataDao(
     tags = tags,
     isbn = isbn,
     links = links,
+    publisher = publisher,
+    genres = genres,
+    language = language,
     bookId = bookId,
     createdDate = createdDate.toCurrentTimeZone(),
     lastModifiedDate = lastModifiedDate.toCurrentTimeZone(),
@@ -328,5 +404,8 @@ class BookMetadataDao(
     tagsLock = tagsLock,
     isbnLock = isbnLock,
     linksLock = linksLock,
+    publisherLock = publisherLock,
+    genresLock = genresLock,
+    languageLock = languageLock,
   )
 }

@@ -88,6 +88,21 @@ class ScrapeInboxDao(
       .execute()
   }
 
+  override fun deleteBySeriesId(seriesId: String) {
+    dslRW
+      .deleteFrom(t)
+      .where(t.SERIES_ID.eq(seriesId))
+      .execute()
+  }
+
+  override fun deleteOrphans(): Int {
+    val s = Tables.SERIES
+    return dslRW
+      .deleteFrom(t)
+      .whereNotExists(dslRW.selectOne().from(s).where(s.ID.eq(t.SERIES_ID)))
+      .execute()
+  }
+
   private fun ScrapeInboxRecord.toDomain() =
     ScrapeInboxEntry(
       queueId = queueId,

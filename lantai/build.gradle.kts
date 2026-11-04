@@ -195,7 +195,7 @@ tasks {
     excludes.add("index.html")
     doFirst {
       fileTree("$projectDir/src/main/resources/public") {
-        include("js/lantai.*.js", "css/lantai.*.css", "index-lantai.html")
+        include("js/lantai.*.js", "js/reader.*.js", "js/docs.*.js", "js/sysx.*.js", "js/lang-*.*.js", "css/lantai.*.css", "index-lantai.html")
       }.forEach { it.delete() }
     }
   }

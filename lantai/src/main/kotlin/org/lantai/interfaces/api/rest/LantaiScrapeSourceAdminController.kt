@@ -1,5 +1,6 @@
 package org.lantai.interfaces.api.rest
 
+import io.swagger.v3.oas.annotations.Operation
 import org.lantai.domain.model.ScrapeSourceConfig
 import org.lantai.infrastructure.metadata.scrape.ScrapeSourceRegistry
 import org.springframework.http.HttpStatus
@@ -23,6 +24,7 @@ class LantaiScrapeSourceAdminController(
   private val registry: ScrapeSourceRegistry,
 ) {
   @PostMapping("sources")
+  @Operation(summary = "Add a scraping source")
   fun create(
     @RequestBody body: ScrapeSourceUpsertRequest,
   ): ScrapeSourceInfoDto {
@@ -35,6 +37,7 @@ class LantaiScrapeSourceAdminController(
   }
 
   @PatchMapping("sources/{id}")
+  @Operation(summary = "Update a scraping source")
   fun update(
     @PathVariable id: String,
     @RequestBody body: ScrapeSourceUpsertRequest,
@@ -46,6 +49,7 @@ class LantaiScrapeSourceAdminController(
   }
 
   @GetMapping("sources/{id}")
+  @Operation(summary = "Get scraping source details")
   fun detail(
     @PathVariable id: String,
   ): ScrapeSourceDetailDto {
@@ -67,6 +71,7 @@ class LantaiScrapeSourceAdminController(
   }
 
   @PostMapping("sources/{id}/enabled")
+  @Operation(summary = "Enable or disable a scraping source")
   fun toggle(
     @PathVariable id: String,
     @RequestParam(name = "value") value: Boolean,
@@ -76,6 +81,7 @@ class LantaiScrapeSourceAdminController(
   }
 
   @DeleteMapping("sources/{id}")
+  @Operation(summary = "Delete a scraping source")
   fun delete(
     @PathVariable id: String,
   ) {
@@ -84,6 +90,7 @@ class LantaiScrapeSourceAdminController(
   }
 
   @PostMapping("sources/{id}/test")
+  @Operation(summary = "Test a scraping source connection")
   fun test(
     @PathVariable id: String,
     @RequestParam(name = "q") query: String,

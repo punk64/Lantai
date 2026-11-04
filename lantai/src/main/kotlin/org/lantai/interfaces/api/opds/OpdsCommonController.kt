@@ -1,5 +1,6 @@
 package org.lantai.interfaces.api.opds
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -30,6 +31,7 @@ class OpdsCommonController(
     ],
     produces = [MediaType.IMAGE_JPEG_VALUE],
   )
+  @Operation(summary = "Get a book page thumbnail")
   fun getBookThumbnail(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable bookId: String,

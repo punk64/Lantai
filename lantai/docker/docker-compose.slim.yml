@@ -1,0 +1,30 @@
+name: lantai
+
+services:
+  lantai:
+    image: lantai:${LANTAI_VERSION:-0.4.21}-alpine
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.alpine
+      args:
+        VERSION: ${LANTAI_VERSION:-0.4.21}
+    container_name: lantai
+    ports:
+      - "${LANTAI_PORT:-25600}:25600"
+    environment:
+      TZ: Asia/Shanghai
+      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true"
+      LANTAI_CONFIGDIR: /config
+      LANTAI_ONLINE_ENABLED: "false"
+    volumes:
+      - ./config:/config
+      - ./books:/books:ro
+    restart: unless-stopped
+    stop_grace_period: 40s
+    mem_limit: 1536m
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:25600/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3

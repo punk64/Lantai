@@ -21,7 +21,18 @@ class ScrapeEmbeddedReader(
   private val seriesMetadataFromBookProviders: List<SeriesMetadataFromBookProvider>,
   private val bookMetadataProviders: List<BookMetadataProvider>,
 ) {
+  private val cache = java.util.concurrent.ConcurrentHashMap<String, CacheEntry>()
+
   fun read(series: Series): EmbeddedRead {
+    val now = System.currentTimeMillis()
+    cache[series.id]?.takeIf { now - it.at < CACHE_TTL_MS }?.let { return it.read }
+    val read = readFresh(series)
+    cache[series.id] = CacheEntry(now, read)
+    if (cache.size > MAX_CACHE) cache.clear()
+    return read
+  }
+
+  private fun readFresh(series: Series): EmbeddedRead {
     val library =
       runCatching { libraryRepository.findById(series.libraryId) }.getOrNull()
         ?: return EmbeddedRead()
@@ -110,5 +121,15 @@ class ScrapeEmbeddedReader(
       authors = authors.toList(),
       tags = tags.toList(),
     )
+  }
+
+  private data class CacheEntry(
+    val at: Long,
+    val read: EmbeddedRead,
+  )
+
+  companion object {
+    private const val CACHE_TTL_MS = 60_000L
+    private const val MAX_CACHE = 2_000
   }
 }

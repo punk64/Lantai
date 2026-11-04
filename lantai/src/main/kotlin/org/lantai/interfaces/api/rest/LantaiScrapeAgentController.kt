@@ -59,7 +59,7 @@ class LantaiScrapeAgentController(
 
   @PostMapping("queue/{id}/result")
   @PreAuthorize("hasAnyRole('ADMIN', 'SCRAPE_SUBMIT')")
-  @Operation(summary = "Submit a scrape result for a queue entry")
+  @Operation(summary = "Submit a scrape result for a queue entry, or pass a series id to overwrite an already applied result")
   fun submit(
     @PathVariable id: String,
     @RequestBody payload: JsonNode,
@@ -99,13 +99,21 @@ class LantaiScrapeAgentController(
         .filter { it.scopes.isNotEmpty() && it.scopes.all { scope -> scope.isScrapeOnly } }
         .forEach { apiTokenRepository.deleteById(it.id) }
     }
+    val expires =
+      when {
+        body.expiresDate != null -> body.expiresDate
+        body.expiresInDays != null ->
+          if (body.expiresInDays <= 0) null
+          else java.time.LocalDateTime.now().plusDays(body.expiresInDays.coerceAtMost(3650).toLong())
+        else -> java.time.LocalDateTime.now().plusDays(7)
+      }
     val token =
       ApiToken(
         name = name,
         ownerId = principal.user.id,
         tokenValue = apiTokenGenerator.generate(),
         scopes = setOf(ApiToken.Scope.SCRAPE_READ, ApiToken.Scope.SCRAPE_SUBMIT),
-        expiresDate = body.expiresDate,
+        expiresDate = expires,
       )
     apiTokenRepository.insert(token)
     return apiTokenRepository.findByIdOrNull(token.id)?.toDto() ?: token.toDto()
@@ -155,4 +163,5 @@ data class ScrapeAgentTokenRequest(
   val name: String? = null,
   val rotate: Boolean = false,
   val expiresDate: java.time.LocalDateTime? = null,
+  val expiresInDays: Int? = null,
 )

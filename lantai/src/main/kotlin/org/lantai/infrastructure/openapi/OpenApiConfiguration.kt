@@ -26,14 +26,12 @@ import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.BOOK_IMPO
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.BOOK_PAGES
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.BOOK_POSTER
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.BOOK_WEBPUB
-import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.CLAIM
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.CLIENT_SETTINGS
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.COLLECTIONS
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.COLLECTION_POSTER
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.COLLECTION_SERIES
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.COMICRACK
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.CURRENT_USER
-import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.DEPRECATED
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.DUPLICATE_PAGES
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.FILE_SYSTEM
 import org.lantai.infrastructure.openapi.OpenApiConfiguration.TagNames.HISTORY
@@ -114,9 +112,9 @@ class OpenApiConfiguration(
 
             You can explicitly logout an existing session by calling `/api/logout`. This would return a `204`.
 
-            ## Deprecation
+            ## Compatibility
 
-            API endpoints marked as deprecated will be removed in the next major version.
+            Endpoints under `/api/v1/**` that also exist under `/api/v2/**` are kept for older Komga clients. They share the same data and remain fully supported; new integrations should use the `/api/v2/**` form.
             """.trimIndent(),
           ).license(License().name("MIT").url("https://github.com/punk64/Lantai/blob/main/LICENSE")),
       ).components(
@@ -270,12 +268,6 @@ class OpenApiConfiguration(
   private val tagGroups =
     listOf(
       TagGroup(
-        "Deprecation",
-        listOf(
-          DEPRECATED,
-        ),
-      ),
-      TagGroup(
         "Libraries",
         listOf(
           LIBRARIES,
@@ -336,7 +328,6 @@ class OpenApiConfiguration(
       TagGroup(
         "Server",
         listOf(
-          CLAIM,
           SERVER_SETTINGS,
           TASKS,
           HISTORY,
@@ -362,8 +353,6 @@ class OpenApiConfiguration(
   }
 
   object TagNames {
-    const val DEPRECATED = "Deprecated"
-
     const val LIBRARIES = "Libraries"
     const val SERIES = "Series"
 
@@ -393,7 +382,6 @@ class OpenApiConfiguration(
     const val OAUTH2 = "OAuth2"
 
     const val SYNCPOINTS = "Sync points"
-    const val CLAIM = "Claim"
     const val TASKS = "Tasks"
     const val HISTORY = "History"
     const val FILE_SYSTEM = "File system"
@@ -410,7 +398,6 @@ class OpenApiConfiguration(
 
   private val tags =
     listOf(
-      Tag().name(DEPRECATED),
       Tag().name(LIBRARIES).description("Manage libraries."),
       Tag().name(SERIES).description("Manage series."),
       Tag().name(SERIES_POSTER).description("Manage posters for series."),
@@ -434,7 +421,6 @@ class OpenApiConfiguration(
       Tag().name(USER_SESSION),
       Tag().name(OAUTH2).description("List registered OAuth2 providers"),
       Tag().name(SYNCPOINTS).description("Sync points are automatically created during a Kobo sync."),
-      Tag().name(CLAIM).description("Claim a freshly installed Lantai server."),
       Tag().name(TASKS).description("Manage server tasks"),
       Tag().name(HISTORY).description("Server events history"),
       Tag().name(FILE_SYSTEM).description("List files from the host server's file system"),

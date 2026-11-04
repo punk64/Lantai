@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.swagger.v3.oas.annotations.Operation
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.lantai.domain.model.Book
@@ -187,9 +188,11 @@ class KoboController(
       }.build<String, Path>()
 
   @GetMapping("ping")
+  @Operation(summary = "Check Kobo connectivity")
   fun ping() = "pong"
 
   @GetMapping("v1/initialization")
+  @Operation(summary = "Initialize a Kobo device")
   fun initialization(
     @PathVariable authToken: String,
   ): ResponseEntity<ResourcesDto> {
@@ -232,6 +235,7 @@ class KoboController(
    * @return an [AuthDto]
    */
   @PostMapping("v1/auth/device")
+  @Operation(summary = "Exchange a Kobo device token")
   fun authDevice(
     @RequestBody rawBody: ByteArray,
   ): Any {
@@ -267,6 +271,7 @@ class KoboController(
    * @return an array of [SyncResultDto]
    */
   @GetMapping("v1/library/sync")
+  @Operation(summary = "Sync the Kobo library")
   fun syncLibrary(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable authToken: String,
@@ -516,6 +521,7 @@ class KoboController(
    * @return an array of [KoboBookMetadataDto]
    */
   @GetMapping("/v1/library/{bookId}/metadata")
+  @Operation(summary = "Get Kobo metadata for a book")
   fun getBookMetadata(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable authToken: String,
@@ -533,6 +539,7 @@ class KoboController(
    * @return an array of [ReadingStateDto]
    */
   @GetMapping("/v1/library/{bookId}/state")
+  @Operation(summary = "Get Kobo reading state for a book")
   fun getState(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable bookId: String,
@@ -554,6 +561,7 @@ class KoboController(
    * @return a [RequestResultDto]
    */
   @PutMapping("/v1/library/{bookId}/state")
+  @Operation(summary = "Update Kobo reading state for a book")
   fun updateState(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable bookId: String,
@@ -652,6 +660,7 @@ class KoboController(
     produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE],
   )
   @PreAuthorize("hasRole('FILE_DOWNLOAD')")
+  @Operation(summary = "Download a book file for Kobo")
   fun getBookFile(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable bookId: String,
@@ -720,6 +729,7 @@ class KoboController(
     ],
     produces = [MediaType.IMAGE_JPEG_VALUE],
   )
+  @Operation(summary = "Get a book cover for Kobo")
   fun getBookCover(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable thumbnailId: String,
@@ -749,6 +759,7 @@ class KoboController(
     value = ["{*path}"],
     method = [RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PATCH],
   )
+  @Operation(summary = "Proxy unmatched Kobo requests")
   fun catchAll(
     @RequestBody body: ByteArray?,
   ): ResponseEntity<JsonNode> =

@@ -16,4 +16,8 @@ interface ScrapeInboxRepository {
   fun countByStatus(status: ScrapeInboxEntry.Status): Long
 
   fun deleteByQueueId(queueId: String)
+
+  fun deleteBySeriesId(seriesId: String)
+
+  fun deleteOrphans(): Int
 }

@@ -1,5 +1,6 @@
 package org.lantai.interfaces.mvc
 
+import io.swagger.v3.oas.annotations.Operation
 import jakarta.servlet.ServletContext
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.ObjectProvider
@@ -16,6 +17,7 @@ class IndexController(
   private val baseUrl: String = "${servletContext.contextPath}/"
 
   @GetMapping("/")
+  @Operation(summary = "Serve the web interface")
   fun index(
     model: Model,
     response: HttpServletResponse,

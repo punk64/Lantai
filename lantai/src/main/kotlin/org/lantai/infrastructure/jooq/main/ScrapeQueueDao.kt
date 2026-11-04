@@ -2,6 +2,7 @@ package org.lantai.infrastructure.jooq.main
 
 import org.jooq.impl.DSL
 import org.lantai.domain.model.ScrapeQueueItem
+import org.lantai.domain.persistence.ScrapeQueueBrief
 import org.lantai.domain.persistence.ScrapeQueueRepository
 import org.lantai.infrastructure.jooq.SplitDslDaoBase
 import org.lantai.jooq.main.Tables
@@ -31,6 +32,7 @@ class ScrapeQueueDao(
       .set(q.STATUS, item.status.name)
       .set(q.ORIGIN, item.origin.name)
       .set(q.LIBRARY_ID, item.libraryId)
+      .set(q.BOOK_IDS, item.bookIds.takeIf { it.isNotEmpty() }?.joinToString(","))
       .set(q.MATCH_ID, item.matchId)
       .set(q.SCORE, item.score?.toFloat())
       .set(q.SOURCE, item.source)
@@ -53,6 +55,7 @@ class ScrapeQueueDao(
       .set(q.STATUS, item.status.name)
       .set(q.ORIGIN, item.origin.name)
       .set(q.LIBRARY_ID, item.libraryId)
+      .set(q.BOOK_IDS, item.bookIds.takeIf { it.isNotEmpty() }?.joinToString(","))
       .set(q.MATCH_ID, item.matchId)
       .set(q.SCORE, item.score?.toFloat())
       .set(q.SOURCE, item.source)
@@ -81,6 +84,19 @@ class ScrapeQueueDao(
       .where(q.SERIES_ID.eq(seriesId))
       .fetchOne()
       ?.toDomain()
+
+  override fun findAllBrief(): List<ScrapeQueueBrief> =
+    dslRO
+      .select(q.STATUS, q.SERIES_ID, q.BOOK_IDS)
+      .from(q)
+      .fetch()
+      .map {
+        ScrapeQueueBrief(
+          status = ScrapeQueueItem.Status.valueOf(it.value1()),
+          seriesId = it.value2(),
+          bookIds = it.value3()?.split(",")?.filter { id -> id.isNotBlank() }.orEmpty(),
+        )
+      }
 
   override fun findPage(
     status: ScrapeQueueItem.Status?,
@@ -134,6 +150,28 @@ class ScrapeQueueDao(
       .execute()
   }
 
+  override fun deleteBySeriesId(seriesId: String) {
+    dslRW
+      .deleteFrom(q)
+      .where(q.SERIES_ID.eq(seriesId))
+      .execute()
+  }
+
+  override fun deleteByLibraryId(libraryId: String) {
+    dslRW
+      .deleteFrom(q)
+      .where(q.LIBRARY_ID.eq(libraryId))
+      .execute()
+  }
+
+  override fun deleteOrphans(): Int {
+    val s = Tables.SERIES
+    return dslRW
+      .deleteFrom(q)
+      .whereNotExists(dslRW.selectOne().from(s).where(s.ID.eq(q.SERIES_ID)))
+      .execute()
+  }
+
   override fun deleteByStatuses(statuses: List<ScrapeQueueItem.Status>) {
     if (statuses.isEmpty()) return
     dslRW
@@ -155,6 +193,7 @@ class ScrapeQueueDao(
       status = ScrapeQueueItem.Status.valueOf(status),
       origin = ScrapeQueueItem.Origin.valueOf(origin ?: ScrapeQueueItem.Origin.SERIES.name),
       libraryId = libraryId,
+      bookIds = bookIds?.split(",")?.filter { it.isNotBlank() }.orEmpty(),
       matchId = matchId,
       score = score?.toDouble(),
       source = source,

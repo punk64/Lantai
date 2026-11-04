@@ -84,6 +84,29 @@ class BookMetadataUpdateDto {
     }
 
   var linksLock: Boolean? = null
+
+  @get:NullOrNotBlank
+  var publisher: String?
+    by Delegates.observable(null) { prop, _, _ ->
+      isSet[prop.name] = true
+    }
+
+  var publisherLock: Boolean? = null
+
+  var genres: Set<String>?
+    by Delegates.observable(null) { prop, _, _ ->
+      isSet[prop.name] = true
+    }
+
+  var genresLock: Boolean? = null
+
+  @get:NullOrNotBlank
+  var language: String?
+    by Delegates.observable(null) { prop, _, _ ->
+      isSet[prop.name] = true
+    }
+
+  var languageLock: Boolean? = null
 }
 
 class AuthorUpdateDto {
@@ -153,5 +176,16 @@ fun BookMetadata.patch(patch: BookMetadataUpdateDto) =
           this.links
         },
       linksLock = patch.linksLock ?: this.linksLock,
+      publisher = if (patch.isSet("publisher")) patch.publisher ?: "" else this.publisher,
+      publisherLock = patch.publisherLock ?: this.publisherLock,
+      genres =
+        if (patch.isSet("genres")) {
+          if (patch.genres != null) patch.genres!! else emptySet()
+        } else {
+          this.genres
+        },
+      genresLock = patch.genresLock ?: this.genresLock,
+      language = if (patch.isSet("language")) patch.language ?: "" else this.language,
+      languageLock = patch.languageLock ?: this.languageLock,
     )
   }

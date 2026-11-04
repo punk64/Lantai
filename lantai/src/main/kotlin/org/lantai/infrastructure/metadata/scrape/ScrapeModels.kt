@@ -55,6 +55,39 @@ data class EmbeddedBook(
   val values: ScrapeValues,
 )
 
+data class ScrapeBookDto(
+  val bookId: String,
+  val fileName: String,
+  val title: String,
+  val number: String,
+  val authors: List<String> = emptyList(),
+  val releaseDate: String? = null,
+  val isbn: String = "",
+  val tags: List<String> = emptyList(),
+  val summary: String = "",
+  val publisher: String = "",
+  val genres: List<String> = emptyList(),
+  val language: String = "",
+  val titleLock: Boolean = false,
+  val numberLock: Boolean = false,
+  val authorsLock: Boolean = false,
+)
+
+data class ScrapeBookChoice(
+  val bookId: String = "",
+  val fields: List<String> = emptyList(),
+  val title: String = "",
+  val number: String = "",
+  val authors: List<String> = emptyList(),
+  val releaseDate: String = "",
+  val isbn: String = "",
+  val tags: List<String> = emptyList(),
+  val summary: String = "",
+  val publisher: String = "",
+  val genres: List<String> = emptyList(),
+  val language: String = "",
+)
+
 data class EmbeddedRead(
   val series: ScrapeValues = ScrapeValues(),
   val books: List<EmbeddedBook> = emptyList(),

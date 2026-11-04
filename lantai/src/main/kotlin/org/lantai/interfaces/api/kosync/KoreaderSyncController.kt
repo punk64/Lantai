@@ -1,6 +1,7 @@
 package org.lantai.interfaces.api.kosync
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.swagger.v3.oas.annotations.Operation
 import org.lantai.domain.model.BookWithMedia
 import org.lantai.domain.model.MediaExtensionEpub
 import org.lantai.domain.model.MediaProfile
@@ -37,12 +38,15 @@ class KoreaderSyncController(
   private val koreaderProgressConverter: KoreaderProgressConverter,
 ) {
   @PostMapping("users/create")
+  @Operation(summary = "Register a KOReader user (disabled)")
   fun registerUser(): ResponseEntity<String> = throw ResponseStatusException(HttpStatus.FORBIDDEN, "User creation is disabled")
 
   @GetMapping("users/auth")
+  @Operation(summary = "Authenticate a KOReader user")
   fun authorize() = UserAuthenticationDto()
 
   @GetMapping("syncs/progress/{bookHash}")
+  @Operation(summary = "Get reading progress for a document")
   fun getProgress(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable bookHash: String,
@@ -104,6 +108,7 @@ class KoreaderSyncController(
   }
 
   @PutMapping("syncs/progress")
+  @Operation(summary = "Update reading progress for a document")
   fun updateProgress(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @RequestBody koreaderProgress: DocumentProgressDto,

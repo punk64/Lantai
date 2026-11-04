@@ -1,5 +1,6 @@
 package org.lantai.interfaces.api.opds.v1
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -147,6 +148,7 @@ class OpdsController(
     )
 
   @GetMapping(ROUTE_CATALOG)
+  @Operation(summary = "Get the OPDS v1 catalog")
   fun getCatalog(): OpdsFeed =
     OpdsFeedNavigation(
       id = "root",
@@ -229,6 +231,7 @@ class OpdsController(
     )
 
   @GetMapping(ROUTE_SEARCH)
+  @Operation(summary = "Get the OPDS search description")
   fun getSearch(): OpenSearchDescription =
     OpenSearchDescription(
       shortName = "Search",
@@ -237,6 +240,7 @@ class OpdsController(
     )
 
   @GetMapping(ROUTE_ON_DECK)
+  @Operation(summary = "List books currently being read")
   fun getOnDeck(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Parameter(hidden = true) page: Pageable,
@@ -267,6 +271,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_KEEP_READING)
+  @Operation(summary = "List books to keep reading")
   fun getKeepReading(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Parameter(hidden = true) page: Pageable,
@@ -307,6 +312,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_SERIES_ALL)
+  @Operation(summary = "List all series")
   fun getAllSeries(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @RequestParam(name = "search", required = false) searchTerm: String?,
@@ -354,6 +360,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_SERIES_LATEST)
+  @Operation(summary = "List recently added series")
   fun getLatestSeries(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Parameter(hidden = true) page: Pageable,
@@ -382,6 +389,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_BOOKS_LATEST)
+  @Operation(summary = "List recently added books")
   fun getLatestBooks(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Parameter(hidden = true) page: Pageable,
@@ -415,6 +423,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_LIBRARIES_ALL)
+  @Operation(summary = "List libraries")
   fun getLibraries(
     @AuthenticationPrincipal principal: LantaiPrincipal,
   ): OpdsFeed {
@@ -439,6 +448,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_COLLECTIONS_ALL)
+  @Operation(summary = "List collections")
   fun getCollections(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Parameter(hidden = true) page: Pageable,
@@ -464,6 +474,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_READLISTS_ALL)
+  @Operation(summary = "List reading lists")
   fun getReadLists(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Parameter(hidden = true) page: Pageable,
@@ -489,6 +500,7 @@ class OpdsController(
   }
 
   @GetMapping(ROUTE_PUBLISHERS_ALL)
+  @Operation(summary = "List publishers")
   fun getPublishers(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Parameter(hidden = true) page: Pageable,
@@ -522,6 +534,7 @@ class OpdsController(
   }
 
   @GetMapping("series/{id}")
+  @Operation(summary = "Get one series with its books")
   fun getOneSeries(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable id: String,
@@ -563,6 +576,7 @@ class OpdsController(
     } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
   @GetMapping("libraries/{id}")
+  @Operation(summary = "Get one library")
   fun getOneLibrary(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable id: String,
@@ -604,6 +618,7 @@ class OpdsController(
     } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
   @GetMapping("collections/{id}")
+  @Operation(summary = "Get one collection")
   fun getOneCollection(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable id: String,
@@ -648,6 +663,7 @@ class OpdsController(
     } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
   @GetMapping("readlists/{id}")
+  @Operation(summary = "Get one reading list")
   fun getOneReadList(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable id: String,
@@ -698,6 +714,7 @@ class OpdsController(
     value = ["books/{bookId}/thumbnail/small"],
     produces = [MediaType.IMAGE_JPEG_VALUE],
   )
+  @Operation(summary = "Get a book thumbnail")
   fun getBookThumbnailSmall(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @PathVariable bookId: String,
@@ -712,6 +729,7 @@ class OpdsController(
   @ApiResponse(content = [Content(mediaType = "image/*", schema = Schema(type = "string", format = "binary"))])
   @GetMapping("books/{bookId}/pages/{pageNumber}", produces = ["image/png", "image/gif", "image/jpeg"])
   @PreAuthorize("hasRole('PAGE_STREAMING')")
+  @Operation(summary = "Get a book page image")
   fun getBookPageOpds(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     request: ServletWebRequest,

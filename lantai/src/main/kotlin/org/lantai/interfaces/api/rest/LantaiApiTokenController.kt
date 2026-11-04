@@ -1,5 +1,6 @@
 package org.lantai.interfaces.api.rest
 
+import io.swagger.v3.oas.annotations.Operation
 import org.lantai.domain.model.ApiToken
 import org.lantai.domain.persistence.ApiTokenRepository
 import org.lantai.domain.persistence.LantaiUserRepository
@@ -30,14 +31,17 @@ class LantaiApiTokenController(
   private val apiTokenGenerator: ApiTokenGenerator,
 ) {
   @GetMapping
+  @Operation(summary = "List API tokens")
   fun list(): List<ApiTokenDto> = apiTokenRepository.findAll().map { it.toDto() }
 
   @GetMapping("scopes")
+  @Operation(summary = "List available API token scopes")
   fun scopes(): List<ApiTokenScopeDto> =
     ApiToken.Scope.entries.filter { !it.isScrapeOnly }.map { ApiTokenScopeDto(it.label, it.display) }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(summary = "Create an API token")
   fun create(
     @RequestBody body: ApiTokenCreateDto,
     @AuthenticationPrincipal principal: LantaiPrincipal,
@@ -60,6 +64,7 @@ class LantaiApiTokenController(
   }
 
   @PatchMapping("{id}")
+  @Operation(summary = "Update an API token")
   fun update(
     @PathVariable id: String,
     @RequestBody body: ApiTokenUpdateDto,
@@ -93,6 +98,7 @@ class LantaiApiTokenController(
 
   @DeleteMapping("{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Delete an API token")
   fun delete(
     @PathVariable id: String,
   ) {

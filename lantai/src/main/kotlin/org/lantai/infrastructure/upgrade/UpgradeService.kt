@@ -1,5 +1,6 @@
 package org.lantai.infrastructure.upgrade
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.lantai.infrastructure.runtime.install.RuntimeEnvironment
@@ -13,6 +14,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
@@ -98,7 +100,7 @@ class UpgradeService(
 
   fun status(): UpgradeStatus {
     val jar = currentJar()
-    val staged = readManifestOrNull()
+    val staged = readManifestOrNull()?.takeIf { stagedPending(it) }
     val backupVersion = backupVersion(latestBackup(), currentVersion)
     return UpgradeStatus(
       version = currentVersion,
@@ -115,26 +117,57 @@ class UpgradeService(
     deleteRecursively(stagedDir)
   }
 
+  private fun stagedPending(manifest: UpgradeManifest): Boolean {
+    val version = manifest.version?.trim()
+    if (version.isNullOrBlank()) return false
+    return compareVersions(version, currentVersion) > 0
+  }
+
   fun inspect(file: MultipartFile): UpgradeInspect {
     if (file.isEmpty) throw IllegalArgumentException("上传文件为空")
     val name = (file.originalFilename ?: "").lowercase()
     if (!name.endsWith(".zip") && !name.endsWith(".lup")) throw IllegalArgumentException("升级包必须是 .zip")
     if (file.size > 512L * 1024 * 1024) throw IllegalArgumentException("升级包超过 512MB")
     if (!inspectGuard.tryLock()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
+    try {
+      return stage({ file.inputStream }, file.size)
+    } finally {
+      inspectGuard.unlock()
+    }
+  }
 
+  fun inspectFile(path: Path): UpgradeInspect {
+    if (!Files.isRegularFile(path)) throw IllegalArgumentException("找不到已下载的升级包")
+    val name = path.fileName.toString().lowercase()
+    if (!name.endsWith(".zip") && !name.endsWith(".lup")) throw IllegalArgumentException("升级包必须是 .zip")
+    val size = Files.size(path)
+    if (size > 512L * 1024 * 1024) throw IllegalArgumentException("升级包超过 512MB")
+    if (!inspectGuard.tryLock()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
+    try {
+      return stage({ Files.newInputStream(path) }, size)
+    } finally {
+      inspectGuard.unlock()
+    }
+  }
+
+  private fun stage(
+    open: () -> InputStream,
+    size: Long,
+  ): UpgradeInspect {
     try {
       discard()
       Files.createDirectories(stagedDir)
 
-      val compressed = file.size.coerceAtLeast(1L)
-      report("unzip", 2, "正在解压 " + formatSize(compressed))
-      file.inputStream.use { input ->
+      val compressed = size.coerceAtLeast(1L)
+      report("unzip", 0, "正在解压 " + formatSize(compressed))
+      open().use { input ->
         val counting = CountingInputStream(input)
         unzip(counting, stagedDir, compressed)
         drain(counting)
       }
+      report("unzip", 100, "解压完成，正在校验包内容")
 
-      report("verify", 72, "正在读取包信息")
+      report("verify", -1, "正在读取包信息")
       val manifest = readManifest()
       if (!manifest.product.equals("lantai", ignoreCase = true)) throw IllegalArgumentException("不是兰台的升级包")
       val version = manifest.version?.trim()
@@ -146,14 +179,12 @@ class UpgradeService(
 
       val jar = stagedJar()
       val jarSize = Files.size(jar).coerceAtLeast(1L)
-      val digest =
-        sha256(jar) { done ->
-          report("verify", 78 + (done * 18 / jarSize).toInt().coerceIn(0, 18), "正在校验 SHA-256")
-        }
+      report("verify", -1, "正在校验 SHA-256")
+      val digest = sha256(jar)
       if (manifest.sha256 != null && manifest.sha256.isNotBlank()) {
         if (!digest.equals(manifest.sha256.trim(), ignoreCase = true)) throw IllegalArgumentException("jar 校验失败，包可能损坏")
       }
-      report("verify", 97, "正在检查 jar 结构")
+      report("verify", -1, "正在检查 jar 结构")
       if (!jarStructureOk(jar)) throw IllegalArgumentException("jar 结构不合法，缺少 BOOT-INF")
 
       val result =
@@ -174,8 +205,6 @@ class UpgradeService(
       runCatching { discard() }
       report("error", 0, e.message ?: "校验失败")
       throw e
-    } finally {
-      inspectGuard.unlock()
     }
   }
 
@@ -184,7 +213,8 @@ class UpgradeService(
     pct: Int,
     label: String,
   ) {
-    inspectProgress.set(UpgradeProgress(idle = false, phase = phase, pct = pct.coerceIn(0, 100), label = label))
+    val value = if (pct < 0) -1 else pct.coerceIn(0, 100)
+    inspectProgress.set(UpgradeProgress(idle = false, phase = phase, pct = value, label = label))
   }
 
   private fun formatSize(bytes: Long): String =
@@ -204,6 +234,15 @@ class UpgradeService(
   }
 
   fun apply(): UpgradeApply {
+    if (!inspectGuard.tryLock()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
+    try {
+      return applyLocked()
+    } finally {
+      inspectGuard.unlock()
+    }
+  }
+
+  private fun applyLocked(): UpgradeApply {
     val manifest = readManifest()
     val version = manifest.version?.trim()?.takeIf { it.isNotBlank() } ?: throw IllegalStateException("缺少升级包信息")
     if (compareVersions(version, currentVersion) <= 0)
@@ -214,36 +253,83 @@ class UpgradeService(
     val parent = target.parent ?: throw IllegalStateException("无法定位 jar 所在目录")
     if (!Files.isWritable(parent)) throw IllegalStateException("jar 所在目录不可写：$parent")
 
+    report("backup", 0, "正在备份当前版本")
     backupCurrent(target)
 
     val temp = parent.resolve(target.fileName.toString() + ".new")
     try {
-      Files.copy(jar, temp, StandardCopyOption.REPLACE_EXISTING)
+      report("copy", 45, "正在替换程序文件")
+      copyWithProgress(jar, temp, "copy", 45, 95, "正在替换程序文件")
       Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
     } catch (e: Exception) {
       runCatching { Files.deleteIfExists(temp) }
+      report("error", 0, e.message ?: "替换失败")
       throw IllegalStateException("替换失败（文件可能被系统锁定）：${e.message}。可停机后手动用 ${jar} 替换 ${target}")
     }
 
+    report("restart", -1, "已替换，正在重启")
+    runCatching { deleteRecursively(stagedDir) }
     logger.warn { "Applying upgrade $currentVersion -> $version, restart scheduled" }
     scheduleRestart()
     return UpgradeApply(applied = true, version = version, previousVersion = currentVersion, restartMode = if (isContainerized()) "container" else "manual")
   }
 
   fun rollback(): UpgradeApply {
+    if (!inspectGuard.tryLock()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
+    try {
+      return rollbackLocked()
+    } finally {
+      inspectGuard.unlock()
+    }
+  }
+
+  private fun rollbackLocked(): UpgradeApply {
     val latest = latestBackup() ?: throw IllegalStateException("没有可用的备份")
     val target = currentJar() ?: throw IllegalStateException("无法定位当前运行的 jar")
     val temp = target.resolveSibling(target.fileName.toString() + ".new")
     try {
-      Files.copy(latest, temp, StandardCopyOption.REPLACE_EXISTING)
+      report("copy", 0, "正在恢复备份文件")
+      copyWithProgress(latest, temp, "copy", 0, 95, "正在恢复备份文件")
       Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
     } catch (e: Exception) {
       runCatching { Files.deleteIfExists(temp) }
+      report("error", 0, e.message ?: "回退失败")
       throw IllegalStateException("回滚失败：${e.message}")
     }
+    report("restart", -1, "已恢复，正在重启")
     val restored = latest.fileName.toString().removePrefix("lantai-").removeSuffix(".jar")
     scheduleRestart()
     return UpgradeApply(applied = true, version = restored, previousVersion = currentVersion, restartMode = if (isContainerized()) "container" else "manual")
+  }
+
+  private fun copyWithProgress(
+    source: Path,
+    target: Path,
+    phase: String,
+    from: Int,
+    to: Int,
+    label: String,
+  ) {
+    val total = Files.size(source).coerceAtLeast(1L)
+    var read = 0L
+    var mark = 0L
+    Files.newInputStream(source).use { ins ->
+      Files.newOutputStream(target, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use { os ->
+        val buf = ByteArray(256 * 1024)
+        while (true) {
+          val n = ins.read(buf)
+          if (n <= 0) break
+          os.write(buf, 0, n)
+          read += n
+          if (read - mark >= PROGRESS_STEP) {
+            mark = read
+            val ratio = (read * 100 / total).toInt().coerceIn(0, 100)
+            report(phase, from + (to - from) * ratio / 100, label)
+          }
+        }
+      }
+    }
+    report(phase, to, label)
   }
 
   private fun backupCurrent(target: Path) {
@@ -251,7 +337,7 @@ class UpgradeService(
     val backup = backupDir.resolve("lantai-$currentVersion.jar")
     val temp = backupDir.resolve("lantai-$currentVersion.jar.tmp")
     runCatching { Files.deleteIfExists(temp) }
-    Files.copy(target, temp, StandardCopyOption.REPLACE_EXISTING)
+    copyWithProgress(target, temp, "backup", 0, 40, "正在备份当前版本")
     Files.move(temp, backup, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
     val removed = pruneBackups(backupDir, backup)
     if (removed > 0) logger.warn { "Pruned $removed stale upgrade backup file(s), kept ${backup.fileName}" }
@@ -334,10 +420,10 @@ class UpgradeService(
             written += n
             if (written > 400L * 1024 * 1024) throw IllegalArgumentException("解压后体积超过 400MB")
             os.write(buf, 0, n)
-            if (written - mark >= PROGRESS_STEP) {
-              mark = written
-              val ratio = (input.count * 62 / compressed).toInt().coerceIn(0, 61)
-              report("unzip", 3 + ratio, "正在解压 " + formatSize(written))
+            if (input.count - mark >= PROGRESS_STEP) {
+              mark = input.count
+              val ratio = (input.count * 100 / compressed).toInt().coerceIn(0, 99)
+              report("unzip", ratio, "正在解压 " + formatSize(written))
             }
           }
         }
@@ -411,6 +497,7 @@ class UpgradeService(
   }
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class UpgradeManifest(
   val product: String? = null,
   val version: String? = null,

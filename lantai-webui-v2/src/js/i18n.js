@@ -26,10 +26,16 @@
     return out;
   }
 
-  for (var i = 0; i < NAMES.length; i++) DICT[NAMES[i][0]] = merge(NAMES[i][0]);
-
   function known(code) {
-    return Object.prototype.hasOwnProperty.call(DICT, code);
+    for (var i = 0; i < NAMES.length; i++) if (NAMES[i][0] === code) return true;
+    return false;
+  }
+
+  function ensure(code) {
+    if (DICT[code]) return true;
+    if (!OWN[code]) return false;
+    DICT[code] = merge(code);
+    return true;
   }
 
   try {
@@ -37,12 +43,15 @@
     if (saved && known(saved)) cur = saved;
   } catch (e) { }
 
+  ensure(cur);
+
   function lookup(code, key) {
     var t = DICT[code];
     return t && Object.prototype.hasOwnProperty.call(t, key) ? t[key] : null;
   }
 
   function t(key, vars) {
+    ensure(cur);
     var out = lookup(cur, key);
     if (out == null) out = lookup('en', key);
     if (out == null) out = lookup('zh-Hans', key);
@@ -60,7 +69,7 @@
   }
 
   function lang(code) {
-    if (code && known(code)) {
+    if (code && known(code) && ensure(code)) {
       cur = code;
       try { localStorage.setItem(KEY, code); } catch (e) { }
       setHtmlLang();

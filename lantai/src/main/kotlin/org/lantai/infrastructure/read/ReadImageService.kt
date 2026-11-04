@@ -5,9 +5,12 @@ import org.lantai.infrastructure.image.ImageAnalyzer
 import org.lantai.infrastructure.image.ImageType
 import org.lantai.infrastructure.mediacontainer.ContentDetector
 import org.springframework.stereotype.Service
+import java.awt.Color
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.Base64
+import javax.imageio.ImageIO
 import kotlin.math.max
 
 data class RenderedImage(
@@ -70,21 +73,42 @@ class ReadImageService(
     if (longest <= width) return RenderedImage(bytes, sourceType)
 
     val target = pickType(sourceType, format)
-    val output =
-      runCatching {
-        ByteArrayOutputStream().use { buffer ->
-          Thumbnails
-            .of(bytes.inputStream())
-            .size(width, width)
-            .imageType(if (target == ImageType.PNG) BufferedImage.TYPE_INT_ARGB else BufferedImage.TYPE_INT_RGB)
-            .outputFormat(target.imageIOFormat)
-            .outputQuality(if (target == ImageType.JPEG) readProperties.jpegQuality else 1.0)
-            .toOutputStream(buffer)
-          buffer.toByteArray()
-        }
-      }.getOrNull() ?: return RenderedImage(bytes, sourceType)
+    val output = encode(bytes, sourceType, width, target) ?: return RenderedImage(bytes, sourceType)
 
     return RenderedImage(output, target.mediaType)
+  }
+
+  private fun encode(
+    bytes: ByteArray,
+    sourceType: String,
+    width: Int,
+    target: ImageType,
+  ): ByteArray? =
+    runCatching {
+      val source = if (target == ImageType.JPEG && sourceType != "image/jpeg") flattenOnWhite(bytes) else null
+      val builder = if (source != null) Thumbnails.of(source) else Thumbnails.of(bytes.inputStream())
+      ByteArrayOutputStream().use { buffer ->
+        builder
+          .size(width, width)
+          .imageType(if (target == ImageType.PNG) BufferedImage.TYPE_INT_ARGB else BufferedImage.TYPE_INT_RGB)
+          .outputFormat(target.imageIOFormat)
+          .outputQuality(if (target == ImageType.JPEG) readProperties.jpegQuality else 1.0)
+          .toOutputStream(buffer)
+        buffer.toByteArray()
+      }
+    }.getOrNull()
+
+  private fun flattenOnWhite(bytes: ByteArray): BufferedImage? {
+    val source = runCatching { ImageIO.read(ByteArrayInputStream(bytes)) }.getOrNull() ?: return null
+    if (!source.colorModel.hasAlpha()) return source
+    val flat = BufferedImage(source.width, source.height, BufferedImage.TYPE_INT_RGB)
+    flat.createGraphics().apply {
+      color = Color.WHITE
+      fillRect(0, 0, flat.width, flat.height)
+      drawImage(source, 0, 0, null)
+      dispose()
+    }
+    return flat
   }
 
   private fun encode(raw: String): String = Base64.getUrlEncoder().withoutPadding().encodeToString(raw.toByteArray(Charsets.UTF_8))

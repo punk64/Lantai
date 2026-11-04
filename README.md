@@ -9,6 +9,12 @@
 
 名字取自汉代藏书之所「兰台」。与 Komga 的关系用一个词概括：**同源，不同路**。
 
+> English: [README.en.md](README.en.md)
+
+## 版本状态
+
+**V1.0.0 之前均为测试版本。** 期间的功能升级与调整会尽量不破坏已有数据结构，改动重点放在界面修复与使用体验优化；确需跨版本的破坏性变更时会单独说明并提供迁移路径。
+
 ## 与 Komga 的关系
 
 | 项 | 说明 |
@@ -30,11 +36,46 @@
 | 阅读器 | 漫画页流（双页、条漫、阅读方向）；电子书双模式（滚动 / 分页），保留原书排版，可调字体字号行距与主题 |
 | 阅读增强 | TTS 逐句朗读并高亮、书内全文搜索、批注与书签 |
 | 在线图源 | 内置托管 Suwayomi，客户端零扩展；订阅、浏览、单章下载存档且不丢进度 |
-| 元数据 | 豆瓣读书 + AniList 搜索匹配，支持批量导出与回写，可回滚 |
+| 元数据 | 豆瓣读书 + AniList 搜索匹配，冲突逐字段核对；刮削名单可导出为 JSON / CSV，外部填好后导入回写，也可通过刮削令牌接入外部程序 |
 | 统计 | 阅读时长明细 + 日聚合，网页心跳与客户端自报双通道 |
 | 协议 | OPDS v1 / v2、Kobo Sync、KOReader Sync、WebPub |
 | 账号 | 多用户、角色权限、子账户、一次性密码重置 |
 | 界面 | 39 种语言，默认简体中文 |
+
+## 界面预览
+
+以下截图取自 **兰台 `0.4.21` 的实际界面**，而非设计稿：使用独立实例与虚构测试书籍，书名、作者、统计数字均为演示数据，书库路径已脱敏。左列为「宣纸」浅色主题，右列为「墨金」深色主题，可通过顶栏的太阳 / 月亮按钮即时切换。
+
+| 页面 | 宣纸（浅色） | 墨金（深色） |
+|---|---|---|
+| 首页 | ![首页 浅色](docs/preview/01-home.png) | ![首页 深色](docs/preview/01-home-dark.png) |
+| 书库 | ![书库 浅色](docs/preview/02-library.png) | ![书库 深色](docs/preview/02-library-dark.png) |
+| 系列详情 | ![系列详情 浅色](docs/preview/03-series.png) | ![系列详情 深色](docs/preview/03-series-dark.png) |
+| 阅读器 | ![阅读器 浅色](docs/preview/04-reader.png) | ![阅读器 深色](docs/preview/04-reader-dark.png) |
+| 阅读统计 | ![阅读统计 浅色](docs/preview/05-stats.png) | ![阅读统计 深色](docs/preview/05-stats-dark.png) |
+| 设置中心 | ![设置中心 浅色](docs/preview/06-settings.png) | ![设置中心 深色](docs/preview/06-settings-dark.png) |
+
+## 界面语言
+
+39 种，默认简体中文，可在「设置 → 外观」即时切换，无需重启。
+
+| 语言 | 代码 | 语言 | 代码 | 语言 | 代码 |
+|---|---|---|---|---|---|
+| 简体中文 | `zh-Hans` | 繁体中文 | `zh-Hant` | 英语 | `en` |
+| 日语 | `ja` | 韩语 | `ko` | 俄语 | `ru` |
+| 德语 | `de` | 法语 | `fr` | 西班牙语 | `es` |
+| 葡萄牙语 | `pt` | 葡萄牙语（巴西） | `pt-BR` | 意大利语 | `it` |
+| 荷兰语 | `nl` | 波兰语 | `pl` | 捷克语 | `cs` |
+| 斯洛伐克语 | `sk` | 斯洛文尼亚语 | `sl` | 克罗地亚语 | `hr` |
+| 保加利亚语 | `bg` | 乌克兰语 | `uk` | 瑞典语 | `sv` |
+| 丹麦语 | `da` | 挪威语 | `nb` | 芬兰语 | `fi` |
+| 加泰罗尼亚语 | `ca` | 加利西亚语 | `gl` | 阿拉伯语 | `ar` |
+| 希伯来语 | `he` | 波斯语 | `fa` | 土耳其语 | `tr` |
+| 希腊语 | `el` | 匈牙利语 | `hu` | 印尼语 | `id` |
+| 越南语 | `vi` | 泰语 | `th` | 泰米尔语 | `ta` |
+| 马拉雅拉姆语 | `ml` | 提格利尼亚语 | `ti` | 世界语 | `eo` |
+
+简体中文内置在主包里，其余 38 种按需加载，切换时才拉取对应语言包。
 
 ## 技术栈
 
@@ -44,7 +85,9 @@ Kotlin · Spring Boot 3.5 · Spring Data JDBC + jOOQ · Flyway · SQLite · Luce
 
 ```
 lantai/                  Spring Boot 服务端（API、扫描引擎、客户端协议）
+lantai/docker/           镜像构建文件与两套 compose
 lantai-webui-v2/         网页前端源码（零依赖，vanilla JS）
+docs/preview/            界面预览图
 res/                     应用图标
 gradle/                  Gradle Wrapper
 ```
@@ -151,9 +194,114 @@ WantedBy=multi-user.target
 
 Windows 用「任务计划程序」建一个「计算机启动时」触发的任务，操作填 `javaw -jar <jar路径> --lantai.config-dir=<数据目录>`。
 
-### Docker
+### Docker 部署
 
-镜像构建文件（`Dockerfile`、`docker-compose.yml`、`entrypoint.sh`）**不在本仓库**，随发布产物单独分发。
+镜像按「版本 + 基础系统」命名，两版跑的是同一个 `lantai-<version>.jar`，升级包通用：
+
+| 标签 | 基础镜像 | 体积 | 差异 |
+|---|---|---|---|
+| `lantai:<version>-alpine` | `eclipse-temurin:21-jre-alpine` | 约 531 MB | 精简版。仅 JRE、字体、时区与图像解码库。**Calibre 不可用**（官方 Calibre 无 musl 构建），MOBI/AZW3 走外部转换器 |
+| `lantai:<version>-ubuntu` | `ubuntu:26.04` | 约 1.09 GB | 完整版。额外带 poppler、kepubify、libjxl / libheif / libwebp 与 Qt 运行库，支持 KEPUB 转换与更多图片格式 |
+
+构建（在仓库根执行，`context` 指向 `lantai/` 模块目录）：
+
+```bash
+cd lantai-webui-v2 && node build.js && cd ..
+./gradlew :lantai:bootJar -x test
+cd lantai
+docker build -f docker/Dockerfile.alpine --build-arg VERSION=<version> -t lantai:<version>-alpine ..
+docker build -f docker/Dockerfile.lantai --build-arg VERSION=<version> -t lantai:<version>-ubuntu ..
+```
+
+容器内数据目录固定 `/config`（含 SQLite、Lucene 索引、头像、升级包缓存），书库挂到 `/books`。
+
+#### 完整版 `docker-compose.full.yml`
+
+Host 网络，开箱即可用内置在线源；卷分三份，`packages/` 存放运行时安装包。
+
+```yaml
+name: lantai
+
+services:
+  lantai:
+    image: lantai:${LANTAI_VERSION:-0.4.21}-ubuntu
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.lantai
+      args:
+        VERSION: ${LANTAI_VERSION:-0.4.21}
+        WITH_KEPUBIFY: "true"
+    container_name: lantai
+    network_mode: host
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: ${LANTAI_PORT:-25600}
+      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true"
+      LANTAI_CONFIGDIR: /config
+      LANTAI_RUNTIME_AUTO_INSTALL: ""
+      LANTAI_RUNTIME_AUTO_ENABLE: "true"
+      LANTAI_RUNTIME_SOURCE_MODE: "auto"
+      LANTAI_RUNTIME_PACKAGE_DIR: /packages
+      LANTAI_RUNTIME_FAIL_FAST: "false"
+    volumes:
+      - ./config:/config
+      - ./books:/books
+      - ./packages:/packages
+    restart: unless-stopped
+    stop_grace_period: 40s
+    shm_size: 256m
+    mem_limit: 3g
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:25600/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+```
+
+#### 精简版 `docker-compose.slim.yml`
+
+Bridge 网络 + 端口映射，只挂数据目录与书库，关闭在线源，内存上限 1.5 GB，适合小内存机器或纯离线阅读。
+
+```yaml
+name: lantai
+
+services:
+  lantai:
+    image: lantai:${LANTAI_VERSION:-0.4.21}-alpine
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.alpine
+      args:
+        VERSION: ${LANTAI_VERSION:-0.4.21}
+    container_name: lantai
+    ports:
+      - "${LANTAI_PORT:-25600}:25600"
+    environment:
+      TZ: Asia/Shanghai
+      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true"
+      LANTAI_CONFIGDIR: /config
+      LANTAI_ONLINE_ENABLED: "false"
+    volumes:
+      - ./config:/config
+      - ./books:/books:ro
+    restart: unless-stopped
+    stop_grace_period: 40s
+    mem_limit: 1536m
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:25600/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
+```
+
+```bash
+docker compose -f docker-compose.slim.yml up -d
+docker compose -f docker-compose.full.yml logs -f lantai
+```
+
+首次启动仍会在日志里打印随机管理员账号。`./config` 若由 Docker 自动创建，属主是 root，容器以 root 运行可直接写入；改用非 root 运行需自行 `chown`。
 
 ## 不在本仓库的内容
 

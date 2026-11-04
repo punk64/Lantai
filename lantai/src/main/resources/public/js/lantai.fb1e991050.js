@@ -42,1243 +42,7 @@
   };
 })();
 
-(function () {
-  var D = window.LANTAI_I18N_DICT = {};
-  D['zh-Hans'] = {
-    'brand.tagline': '个人书库 · 阅读与归档',
-    'boot.login': '登录',
-    'boot.userOrEmail': '用户名或邮箱',
-    'boot.password': '密码',
-    'boot.go': '进入兰台',
-    'boot.hint': '首次使用：管理员账号与初始密码已打印在启动日志（控制台窗口）中，登录后请立即修改密码',
-    'boot.language': '界面语言',
-    'boot.remember': '记住账号',
-    'boot.checking': '校验中…',
-    'boot.fillLogin': '请填写用户名与密码',
-    'boot.badCred': '用户名或密码不正确',
-    'boot.loginFail': '登录失败，请稍后再试',
-    'boot.needLogin': '请使用兰台账号登录',
-    'boot.serverDown': '服务端暂时不可用（状态码 {code}）',
-    'boot.cantConnect': '无法连接服务端，请确认兰台已启动',
-    'boot.loggedOut': '已退出登录',
-    'boot.signedIn': '已登录',
-    'nav.gOverview': '概览',
-    'nav.gLantai': '兰台增量',
-    'nav.gSystem': '系统',
-    'nav.home': '首页',
-    'nav.browse': '书库',
-    'nav.collections': '合集',
-    'nav.readlists': '阅读清单',
-    'nav.online': '在线源',
-    'nav.scrape': '刮削',
-    'nav.annotations': '批注',
-    'nav.stats': '阅读统计',
-    'nav.tasks': '任务中心',
-    'nav.settings': '设置中心',
-    'nav.extensions': '功能拓展',
-    'nav.users': '用户管理',
-    'nav.audit': '管理日志',
-    'nav.logs': '日志',
-    'nav.opds': 'OPDS 目录',
-    'nav.kobo': 'Kobo 设备',
-    'nav.devices': '阅读设备',
-    'nav.trash': '回收站',
-    'nav.inspect': '巡检',
-    'nav.system': '系统信息',
-    'nav.protocol': 'API 接口',
-    'top.search': '搜索系列、书籍、合集、在线源…',
-    'top.tasks': '任务队列',
-    'top.theme': '切换主题',
-    'top.nav': '导航',
-    'top.collapse': '收起导航',
-    'top.admin': '管理员',
-    'top.allLibs': '管理员 · 全部库',
-    'side.running': '运行中',
-    'side.onlineDown': '在线源服务未启动',
-    'side.onlineUp': '在线源服务运行中',
-    'set.title': '设置中心',
-    'set.sub': '书库、在线源、阅读与缓存设置',
-    'set.api': 'API 接口',
-    'set.libraries': '库与扫描',
-    'set.online': '在线库配置',
-    'set.heartbeat': '计时与同步',
-    'set.appearance': '外观',
-    'set.cache': '派生缓存',
-    'set.tokens': 'API 令牌',
-    'set.system': '兰台全局',
-    'set.upgrade': '在线升级',
-    'set.language': '界面语言',
-    'set.languageNote': '切换后立即生效，仅影响界面文字，不改变书籍元数据。',
-    'set.languageScope': '当前覆盖登录页、导航、顶栏与设置页标题；具体业务页正文仍为中文。',
-    'common.save': '保存',
-    'common.cancel': '取消',
-    'common.delete': '删除',
-    'common.close': '关闭',
-    'common.confirm': '确认',
-    'common.search': '搜索',
-    'common.filter': '筛选',
-    'common.reset': '重置',
-    'common.loading': '加载中…',
-    'common.retry': '重试',
-    'common.empty': '暂无数据',
-    'common.all': '全部'
-  };
-  D['en'] = {
-    'brand.tagline': 'Personal library · reading & archiving',
-    'boot.login': 'Sign in',
-    'boot.userOrEmail': 'Username or email',
-    'boot.password': 'Password',
-    'boot.go': 'Enter Lantai',
-    'boot.hint': 'First run: the admin username and initial password were printed in the startup log (console window). Change the password after signing in.',
-    'boot.language': 'Language',
-    'boot.remember': 'Remember me',
-    'boot.checking': 'Checking…',
-    'boot.fillLogin': 'Enter your username and password',
-    'boot.badCred': 'Incorrect username or password',
-    'boot.loginFail': 'Sign-in failed, please try again later',
-    'boot.needLogin': 'Sign in with your Lantai account',
-    'boot.serverDown': 'Server unavailable (status {code})',
-    'boot.cantConnect': 'Cannot reach the server, make sure Lantai is running',
-    'boot.loggedOut': 'Signed out',
-    'boot.signedIn': 'Signed in',
-    'nav.gOverview': 'Overview',
-    'nav.gLantai': 'Lantai extras',
-    'nav.gSystem': 'System',
-    'nav.home': 'Home',
-    'nav.browse': 'Library',
-    'nav.collections': 'Collections',
-    'nav.readlists': 'Reading lists',
-    'nav.online': 'Online sources',
-    'nav.scrape': 'Scraping',
-    'nav.annotations': 'Annotations',
-    'nav.stats': 'Reading stats',
-    'nav.tasks': 'Tasks',
-    'nav.settings': 'Settings',
-    'nav.extensions': 'Extensions',
-    'nav.users': 'Users',
-    'nav.audit': 'Audit log',
-    'nav.logs': 'Logs',
-    'nav.opds': 'OPDS catalog',
-    'nav.kobo': 'Kobo devices',
-    'nav.devices': 'Reading devices',
-    'nav.trash': 'Trash',
-    'nav.inspect': 'Inspection',
-    'nav.system': 'System info',
-    'nav.protocol': 'API',
-    'top.search': 'Search series, books, collections, online sources…',
-    'top.tasks': 'Task queue',
-    'top.theme': 'Toggle theme',
-    'top.nav': 'Navigation',
-    'top.collapse': 'Collapse sidebar',
-    'top.admin': 'Administrator',
-    'top.allLibs': 'Administrator · all libraries',
-    'side.running': 'Running',
-    'side.onlineDown': 'Online source service stopped',
-    'side.onlineUp': 'Online source service running',
-    'set.title': 'Settings',
-    'set.sub': 'Libraries, online sources, reading and cache',
-    'set.api': 'API',
-    'set.libraries': 'Libraries & scanning',
-    'set.online': 'Online library',
-    'set.heartbeat': 'Timing & sync',
-    'set.appearance': 'Appearance',
-    'set.cache': 'Derived cache',
-    'set.tokens': 'API tokens',
-    'set.system': 'Server',
-    'set.upgrade': 'Upgrade',
-    'set.language': 'Language',
-    'set.languageNote': 'Takes effect immediately and only affects interface text, not book metadata.',
-    'set.languageScope': 'Currently covers the sign-in page, navigation, top bar and settings titles; page content remains in Chinese.',
-    'common.save': 'Save',
-    'common.cancel': 'Cancel',
-    'common.delete': 'Delete',
-    'common.close': 'Close',
-    'common.confirm': 'Confirm',
-    'common.search': 'Search',
-    'common.filter': 'Filter',
-    'common.reset': 'Reset',
-    'common.loading': 'Loading…',
-    'common.retry': 'Retry',
-    'common.empty': 'Nothing here',
-    'common.all': 'All'
-  };
-  D['zh-Hant'] = {
-    'brand.tagline': '個人書庫 · 閱讀與歸檔',
-    'boot.login': '登入',
-    'boot.userOrEmail': '使用者名稱或電子郵件',
-    'boot.password': '密碼',
-    'boot.go': '進入蘭台',
-    'boot.hint': '首次使用：管理員帳號與初始密碼已列印在啟動日誌（主控台視窗）中，登入後請立即變更密碼',
-    'boot.language': '介面語言',
-    'boot.remember': '記住帳號',
-    'boot.checking': '驗證中…',
-    'boot.fillLogin': '請填寫使用者名稱與密碼',
-    'boot.badCred': '使用者名稱或密碼不正確',
-    'boot.loginFail': '登入失敗，請稍後再試',
-    'boot.needLogin': '請使用蘭台帳號登入',
-    'boot.serverDown': '伺服器暫時無法使用（狀態碼 {code}）',
-    'boot.cantConnect': '無法連線至伺服器，請確認蘭台已啟動',
-    'boot.loggedOut': '已登出',
-    'boot.signedIn': '已登入',
-    'nav.gOverview': '總覽',
-    'nav.gLantai': '蘭台增補',
-    'nav.gSystem': '系統',
-    'nav.home': '首頁',
-    'nav.browse': '書庫',
-    'nav.collections': '合集',
-    'nav.readlists': '閱讀清單',
-    'nav.online': '線上來源',
-    'nav.scrape': '刮削',
-    'nav.annotations': '註記',
-    'nav.stats': '閱讀統計',
-    'nav.tasks': '任務中心',
-    'nav.settings': '設定中心',
-    'nav.extensions': '功能擴充',
-    'nav.users': '使用者管理',
-    'nav.audit': '管理日誌',
-    'nav.logs': '日誌',
-    'nav.opds': 'OPDS 目錄',
-    'nav.kobo': 'Kobo 裝置',
-    'nav.devices': '閱讀裝置',
-    'nav.trash': '回收筒',
-    'nav.inspect': '巡檢',
-    'nav.system': '系統資訊',
-    'nav.protocol': 'API 介面',
-    'top.search': '搜尋系列、書籍、合集、線上來源…',
-    'top.tasks': '任務佇列',
-    'top.theme': '切換主題',
-    'top.nav': '導覽',
-    'top.collapse': '收合導覽',
-    'top.admin': '管理員',
-    'top.allLibs': '管理員 · 全部書庫',
-    'side.running': '執行中',
-    'side.onlineDown': '線上來源服務未啟動',
-    'side.onlineUp': '線上來源服務執行中',
-    'set.title': '設定中心',
-    'set.sub': '書庫、線上來源、閱讀與快取設定',
-    'set.api': 'API 介面',
-    'set.libraries': '書庫與掃描',
-    'set.online': '線上書庫設定',
-    'set.heartbeat': '計時與同步',
-    'set.appearance': '外觀',
-    'set.cache': '衍生快取',
-    'set.system': '蘭台全域',
-    'set.language': '介面語言',
-    'set.languageNote': '切換後立即生效，僅影響介面文字，不變更書籍中繼資料。',
-    'set.languageScope': '目前涵蓋登入頁、導覽、頂欄與設定頁標題；各業務頁正文仍為中文。',
-    'common.save': '儲存',
-    'common.cancel': '取消',
-    'common.delete': '刪除',
-    'common.close': '關閉',
-    'common.confirm': '確認',
-    'common.search': '搜尋',
-    'common.filter': '篩選',
-    'common.reset': '重設',
-    'common.loading': '載入中…',
-    'common.retry': '重試',
-    'common.empty': '暫無資料',
-    'common.all': '全部'
-  };
-  D['ja'] = {
-    'brand.tagline': '個人書庫 · 読書とアーカイブ',
-    'boot.login': 'ログイン',
-    'boot.userOrEmail': 'ユーザー名またはメール',
-    'boot.password': 'パスワード',
-    'boot.go': '蘭台に入る',
-    'boot.hint': '初回利用時：管理者アカウントと初期パスワードは起動ログ（コンソール画面）に出力されています。ログイン後すぐに変更してください',
-    'boot.language': '表示言語',
-    'boot.remember': 'アカウントを記憶',
-    'boot.checking': '確認中…',
-    'boot.fillLogin': 'ユーザー名とパスワードを入力してください',
-    'boot.badCred': 'ユーザー名またはパスワードが正しくありません',
-    'boot.loginFail': 'ログインに失敗しました。後でもう一度お試しください',
-    'boot.needLogin': '蘭台アカウントでログインしてください',
-    'boot.serverDown': 'サーバーが一時的に利用できません（ステータス {code}）',
-    'boot.cantConnect': 'サーバーに接続できません。蘭台が起動しているか確認してください',
-    'boot.loggedOut': 'ログアウトしました',
-    'boot.signedIn': 'ログイン済み',
-    'nav.gOverview': '概要',
-    'nav.gLantai': '蘭台の拡張',
-    'nav.gSystem': 'システム',
-    'nav.home': 'ホーム',
-    'nav.browse': '書庫',
-    'nav.collections': 'コレクション',
-    'nav.readlists': 'リーディングリスト',
-    'nav.online': 'オンラインソース',
-    'nav.scrape': 'スクレイピング',
-    'nav.annotations': '注釈',
-    'nav.stats': '読書統計',
-    'nav.tasks': 'タスク',
-    'nav.settings': '設定',
-    'nav.extensions': '拡張機能',
-    'nav.users': 'ユーザー管理',
-    'nav.audit': '監査ログ',
-    'nav.logs': 'ログ',
-    'nav.opds': 'OPDS カタログ',
-    'nav.kobo': 'Kobo 端末',
-    'nav.devices': '読書端末',
-    'nav.trash': 'ゴミ箱',
-    'nav.inspect': '点検',
-    'nav.system': 'システム情報',
-    'nav.protocol': 'API',
-    'top.search': 'シリーズ、書籍、コレクション、オンラインソースを検索…',
-    'top.tasks': 'タスクキュー',
-    'top.theme': 'テーマ切り替え',
-    'top.nav': 'ナビゲーション',
-    'top.collapse': 'サイドバーを折りたたむ',
-    'top.admin': '管理者',
-    'top.allLibs': '管理者 · すべての書庫',
-    'side.running': '稼働中',
-    'side.onlineDown': 'オンラインソースサービス停止中',
-    'side.onlineUp': 'オンラインソースサービス稼働中',
-    'set.title': '設定',
-    'set.sub': '書庫、オンラインソース、読書、キャッシュの設定',
-    'set.api': 'API',
-    'set.libraries': '書庫とスキャン',
-    'set.online': 'オンライン書庫',
-    'set.heartbeat': '計測と同期',
-    'set.appearance': '外観',
-    'set.cache': '派生キャッシュ',
-    'set.system': 'サーバー',
-    'set.language': '表示言語',
-    'set.languageNote': '変更はすぐに反映されます。表示文字のみに影響し、書籍のメタデータは変更しません。',
-    'set.languageScope': '現在はログイン画面、ナビゲーション、トップバー、設定画面の見出しを対象としています。各機能ページの本文は中国語のままです。',
-    'common.save': '保存',
-    'common.cancel': 'キャンセル',
-    'common.delete': '削除',
-    'common.close': '閉じる',
-    'common.confirm': '確認',
-    'common.search': '検索',
-    'common.filter': '絞り込み',
-    'common.reset': 'リセット',
-    'common.loading': '読み込み中…',
-    'common.retry': '再試行',
-    'common.empty': 'データがありません',
-    'common.all': 'すべて'
-  };
-  D['ko'] = {
-    'brand.tagline': '개인 서재 · 읽기와 보관',
-    'boot.login': '로그인',
-    'boot.userOrEmail': '사용자 이름 또는 이메일',
-    'boot.password': '비밀번호',
-    'boot.go': '란타이 들어가기',
-    'boot.hint': '처음 사용 시: 관리자 계정과 초기 비밀번호가 시작 로그(콘솔 창)에 출력됩니다. 로그인 후 즉시 변경하세요',
-    'boot.language': '인터페이스 언어',
-    'boot.remember': '계정 기억',
-    'boot.checking': '확인 중…',
-    'boot.fillLogin': '사용자 이름과 비밀번호를 입력하세요',
-    'boot.badCred': '사용자 이름 또는 비밀번호가 올바르지 않습니다',
-    'boot.loginFail': '로그인에 실패했습니다. 잠시 후 다시 시도하세요',
-    'boot.needLogin': '란타이 계정으로 로그인하세요',
-    'boot.serverDown': '서버를 일시적으로 사용할 수 없습니다(상태 {code})',
-    'boot.cantConnect': '서버에 연결할 수 없습니다. 란타이가 실행 중인지 확인하세요',
-    'boot.loggedOut': '로그아웃되었습니다',
-    'boot.signedIn': '로그인됨',
-    'nav.gOverview': '개요',
-    'nav.gLantai': '란타이 확장',
-    'nav.gSystem': '시스템',
-    'nav.home': '홈',
-    'nav.browse': '서재',
-    'nav.collections': '컬렉션',
-    'nav.readlists': '읽기 목록',
-    'nav.online': '온라인 소스',
-    'nav.scrape': '스크레이핑',
-    'nav.annotations': '주석',
-    'nav.stats': '읽기 통계',
-    'nav.tasks': '작업',
-    'nav.settings': '설정',
-    'nav.extensions': '확장 기능',
-    'nav.users': '사용자 관리',
-    'nav.audit': '감사 로그',
-    'nav.logs': '로그',
-    'nav.opds': 'OPDS 카탈로그',
-    'nav.kobo': 'Kobo 기기',
-    'nav.devices': '읽기 기기',
-    'nav.trash': '휴지통',
-    'nav.inspect': '점검',
-    'nav.system': '시스템 정보',
-    'nav.protocol': 'API',
-    'top.search': '시리즈, 책, 컬렉션, 온라인 소스 검색…',
-    'top.tasks': '작업 대기열',
-    'top.theme': '테마 전환',
-    'top.nav': '탐색',
-    'top.collapse': '사이드바 접기',
-    'top.admin': '관리자',
-    'top.allLibs': '관리자 · 모든 서재',
-    'side.running': '실행 중',
-    'side.onlineDown': '온라인 소스 서비스 중지됨',
-    'side.onlineUp': '온라인 소스 서비스 실행 중',
-    'set.title': '설정',
-    'set.sub': '서재, 온라인 소스, 읽기 및 캐시 설정',
-    'set.api': 'API',
-    'set.libraries': '서재 및 스캔',
-    'set.online': '온라인 서재',
-    'set.heartbeat': '측정 및 동기화',
-    'set.appearance': '모양',
-    'set.cache': '파생 캐시',
-    'set.system': '서버',
-    'set.language': '인터페이스 언어',
-    'set.languageNote': '변경 사항은 즉시 적용되며 인터페이스 텍스트에만 영향을 주고 책 메타데이터는 변경하지 않습니다.',
-    'set.languageScope': '현재 로그인 화면, 탐색, 상단 표시줄, 설정 화면 제목을 포함합니다. 각 기능 페이지 본문은 여전히 중국어입니다.',
-    'common.save': '저장',
-    'common.cancel': '취소',
-    'common.delete': '삭제',
-    'common.close': '닫기',
-    'common.confirm': '확인',
-    'common.search': '검색',
-    'common.filter': '필터',
-    'common.reset': '초기화',
-    'common.loading': '불러오는 중…',
-    'common.retry': '다시 시도',
-    'common.empty': '데이터 없음',
-    'common.all': '전체'
-  };
-  D['fr'] = {
-    'brand.tagline': 'Bibliothèque personnelle · lecture et archivage',
-    'boot.login': 'Connexion',
-    'boot.userOrEmail': "Nom d'utilisateur ou e-mail",
-    'boot.password': 'Mot de passe',
-    'boot.go': 'Entrer dans Lantai',
-    'boot.hint': "Première utilisation : le compte administrateur et le mot de passe initial ont été affichés dans le journal de démarrage (fenêtre de console). Changez le mot de passe après la connexion.",
-    'boot.language': 'Langue de l’interface',
-    'boot.remember': 'Se souvenir de moi',
-    'boot.checking': 'Vérification…',
-    'boot.fillLogin': "Saisissez votre nom d'utilisateur et votre mot de passe",
-    'boot.badCred': "Nom d'utilisateur ou mot de passe incorrect",
-    'boot.loginFail': 'Échec de la connexion, réessayez plus tard',
-    'boot.needLogin': 'Connectez-vous avec votre compte Lantai',
-    'boot.serverDown': 'Serveur indisponible (statut {code})',
-    'boot.cantConnect': 'Impossible de joindre le serveur, vérifiez que Lantai est démarré',
-    'boot.loggedOut': 'Déconnecté',
-    'boot.signedIn': 'Connecté',
-    'nav.gOverview': 'Aperçu',
-    'nav.gLantai': 'Extras Lantai',
-    'nav.gSystem': 'Système',
-    'nav.home': 'Accueil',
-    'nav.browse': 'Bibliothèque',
-    'nav.collections': 'Collections',
-    'nav.readlists': 'Listes de lecture',
-    'nav.online': 'Sources en ligne',
-    'nav.scrape': 'Scraping',
-    'nav.annotations': 'Annotations',
-    'nav.stats': 'Statistiques de lecture',
-    'nav.tasks': 'Tâches',
-    'nav.settings': 'Paramètres',
-    'nav.extensions': 'Extensions',
-    'nav.users': 'Utilisateurs',
-    'nav.audit': "Journal d'audit",
-    'nav.logs': "Journal d'exécution",
-    'nav.opds': 'Catalogue OPDS',
-    'nav.kobo': 'Appareils Kobo',
-    'nav.devices': 'Appareils de lecture',
-    'nav.trash': 'Corbeille',
-    'nav.inspect': 'Inspection',
-    'nav.system': 'Informations système',
-    'nav.protocol': 'API',
-    'top.search': 'Rechercher séries, livres, collections, sources en ligne…',
-    'top.tasks': 'File de tâches',
-    'top.theme': 'Changer de thème',
-    'top.nav': 'Navigation',
-    'top.collapse': 'Réduire la barre latérale',
-    'top.admin': 'Administrateur',
-    'top.allLibs': 'Administrateur · toutes les bibliothèques',
-    'side.running': 'En cours',
-    'side.onlineDown': 'Service de sources en ligne arrêté',
-    'side.onlineUp': 'Service de sources en ligne actif',
-    'set.title': 'Paramètres',
-    'set.sub': 'Bibliothèques, sources en ligne, lecture et cache',
-    'set.api': 'API',
-    'set.libraries': 'Bibliothèques et analyse',
-    'set.online': 'Bibliothèque en ligne',
-    'set.heartbeat': 'Chronométrage et synchronisation',
-    'set.appearance': 'Apparence',
-    'set.cache': 'Cache dérivé',
-    'set.system': 'Serveur',
-    'set.language': 'Langue de l’interface',
-    'set.languageNote': "Prise en compte immédiate, n'affecte que le texte de l'interface, pas les métadonnées des livres.",
-    'set.languageScope': "Couvre actuellement la page de connexion, la navigation, la barre supérieure et les titres des paramètres ; le contenu des pages reste en chinois.",
-    'common.save': 'Enregistrer',
-    'common.cancel': 'Annuler',
-    'common.delete': 'Supprimer',
-    'common.close': 'Fermer',
-    'common.confirm': 'Confirmer',
-    'common.search': 'Rechercher',
-    'common.filter': 'Filtrer',
-    'common.reset': 'Réinitialiser',
-    'common.loading': 'Chargement…',
-    'common.retry': 'Réessayer',
-    'common.empty': 'Aucune donnée',
-    'common.all': 'Tout'
-  };
-  D['de'] = {
-    'brand.tagline': 'Persönliche Bibliothek · Lesen und Archivieren',
-    'boot.login': 'Anmelden',
-    'boot.userOrEmail': 'Benutzername oder E-Mail',
-    'boot.password': 'Passwort',
-    'boot.go': 'Lantai betreten',
-    'boot.hint': 'Erste Nutzung: Administratorkonto und Startpasswort wurden im Startprotokoll (Konsolenfenster) ausgegeben. Ändern Sie das Passwort nach der Anmeldung.',
-    'boot.language': 'Oberflächensprache',
-    'boot.remember': 'Angemeldet bleiben',
-    'boot.checking': 'Prüfe…',
-    'boot.fillLogin': 'Benutzername und Passwort eingeben',
-    'boot.badCred': 'Benutzername oder Passwort ist falsch',
-    'boot.loginFail': 'Anmeldung fehlgeschlagen, bitte später erneut versuchen',
-    'boot.needLogin': 'Mit einem Lantai-Konto anmelden',
-    'boot.serverDown': 'Server vorübergehend nicht verfügbar (Status {code})',
-    'boot.cantConnect': 'Server nicht erreichbar, prüfen Sie ob Lantai läuft',
-    'boot.loggedOut': 'Abgemeldet',
-    'boot.signedIn': 'Angemeldet',
-    'nav.gOverview': 'Übersicht',
-    'nav.gLantai': 'Lantai-Erweiterungen',
-    'nav.gSystem': 'System',
-    'nav.home': 'Startseite',
-    'nav.browse': 'Bibliothek',
-    'nav.collections': 'Sammlungen',
-    'nav.readlists': 'Leselisten',
-    'nav.online': 'Online-Quellen',
-    'nav.scrape': 'Metadaten-Abgleich',
-    'nav.annotations': 'Anmerkungen',
-    'nav.stats': 'Lesestatistik',
-    'nav.tasks': 'Aufgaben',
-    'nav.settings': 'Einstellungen',
-    'nav.extensions': 'Erweiterungen',
-    'nav.users': 'Benutzer',
-    'nav.audit': 'Audit-Protokoll',
-    'nav.logs': 'Laufzeitprotokoll',
-    'nav.opds': 'OPDS-Katalog',
-    'nav.kobo': 'Kobo-Geräte',
-    'nav.devices': 'Lesegeräte',
-    'nav.trash': 'Papierkorb',
-    'nav.inspect': 'Prüfung',
-    'nav.system': 'Systeminfo',
-    'nav.protocol': 'API',
-    'top.search': 'Serien, Bücher, Sammlungen, Online-Quellen durchsuchen…',
-    'top.tasks': 'Aufgabenwarteschlange',
-    'top.theme': 'Design wechseln',
-    'top.nav': 'Navigation',
-    'top.collapse': 'Seitenleiste einklappen',
-    'top.admin': 'Administrator',
-    'top.allLibs': 'Administrator · alle Bibliotheken',
-    'side.running': 'Läuft',
-    'side.onlineDown': 'Online-Quellen-Dienst gestoppt',
-    'side.onlineUp': 'Online-Quellen-Dienst läuft',
-    'set.title': 'Einstellungen',
-    'set.sub': 'Bibliotheken, Online-Quellen, Lesen und Cache',
-    'set.api': 'API',
-    'set.libraries': 'Bibliotheken und Scan',
-    'set.online': 'Online-Bibliothek',
-    'set.heartbeat': 'Zeitmessung und Sync',
-    'set.appearance': 'Darstellung',
-    'set.cache': 'Abgeleiteter Cache',
-    'set.system': 'Server',
-    'set.language': 'Oberflächensprache',
-    'set.languageNote': 'Wirkt sofort und betrifft nur Oberflächentexte, nicht die Metadaten der Bücher.',
-    'set.languageScope': 'Umfasst derzeit Anmeldeseite, Navigation, obere Leiste und Einstellungs-Titel; die Inhalte der Funktionsseiten bleiben auf Chinesisch.',
-    'common.save': 'Speichern',
-    'common.cancel': 'Abbrechen',
-    'common.delete': 'Löschen',
-    'common.close': 'Schließen',
-    'common.confirm': 'Bestätigen',
-    'common.search': 'Suchen',
-    'common.filter': 'Filtern',
-    'common.reset': 'Zurücksetzen',
-    'common.loading': 'Wird geladen…',
-    'common.retry': 'Wiederholen',
-    'common.empty': 'Keine Daten',
-    'common.all': 'Alle'
-  };
-  D['es'] = {
-    'brand.tagline': 'Biblioteca personal · lectura y archivado',
-    'boot.login': 'Iniciar sesión',
-    'boot.userOrEmail': 'Usuario o correo',
-    'boot.password': 'Contraseña',
-    'boot.go': 'Entrar en Lantai',
-    'boot.hint': 'Primer uso: el usuario administrador y la contraseña inicial se imprimieron en el registro de inicio (ventana de consola). Cambie la contraseña tras iniciar sesión.',
-    'boot.language': 'Idioma de la interfaz',
-    'boot.remember': 'Recordar cuenta',
-    'boot.checking': 'Comprobando…',
-    'boot.fillLogin': 'Introduzca usuario y contraseña',
-    'boot.badCred': 'Usuario o contraseña incorrectos',
-    'boot.loginFail': 'No se pudo iniciar sesión, inténtelo más tarde',
-    'boot.needLogin': 'Inicie sesión con su cuenta de Lantai',
-    'boot.serverDown': 'Servidor no disponible (estado {code})',
-    'boot.cantConnect': 'No se puede conectar al servidor, compruebe que Lantai esté iniciado',
-    'boot.loggedOut': 'Sesión cerrada',
-    'boot.signedIn': 'Sesión iniciada',
-    'nav.gOverview': 'Resumen',
-    'nav.gLantai': 'Extras de Lantai',
-    'nav.gSystem': 'Sistema',
-    'nav.home': 'Inicio',
-    'nav.browse': 'Biblioteca',
-    'nav.collections': 'Colecciones',
-    'nav.readlists': 'Listas de lectura',
-    'nav.online': 'Fuentes en línea',
-    'nav.scrape': 'Scraping',
-    'nav.annotations': 'Anotaciones',
-    'nav.stats': 'Estadísticas de lectura',
-    'nav.tasks': 'Tareas',
-    'nav.settings': 'Ajustes',
-    'nav.extensions': 'Extensiones',
-    'nav.users': 'Usuarios',
-    'nav.audit': 'Registro de auditoría',
-    'nav.logs': 'Registro de ejecución',
-    'nav.opds': 'Catálogo OPDS',
-    'nav.kobo': 'Dispositivos Kobo',
-    'nav.devices': 'Dispositivos de lectura',
-    'nav.trash': 'Papelera',
-    'nav.inspect': 'Inspección',
-    'nav.system': 'Información del sistema',
-    'nav.protocol': 'API',
-    'top.search': 'Buscar series, libros, colecciones, fuentes en línea…',
-    'top.tasks': 'Cola de tareas',
-    'top.theme': 'Cambiar tema',
-    'top.nav': 'Navegación',
-    'top.collapse': 'Contraer barra lateral',
-    'top.admin': 'Administrador',
-    'top.allLibs': 'Administrador · todas las bibliotecas',
-    'side.running': 'En ejecución',
-    'side.onlineDown': 'Servicio de fuentes en línea detenido',
-    'side.onlineUp': 'Servicio de fuentes en línea activo',
-    'set.title': 'Ajustes',
-    'set.sub': 'Bibliotecas, fuentes en línea, lectura y caché',
-    'set.api': 'API',
-    'set.libraries': 'Bibliotecas y escaneo',
-    'set.online': 'Biblioteca en línea',
-    'set.heartbeat': 'Cronometraje y sincronización',
-    'set.appearance': 'Apariencia',
-    'set.cache': 'Caché derivada',
-    'set.system': 'Servidor',
-    'set.language': 'Idioma de la interfaz',
-    'set.languageNote': 'Se aplica al instante y solo afecta al texto de la interfaz, no a los metadatos de los libros.',
-    'set.languageScope': 'Actualmente cubre la página de acceso, la navegación, la barra superior y los títulos de ajustes; el contenido de las páginas sigue en chino.',
-    'common.save': 'Guardar',
-    'common.cancel': 'Cancelar',
-    'common.delete': 'Eliminar',
-    'common.close': 'Cerrar',
-    'common.confirm': 'Confirmar',
-    'common.search': 'Buscar',
-    'common.filter': 'Filtrar',
-    'common.reset': 'Restablecer',
-    'common.loading': 'Cargando…',
-    'common.retry': 'Reintentar',
-    'common.empty': 'Sin datos',
-    'common.all': 'Todo'
-  };
-  D['it'] = {
-    'brand.tagline': 'Biblioteca personale · lettura e archiviazione',
-    'boot.login': 'Accedi',
-    'boot.userOrEmail': 'Nome utente o email',
-    'boot.password': 'Password',
-    'boot.go': 'Entra in Lantai',
-    'boot.hint': "Primo utilizzo: l'account amministratore e la password iniziale sono stati stampati nel log di avvio (finestra della console). Cambia la password dopo l'accesso.",
-    'boot.language': "Lingua dell'interfaccia",
-    'boot.remember': 'Ricorda account',
-    'boot.checking': 'Verifica…',
-    'boot.fillLogin': 'Inserisci nome utente e password',
-    'boot.badCred': 'Nome utente o password non corretti',
-    'boot.loginFail': 'Accesso non riuscito, riprova più tardi',
-    'boot.needLogin': 'Accedi con il tuo account Lantai',
-    'boot.serverDown': 'Server temporaneamente non disponibile (stato {code})',
-    'boot.cantConnect': 'Impossibile raggiungere il server, verifica che Lantai sia avviato',
-    'boot.loggedOut': 'Disconnesso',
-    'boot.signedIn': 'Connesso',
-    'nav.gOverview': 'Panoramica',
-    'nav.gLantai': 'Extra di Lantai',
-    'nav.gSystem': 'Sistema',
-    'nav.home': 'Home',
-    'nav.browse': 'Biblioteca',
-    'nav.collections': 'Collezioni',
-    'nav.readlists': 'Liste di lettura',
-    'nav.online': 'Fonti online',
-    'nav.scrape': 'Scraping',
-    'nav.annotations': 'Annotazioni',
-    'nav.stats': 'Statistiche di lettura',
-    'nav.tasks': 'Attività',
-    'nav.settings': 'Impostazioni',
-    'nav.extensions': 'Estensioni',
-    'nav.users': 'Utenti',
-    'nav.audit': 'Registro di controllo',
-    'nav.logs': 'Registro di esecuzione',
-    'nav.opds': 'Catalogo OPDS',
-    'nav.kobo': 'Dispositivi Kobo',
-    'nav.devices': 'Dispositivi di lettura',
-    'nav.trash': 'Cestino',
-    'nav.inspect': 'Ispezione',
-    'nav.system': 'Informazioni di sistema',
-    'nav.protocol': 'API',
-    'top.search': 'Cerca serie, libri, collezioni, fonti online…',
-    'top.tasks': 'Coda attività',
-    'top.theme': 'Cambia tema',
-    'top.nav': 'Navigazione',
-    'top.collapse': 'Comprimi barra laterale',
-    'top.admin': 'Amministratore',
-    'top.allLibs': 'Amministratore · tutte le biblioteche',
-    'side.running': 'In esecuzione',
-    'side.onlineDown': 'Servizio fonti online fermo',
-    'side.onlineUp': 'Servizio fonti online attivo',
-    'set.title': 'Impostazioni',
-    'set.sub': 'Biblioteche, fonti online, lettura e cache',
-    'set.api': 'API',
-    'set.libraries': 'Biblioteche e scansione',
-    'set.online': 'Biblioteca online',
-    'set.heartbeat': 'Cronometraggio e sincronizzazione',
-    'set.appearance': 'Aspetto',
-    'set.cache': 'Cache derivata',
-    'set.system': 'Server',
-    'set.language': "Lingua dell'interfaccia",
-    'set.languageNote': "Ha effetto immediato e riguarda solo il testo dell'interfaccia, non i metadati dei libri.",
-    'set.languageScope': "Attualmente copre la pagina di accesso, la navigazione, la barra superiore e i titoli delle impostazioni; il contenuto delle pagine resta in cinese.",
-    'common.save': 'Salva',
-    'common.cancel': 'Annulla',
-    'common.delete': 'Elimina',
-    'common.close': 'Chiudi',
-    'common.confirm': 'Conferma',
-    'common.search': 'Cerca',
-    'common.filter': 'Filtra',
-    'common.reset': 'Reimposta',
-    'common.loading': 'Caricamento…',
-    'common.retry': 'Riprova',
-    'common.empty': 'Nessun dato',
-    'common.all': 'Tutti'
-  };
-  D['pt-BR'] = {
-    'brand.tagline': 'Biblioteca pessoal · leitura e arquivamento',
-    'boot.login': 'Entrar',
-    'boot.userOrEmail': 'Usuário ou e-mail',
-    'boot.password': 'Senha',
-    'boot.go': 'Entrar no Lantai',
-    'boot.hint': 'Primeiro uso: o usuário administrador e a senha inicial foram impressos no log de inicialização (janela do console). Altere a senha após entrar.',
-    'boot.language': 'Idioma da interface',
-    'boot.remember': 'Lembrar conta',
-    'boot.checking': 'Verificando…',
-    'boot.fillLogin': 'Informe usuário e senha',
-    'boot.badCred': 'Usuário ou senha incorretos',
-    'boot.loginFail': 'Falha ao entrar, tente novamente mais tarde',
-    'boot.needLogin': 'Entre com sua conta Lantai',
-    'boot.serverDown': 'Servidor indisponível (status {code})',
-    'boot.cantConnect': 'Não foi possível conectar ao servidor, verifique se o Lantai está em execução',
-    'boot.loggedOut': 'Sessão encerrada',
-    'boot.signedIn': 'Conectado',
-    'nav.gOverview': 'Visão geral',
-    'nav.gLantai': 'Extras do Lantai',
-    'nav.gSystem': 'Sistema',
-    'nav.home': 'Início',
-    'nav.browse': 'Biblioteca',
-    'nav.collections': 'Coleções',
-    'nav.readlists': 'Listas de leitura',
-    'nav.online': 'Fontes online',
-    'nav.scrape': 'Coleta de metadados',
-    'nav.annotations': 'Anotações',
-    'nav.stats': 'Estatísticas de leitura',
-    'nav.tasks': 'Tarefas',
-    'nav.settings': 'Configurações',
-    'nav.extensions': 'Extensões',
-    'nav.users': 'Usuários',
-    'nav.audit': 'Log de auditoria',
-    'nav.logs': 'Log de execução',
-    'nav.opds': 'Catálogo OPDS',
-    'nav.kobo': 'Dispositivos Kobo',
-    'nav.devices': 'Dispositivos de leitura',
-    'nav.trash': 'Lixeira',
-    'nav.inspect': 'Inspeção',
-    'nav.system': 'Informações do sistema',
-    'nav.protocol': 'API',
-    'top.search': 'Pesquisar séries, livros, coleções, fontes online…',
-    'top.tasks': 'Fila de tarefas',
-    'top.theme': 'Alternar tema',
-    'top.nav': 'Navegação',
-    'top.collapse': 'Recolher barra lateral',
-    'top.admin': 'Administrador',
-    'top.allLibs': 'Administrador · todas as bibliotecas',
-    'side.running': 'Em execução',
-    'side.onlineDown': 'Serviço de fontes online parado',
-    'side.onlineUp': 'Serviço de fontes online ativo',
-    'set.title': 'Configurações',
-    'set.sub': 'Bibliotecas, fontes online, leitura e cache',
-    'set.api': 'API',
-    'set.libraries': 'Bibliotecas e varredura',
-    'set.online': 'Biblioteca online',
-    'set.heartbeat': 'Cronometragem e sincronização',
-    'set.appearance': 'Aparência',
-    'set.cache': 'Cache derivado',
-    'set.system': 'Servidor',
-    'set.language': 'Idioma da interface',
-    'set.languageNote': 'Aplica-se imediatamente e afeta apenas o texto da interface, não os metadados dos livros.',
-    'set.languageScope': 'Atualmente cobre a tela de login, a navegação, a barra superior e os títulos das configurações; o conteúdo das páginas continua em chinês.',
-    'common.save': 'Salvar',
-    'common.cancel': 'Cancelar',
-    'common.delete': 'Excluir',
-    'common.close': 'Fechar',
-    'common.confirm': 'Confirmar',
-    'common.search': 'Pesquisar',
-    'common.filter': 'Filtrar',
-    'common.reset': 'Redefinir',
-    'common.loading': 'Carregando…',
-    'common.retry': 'Tentar novamente',
-    'common.empty': 'Sem dados',
-    'common.all': 'Tudo'
-  };
-  D['ru'] = {
-    'brand.tagline': 'Личная библиотека · чтение и архивирование',
-    'boot.login': 'Вход',
-    'boot.userOrEmail': 'Имя пользователя или почта',
-    'boot.password': 'Пароль',
-    'boot.go': 'Войти в Lantai',
-    'boot.hint': 'Первый запуск: имя администратора и начальный пароль выведены в журнал запуска (окно консоли). Смените пароль после входа.',
-    'boot.language': 'Язык интерфейса',
-    'boot.remember': 'Запомнить аккаунт',
-    'boot.checking': 'Проверка…',
-    'boot.fillLogin': 'Введите имя пользователя и пароль',
-    'boot.badCred': 'Неверное имя пользователя или пароль',
-    'boot.loginFail': 'Не удалось войти, повторите попытку позже',
-    'boot.needLogin': 'Войдите под учётной записью Lantai',
-    'boot.serverDown': 'Сервер недоступен (код {code})',
-    'boot.cantConnect': 'Не удаётся подключиться к серверу, проверьте, запущен ли Lantai',
-    'boot.loggedOut': 'Выход выполнен',
-    'boot.signedIn': 'Вы вошли',
-    'nav.gOverview': 'Обзор',
-    'nav.gLantai': 'Дополнения Lantai',
-    'nav.gSystem': 'Система',
-    'nav.home': 'Главная',
-    'nav.browse': 'Библиотека',
-    'nav.collections': 'Коллекции',
-    'nav.readlists': 'Списки чтения',
-    'nav.online': 'Онлайн-источники',
-    'nav.scrape': 'Сбор метаданных',
-    'nav.annotations': 'Аннотации',
-    'nav.stats': 'Статистика чтения',
-    'nav.tasks': 'Задачи',
-    'nav.settings': 'Настройки',
-    'nav.extensions': 'Расширения',
-    'nav.users': 'Пользователи',
-    'nav.audit': 'Журнал аудита',
-    'nav.logs': 'Журнал выполнения',
-    'nav.opds': 'Каталог OPDS',
-    'nav.kobo': 'Устройства Kobo',
-    'nav.devices': 'Устройства чтения',
-    'nav.trash': 'Корзина',
-    'nav.inspect': 'Проверка',
-    'nav.system': 'Системная информация',
-    'nav.protocol': 'API',
-    'top.search': 'Поиск серий, книг, коллекций, онлайн-источников…',
-    'top.tasks': 'Очередь задач',
-    'top.theme': 'Сменить тему',
-    'top.nav': 'Навигация',
-    'top.collapse': 'Свернуть панель',
-    'top.admin': 'Администратор',
-    'top.allLibs': 'Администратор · все библиотеки',
-    'side.running': 'Работает',
-    'side.onlineDown': 'Служба онлайн-источников остановлена',
-    'side.onlineUp': 'Служба онлайн-источников работает',
-    'set.title': 'Настройки',
-    'set.sub': 'Библиотеки, онлайн-источники, чтение и кэш',
-    'set.api': 'API',
-    'set.libraries': 'Библиотеки и сканирование',
-    'set.online': 'Онлайн-библиотека',
-    'set.heartbeat': 'Учёт времени и синхронизация',
-    'set.appearance': 'Оформление',
-    'set.cache': 'Производный кэш',
-    'set.system': 'Сервер',
-    'set.language': 'Язык интерфейса',
-    'set.languageNote': 'Применяется сразу и влияет только на текст интерфейса, не на метаданные книг.',
-    'set.languageScope': 'Сейчас охватывает страницу входа, навигацию, верхнюю панель и заголовки настроек; содержимое рабочих страниц остаётся на китайском.',
-    'common.save': 'Сохранить',
-    'common.cancel': 'Отмена',
-    'common.delete': 'Удалить',
-    'common.close': 'Закрыть',
-    'common.confirm': 'Подтвердить',
-    'common.search': 'Поиск',
-    'common.filter': 'Фильтр',
-    'common.reset': 'Сбросить',
-    'common.loading': 'Загрузка…',
-    'common.retry': 'Повторить',
-    'common.empty': 'Нет данных',
-    'common.all': 'Все'
-  };
-  D['vi'] = {
-    'brand.tagline': 'Thư viện cá nhân · đọc và lưu trữ',
-    'boot.login': 'Đăng nhập',
-    'boot.userOrEmail': 'Tên đăng nhập hoặc email',
-    'boot.password': 'Mật khẩu',
-    'boot.go': 'Vào Lantai',
-    'boot.hint': 'Lần đầu sử dụng: tài khoản quản trị và mật khẩu ban đầu đã được in trong nhật ký khởi động (cửa sổ console). Hãy đổi mật khẩu ngay sau khi đăng nhập.',
-    'boot.language': 'Ngôn ngữ giao diện',
-    'boot.remember': 'Ghi nhớ tài khoản',
-    'boot.checking': 'Đang kiểm tra…',
-    'boot.fillLogin': 'Nhập tên đăng nhập và mật khẩu',
-    'boot.badCred': 'Tên đăng nhập hoặc mật khẩu không đúng',
-    'boot.loginFail': 'Đăng nhập thất bại, vui lòng thử lại sau',
-    'boot.needLogin': 'Đăng nhập bằng tài khoản Lantai',
-    'boot.serverDown': 'Máy chủ tạm thời không khả dụng (mã {code})',
-    'boot.cantConnect': 'Không kết nối được máy chủ, hãy kiểm tra Lantai đã chạy chưa',
-    'boot.loggedOut': 'Đã đăng xuất',
-    'boot.signedIn': 'Đã đăng nhập',
-    'nav.gOverview': 'Tổng quan',
-    'nav.gLantai': 'Tiện ích Lantai',
-    'nav.gSystem': 'Hệ thống',
-    'nav.home': 'Trang chủ',
-    'nav.browse': 'Thư viện',
-    'nav.collections': 'Bộ sưu tập',
-    'nav.readlists': 'Danh sách đọc',
-    'nav.online': 'Nguồn trực tuyến',
-    'nav.scrape': 'Thu thập siêu dữ liệu',
-    'nav.annotations': 'Chú thích',
-    'nav.stats': 'Thống kê đọc',
-    'nav.tasks': 'Tác vụ',
-    'nav.settings': 'Cài đặt',
-    'nav.extensions': 'Tiện ích mở rộng',
-    'nav.users': 'Người dùng',
-    'nav.audit': 'Nhật ký quản trị',
-    'nav.logs': 'Nhật ký chạy',
-    'nav.opds': 'Danh mục OPDS',
-    'nav.kobo': 'Thiết bị Kobo',
-    'nav.devices': 'Thiết bị đọc',
-    'nav.trash': 'Thùng rác',
-    'nav.inspect': 'Kiểm tra',
-    'nav.system': 'Thông tin hệ thống',
-    'nav.protocol': 'API',
-    'top.search': 'Tìm bộ truyện, sách, bộ sưu tập, nguồn trực tuyến…',
-    'top.tasks': 'Hàng đợi tác vụ',
-    'top.theme': 'Đổi giao diện',
-    'top.nav': 'Điều hướng',
-    'top.collapse': 'Thu gọn thanh bên',
-    'top.admin': 'Quản trị viên',
-    'top.allLibs': 'Quản trị viên · tất cả thư viện',
-    'side.running': 'Đang chạy',
-    'side.onlineDown': 'Dịch vụ nguồn trực tuyến đã dừng',
-    'side.onlineUp': 'Dịch vụ nguồn trực tuyến đang chạy',
-    'set.title': 'Cài đặt',
-    'set.sub': 'Thư viện, nguồn trực tuyến, đọc và bộ nhớ đệm',
-    'set.api': 'API',
-    'set.libraries': 'Thư viện và quét',
-    'set.online': 'Thư viện trực tuyến',
-    'set.heartbeat': 'Đếm thời gian và đồng bộ',
-    'set.appearance': 'Hiển thị',
-    'set.cache': 'Bộ nhớ đệm dẫn xuất',
-    'set.system': 'Máy chủ',
-    'set.language': 'Ngôn ngữ giao diện',
-    'set.languageNote': 'Có hiệu lực ngay, chỉ ảnh hưởng văn bản giao diện, không đổi siêu dữ liệu sách.',
-    'set.languageScope': 'Hiện bao gồm trang đăng nhập, điều hướng, thanh trên và tiêu đề cài đặt; nội dung các trang nghiệp vụ vẫn là tiếng Trung.',
-    'common.save': 'Lưu',
-    'common.cancel': 'Hủy',
-    'common.delete': 'Xóa',
-    'common.close': 'Đóng',
-    'common.confirm': 'Xác nhận',
-    'common.search': 'Tìm kiếm',
-    'common.filter': 'Lọc',
-    'common.reset': 'Đặt lại',
-    'common.loading': 'Đang tải…',
-    'common.retry': 'Thử lại',
-    'common.empty': 'Không có dữ liệu',
-    'common.all': 'Tất cả'
-  };
-  D['ar'] = {    'nav.home': 'الرئيسية', 'nav.browse': 'المكتبة', 'nav.collections': 'المجموعات',
-    'nav.readlists': 'قوائم القراءة', 'nav.settings': 'الإعدادات', 'nav.users': 'المستخدمون',
-    'nav.tasks': 'المهام', 'nav.online': 'المصادر عبر الإنترنت', 'nav.scrape': 'جمع البيانات الوصفية',
-    'nav.annotations': 'التعليقات', 'nav.stats': 'إحصاءات القراءة', 'nav.trash': 'سلة المحذوفات',
-    'nav.logs': 'سجل التشغيل', 'nav.system': 'معلومات النظام', 'nav.protocol': 'واجهة API',
-    'top.search': 'ابحث عن سلاسل أو كتب أو مجموعات أو مصادر عبر الإنترنت…', 'top.theme': 'المظهر',
-    'set.title': 'الإعدادات', 'boot.login': 'تسجيل الدخول', 'boot.password': 'كلمة المرور',
-    'boot.go': 'الدخول إلى لانتاي', 'common.save': 'حفظ', 'common.cancel': 'إلغاء', 'common.close': 'إغلاق'
-  };
-  D['bg'] = {
-    'nav.home': 'Начало', 'nav.browse': 'Библиотека', 'nav.collections': 'Колекции',
-    'nav.readlists': 'Списъци за четене', 'nav.settings': 'Настройки', 'nav.users': 'Потребители',
-    'nav.tasks': 'Задачи', 'nav.online': 'Онлайн източници', 'nav.scrape': 'Събиране на метаданни',
-    'nav.annotations': 'Анотации', 'nav.stats': 'Статистика на четенето', 'nav.trash': 'Кошче',
-    'nav.logs': 'Дневник на изпълнението', 'nav.system': 'Системна информация', 'nav.protocol': 'API',
-    'top.search': 'Търсене на серии, книги, колекции, онлайн източници…', 'top.theme': 'Тема',
-    'set.title': 'Настройки', 'boot.login': 'Вход', 'boot.password': 'Парола',
-    'boot.go': 'Влезте в Lantai', 'common.save': 'Запази', 'common.cancel': 'Отказ', 'common.close': 'Затвори'
-  };
-  D['ca'] = {
-    'nav.home': 'Inici', 'nav.browse': 'Biblioteca', 'nav.collections': 'Col·leccions',
-    'nav.readlists': 'Llistes de lectura', 'nav.settings': 'Configuració', 'nav.users': 'Usuaris',
-    'nav.tasks': 'Tasques', 'nav.online': 'Fonts en línia', 'nav.scrape': 'Extracció de metadades',
-    'nav.annotations': 'Anotacions', 'nav.stats': 'Estadístiques de lectura', 'nav.trash': 'Paperera',
-    'nav.logs': "Registre d'execució", 'nav.system': 'Informació del sistema', 'nav.protocol': 'API',
-    'top.search': 'Cerca sèries, llibres, col·leccions, fonts en línia…', 'top.theme': 'Tema',
-    'set.title': 'Configuració', 'boot.login': 'Inicia sessió', 'boot.password': 'Contrasenya',
-    'boot.go': 'Entra a Lantai', 'common.save': 'Desa', 'common.cancel': 'Cancel·la', 'common.close': 'Tanca'
-  };
-  D['cs'] = {
-    'nav.home': 'Domů', 'nav.browse': 'Knihovna', 'nav.collections': 'Sbírky',
-    'nav.readlists': 'Seznamy čtení', 'nav.settings': 'Nastavení', 'nav.users': 'Uživatelé',
-    'nav.tasks': 'Úlohy', 'nav.online': 'Online zdroje', 'nav.scrape': 'Získávání metadat',
-    'nav.annotations': 'Anotace', 'nav.stats': 'Statistiky čtení', 'nav.trash': 'Koš',
-    'nav.logs': 'Protokol běhu', 'nav.system': 'Informace o systému', 'nav.protocol': 'API',
-    'top.search': 'Hledat série, knihy, sbírky, online zdroje…', 'top.theme': 'Motiv',
-    'set.title': 'Nastavení', 'boot.login': 'Přihlásit se', 'boot.password': 'Heslo',
-    'boot.go': 'Vstoupit do Lantai', 'common.save': 'Uložit', 'common.cancel': 'Zrušit', 'common.close': 'Zavřít'
-  };
-  D['da'] = {
-    'nav.home': 'Hjem', 'nav.browse': 'Bibliotek', 'nav.collections': 'Samlinger',
-    'nav.readlists': 'Læselister', 'nav.settings': 'Indstillinger', 'nav.users': 'Brugere',
-    'nav.tasks': 'Opgaver', 'nav.online': 'Onlinekilder', 'nav.scrape': 'Metadatahøst',
-    'nav.annotations': 'Annotationer', 'nav.stats': 'Læsestatistik', 'nav.trash': 'Papirkurv',
-    'nav.logs': 'Kørselslog', 'nav.system': 'Systeminfo', 'nav.protocol': 'API',
-    'top.search': 'Søg serier, bøger, samlinger, onlinekilder…', 'top.theme': 'Tema',
-    'set.title': 'Indstillinger', 'boot.login': 'Log ind', 'boot.password': 'Adgangskode',
-    'boot.go': 'Gå ind i Lantai', 'common.save': 'Gem', 'common.cancel': 'Annuller', 'common.close': 'Luk'
-  };
-  D['el'] = {
-    'nav.home': 'Αρχική', 'nav.browse': 'Βιβλιοθήκη', 'nav.collections': 'Συλλογές',
-    'nav.readlists': 'Λίστες ανάγνωσης', 'nav.settings': 'Ρυθμίσεις', 'nav.users': 'Χρήστες',
-    'nav.tasks': 'Εργασίες', 'nav.online': 'Διαδικτυακές πηγές', 'nav.scrape': 'Εξαγωγή μεταδεδομένων',
-    'nav.annotations': 'Σχολιασμοί', 'nav.stats': 'Στατιστικά ανάγνωσης', 'nav.trash': 'Κάδος',
-    'nav.logs': 'Μητρώο εκτέλεσης', 'nav.system': 'Πληροφορίες συστήματος', 'nav.protocol': 'API',
-    'top.search': 'Αναζήτηση σειρών, βιβλίων, συλλογών, διαδικτυακών πηγών…', 'top.theme': 'Θέμα',
-    'set.title': 'Ρυθμίσεις', 'boot.login': 'Σύνδεση', 'boot.password': 'Κωδικός πρόσβασης',
-    'boot.go': 'Είσοδος στο Lantai', 'common.save': 'Αποθήκευση', 'common.cancel': 'Ακύρωση', 'common.close': 'Κλείσιμο'
-  };
-  D['eo'] = {
-    'nav.home': 'Hejmo', 'nav.browse': 'Biblioteko', 'nav.collections': 'Kolektoj',
-    'nav.readlists': 'Legolistoj', 'nav.settings': 'Agordoj', 'nav.users': 'Uzantoj',
-    'nav.tasks': 'Taskoj', 'nav.online': 'Retaj fontoj', 'nav.scrape': 'Metadatenkolektado',
-    'nav.annotations': 'Adnotoj', 'nav.stats': 'Legoststistiko', 'nav.trash': 'Rubujo',
-    'nav.logs': 'Rultprotokolo', 'nav.system': 'Sisteminformoj', 'nav.protocol': 'API',
-    'top.search': 'Serĉi seriojn, librojn, kolektojn, retajn fontojn…', 'top.theme': 'Etoso',
-    'set.title': 'Agordoj', 'boot.login': 'Ensaluti', 'boot.password': 'Pasvorto',
-    'boot.go': 'Eniri Lantai', 'common.save': 'Konservi', 'common.cancel': 'Nuligi', 'common.close': 'Fermi'
-  };
-  D['fa'] = {
-    'nav.home': 'خانه', 'nav.browse': 'کتابخانه', 'nav.collections': 'مجموعه‌ها',
-    'nav.readlists': 'فهرست‌های خواندن', 'nav.settings': 'تنظیمات', 'nav.users': 'کاربران',
-    'nav.tasks': 'وظایف', 'nav.online': 'منابع برخط', 'nav.scrape': 'استخراج فراداده',
-    'nav.annotations': 'یادداشت‌ها', 'nav.stats': 'آمار مطالعه', 'nav.trash': 'سطل بازیافت',
-    'nav.logs': 'گزارش اجرا', 'nav.system': 'اطلاعات سیستم', 'nav.protocol': 'رابط API',
-    'top.search': 'جستجوی مجموعه، کتاب، گردآوری، منابع برخط…', 'top.theme': 'پوسته',
-    'set.title': 'تنظیمات', 'boot.login': 'ورود', 'boot.password': 'گذرواژه',
-    'boot.go': 'ورود به لانتای', 'common.save': 'ذخیره', 'common.cancel': 'انصراف', 'common.close': 'بستن'
-  };
-  D['fi'] = {
-    'nav.home': 'Koti', 'nav.browse': 'Kirjasto', 'nav.collections': 'Kokoelmat',
-    'nav.readlists': 'Lukulistat', 'nav.settings': 'Asetukset', 'nav.users': 'Käyttäjät',
-    'nav.tasks': 'Tehtävät', 'nav.online': 'Verkkolähteet', 'nav.scrape': 'Metatietojen haku',
-    'nav.annotations': 'Huomautukset', 'nav.stats': 'Lukutilastot', 'nav.trash': 'Roskakori',
-    'nav.logs': 'Suoritusloki', 'nav.system': 'Järjestelmätiedot', 'nav.protocol': 'API',
-    'top.search': 'Hae sarjoja, kirjoja, kokoelmia, verkkolähteitä…', 'top.theme': 'Teema',
-    'set.title': 'Asetukset', 'boot.login': 'Kirjaudu', 'boot.password': 'Salasana',
-    'boot.go': 'Siirry Lantaihin', 'common.save': 'Tallenna', 'common.cancel': 'Peruuta', 'common.close': 'Sulje'
-  };
-  D['gl'] = {
-    'nav.home': 'Inicio', 'nav.browse': 'Biblioteca', 'nav.collections': 'Coleccións',
-    'nav.readlists': 'Listas de lectura', 'nav.settings': 'Axustes', 'nav.users': 'Usuarios',
-    'nav.tasks': 'Tarefas', 'nav.online': 'Fontes en liña', 'nav.scrape': 'Extracción de metadatos',
-    'nav.annotations': 'Anotacións', 'nav.stats': 'Estatísticas de lectura', 'nav.trash': 'Lixo',
-    'nav.logs': 'Rexistro de execución', 'nav.system': 'Información do sistema', 'nav.protocol': 'API',
-    'top.search': 'Buscar series, libros, coleccións, fontes en liña…', 'top.theme': 'Tema',
-    'set.title': 'Axustes', 'boot.login': 'Iniciar sesión', 'boot.password': 'Contrasinal',
-    'boot.go': 'Entrar en Lantai', 'common.save': 'Gardar', 'common.cancel': 'Cancelar', 'common.close': 'Pechar'
-  };
-  D['he'] = {
-    'nav.home': 'בית', 'nav.browse': 'ספרייה', 'nav.collections': 'אוספים',
-    'nav.readlists': 'רשימות קריאה', 'nav.settings': 'הגדרות', 'nav.users': 'משתמשים',
-    'nav.tasks': 'משימות', 'nav.online': 'מקורות מקוונים', 'nav.scrape': 'איסוף מטא-נתונים',
-    'nav.annotations': 'הערות', 'nav.stats': 'סטטיסטיקת קריאה', 'nav.trash': 'אשפה',
-    'nav.logs': 'יומן ריצה', 'nav.system': 'מידע מערכת', 'nav.protocol': 'API',
-    'top.search': 'חיפוש סדרות, ספרים, אוספים, מקורות מקוונים…', 'top.theme': 'ערכת נושא',
-    'set.title': 'הגדרות', 'boot.login': 'התחברות', 'boot.password': 'סיסמה',
-    'boot.go': 'כניסה ל-Lantai', 'common.save': 'שמירה', 'common.cancel': 'ביטול', 'common.close': 'סגירה'
-  };
-  D['hr'] = {
-    'nav.home': 'Početna', 'nav.browse': 'Knjižnica', 'nav.collections': 'Zbirke',
-    'nav.readlists': 'Popisi čitanja', 'nav.settings': 'Postavke', 'nav.users': 'Korisnici',
-    'nav.tasks': 'Zadaci', 'nav.online': 'Mrežni izvori', 'nav.scrape': 'Dohvat metapodataka',
-    'nav.annotations': 'Bilješke', 'nav.stats': 'Statistika čitanja', 'nav.trash': 'Smeće',
-    'nav.logs': 'Dnevnik izvršavanja', 'nav.system': 'Podaci o sustavu', 'nav.protocol': 'API',
-    'top.search': 'Pretraži serije, knjige, zbirke, mrežne izvore…', 'top.theme': 'Tema',
-    'set.title': 'Postavke', 'boot.login': 'Prijava', 'boot.password': 'Lozinka',
-    'boot.go': 'Uđi u Lantai', 'common.save': 'Spremi', 'common.cancel': 'Odustani', 'common.close': 'Zatvori'
-  };
-  D['hu'] = {
-    'nav.home': 'Kezdőlap', 'nav.browse': 'Könyvtár', 'nav.collections': 'Gyűjtemények',
-    'nav.readlists': 'Olvasási listák', 'nav.settings': 'Beállítások', 'nav.users': 'Felhasználók',
-    'nav.tasks': 'Feladatok', 'nav.online': 'Online források', 'nav.scrape': 'Metaadat-gyűjtés',
-    'nav.annotations': 'Megjegyzések', 'nav.stats': 'Olvasási statisztika', 'nav.trash': 'Kuka',
-    'nav.logs': 'Futási napló', 'nav.system': 'Rendszerinformáció', 'nav.protocol': 'API',
-    'top.search': 'Sorozatok, könyvek, gyűjtemények, online források keresése…', 'top.theme': 'Téma',
-    'set.title': 'Beállítások', 'boot.login': 'Bejelentkezés', 'boot.password': 'Jelszó',
-    'boot.go': 'Belépés a Lantaiba', 'common.save': 'Mentés', 'common.cancel': 'Mégse', 'common.close': 'Bezárás'
-  };
-  D['id'] = {
-    'nav.home': 'Beranda', 'nav.browse': 'Pustaka', 'nav.collections': 'Koleksi',
-    'nav.readlists': 'Daftar bacaan', 'nav.settings': 'Pengaturan', 'nav.users': 'Pengguna',
-    'nav.tasks': 'Tugas', 'nav.online': 'Sumber online', 'nav.scrape': 'Pengambilan metadata',
-    'nav.annotations': 'Anotasi', 'nav.stats': 'Statistik bacaan', 'nav.trash': 'Sampah',
-    'nav.logs': 'Log eksekusi', 'nav.system': 'Info sistem', 'nav.protocol': 'API',
-    'top.search': 'Cari seri, buku, koleksi, sumber online…', 'top.theme': 'Tema',
-    'set.title': 'Pengaturan', 'boot.login': 'Masuk', 'boot.password': 'Kata sandi',
-    'boot.go': 'Masuk ke Lantai', 'common.save': 'Simpan', 'common.cancel': 'Batal', 'common.close': 'Tutup'
-  };
-  D['ml'] = {
-    'nav.home': 'ഹോം', 'nav.browse': 'ലൈബ്രറി', 'nav.collections': 'ശേഖരങ്ങൾ',
-    'nav.readlists': 'വായനാ ലിസ്റ്റുകൾ', 'nav.settings': 'ക്രമീകരണങ്ങൾ', 'nav.users': 'ഉപയോക്താക്കൾ',
-    'nav.tasks': 'ജോലികൾ', 'nav.online': 'ഓൺലൈൻ ഉറവിടങ്ങൾ', 'nav.scrape': 'മെറ്റാഡാറ്റ ശേഖരണം',
-    'nav.annotations': 'കുറിപ്പുകൾ', 'nav.stats': 'വായനാ സ്ഥിതിവിവരങ്ങൾ', 'nav.trash': 'ചവറ്റുകുട്ട',
-    'nav.logs': 'റൺ ലോഗ്', 'nav.system': 'സിസ്റ്റം വിവരങ്ങൾ', 'nav.protocol': 'API',
-    'top.search': 'സീരീസ്, പുസ്തകങ്ങൾ, ശേഖരങ്ങൾ, ഓൺലൈൻ ഉറവിടങ്ങൾ തിരയുക…', 'top.theme': 'തീം',
-    'set.title': 'ക്രമീകരണങ്ങൾ', 'boot.login': 'സൈൻ ഇൻ', 'boot.password': 'പാസ്‌വേഡ്',
-    'boot.go': 'Lantai-ൽ പ്രവേശിക്കുക', 'common.save': 'സംരക്ഷിക്കുക', 'common.cancel': 'റദ്ദാക്കുക', 'common.close': 'അടയ്ക്കുക'
-  };
-  D['nb'] = {
-    'nav.home': 'Hjem', 'nav.browse': 'Bibliotek', 'nav.collections': 'Samlinger',
-    'nav.readlists': 'Leselister', 'nav.settings': 'Innstillinger', 'nav.users': 'Brukere',
-    'nav.tasks': 'Oppgaver', 'nav.online': 'Nettkilder', 'nav.scrape': 'Metadatahøsting',
-    'nav.annotations': 'Merknader', 'nav.stats': 'Lesestatistikk', 'nav.trash': 'Papirkurv',
-    'nav.logs': 'Kjørelogg', 'nav.system': 'Systeminfo', 'nav.protocol': 'API',
-    'top.search': 'Søk etter serier, bøker, samlinger, nettkilder…', 'top.theme': 'Tema',
-    'set.title': 'Innstillinger', 'boot.login': 'Logg inn', 'boot.password': 'Passord',
-    'boot.go': 'Gå inn i Lantai', 'common.save': 'Lagre', 'common.cancel': 'Avbryt', 'common.close': 'Lukk'
-  };
-  D['nl'] = {
-    'nav.home': 'Start', 'nav.browse': 'Bibliotheek', 'nav.collections': 'Verzamelingen',
-    'nav.readlists': 'Leeslijsten', 'nav.settings': 'Instellingen', 'nav.users': 'Gebruikers',
-    'nav.tasks': 'Taken', 'nav.online': 'Onlinebronnen', 'nav.scrape': 'Metagegevens ophalen',
-    'nav.annotations': 'Annotaties', 'nav.stats': 'Leesstatistieken', 'nav.trash': 'Prullenbak',
-    'nav.logs': 'Uitvoeringslogboek', 'nav.system': 'Systeeminfo', 'nav.protocol': 'API',
-    'top.search': 'Zoek series, boeken, verzamelingen, onlinebronnen…', 'top.theme': 'Thema',
-    'set.title': 'Instellingen', 'boot.login': 'Inloggen', 'boot.password': 'Wachtwoord',
-    'boot.go': 'Lantai binnengaan', 'common.save': 'Opslaan', 'common.cancel': 'Annuleren', 'common.close': 'Sluiten'
-  };
-  D['pl'] = {
-    'nav.home': 'Strona główna', 'nav.browse': 'Biblioteka', 'nav.collections': 'Kolekcje',
-    'nav.readlists': 'Listy czytania', 'nav.settings': 'Ustawienia', 'nav.users': 'Użytkownicy',
-    'nav.tasks': 'Zadania', 'nav.online': 'Źródła online', 'nav.scrape': 'Pobieranie metadanych',
-    'nav.annotations': 'Adnotacje', 'nav.stats': 'Statystyki czytania', 'nav.trash': 'Kosz',
-    'nav.logs': 'Dziennik działania', 'nav.system': 'Informacje o systemie', 'nav.protocol': 'API',
-    'top.search': 'Szukaj serii, książek, kolekcji, źródeł online…', 'top.theme': 'Motyw',
-    'set.title': 'Ustawienia', 'boot.login': 'Zaloguj się', 'boot.password': 'Hasło',
-    'boot.go': 'Wejdź do Lantai', 'common.save': 'Zapisz', 'common.cancel': 'Anuluj', 'common.close': 'Zamknij'
-  };
-  D['pt'] = {
-    'nav.home': 'Início', 'nav.browse': 'Biblioteca', 'nav.collections': 'Coleções',
-    'nav.readlists': 'Listas de leitura', 'nav.settings': 'Definições', 'nav.users': 'Utilizadores',
-    'nav.tasks': 'Tarefas', 'nav.online': 'Fontes online', 'nav.scrape': 'Recolha de metadados',
-    'nav.annotations': 'Anotações', 'nav.stats': 'Estatísticas de leitura', 'nav.trash': 'Reciclagem',
-    'nav.logs': 'Registo de execução', 'nav.system': 'Informação do sistema', 'nav.protocol': 'API',
-    'top.search': 'Pesquisar séries, livros, coleções, fontes online…', 'top.theme': 'Tema',
-    'set.title': 'Definições', 'boot.login': 'Iniciar sessão', 'boot.password': 'Palavra-passe',
-    'boot.go': 'Entrar no Lantai', 'common.save': 'Guardar', 'common.cancel': 'Cancelar', 'common.close': 'Fechar'
-  };
-  D['sk'] = {
-    'nav.home': 'Domov', 'nav.browse': 'Knižnica', 'nav.collections': 'Zbierky',
-    'nav.readlists': 'Zoznamy čítania', 'nav.settings': 'Nastavenia', 'nav.users': 'Používatelia',
-    'nav.tasks': 'Úlohy', 'nav.online': 'Online zdroje', 'nav.scrape': 'Získavanie metadát',
-    'nav.annotations': 'Anotácie', 'nav.stats': 'Štatistiky čítania', 'nav.trash': 'Kôš',
-    'nav.logs': 'Protokol behu', 'nav.system': 'Informácie o systéme', 'nav.protocol': 'API',
-    'top.search': 'Hľadať série, knihy, zbierky, online zdroje…', 'top.theme': 'Motív',
-    'set.title': 'Nastavenia', 'boot.login': 'Prihlásiť sa', 'boot.password': 'Heslo',
-    'boot.go': 'Vstúpiť do Lantai', 'common.save': 'Uložiť', 'common.cancel': 'Zrušiť', 'common.close': 'Zavrieť'
-  };
-  D['sl'] = {
-    'nav.home': 'Domov', 'nav.browse': 'Knjižnica', 'nav.collections': 'Zbirke',
-    'nav.readlists': 'Seznami branja', 'nav.settings': 'Nastavitve', 'nav.users': 'Uporabniki',
-    'nav.tasks': 'Opravila', 'nav.online': 'Spletni viri', 'nav.scrape': 'Pridobivanje metapodatkov',
-    'nav.annotations': 'Opombe', 'nav.stats': 'Bralna statistika', 'nav.trash': 'Smeti',
-    'nav.logs': 'Dnevnik izvajanja', 'nav.system': 'Sistemske informacije', 'nav.protocol': 'API',
-    'top.search': 'Iskanje serij, knjig, zbirk, spletnih virov…', 'top.theme': 'Tema',
-    'set.title': 'Nastavitve', 'boot.login': 'Prijava', 'boot.password': 'Geslo',
-    'boot.go': 'Vstopi v Lantai', 'common.save': 'Shrani', 'common.cancel': 'Prekliči', 'common.close': 'Zapri'
-  };
-  D['sv'] = {
-    'nav.home': 'Hem', 'nav.browse': 'Bibliotek', 'nav.collections': 'Samlingar',
-    'nav.readlists': 'Läslistor', 'nav.settings': 'Inställningar', 'nav.users': 'Användare',
-    'nav.tasks': 'Uppgifter', 'nav.online': 'Onlinekällor', 'nav.scrape': 'Metadatainsamling',
-    'nav.annotations': 'Anteckningar', 'nav.stats': 'Lässtatistik', 'nav.trash': 'Papperskorg',
-    'nav.logs': 'Körningslogg', 'nav.system': 'Systeminfo', 'nav.protocol': 'API',
-    'top.search': 'Sök serier, böcker, samlingar, onlinekällor…', 'top.theme': 'Tema',
-    'set.title': 'Inställningar', 'boot.login': 'Logga in', 'boot.password': 'Lösenord',
-    'boot.go': 'Gå in i Lantai', 'common.save': 'Spara', 'common.cancel': 'Avbryt', 'common.close': 'Stäng'
-  };
-  D['ta'] = {
-    'nav.home': 'முகப்பு', 'nav.browse': 'நூலகம்', 'nav.collections': 'தொகுப்புகள்',
-    'nav.readlists': 'வாசிப்பு பட்டியல்கள்', 'nav.settings': 'அமைப்புகள்', 'nav.users': 'பயனர்கள்',
-    'nav.tasks': 'பணிகள்', 'nav.online': 'இணைய மூலங்கள்', 'nav.scrape': 'மெட்டாடேட்டா சேகரிப்பு',
-    'nav.annotations': 'குறிப்புகள்', 'nav.stats': 'வாசிப்பு புள்ளிவிவரங்கள்', 'nav.trash': 'குப்பை',
-    'nav.logs': 'இயக்கப் பதிவு', 'nav.system': 'கணினி தகவல்', 'nav.protocol': 'API',
-    'top.search': 'தொடர்கள், புத்தகங்கள், தொகுப்புகள், இணைய மூலங்களைத் தேடு…', 'top.theme': 'தீம்',
-    'set.title': 'அமைப்புகள்', 'boot.login': 'உள்நுழை', 'boot.password': 'கடவுச்சொல்',
-    'boot.go': 'Lantai-க்குள் செல்', 'common.save': 'சேமி', 'common.cancel': 'ரத்து', 'common.close': 'மூடு'
-  };
-  D['th'] = {
-    'nav.home': 'หน้าแรก', 'nav.browse': 'ห้องสมุด', 'nav.collections': 'คอลเลกชัน',
-    'nav.readlists': 'รายการอ่าน', 'nav.settings': 'การตั้งค่า', 'nav.users': 'ผู้ใช้',
-    'nav.tasks': 'งาน', 'nav.online': 'แหล่งออนไลน์', 'nav.scrape': 'การเก็บเมทาดาทา',
-    'nav.annotations': 'คำอธิบายประกอบ', 'nav.stats': 'สถิติการอ่าน', 'nav.trash': 'ถังขยะ',
-    'nav.logs': 'บันทึกการทำงาน', 'nav.system': 'ข้อมูลระบบ', 'nav.protocol': 'API',
-    'top.search': 'ค้นหาซีรีส์ หนังสือ คอลเลกชัน แหล่งออนไลน์…', 'top.theme': 'ธีม',
-    'set.title': 'การตั้งค่า', 'boot.login': 'เข้าสู่ระบบ', 'boot.password': 'รหัสผ่าน',
-    'boot.go': 'เข้าสู่ Lantai', 'common.save': 'บันทึก', 'common.cancel': 'ยกเลิก', 'common.close': 'ปิด'
-  };
-  D['ti'] = {
-    'nav.home': 'መንበሪ ገጽ', 'nav.browse': 'ቤት መጻሕፍቲ', 'nav.collections': 'ስብስባት',
-    'nav.readlists': 'ዝርዝር ንባብ', 'nav.settings': 'ቅንብራት', 'nav.users': 'ተጠቀምቲ',
-    'nav.tasks': 'ዕዮታት', 'nav.online': 'ኦንላይን ምንጭታት', 'nav.scrape': 'ሜታዳታ ምእካብ',
-    'nav.annotations': 'ርኢቶታት', 'nav.stats': 'ስታቲስቲክስ ንባብ', 'nav.trash': 'መጎሓፍቲ',
-    'nav.logs': 'መዝገብ ምስራሕ', 'nav.system': 'ሓበሬታ ስርዓት', 'nav.protocol': 'API',
-    'top.search': 'ስርዝራት፣ መጻሕፍቲ፣ ስብስባት፣ ኦንላይን ምንጭታት ድለ…', 'top.theme': 'ገጽታ',
-    'set.title': 'ቅንብራት', 'boot.login': 'እተው', 'boot.password': 'መሕለፊ ቃል',
-    'boot.go': 'ናብ Lantai እተው', 'common.save': 'ኣቐምጥ', 'common.cancel': 'ሰርዝ', 'common.close': 'ዕጸው'
-  };
-  D['tr'] = {
-    'nav.home': 'Ana sayfa', 'nav.browse': 'Kitaplık', 'nav.collections': 'Koleksiyonlar',
-    'nav.readlists': 'Okuma listeleri', 'nav.settings': 'Ayarlar', 'nav.users': 'Kullanıcılar',
-    'nav.tasks': 'Görevler', 'nav.online': 'Çevrimiçi kaynaklar', 'nav.scrape': 'Üstveri toplama',
-    'nav.annotations': 'Notlar', 'nav.stats': 'Okuma istatistikleri', 'nav.trash': 'Çöp kutusu',
-    'nav.logs': 'Çalışma günlüğü', 'nav.system': 'Sistem bilgisi', 'nav.protocol': 'API',
-    'top.search': 'Dizi, kitap, koleksiyon, çevrimiçi kaynak ara…', 'top.theme': 'Tema',
-    'set.title': 'Ayarlar', 'boot.login': 'Oturum aç', 'boot.password': 'Parola',
-    'boot.go': "Lantai'ye gir", 'common.save': 'Kaydet', 'common.cancel': 'İptal', 'common.close': 'Kapat'
-  };
-  D['uk'] = {
-    'nav.home': 'Головна', 'nav.browse': 'Бібліотека', 'nav.collections': 'Колекції',
-    'nav.readlists': 'Списки читання', 'nav.settings': 'Налаштування', 'nav.users': 'Користувачі',
-    'nav.tasks': 'Завдання', 'nav.online': 'Онлайн-джерела', 'nav.scrape': 'Збір метаданих',
-    'nav.annotations': 'Анотації', 'nav.stats': 'Статистика читання', 'nav.trash': 'Кошик',
-    'nav.logs': 'Журнал виконання', 'nav.system': 'Системна інформація', 'nav.protocol': 'API',
-    'top.search': 'Пошук серій, книг, колекцій, онлайн-джерел…', 'top.theme': 'Тема',
-    'set.title': 'Налаштування', 'boot.login': 'Увійти', 'boot.password': 'Пароль',
-    'boot.go': 'Увійти в Lantai', 'common.save': 'Зберегти', 'common.cancel': 'Скасувати', 'common.close': 'Закрити'
-  };
-  var EXTRA = {
-    ar: ['اسم المستخدم أو البريد الإلكتروني', 'لغة الواجهة', 'جارٍ التحقق…'],
-    bg: ['Потребителско име или имейл', 'Език на интерфейса', 'Проверка…'],
-    ca: ["Nom d'usuari o correu", 'Idioma de la interfície', "S'està verificant…"],
-    cs: ['Uživatelské jméno nebo e-mail', 'Jazyk rozhraní', 'Ověřování…'],
-    da: ['Brugernavn eller e-mail', 'Sprog i grænsefladen', 'Kontrollerer…'],
-    el: ['Όνομα χρήστη ή email', 'Γλώσσα διεπαφής', 'Έλεγχος…'],
-    eo: ['Uzantnomo aŭ retpoŝto', 'Interfaca lingvo', 'Kontrolante…'],
-    fa: ['نام کاربری یا ایمیل', 'زبان رابط', 'در حال بررسی…'],
-    fi: ['Käyttäjänimi tai sähköposti', 'Käyttöliittymän kieli', 'Tarkistetaan…'],
-    gl: ['Nome de usuario ou correo', 'Idioma da interface', 'Comprobando…'],
-    he: ['שם משתמש או דוא"ל', 'שפת הממשק', 'בודק…'],
-    hr: ['Korisničko ime ili e-pošta', 'Jezik sučelja', 'Provjera…'],
-    hu: ['Felhasználónév vagy e-mail', 'Felület nyelve', 'Ellenőrzés…'],
-    id: ['Nama pengguna atau email', 'Bahasa antarmuka', 'Memeriksa…'],
-    ml: ['ഉപയോക്തൃനാമം അല്ലെങ്കിൽ ഇമെയിൽ', 'ഇന്റർഫേസ് ഭാഷ', 'പരിശോധിക്കുന്നു…'],
-    nb: ['Brukernavn eller e-post', 'Grensesnittspråk', 'Sjekker…'],
-    nl: ['Gebruikersnaam of e-mail', 'Interfacetaal', 'Controleren…'],
-    pl: ['Nazwa użytkownika lub e-mail', 'Język interfejsu', 'Sprawdzanie…'],
-    pt: ['Nome de utilizador ou email', 'Idioma da interface', 'A verificar…'],
-    sk: ['Používateľské meno alebo e-mail', 'Jazyk rozhrania', 'Overovanie…'],
-    sl: ['Uporabniško ime ali e-pošta', 'Jezik vmesnika', 'Preverjanje…'],
-    sv: ['Användarnamn eller e-post', 'Gränssnittsspråk', 'Kontrollerar…'],
-    ta: ['பயனர் பெயர் அல்லது மின்னஞ்சல்', 'இடைமுக மொழி', 'சரிபார்க்கிறது…'],
-    th: ['ชื่อผู้ใช้หรืออีเมล', 'ภาษาของอินเทอร์เฟซ', 'กำลังตรวจสอบ…'],
-    ti: ['ስም ተጠቃሚ ወይ ኢመይል', 'ቋንቋ ትሕዝቶ', 'ይረጋገጽ ኣሎ…'],
-    tr: ['Kullanıcı adı veya e-posta', 'Arayüz dili', 'Denetleniyor…'],
-    uk: ["Ім'я користувача або email", 'Мова інтерфейсу', 'Перевірка…']
-  };
-  Object.keys(EXTRA).forEach(function (code) {
-    if (!D[code]) return;
-    D[code]['boot.userOrEmail'] = EXTRA[code][0];
-    D[code]['boot.language'] = EXTRA[code][1];
-    D[code]['set.language'] = EXTRA[code][1];
-    D[code]['boot.checking'] = EXTRA[code][2];
-  });
-})();
-
+(function(){var D=window.LANTAI_I18N_DICT=window.LANTAI_I18N_DICT||{};D["zh-Hans"]={"brand.tagline":"个人书库 · 阅读与归档","boot.login":"登录","boot.userOrEmail":"用户名或邮箱","boot.password":"密码","boot.go":"进入兰台","boot.hint":"首次使用：管理员账号与初始密码已打印在启动日志（控制台窗口）中，登录后请立即修改密码","boot.language":"界面语言","boot.remember":"记住账号","boot.checking":"校验中…","boot.fillLogin":"请填写用户名与密码","boot.badCred":"用户名或密码不正确","boot.loginFail":"登录失败，请稍后再试","boot.needLogin":"请使用兰台账号登录","boot.serverDown":"服务端暂时不可用（状态码 {code}）","boot.cantConnect":"无法连接服务端，请确认兰台已启动","boot.loggedOut":"已退出登录","boot.signedIn":"已登录","nav.gOverview":"概览","nav.gLantai":"兰台增量","nav.gSystem":"系统","nav.home":"首页","nav.browse":"书库","nav.collections":"合集","nav.readlists":"阅读清单","nav.online":"在线源","nav.scrape":"刮削","nav.annotations":"批注","nav.stats":"阅读统计","nav.tasks":"任务中心","nav.settings":"设置中心","nav.extensions":"功能拓展","nav.users":"用户管理","nav.audit":"管理日志","nav.logs":"日志","nav.opds":"OPDS 目录","nav.kobo":"Kobo 设备","nav.devices":"阅读设备","nav.trash":"回收站","nav.inspect":"查重","nav.system":"系统信息","nav.protocol":"API 接口","top.search":"搜索系列、书籍、合集、在线源…","top.tasks":"任务队列","top.theme":"切换主题","top.nav":"导航","top.collapse":"收起导航","top.admin":"管理员","top.allLibs":"管理员 · 全部库","side.running":"运行中","side.onlineDown":"在线源服务未启动","side.onlineUp":"在线源服务运行中","set.title":"设置中心","set.sub":"书库、在线源、阅读与缓存设置","set.api":"API 接口","set.libraries":"库与扫描","set.online":"在线库配置","set.heartbeat":"计时与同步","set.appearance":"外观","set.cache":"派生缓存","set.backup":"备份","set.tokens":"API 令牌","set.system":"兰台全局","set.upgrade":"在线升级","set.language":"界面语言","set.languageNote":"切换后立即生效，仅影响界面文字，不改变书籍元数据。","set.languageScope":"当前覆盖登录页、导航、顶栏与设置页标题；具体业务页正文仍为中文。","common.save":"保存","common.cancel":"取消","common.delete":"删除","common.close":"关闭","common.confirm":"确认","common.search":"搜索","common.filter":"筛选","common.reset":"重置","common.loading":"加载中…","common.retry":"重试","common.empty":"暂无数据","common.all":"全部","ext.lang.all":"全部语言","ext.lang.more":"更多 {n} 种","ext.lang.pick":"选择语言","ext.lang.search":"搜索语言…","ext.lang.empty":"没有匹配的语言","ext.page.prev":"上一页","ext.page.next":"下一页","ext.page.detail":"共 {n} 条 · 第 {cur} / {pages} 页 · 本页 {m} 条","ext.searchPh":"搜索扩展…","ext.col.ext":"扩展","ext.col.lang":"语言","ext.col.ver":"版本","ext.col.state":"状态","ext.col.acts":"操作","nav.gMore":"更多","nav.about":"关于","nav.notify":"通知","api.title":"API 接口","api.sub":"全部对外接口 · {n} 个端点 · 基地址 {host}","api.needAdmin":"需要管理员权限","api.needAdminHint":"接口清单包含全部对外端点与鉴权方式，仅管理员账户可查看。","api.copyBase":"复制基地址","api.openapi":"OpenAPI JSON","api.users":"用户与角色","api.loading":"正在读取接口文档…","api.loadFail":"读取接口文档失败：{msg}","api.retry":"重新加载","api.authTitle":"调用说明","api.authHint":"鉴权与示例","api.expand":"展开","api.collapse":"收起","api.filterGroup":"功能","api.filterVer":"版本","api.all":"全部","api.count":"{n} 个端点","api.search":"搜索路径、说明或标签…","api.noResult":"没有匹配的端点","api.colMethod":"方法","api.colPath":"路径","api.colSummary":"说明","api.colVer":"版本","api.colTag":"标签","api.authBasic":"Basic Auth","api.authApiKey":"API Key","api.authAgent":"Agent 令牌","api.authSession":"会话","api.authBasicUse":"Authorization: Basic base64(邮箱:密码)","api.authApiKeyUse":"X-API-Key: 访问密钥","api.authAgentUse":"Authorization: Bearer 令牌（config-dir/agent-token.txt）","api.authSessionUse":"登录后返回 LANTAI-SESSION Cookie；加 X-Auth-Token 头可改用该头传会话","api.authLan":"所有接口基地址 {host}，局域网内其他设备需放行 25600 端口。","api.clients":"客户端适用内容","api.clientsClient":"客户端","api.clientsFits":"适合","api.clientsNot":"不支持","api.access":"接入方式","api.accessAddr":"地址","api.accessAccount":"账号","api.accessLan":"局域网访问需放行 25600 端口","api.accessSame":"客户端与电脑须在同一局域网","api.verLantai":"兰台","api.verV1":"v1","api.verV2":"v2","api.verOther":"—","api.grpLantai":"兰台自有","api.grpOther":"其他","api.detailParams":"参数","api.detailBody":"请求体","api.detailResp":"响应","api.detailNone":"没有需要说明的参数","api.detailRequired":"必填","api.detailName":"名称","api.detailType":"类型","api.detailDesc":"说明","api.detailClose":"收起详情","api.detailOpen":"查看详情","up.title":"在线更新","up.current":"当前版本","up.latest":"最新版本","up.uptodate":"已是最新版本","up.norelease":"更新源暂无可用版本","up.check":"检查更新","up.checking":"正在检查…","up.published":"发布时间","up.size":"大小","up.notes":"更新说明","up.download":"下载更新包","up.downloading":"正在下载","up.verifying":"正在校验","up.ready":"已下载并通过校验","up.install":"安装并重启","up.reverify":"重新校验","up.discard":"放弃这个包","up.autoCheck":"自动检查更新","up.autoCheckHint":"打开升级页时向更新源确认一次，最多每 4 小时一次","up.autoDownload":"发现新版本后自动下载","up.autoInstall":"下载校验通过后自动安装并重启","up.autoInstallHint":"仅容器部署可全自动；桌面形态安装后需手动重新启动","up.feed":"更新源","up.feedHint":"默认读取项目 Release，可换成返回同结构的镜像地址","up.unreachable":"更新源不可达","up.restartContainer":"兰台进程会退出，由容器自动拉起新版本；未配置重启策略时请手动启动容器","up.phUpload":"正在上传升级包","up.phDownload":"正在下载升级包","up.phUnzip":"正在解压升级包","up.phVerify":"正在校验升级包","up.phBackup":"正在备份当前版本","up.phCopy":"正在替换程序文件","up.phRestart":"已替换，正在重启","up.phWorking":"正在处理","up.restartTitle":"正在升级","up.restartMsg":"兰台正在替换程序并重启，页面会自动重新连接。请不要关闭或刷新本页。","up.restartWait":"已等待 {n} 秒","up.restartReload":"立即刷新","up.restartPending":"升级已提交，正在等待服务重启","up.restartTimeout":"未检测到服务重启，请手动启动兰台后刷新本页","up.manualHint":"兰台会自行退出，请重新启动后再刷新本页","up.importTitle":"导入升级包","up.importHint":"升级包只包含应用 jar，不含镜像、JDK、配置与数据。上传后先校验，确认无误才替换文件。","up.verifyBtn":"校验","up.rollback":"回退","up.rollbackHint":"每次升级前会把当前 jar 备份到配置目录 upgrade/backup/，只保留一份。","up.backupNone":"无","up.jarPath":"运行文件","up.jarWritable":"写入权限","up.jarWritableYes":"可替换","up.jarWritableNo":"不可写，无法在线升级","up.deploy":"部署形态","up.deployContainer":"容器内","up.deployBare":"裸机 / 桌面","up.restartNote":"升级后","up.target":"目标版本","up.sha":"SHA-256","up.builtAt":"构建时间","up.applyNow":"立即升级并重启","up.discardShort":"放弃这个包","up.checkedAt":"最后检查 {t}","up.noNotes":"该版本未提供说明","up.dropTitle":"把升级包拖到这里，或点击选择文件","up.dropHint":"支持 .zip 格式，单个文件不超过 512 MB","up.foundNew":"发现新版本 v{v}","up.uptodateToast":"已是最新版本 v{v}","about.title":"关于兰台","about.version":"版本","about.build":"构建时间","about.runtime":"运行形态","about.repo":"项目地址","about.license":"许可证","about.upstream":"上游项目","about.check":"检查更新","notify.title":"通知","notify.empty":"暂无通知","notify.markAll":"全部标为已读","notify.newVer":"发现新版本 {v}","notify.view":"查看更新说明","help.copy":"复制","help.export":"导出 .md","help.copied":"已复制到剪贴板","help.copyFail":"复制失败，请手动选择","help.exported":"已导出 {name}"};})();
 (function () {
   var NAMES = [
     ['zh-Hans', '简体中文'], ['zh-Hant', '繁體中文'], ['en', 'English'],
@@ -1307,10 +71,16 @@
     return out;
   }
 
-  for (var i = 0; i < NAMES.length; i++) DICT[NAMES[i][0]] = merge(NAMES[i][0]);
-
   function known(code) {
-    return Object.prototype.hasOwnProperty.call(DICT, code);
+    for (var i = 0; i < NAMES.length; i++) if (NAMES[i][0] === code) return true;
+    return false;
+  }
+
+  function ensure(code) {
+    if (DICT[code]) return true;
+    if (!OWN[code]) return false;
+    DICT[code] = merge(code);
+    return true;
   }
 
   try {
@@ -1318,12 +88,15 @@
     if (saved && known(saved)) cur = saved;
   } catch (e) { }
 
+  ensure(cur);
+
   function lookup(code, key) {
     var t = DICT[code];
     return t && Object.prototype.hasOwnProperty.call(t, key) ? t[key] : null;
   }
 
   function t(key, vars) {
+    ensure(cur);
     var out = lookup(cur, key);
     if (out == null) out = lookup('en', key);
     if (out == null) out = lookup('zh-Hans', key);
@@ -1341,7 +114,7 @@
   }
 
   function lang(code) {
-    if (code && known(code)) {
+    if (code && known(code) && ensure(code)) {
       cur = code;
       try { localStorage.setItem(KEY, code); } catch (e) { }
       setHtmlLang();
@@ -1371,6 +144,183 @@
 
   setHtmlLang();
   window.LantaiI18n = { t: t, lang: lang, langs: langs, name: name, apply: apply };
+})();
+
+(function () {
+  var T = {
+    af: ['Afrikaans', 'Afrikaans', '南非荷兰文'],
+    am: ['አማርኛ', 'Amharic', '阿姆哈拉文'],
+    ar: ['العربية', 'Arabic', '阿拉伯文'],
+    az: ['Azərbaycan dili', 'Azerbaijani', '阿塞拜疆文'],
+    be: ['Беларуская', 'Belarusian', '白俄罗斯文'],
+    bg: ['Български', 'Bulgarian', '保加利亚文'],
+    bn: ['বাংলা', 'Bengali', '孟加拉文'],
+    br: ['Brezhoneg', 'Breton', '布列塔尼文'],
+    bs: ['Bosanski', 'Bosnian', '波斯尼亚文'],
+    ca: ['Català', 'Catalan', '加泰罗尼亚文'],
+    ceb: ['Cebuano', 'Cebuano', '宿务文'],
+    co: ['Corsu', 'Corsican', '科西嘉文'],
+    cs: ['Čeština', 'Czech', '捷克文'],
+    cy: ['Cymraeg', 'Welsh', '威尔士文'],
+    da: ['Dansk', 'Danish', '丹麦文'],
+    de: ['Deutsch', 'German', '德文'],
+    el: ['Ελληνικά', 'Greek', '希腊文'],
+    en: ['English', 'English', '英文'],
+    eo: ['Esperanto', 'Esperanto', '世界文'],
+    es: ['Español', 'Spanish', '西班牙文'],
+    et: ['Eesti', 'Estonian', '爱沙尼亚文'],
+    eu: ['Euskara', 'Basque', '巴斯克文'],
+    fa: ['فارسی', 'Persian', '波斯文'],
+    fi: ['Suomi', 'Finnish', '芬兰文'],
+    fil: ['Filipino', 'Filipino', '菲律宾文'],
+    fr: ['Français', 'French', '法文'],
+    fy: ['Frysk', 'Frisian', '弗里斯兰文'],
+    ga: ['Gaeilge', 'Irish', '爱尔兰文'],
+    gd: ['Gàidhlig', 'Scottish Gaelic', '苏格兰盖尔文'],
+    gl: ['Galego', 'Galician', '加利西亚文'],
+    gu: ['ગુજરાતી', 'Gujarati', '古吉拉特文'],
+    ha: ['Hausa', 'Hausa', '豪萨文'],
+    he: ['עברית', 'Hebrew', '希伯来文'],
+    hi: ['हिन्दी', 'Hindi', '印地文'],
+    hr: ['Hrvatski', 'Croatian', '克罗地亚文'],
+    ht: ['Kreyòl ayisyen', 'Haitian Creole', '海地克里奥尔文'],
+    hu: ['Magyar', 'Hungarian', '匈牙利文'],
+    hy: ['Հայերեն', 'Armenian', '亚美尼亚文'],
+    id: ['Bahasa Indonesia', 'Indonesian', '印尼文'],
+    ig: ['Igbo', 'Igbo', '伊博文'],
+    is: ['Íslenska', 'Icelandic', '冰岛文'],
+    it: ['Italiano', 'Italian', '意大利文'],
+    ja: ['日本語', 'Japanese', '日文'],
+    jv: ['Basa Jawa', 'Javanese', '爪哇文'],
+    ka: ['ქართული', 'Georgian', '格鲁吉亚文'],
+    kk: ['Қазақ тілі', 'Kazakh', '哈萨克文'],
+    km: ['ខ្មែរ', 'Khmer', '高棉文'],
+    kn: ['ಕನ್ನಡ', 'Kannada', '卡纳达文'],
+    ko: ['한국어', 'Korean', '韩文'],
+    ku: ['Kurdî', 'Kurdish', '库尔德文'],
+    ky: ['Кыргызча', 'Kyrgyz', '吉尔吉斯文'],
+    la: ['Latina', 'Latin', '拉丁文'],
+    lb: ['Lëtzebuergesch', 'Luxembourgish', '卢森堡文'],
+    lo: ['ລາວ', 'Lao', '老挝文'],
+    lt: ['Lietuvių', 'Lithuanian', '立陶宛文'],
+    lv: ['Latviešu', 'Latvian', '拉脱维亚文'],
+    mg: ['Malagasy', 'Malagasy', '马达加斯加文'],
+    mi: ['Te Reo Māori', 'Maori', '毛利文'],
+    mk: ['Македонски', 'Macedonian', '马其顿文'],
+    ml: ['മലയാളം', 'Malayalam', '马拉雅拉姆文'],
+    mn: ['Монгол', 'Mongolian', '蒙古文'],
+    mr: ['मराठी', 'Marathi', '马拉地文'],
+    ms: ['Bahasa Melayu', 'Malay', '马来文'],
+    mt: ['Malti', 'Maltese', '马耳他文'],
+    my: ['မြန်မာ', 'Burmese', '缅甸文'],
+    nb: ['Norsk bokmål', 'Norwegian Bokmål', '挪威文'],
+    ne: ['नेपाली', 'Nepali', '尼泊尔文'],
+    nl: ['Nederlands', 'Dutch', '荷兰文'],
+    no: ['Norsk', 'Norwegian', '挪威文'],
+    ny: ['Chichewa', 'Chichewa', '齐切瓦文'],
+    or: ['ଓଡ଼ିଆ', 'Odia', '奥里亚文'],
+    pa: ['ਪੰਜਾਬੀ', 'Punjabi', '旁遮普文'],
+    pl: ['Polski', 'Polish', '波兰文'],
+    ps: ['پښتو', 'Pashto', '普什图文'],
+    pt: ['Português', 'Portuguese', '葡萄牙文'],
+    ro: ['Română', 'Romanian', '罗马尼亚文'],
+    ru: ['Русский', 'Russian', '俄文'],
+    rw: ['Ikinyarwanda', 'Kinyarwanda', '卢旺达文'],
+    sd: ['سنڌي', 'Sindhi', '信德文'],
+    si: ['සිංහල', 'Sinhala', '僧伽罗文'],
+    sk: ['Slovenčina', 'Slovak', '斯洛伐克文'],
+    sl: ['Slovenščina', 'Slovenian', '斯洛文尼亚文'],
+    sm: ['Gagana Sāmoa', 'Samoan', '萨摩亚文'],
+    sn: ['chiShona', 'Shona', '绍纳文'],
+    so: ['Soomaali', 'Somali', '索马里文'],
+    sq: ['Shqip', 'Albanian', '阿尔巴尼亚文'],
+    sr: ['Српски', 'Serbian', '塞尔维亚文'],
+    st: ['Sesotho', 'Sesotho', '塞索托文'],
+    su: ['Basa Sunda', 'Sundanese', '巽他文'],
+    sv: ['Svenska', 'Swedish', '瑞典文'],
+    sw: ['Kiswahili', 'Swahili', '斯瓦希里文'],
+    ta: ['தமிழ்', 'Tamil', '泰米尔文'],
+    te: ['తెలుగు', 'Telugu', '泰卢固文'],
+    tg: ['Тоҷикӣ', 'Tajik', '塔吉克文'],
+    th: ['ไทย', 'Thai', '泰文'],
+    ti: ['ትግርኛ', 'Tigrinya', '提格里尼亚文'],
+    tk: ['Türkmen', 'Turkmen', '土库曼文'],
+    tr: ['Türkçe', 'Turkish', '土耳其文'],
+    tt: ['Татарча', 'Tatar', '鞑靼文'],
+    ug: ['ئۇيغۇرچە', 'Uyghur', '维吾尔文'],
+    uk: ['Українська', 'Ukrainian', '乌克兰文'],
+    ur: ['اردو', 'Urdu', '乌尔都文'],
+    uz: ['Oʻzbek', 'Uzbek', '乌兹别克文'],
+    vi: ['Tiếng Việt', 'Vietnamese', '越南文'],
+    xh: ['isiXhosa', 'Xhosa', '科萨文'],
+    yi: ['ייִדיש', 'Yiddish', '意第绪文'],
+    yo: ['Yorùbá', 'Yoruba', '约鲁巴文'],
+    zh: ['中文', 'Chinese', '中文'],
+    zu: ['isiZulu', 'Zulu', '祖鲁文']
+  };
+  var HYPHEN = {
+    'zh-hans': ['简体中文', 'Chinese (Simplified)', '简体中文'],
+    'zh-hant': ['繁體中文', 'Chinese (Traditional)', '繁体中文'],
+    'zh-tw': ['繁體中文', 'Chinese (Traditional)', '繁体中文'],
+    'zh-hk': ['繁體中文', 'Chinese (Traditional)', '繁体中文'],
+    'pt-br': ['Português (Brasil)', 'Portuguese (Brazil)', '巴西葡文'],
+    'pt-pt': ['Português', 'Portuguese (Portugal)', '葡萄牙文'],
+    'sr-latn': ['Srpski', 'Serbian (Latin)', '塞尔维亚文'],
+    'nb-no': ['Norsk bokmål', 'Norwegian Bokmål', '挪威文']
+  };
+  var SPECIAL = {
+    all: ['全部', 'All', '全部'],
+    multi: ['多语言', 'Multi', '多语言'],
+    other: ['其他', 'Other', '其他'],
+    misc: ['其他', 'Other', '其他'],
+    unknown: ['未知', 'Unknown', '未知']
+  };
+
+  function key(code) {
+    return String(code || '').trim().toLowerCase().replace(/_/g, '-');
+  }
+
+  function entry(code) {
+    var k = key(code);
+    if (!k) return null;
+    return HYPHEN[k] || SPECIAL[k] || T[k] || T[k.split('-')[0]] || null;
+  }
+
+  function zhUi() {
+    var api = window.LantaiI18n || window.L;
+    var l = (api && api.lang) ? String(api.lang() || '') : '';
+    return l === 'zh-Hans' || l === 'zh-Hant';
+  }
+
+  function name(code) {
+    var e = entry(code);
+    if (!e) {
+      var k = key(code);
+      if (!k) return '—';
+      return k.length <= 3 && k.indexOf('-') < 0 ? k.toUpperCase() : code;
+    }
+    return zhUi() ? e[2] : e[0];
+  }
+
+  function alias(code) {
+    var e = entry(code);
+    if (!e) return '';
+    return zhUi() ? e[1] : e[2];
+  }
+
+  function label(codes) {
+    var list = String(codes == null ? '' : codes).split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+    if (!list.length) return '—';
+    var seen = {};
+    return list.filter(function (c) {
+      var k = key(c);
+      if (seen[k]) return false;
+      seen[k] = 1;
+      return true;
+    }).map(name).join(' / ');
+  }
+
+  window.LantaiLang = { name: name, alias: alias, label: label, entry: entry, key: key };
 })();
 
 (function () {
@@ -1458,8 +408,12 @@
         });
       }
       if (res.status === 204) return null;
-      var ct = res.headers.get('content-type') || '';
-      return ct.indexOf('json') >= 0 ? res.json() : res.text();
+      return res.text().then(function (text) {
+        if (!text) return null;
+        var ct = res.headers.get('content-type') || '';
+        if (ct.indexOf('json') < 0) return text;
+        try { return JSON.parse(text); } catch (e) { return text; }
+      });
     });
   }
 
@@ -1505,6 +459,14 @@
 
   function letterIds(letter) {
     return request('api/lantai/v1/series/letter-ids?letter=' + encodeURIComponent(letter)).then(unwrap);
+  }
+
+  function bookLetterIds(letter) {
+    return request('api/lantai/v1/books/letter-ids?letter=' + encodeURIComponent(letter)).then(unwrap);
+  }
+
+  function bookLetterGroups() {
+    return request('api/lantai/v1/books/letter-groups').then(function (r) { return Array.isArray(r) ? r : []; });
   }
 
   function searchBooks(body) {
@@ -1576,18 +538,32 @@
 
   function mapBook(b) {
     var media = b.media || {};
+    var md = b.metadata || {};
     var ext = extOf(b.name);
     var profile = media.mediaProfile || ({ pdf: 'PDF', epub: 'EPUB', cbz: 'DIVINA', cbr: 'DIVINA', txt: 'TXT' })[ext] || '';
+    if (!profile && media.mediaType) {
+      var mt = String(media.mediaType).toLowerCase();
+      if (mt.indexOf('epub') >= 0) profile = 'EPUB';
+      else if (mt.indexOf('pdf') >= 0) profile = 'PDF';
+      else if (mt.indexOf('zip') >= 0 || mt.indexOf('rar') >= 0) profile = 'DIVINA';
+      else if (mt.indexOf('text') >= 0) profile = 'TXT';
+    }
+    var fmt = ext || (profile === 'DIVINA' ? 'cbz' : profile === 'EPUB' ? 'epub' : profile === 'PDF' ? 'pdf' : profile === 'TXT' ? 'txt' : '');
     return {
       id: b.id,
       s: b.seriesId,
       num: b.number || 0,
       name: b.name,
-      fmt: ext,
+      mdTitle: md.title || '',
+      mdNum: md.number || '',
+      mdIsbn: md.isbn || '',
+      mdAuthors: (md.authors || []).map(function (a) { return a.name; }).join('、'),
+      fmt: fmt,
       profile: profile,
+      divina: !!media.epubDivinaCompatible,
       pages: media.pagesCount || 0,
       size: b.sizeBytes || 0,
-      pub: (b.metadata && b.metadata.releaseDate) || '',
+      pub: md.releaseDate || '',
       added: b.createdDate || '',
       last: fmtDate(b.lastModified || b.fileLastModified || b.createdDate),
       status: media.status || 'READY',
@@ -1672,6 +648,8 @@
         users.forEach(function (u) {
           var uname = u.username || (u.email ? String(u.email).split('@')[0] : '');
           USERS.push({
+            id: u.id,
+            username: uname,
             name: uname,
             email: u.email || '',
             roles: Array.from(u.roles || []),
@@ -1783,9 +761,13 @@
     });
   }
 
-  function hydrateCatalog(reuse) {
-    if (reuse && runtime.catalogLoaded) return Promise.resolve(true);
-    if (runtime.catalogLoading) return runtime.catalogLoading;
+  function hydrateCatalog(reuse, force) {
+    if (!force && reuse && runtime.catalogLoaded) return Promise.resolve(true);
+    if (!force && runtime.catalogLoading) return runtime.catalogLoading;
+    if (force) {
+      runtime.catalogLoaded = false;
+      runtime.catalogLoading = null;
+    }
     runtime.catalog = null;
     runtime._more = null;
     runtime.catalogLoading = Promise.all([
@@ -1834,8 +816,8 @@
     };
   }
 
-  function hydrate() {
-    return hydrateShell().then(function () { return hydrateCatalog(); });
+  function hydrate(force) {
+    return hydrateShell().then(function () { return hydrateCatalog(false, force); }).then(paintRuntimeDot);
   }
 
   function fetchSeriesBooks(id) {
@@ -1948,9 +930,63 @@
     return hydrateShell().then(function () {
       showApp();
       hydrateCatalog();
+      bindWake();
+      watchRuntime();
     }).catch(function (err) {
       showApp();
       if (typeof toast === 'function') toast('数据载入失败，当前显示示例数据', 'err');
+    });
+  }
+
+  function paintRuntimeDot() {
+    if (typeof paintRuntime === 'function') paintRuntime();
+  }
+
+  function pullRuntimes() {
+    return request('api/lantai/v1/runtimes')
+      .then(function (list) {
+        if (!Array.isArray(list)) return;
+        var map = {};
+        list.forEach(function (r) { if (r && r.kind) map[r.kind] = r; });
+        runtime.runtimes = map;
+        live.runtimes = true;
+      })
+      .catch(function () { })
+      .then(paintRuntimeDot);
+  }
+
+  function swyRunning() {
+    var st = (runtime.runtimes || {}).suwayomi;
+    return !!(st && st.running);
+  }
+
+  var watchTimer = null;
+  var WATCH_DELAYS = [3000, 8000, 15000, 25000, 40000];
+
+  function watchRuntime() {
+    if (watchTimer) { clearTimeout(watchTimer); watchTimer = null; }
+    if (swyRunning()) return;
+    var i = 0;
+    var step = function () {
+      watchTimer = null;
+      if (swyRunning()) return;
+      pullRuntimes().then(function () {
+        if (swyRunning() || i + 1 >= WATCH_DELAYS.length) return;
+        i++;
+        watchTimer = setTimeout(step, WATCH_DELAYS[i]);
+      });
+    };
+    watchTimer = setTimeout(step, WATCH_DELAYS[0]);
+  }
+
+  var wakeBound = false;
+
+  function bindWake() {
+    if (wakeBound || !document.addEventListener) return;
+    wakeBound = true;
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) return;
+      pullRuntimes().then(function () { if (!swyRunning()) watchRuntime(); });
     });
   }
 
@@ -2058,6 +1094,8 @@
     requestEtag: requestEtag,
     searchSeries: searchSeries,
     letterIds: letterIds,
+    bookLetterIds: bookLetterIds,
+    bookLetterGroups: bookLetterGroups,
     searchBooks: searchBooks,
     seriesGroups: seriesGroups,
     refData: refData,
@@ -2209,6 +1247,9 @@ function loadSources(force) {
 
 const USERS = [];
 
+const PROFILES = {};
+let profileBusy = false;
+
 const DEVICES = [];
 
 const READLISTS = [];
@@ -2235,6 +1276,7 @@ const S = {
   scrape: { stage: 'pick', picks: {}, fields: {}, bTab: 'fmt', bHelp: false },
   reader: null, annTbSel: null, paletteSel: 0, statsRange: 30, statsTab: 'trend',
   settingsTab: 'libraries', searchQ: '', sessionExtra: 0, demoFast: true, palItems: [], palSel: 0,
+  navFold: {},
   ext: { q: '', lang: 'all', nsfw: false },
   rt: {}, rtTimers: {}
 };
@@ -2315,29 +1357,60 @@ const NAV = [
   { p: '/readlists', i: 'readlist', t: 'nav.readlists', n: () => READLISTS.length },
   { g: 'nav.gLantai' },
   { p: '/online', i: 'globe', t: 'nav.online', n: () => SERIES.filter(s => s.online).length },
-  { p: '/scrape', i: 'wand', t: 'nav.scrape', n: () => scPage && scPage.counts ? (scPage.counts.queued + scPage.counts.running + scPage.counts.review) : 0 },
+  { p: '/scrape', i: 'wand', t: 'nav.scrape', n: () => scPage && scPage.counts ? (scPage.counts.total || 0) : 0 },
   { p: '/annotations', i: 'marker', t: 'nav.annotations', n: () => ANNOTATIONS.length },
   { p: '/stats', i: 'chart', t: 'nav.stats' },
   { g: 'nav.gSystem' },
   { p: '/tasks', i: 'bolt', t: 'nav.tasks', n: () => TASKS.filter(t => t.state === 'run' || t.state === 'queued').length },
-  { p: '/inspect', i: 'layers', t: 'nav.inspect' },
-  { p: '/trash', i: 'trash', t: 'nav.trash' },
   { p: '/settings', i: 'settings', t: 'nav.settings' },
   { p: '/extensions', i: 'puzzle', t: 'nav.extensions', n: () => Object.keys(RT_META).filter(k => { const r = S.rt[k]; return r && r.detect && !r.detect.installed; }).length },
+  { g: 'nav.gMore', fold: 'more' },
   { p: '/users', i: 'user', t: 'nav.users' },
   { p: '/logs', i: 'list', t: 'nav.logs' },
   { p: '/opds', i: 'toc', t: 'nav.opds' },
   { p: '/kobo', i: 'sync', t: 'nav.kobo' },
   { p: '/devices', i: 'grid', t: 'nav.devices' },
+  { p: '/inspect', i: 'layers', t: 'nav.inspect' },
+  { p: '/trash', i: 'trash', t: 'nav.trash' },
   { p: '/system', i: 'info', t: 'nav.system' },
   { p: '/protocol', i: 'server', t: 'nav.protocol', admin: true }
 ];
+function navGroups() {
+  const out = [];
+  let cur = { g: null, fold: null, items: [] };
+  NAV.filter(it => !it.admin || isAdmin()).forEach(it => {
+    if (it.g) { out.push(cur); cur = { g: it.g, fold: it.fold || null, items: [] }; return; }
+    cur.items.push(it);
+  });
+  out.push(cur);
+  return out.filter(x => x.g || x.items.length);
+}
+function navItemHtml(it) {
+  return '<a data-go="' + it.p + '" class="' + (S.route === it.p || S.route.startsWith(it.p + '/') ? 'on' : '') + '"' +
+    (S.collapsed ? ' title="' + esc(L.t(it.t)) + '"' : '') + '>' +
+    ico(it.i) + '<span class="lb">' + L.t(it.t) + '</span>' + (it.n ? '<span class="tag">' + it.n() + '</span>' : '') + '</a>';
+}
 function renderNav() {
-  $('#nav').innerHTML = NAV.filter(it => !it.admin || isAdmin()).map(it => it.g
-    ? '<div class="nav-grp">' + esc(S.collapsed ? '·' : L.t(it.g)) + '</div>'
-    : '<a data-go="' + it.p + '" class="' + (S.route === it.p || S.route.startsWith(it.p + '/') ? 'on' : '') + '">' +
-    ico(it.i) + '<span class="lb">' + L.t(it.t) + '</span>' + (it.n ? '<span class="tag">' + it.n() + '</span>' : '') + '</a>').join('');
+  const groups = navGroups();
+  const inGroup = g => g.items.some(it => S.route === it.p || S.route.startsWith(it.p + '/'));
+  S.navFold = S.navFold || {};
+  $('#nav').innerHTML = groups.map(g => {
+    if (!g.g) return g.items.map(navItemHtml).join('');
+    if (!g.fold) return '<div class="nav-grp">' + (S.collapsed ? '' : esc(L.t(g.g))) + '</div>' + g.items.map(navItemHtml).join('');
+    const touched = Object.prototype.hasOwnProperty.call(S.navFold, g.fold);
+    const open = S.collapsed || (touched ? !!S.navFold[g.fold] : inGroup(g));
+    return '<div class="nav-grp fold' + (open ? ' open' : '') + '" data-navfold="' + g.fold + '">' +
+      '<span>' + (S.collapsed ? '' : esc(L.t(g.g))) + '</span>' +
+      ico('down', 'chev') + '</div>' +
+      (open ? g.items.map(navItemHtml).join('') : '');
+  }).join('');
   $$('#nav a').forEach(a => a.onclick = () => go(a.dataset.go));
+  $$('#nav [data-navfold]').forEach(el => el.onclick = () => {
+    const k = el.dataset.navfold;
+    S.navFold[k] = !el.classList.contains('open');
+    savePrefs({ navFold: S.navFold });
+    renderNav();
+  });
 }
 
 /* ---- 路由 ---- */
@@ -2346,7 +1419,6 @@ function go(p, replace) {
   if (S.reader && p.indexOf('/read/') !== 0) closeReader(false);
   if (window.ComicReader && ComicReader.isOpen() && p.indexOf('/read/') !== 0) ComicReader.close(false);
   if (window.EbookReader && EbookReader.isOpen() && p.indexOf('/read/') !== 0) EbookReader.close(false);
-  S.route = p;
   (replace ? history.replaceState : history.pushState).call(history, null, '', '#' + p);
   render();
 }
@@ -2373,6 +1445,37 @@ function ensureCatalog(kind, view) {
   LantaiRuntime.catalogFull(kind).then(() => { view.removeAttribute('data-catfull'); render(); });
   return true;
 }
+function catalogGap(kind) {
+  const T = catalogTotal();
+  if (kind === 'series' ? T.seriesDone : T.booksDone) return '';
+  const have = kind === 'series' ? SERIES.length : BOOKS.length;
+  const total = kind === 'series' ? T.series : T.books;
+  if (window.LantaiRuntime && LantaiRuntime.catalogFull) {
+    LantaiRuntime.catalogFull(kind).then(() => { if (String(S.route).indexOf('/browse') === 0) render(); });
+  }
+  return '<span class="badge warn">目录载入中 ' + num(have) + ' / ' + num(total) + '</span>';
+}
+const CHUNK_OK = {}, CHUNK_WAIT = {}, CHUNK_FAIL = {};
+function loadChunk(name) {
+  if (CHUNK_OK[name] || CHUNK_FAIL[name]) return Promise.resolve();
+  if (CHUNK_WAIT[name]) return CHUNK_WAIT[name];
+  const rel = (window.__LANTAI_CHUNKS__ || {})[name];
+  if (!rel) { CHUNK_OK[name] = true; return Promise.resolve(); }
+  CHUNK_WAIT[name] = new Promise(function (done) {
+    const el = document.createElement('script');
+    el.src = (window.resourceBaseUrl || '/').replace(/\/?$/, '/') + rel;
+    el.onload = function () { CHUNK_OK[name] = true; CHUNK_WAIT[name] = null; done(); };
+    el.onerror = function () { CHUNK_FAIL[name] = true; CHUNK_WAIT[name] = null; done(); };
+    document.head.appendChild(el);
+  });
+  return CHUNK_WAIT[name];
+}
+function needChunk(key) {
+  if (key === 'read') return 'reader';
+  if (key === 'protocol') return 'docs';
+  if (key === 'system') return 'sysx';
+  return '';
+}
 function render() {
   const { path, qs } = parseHash();
   const routeChanged = S.route !== path;
@@ -2385,15 +1488,27 @@ function render() {
   const view = $('#view');
   const keepScroll = window.__lantaiKeepScroll === true;
   window.__lantaiKeepScroll = false;
-  if (routeChanged && !keepScroll) view.scrollTop = 0;
-  if ((key === 'browse' || key === 'search') && !catalogReady()) {
-    document.body.classList.remove('has-dock');
-    if (view.getAttribute('data-cat') !== path) {
-      view.setAttribute('data-cat', path);
-      view.innerHTML = '<div class="empty" style="padding-top:120px"><div class="spinner" style="margin:0 auto 14px"></div><h4>正在载入书库…</h4></div>';
-      if (window.LantaiRuntime) LantaiRuntime.hydrateCatalog();
-    }
+  if (routeChanged && !keepScroll) requestAnimationFrame(function () {
+    const el = $('#view');
+    if (el) { el.style.scrollBehavior = 'auto'; el.scrollTop = 0; el.style.scrollBehavior = ''; }
+  });
+  const need = needChunk(key);
+  if (need && !CHUNK_OK[need] && !CHUNK_FAIL[need]) {
+    view.innerHTML = '<div class="empty" style="padding-top:120px"><div class="spinner" style="margin:0 auto 14px"></div><h4>正在载入模块…</h4></div>';
+    loadChunk(need).then(() => render());
     return;
+  }
+  if ((key === 'browse' || key === 'search') && !catalogReady()) {
+    if (!SERIES.length && !BOOKS.length) {
+      document.body.classList.remove('has-dock');
+      if (view.getAttribute('data-cat') !== path) {
+        view.setAttribute('data-cat', path);
+        view.innerHTML = '<div class="empty" style="padding-top:120px"><div class="spinner" style="margin:0 auto 14px"></div><h4>正在载入书库…</h4></div>';
+        if (window.LantaiRuntime) LantaiRuntime.hydrateCatalog();
+      }
+      return;
+    }
+    if (window.LantaiRuntime && !LantaiRuntime.catalogLoading) LantaiRuntime.hydrateCatalog();
   }
   view.removeAttribute('data-cat');
   view.innerHTML = '';
@@ -2595,7 +1710,22 @@ const PAL_CMDS = [
   { g: '操作', t: '立即结算所有阅读会话', run: () => flushSessions() },
   { g: '操作', t: '收起 / 展开导航', run: () => toggleCollapse() }
 ];
-function toggleCollapse() { S.collapsed = !S.collapsed; savePrefs({ collapsed: S.collapsed }); $('#app').classList.toggle('collapsed', S.collapsed); }
+function toggleCollapse() {
+  S.collapsed = !S.collapsed;
+  savePrefs({ collapsed: S.collapsed });
+  $('#app').classList.toggle('collapsed', S.collapsed);
+  applyCollapseBtn();
+  renderNav();
+}
+function applyCollapseBtn() {
+  const b = $('#collapseBtn');
+  if (!b) return;
+  const label = S.collapsed ? '展开导航' : '收起导航';
+  const lb = b.querySelector('.lb');
+  if (lb) lb.textContent = label;
+  b.setAttribute('title', label);
+  b.setAttribute('aria-label', label);
+}
 function openPalette() {
   $('#palette').classList.add('on'); $('#palInput').value = ''; S.palInput = ''; palPaint(''); $('#palInput').focus();
 }
@@ -2704,12 +1834,16 @@ function bestProgress(sid) {
   booksOf(sid).forEach(b => { const p = prog(b.id); if (p && (!best || p.at > best.p.at)) best = { b, p, pct: p.pages ? Math.round(p.page / p.pages * 100) : 0 }; });
   return best;
 }
-function bookRow(b) {
+function bookRow(b, pickSel) {
   const p = prog(b.id), pct = p && p.pages ? Math.round(p.page / p.pages * 100) : 0;
-  return '<tr class="click" data-book="' + b.id + '"><td style="width:44px">' +
-    '<div class="thumb" style="background:' + gradOf(b.name) + '">' + thumbImg('book', isOnlineBook(b) ? '' : b.id) + '</div></td>' +
-    '<td><div style="font-size:13px">' + esc(b.name) + '</div>' +
-    '<div class="mini mono">' + (PROFILE_CN[b.profile] || b.profile) + ' · ' + (b.pages ? num(b.pages) + (b.profile === 'TXT' || b.profile === 'EPUB' ? ' 章' : ' 页') : '—') + ' · ' + bytes(b.size) +
+  const t = bookTitle(b), sub = bookFileSub(b), nb = bookNumCn(b);
+  const cell = (pickSel === undefined || pickSel === null) ? ''
+    : '<td style="width:36px"><span class="pkbox' + (pickSel ? ' on' : '') + '" style="position:static" data-pick-b="' + b.id + '" title="选择">' + (pickSel ? '✓' : '') + '</span></td>';
+  return '<tr class="click" data-book="' + b.id + '">' + cell + '<td style="width:44px">' +
+    '<div class="thumb" style="background:' + gradOf(t) + '">' + thumbImg('book', isOnlineBook(b) ? '' : b.id) + '</div></td>' +
+    '<td><div style="font-size:13px">' + esc(t) + (nb ? ' <span class="badge">' + nb + '</span>' : '') + '</div>' +
+    (sub ? '<div class="mini mono-sm">' + esc(sub) + '</div>' : '') +
+    '<div class="mini mono">' + (PROFILE_CN[b.profile] || b.profile) + ' · ' + (b.pages ? num(b.pages) + (((b.profile === 'TXT' || b.profile === 'EPUB') && !b.divina) ? ' 章' : ' 页') : '—') + ' · ' + bytes(b.size) +
     (b.enc ? ' · ' + b.enc : '') + '</div></td>' +
     '<td>' + statusBadge(b) + '</td>' +
     '<td style="width:150px">' + (p ? '<div class="pbar"><i class="' + (p.completed ? 'done' : '') + '" style="width:' + pct + '%"></i></div><div class="mini mono">' + p.page + '/' + p.pages + ' · ' + deviceCn(p.device) + '</div>' : '<span class="mini">未读</span>') + '</td>' +
@@ -3162,6 +2296,8 @@ function loadRef() {
 }
 
 let groupCache = { key: '', list: null, busy: false };
+let bookGroupCache = { list: null, busy: false };
+let bookLetterCache = { letter: '', ids: null, busy: false };
 function loadGroups(B) {
   const key = (B.q || '') + '\u0000' + (B.sstate || 'all') + '\u0000' + (B.genre || 'all') + '\u0000' + (B.year || 'all');
   if (groupCache.key === key) return;
@@ -3194,36 +2330,122 @@ function deleteLibrary(id) {
       $('#modal [data-ok]').onclick = () => {
         if ($('#dlIn').value.trim() !== '删除') return toast('确认词不对', 'err');
         LantaiRuntime.request('api/v1/libraries/' + id, { method: 'DELETE' })
-          .then(() => { closeModal(); toast('书库已删除', 'ok'); return LantaiRuntime.hydrate(); })
-          .then(() => go('/libraries'))
+          .then(() => { closeModal(); toast('书库已删除', 'ok'); return LantaiRuntime.hydrate(true); })
+          .then(() => { if (S.route === '/libraries') render(); else go('/libraries'); })
           .catch(e => toast('删除失败：' + onlineErrText(e), 'err'));
       };
     }
   });
 }
 
+let etTimer = null, etSeq = 0;
+function etStop() {
+  if (etTimer) { clearTimeout(etTimer); etTimer = null; }
+  etSeq++;
+}
+function etView(html, foot) {
+  const b = $('#mBody');
+  if (!b) return;
+  b.innerHTML = html;
+  if (foot != null) {
+    $('#mFoot').innerHTML = foot;
+    const x = $('#modal [data-x]');
+    if (x) x.onclick = closeModal;
+  }
+}
+function etWaitHtml(label, sec, extra) {
+  return '<div class="rowflex" style="gap:12px;align-items:center"><div class="spinner"></div><div>' +
+    '<div style="font-size:13px">' + esc(label) + '</div>' +
+    '<div class="mini">已等待 ' + sec + ' 秒' + (extra ? ' · ' + esc(extra) : '') + '</div></div></div>';
+}
+function etRefresh() {
+  trashData = null; trashErr = '';
+  LantaiRuntime.hydrate(true).catch(() => {}).then(() => {
+    if (S.route === '/trash') loadTrash();
+    if (String(S.route).indexOf('/settings') === 0) loadLibStats(true);
+    render();
+  });
+}
+function etWatch(id) {
+  const seq = etSeq, started = Date.now();
+  let seen = false, ticks = 0;
+  const sec = () => Math.round((Date.now() - started) / 1000);
+  const done = timeout => {
+    etStop();
+    etRefresh();
+    etView('<div class="note ' + (timeout ? 'gold' : '') + '">' + ico('trash') + ' ' + (timeout ? '任务仍在后台进行' : '清空任务已结束') + '</div>' +
+      '<div class="mini" style="margin-top:10px">' + (timeout ? '可先关闭本窗口，稍后到任务页查看进度。' : '回收站与书库数据已刷新。若条目仍在，可在任务页「已完成」里查看失败原因。') + '</div>',
+      '<button class="btn" data-x>关闭</button>');
+    if (!timeout) toast('清空任务已结束', 'ok');
+  };
+  const step = () => {
+    if (seq !== etSeq) return;
+    ticks++;
+    LantaiRuntime.request('api/lantai/v1/tasks?type=EmptyTrash&size=500')
+      .then(d => {
+        if (seq !== etSeq) return;
+        const t = ((d && d.tasks) || []).filter(x => x.libraryId === id).pop();
+        if (t) {
+          seen = true;
+          etView(etWaitHtml(t.owner ? '正在清空回收站…' : '排队中，等待后台任务…', sec(),
+            num(d.running || 0) + ' 进行 / ' + num(d.queued || 0) + ' 排队'), '<button class="btn" data-x>后台进行</button>');
+        } else if (seen || ticks >= 2) {
+          return done(false);
+        }
+        if (sec() > 600) return done(true);
+        etTimer = setTimeout(step, 1200);
+      })
+      .catch(() => {
+        if (seq !== etSeq) return;
+        if (ticks >= 5) {
+          etStop();
+          etView('<div class="note red">' + ico('alert') + ' 读取任务状态失败，清空仍在后台进行</div>' +
+            '<div class="mini" style="margin-top:10px">可到任务页查看进度。</div>', '<button class="btn" data-x>关闭</button>');
+          return;
+        }
+        etTimer = setTimeout(step, 2000);
+      });
+  };
+  step();
+}
 function emptyLibTrash(id) {
   const l = lib(id);
+  etStop();
   openModal({
     title: '清空库回收站', width: 460,
     body: '<div class="note red">清空「' + esc(l ? l.name : id) + '」的回收站目录，其中的文件会被彻底删除，不可恢复。</div>' +
       '<div class="field" style="margin-top:10px"><label>输入「清空」确认</label><input class="inp" id="etIn" autocomplete="off"></div>',
     foot: '<button class="btn" data-x>取消</button><button class="btn danger" data-ok>确认清空</button>',
+    onClose: etStop,
     after() {
       $('#modal [data-x]').onclick = closeModal;
       $('#modal [data-ok]').onclick = () => {
         if ($('#etIn').value.trim() !== '清空') return toast('确认词不对', 'err');
+        const ok = $('#modal [data-ok]');
+        ok.disabled = true;
+        ok.textContent = '提交中…';
         LantaiRuntime.request('api/v1/libraries/' + id + '/empty-trash', { method: 'POST' })
-          .then(() => { closeModal(); toast('已提交清空任务', 'ok'); })
-          .catch(e => toast('提交失败：' + onlineErrText(e), 'err'));
+          .then(() => { etSeq++; etWatch(id); })
+          .catch(e => {
+            ok.disabled = false;
+            ok.textContent = '确认清空';
+            toast('提交失败：' + onlineErrText(e), 'err');
+          });
       };
     }
   });
 }
 
-function bulkBarHtml(n) {
+function pickChipsHtml(B, allPicked, n) {
+  return '<span class="chip' + (B.pick ? ' on' : '') + '" data-bulk-mode>' + (B.pick ? '退出多选' : '多选') + '</span>' +
+    (B.pick ? '<span class="chip' + (allPicked ? ' on' : '') + '" data-bulk-all>' + (allPicked ? '取消全选' : '全选本页') + '</span>' : '') +
+    (B.pick && n ? '<span class="chip" data-bulk-clear>清空 ' + n + '</span>' : '');
+}
+
+function bulkBarHtml(n, mode) {
+  const unit = mode === 'books' ? ' 本书' : ' 个系列';
   return '<div class="bulkbar">' +
-    '<div class="bulkbar-top"><span class="mini">已选 <b>' + n + '</b> 个系列</span><span class="mini" id="bulkProg"></span>' +
+    '<div class="bulkbar-top"><span class="mini">已选 <b>' + n + '</b>' + unit + '</span><span class="mini" id="bulkProg"></span>' +
     '<button class="btn xs ghost" data-bulk="clear" style="margin-left:auto">取消选择</button></div>' +
     '<div class="bulkbar-row">' +
     '<button class="btn sm pri" data-bulk="download">' + ico('dl') + '批量下载</button>' +
@@ -3240,28 +2462,41 @@ function bulkBarHtml(n) {
     '</div></div>';
 }
 
-function bulkAction(kind) {
-  const ids = Object.keys(S.browse.sel).filter(id => series(id));
-  if (!ids.length) return toast('先选系列', 'err');
+function seriesOfBooks(bookIds) {
+  const out = [];
+  bookIds.forEach(id => { const b = book(id); if (b && out.indexOf(b.s) < 0) out.push(b.s); });
+  return out;
+}
+
+function bulkAction(kind, mode) {
+  const byBook = mode === 'books';
+  const ids = Object.keys(S.browse.sel).filter(id => (byBook ? book(id) : series(id)));
+  if (!ids.length) return toast(byBook ? '先选书籍' : '先选系列', 'err');
   if (kind === 'clear') { S.browse.sel = {}; return render(); }
   if (!window.LantaiRuntime) return toast('后端不可用', 'err');
+  const sids = byBook ? seriesOfBooks(ids) : ids;
   if (kind === 'read' || kind === 'unread') {
-    const m = kind === 'read' ? 'POST' : 'DELETE';
-    return Promise.all(ids.map(id => LantaiRuntime.request('api/v1/series/' + id + '/read-progress', { method: m }).catch(() => null)))
+    const list = byBook ? ids : ids;
+    const req = id => byBook
+      ? (kind === 'read'
+        ? LantaiRuntime.request('api/v1/books/' + id + '/read-progress', { method: 'PATCH', body: { completed: true } })
+        : LantaiRuntime.request('api/v1/books/' + id + '/read-progress', { method: 'DELETE' }))
+      : LantaiRuntime.request('api/v1/series/' + id + '/read-progress', { method: kind === 'read' ? 'POST' : 'DELETE' });
+    return Promise.all(list.map(id => req(id).then(() => true).catch(() => null)))
       .then(res => {
         const ok = res.filter(x => x !== null).length;
-        toast('已处理 ' + ok + ' / ' + ids.length + ' 个系列', ok === ids.length ? 'ok' : 'warn');
+        toast('已处理 ' + ok + ' / ' + list.length + (byBook ? ' 本书' : ' 个系列'), ok === list.length ? 'ok' : 'warn');
         S.browse.sel = {};
         return LantaiRuntime.hydrate();
       }).then(() => render());
   }
-  if (kind === 'coll') return pickTarget('coll', ids);
-  if (kind === 'list') return pickTarget('list', ids.flatMap(sid => booksOf(sid).map(b => b.id)));
-  if (kind === 'del') return bulkDelete(ids);
-  if (kind === 'download') return bulkDownload(ids);
-  if (kind === 'reparse') return bulkReparse(ids);
-  if (kind === 'enqueue') return bulkScrape(ids, false);
-  if (kind === 'exclude') return bulkExclude(ids);
+  if (kind === 'coll') return pickTarget('coll', sids);
+  if (kind === 'list') return pickTarget('list', byBook ? ids : ids.flatMap(sid => booksOf(sid).map(b => b.id)));
+  if (kind === 'del') return byBook ? bulkDeleteBooks(ids) : bulkDelete(ids);
+  if (kind === 'download') return byBook ? bulkDownloadBooks(ids) : bulkDownload(ids);
+  if (kind === 'reparse') return bulkReparse(sids);
+  if (kind === 'enqueue') return bulkScrape(sids, false, byBook ? ids : null);
+  if (kind === 'exclude') return bulkExclude(sids);
 }
 
 function bulkProg(text) {
@@ -3317,6 +2552,73 @@ function bulkDownload(ids) {
   });
 }
 
+function bulkDownloadBooks(bookIds) {
+  const items = [];
+  let skipped = 0;
+  bookIds.forEach(id => {
+    const b = book(id);
+    if (!b) return;
+    if (isOnlineBook(b) && b.downloaded === false) { skipped++; return; }
+    items.push(b);
+  });
+  if (!items.length) return toast('所选书籍没有可下载的文件' + (skipped ? '，在线未存档章节需先存档' : ''), 'err', 3600);
+  const LIMIT = 60;
+  const cut = Math.min(items.length, LIMIT);
+  openModal({
+    title: '批量下载', width: 480,
+    body: '<div class="note">按原始格式逐个下载 <b>' + cut + '</b> 个文件（epub / txt / cbz / pdf 原样，图片文件夹打包为 zip）。</div>' +
+      (skipped ? '<div class="note gold" style="margin-top:10px">跳过 ' + skipped + ' 个在线未存档章节，需要先在书籍详情里存档为 CBZ。</div>' : '') +
+      (items.length > LIMIT ? '<div class="note red" style="margin-top:10px">本次选中 ' + items.length + ' 个文件，超过单批上限 ' + LIMIT + '。先下载前 ' + LIMIT + ' 个，其余请分批。</div>' : '') +
+      '<div class="note" style="margin-top:10px">浏览器会询问「允许下载多个文件」，请点允许。</div>',
+    foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>开始下载 ' + cut + ' 个</button>',
+    after() {
+      $('#modal [data-x]').onclick = closeModal;
+      $('#modal [data-ok]').onclick = () => {
+        closeModal();
+        let i = 0;
+        const step = () => {
+          if (i >= cut) { bulkProg(''); toast('已发起 ' + cut + ' 个文件下载', 'ok', 3600); return; }
+          const b = items[i++];
+          bulkProg('下载 ' + i + ' / ' + cut);
+          const a = document.createElement('a');
+          a.href = 'api/v1/books/' + b.id + '/file';
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(step, 420);
+        };
+        step();
+      };
+    }
+  });
+}
+
+function bulkDeleteBooks(bookIds) {
+  openModal({
+    title: '删除书籍文件', width: 460,
+    body: '<div class="note red">把选中 ' + bookIds.length + ' 本书的文件移入回收站，可在回收站恢复。</div>' +
+      '<div class="field" style="margin-top:10px"><label>输入「删除」确认</label><input class="inp" id="bdIn" autocomplete="off"></div>',
+    foot: '<button class="btn" data-x>取消</button><button class="btn danger" data-ok>确认删除</button>',
+    after() {
+      $('#modal [data-x]').onclick = closeModal;
+      $('#modal [data-ok]').onclick = () => {
+        if ($('#bdIn').value.trim() !== '删除') return toast('确认词不对', 'err');
+        const btn = $('#modal [data-ok]');
+        btn.disabled = true;
+        Promise.all(bookIds.map(id => LantaiRuntime.request('api/v1/books/' + id + '/file', { method: 'DELETE' }).catch(() => null)))
+          .then(res => {
+            const ok = res.filter(x => x !== null).length;
+            closeModal();
+            toast('已删除 ' + ok + ' / ' + bookIds.length + ' 本书', ok === bookIds.length ? 'ok' : 'warn');
+            S.browse.sel = {};
+            return LantaiRuntime.hydrate();
+          }).then(() => render());
+      };
+    }
+  });
+}
+
 function bulkReparse(ids) {
   openModal({
     title: '重新解析', width: 480,
@@ -3347,11 +2649,16 @@ function bulkReparse(ids) {
   });
 }
 
-function bulkScrape(ids, run) {
+function bulkScrape(ids, run, bookIds) {
+  const byBook = Array.isArray(bookIds) && bookIds.length > 0;
   const label = run ? '重新刮削' : '加入刮削名单';
+  const scope = byBook
+    ? '已选 <b>' + bookIds.length + '</b> 本书，分属 <b>' + ids.length + '</b> 个系列'
+    : '<b>' + ids.length + '</b> 个系列';
   openModal({
     title: label, width: 480,
-    body: '<div class="note">把 <b>' + ids.length + '</b> 个系列' + (run ? '加入刮削名单并立即开始刮削。' : '加入刮削名单，稍后在刮削页统一开始刮削。') + '</div>' +
+    body: '<div class="note">' + scope + (run ? ' 加入刮削名单并立即开始刮削。' : ' 加入刮削名单，稍后在刮削页统一开始刮削。') + '</div>' +
+      (byBook ? '<div class="note" style="margin-top:10px">只登记选中的 ' + bookIds.length + ' 册：检索仍按系列进行，但写入只落在选中的册上，同系列其余册不受影响。</div>' : '') +
       '<div class="note gold" style="margin-top:10px">' + (run ? '会消耗元数据源配额，已存在的名单项会被跳过。' : '只登记不请求，开始刮削时才消耗配额。') + '</div>',
     foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>' + (run ? '开始刮削' : '加入名单') + '</button>',
     after() {
@@ -3359,13 +2666,14 @@ function bulkScrape(ids, run) {
       $('#modal [data-ok]').onclick = () => {
         const btn = $('#modal [data-ok]');
         btn.disabled = true;
-        LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: { seriesIds: ids, run: run } })
+        LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: byBook ? { bookIds: bookIds, run: run } : { seriesIds: ids, run: run } })
           .then(r => {
             closeModal();
-            scPage = null;
-            toast('已加入 ' + r.added + ' 个' + (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
+            toast('已登记 ' + r.added + ' 个系列' + (byBook ? '、' + bookIds.length + ' 册' : '') +
+              (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
             S.browse.sel = {};
             render();
+            loadScrape();
           })
           .catch(e => { btn.disabled = false; toast('提交失败：' + onlineErrText(e), 'err'); });
       };
@@ -3626,8 +2934,12 @@ function modeBarHtml(B) {
 }
 function wireModeChips(v) {
   v.querySelectorAll('[data-bmode]').forEach(el => el.onclick = () => {
+    if (S.browse.mode === el.dataset.bmode) return;
     S.browse.mode = el.dataset.bmode;
     S.browse.pg = 1;
+    S.browse.letter = '';
+    S.browse.sel = {};
+    bookLetterCache = { letter: '', ids: null, busy: false };
     render();
     $('#view').scrollTop = 0;
   });
@@ -3638,20 +2950,131 @@ function wireModeChips(v) {
     $('#view').scrollTop = 0;
   });
 }
-function bookCard(b) {
+const bookTitle = b => (b.mdTitle && String(b.mdTitle).trim()) ? String(b.mdTitle).trim() : b.name;
+const bookFileSub = b => bookTitle(b) === b.name ? '' : b.name;
+const bookNumCn = b => { const n = String(b.mdNum || '').trim(); return n ? '第 ' + n + ' 册' : ''; };
+function libSourceNames() {
+  return [...new Set(SERIES.filter(s => s.online).map(s => s.publisher).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh'));
+}
+function libRefValues(mode) {
+  if (mode === 'books') {
+    const years = [...new Set(BOOKS.map(b => String(b.pub || '').slice(0, 4) || String(seriesOf(b).year || '')).filter(y => y && y !== 'null'))].sort((a, b) => Number(b) - Number(a));
+    const genres = [...new Set(BOOKS.flatMap(b => seriesOf(b).genres || []))].sort((a, b) => a.localeCompare(b, 'zh'));
+    return { years: years, genres: genres };
+  }
+  const rawYears = refCache.years && refCache.years.length ? refCache.years : SERIES.map(s => s.year).filter(Boolean);
+  const years = [...new Set(rawYears.map(y => String(y).slice(0, 4)).filter(Boolean))].sort((a, b) => Number(b) - Number(a));
+  const genres = refCache.genres && refCache.genres.length ? refCache.genres : [...new Set(SERIES.flatMap(s => s.genres || []))].sort((a, b) => a.localeCompare(b, 'zh'));
+  return { years: years, genres: genres };
+}
+function fchip(attr, key, val, label, B) {
+  return '<span class="chip' + ((B[key] || 'all') === val ? ' on' : '') + '" data-' + attr + '="' + esc(val) + '">' + esc(label) + '</span>';
+}
+function libLetterBarHtml(B, mode) {
+  const raw = mode === 'books' ? (bookGroupCache.list || []) : (groupCache.list || []);
+  const groups = raw.filter(g => g && g.group && g.group !== '#' && g.count > 0);
+  const hash = raw.find(g => g && g.group === '#');
+  if (!groups.length && !hash) return '';
+  const list = groups.concat(hash ? [hash] : []);
+  return '<div class="filters"><span class="lbl" style="margin:0">首字母</span><div class="chips">' +
+    '<span class="chip' + (!B.letter ? ' on' : '') + '" data-bletter="">全部</span>' +
+    list.map(g => '<span class="chip' + (B.letter === g.group ? ' on' : '') + '" data-bletter="' + esc(g.group) + '">' + esc(g.group) +
+      '<span class="mini" style="opacity:.55;margin-left:4px">' + g.count + '</span></span>').join('') + '</div></div>';
+}
+function libFilterHtml(B, mode) {
+  const ref = libRefValues(mode), srcNames = libSourceNames();
+  return '<div class="filters">' +
+    (srcNames.length
+      ? '<span class="lbl" style="margin:0">图源</span><div class="chips">' +
+        '<span class="chip' + (B.src === 'all' ? ' on' : '') + '" data-libsrc="all">全部（' + srcNames.length + '）</span>' +
+        srcNames.map(x => '<span class="chip' + (B.src === x ? ' on' : '') + '" data-libsrc="' + esc(x) + '">' + esc(x) + '</span>').join('') +
+        '</div><span class="sep"></span>'
+      : '') +
+    '<span class="lbl" style="margin:0">格式</span><div class="chips">' +
+    fchip('bfmt', 'fmt', 'all', '全部', B) + ['cbx', 'epub', 'pdf', 'txt'].map(x => fchip('bfmt', 'fmt', x, SCAN_CN[x], B)).join('') + '</div>' +
+    '<span class="sep"></span><span class="lbl" style="margin:0">连载</span><div class="chips">' +
+    fchip('bstate', 'sstate', 'all', '全部', B) + ['ONGOING', 'COMPLETED', 'HIATUS'].map(x => fchip('bstate', 'sstate', x, SERIES_STATUS_CN[x], B)).join('') + '</div>' +
+    '<span class="sep"></span><span class="lbl" style="margin:0">年份</span><div class="chips">' +
+    fchip('byear', 'year', 'all', '全部', B) + (ref.years.length ? ref.years.map(y => fchip('byear', 'year', String(y), String(y), B)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
+    '<span class="sep"></span><span class="lbl" style="margin:0">风格</span><div class="chips">' +
+    fchip('bgenre', 'genre', 'all', '全部', B) + (ref.genres.length ? ref.genres.slice(0, 12).map(g => fchip('bgenre', 'genre', g, g, B)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
+    '</div>';
+}
+function libSortBarHtml(B, mode, extra) {
+  const sorts = mode === 'books'
+    ? [['updated', '按更新'], ['title', '按标题'], ['series', '按系列']]
+    : [['updated', '按更新'], ['title', '按标题'], ['count', '按册数']];
+  return '<div class="filters">' +
+    '<span class="lbl" style="margin:0">排序</span><div class="chips">' +
+    sorts.map(x => '<span class="chip' + ((B.sort || 'updated') === x[0] ? ' on' : '') + '" data-bsort="' + x[0] + '">' + x[1] + '</span>').join('') + '</div>' +
+    '<span class="sep"></span><div class="chips">' + (extra || '') + '</div>' +
+    '<input class="inp" style="width:190px;height:31px;margin-left:auto" placeholder="' + (mode === 'books' ? '搜索书名或系列…' : '搜索标题或作者…') + '" value="' + esc(B.q) + '" data-q>' +
+    '<div class="seg"><button class="' + (B.view === 'grid' ? 'on' : '') + '" data-view="grid">' + ico('grid') + '</button><button class="' + (B.view === 'list' ? 'on' : '') + '" data-view="list">' + ico('list') + '</button></div>' +
+    '</div>';
+}
+function wireLibFilters(v, B) {
+  v.querySelectorAll('[data-bfmt]').forEach(el => el.onclick = () => { B.fmt = el.dataset.bfmt; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bstate]').forEach(el => el.onclick = () => { B.sstate = el.dataset.bstate; B.pg = 1; render(); });
+  v.querySelectorAll('[data-byear]').forEach(el => el.onclick = () => { B.year = el.dataset.byear; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bgenre]').forEach(el => el.onclick = () => { B.genre = el.dataset.bgenre; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bletter]').forEach(el => el.onclick = () => {
+    B.letter = el.dataset.bletter || '';
+    B.pg = 1;
+    if (B.mode === 'books') bookLetterCache = { letter: B.letter, ids: null, busy: false };
+    else { groupCache.key = ''; }
+    render();
+  });
+  v.querySelectorAll('[data-bsort]').forEach(el => el.onclick = () => { B.sort = el.dataset.bsort; B.pg = 1; render(); });
+}
+function bookCard(b, pickSel) {
   const s = seriesOf(b), p = prog(b.id), pct = p && p.pages ? Math.round(p.page / p.pages * 100) : 0;
-  return '<div class="cv" data-book="' + b.id + '">' +
-    coverArt((s.t || '') + b.name, b.name, { id: b.id, kind: 'book', fmt: b.profile, vert: false, badge: isOnlineBook(b) ? '<span class="badge gold">在线</span>' : '' }) +
-    '<div class="cv-meta"><div class="t">' + esc(b.name) + '</div>' +
+  const t = bookTitle(b), n = bookNumCn(b);
+  const box = (pickSel === undefined || pickSel === null) ? ''
+    : '<span class="pkbox' + (pickSel ? ' on' : '') + '" data-pick-b="' + b.id + '" title="选择">' + (pickSel ? '✓' : '') + '</span>';
+  return '<div class="cv pk-wrap" data-book="' + b.id + '">' + box +
+    coverArt((s.t || '') + t, t, { id: b.id, kind: 'book', fmt: b.profile, vert: false, badge: isOnlineBook(b) ? '<span class="badge gold">在线</span>' : (n ? '<span class="st-badge">' + n + '</span>' : '') }) +
+    '<div class="cv-meta"><div class="t">' + esc(t) + '</div>' +
     '<div class="s"><span>' + esc(s.t || '—') + '</span><span style="margin-left:auto">' + bytes(b.size) + '</span></div>' +
     (p ? '<div class="pbar"><i class="' + (p.completed ? 'done' : '') + '" style="width:' + pct + '%"></i></div>' : '') + '</div></div>';
 }
+function runBookLetter(B) {
+  const letter = B.letter || '';
+  if (!letter) return null;
+  if (bookLetterCache.letter === letter) return bookLetterCache.ids;
+  if (!bookLetterCache.busy) {
+    bookLetterCache = { letter: letter, ids: null, busy: true };
+    LantaiRuntime.bookLetterIds(letter)
+      .catch(() => [])
+      .then(ids => {
+        if (bookLetterCache.letter !== letter) return;
+        bookLetterCache.ids = ids || [];
+        bookLetterCache.busy = false;
+        if (String(S.route).indexOf('/browse') === 0) render();
+      });
+  }
+  return null;
+}
+function loadBookGroups() {
+  if (bookGroupCache.busy || (bookGroupCache.list && bookGroupCache.list.length) || !LantaiRuntime.bookLetterGroups) return;
+  bookGroupCache.busy = true;
+  LantaiRuntime.bookLetterGroups()
+    .catch(() => [])
+    .then(list => {
+      bookGroupCache.list = list || [];
+      bookGroupCache.busy = false;
+      if (String(S.route).indexOf('/browse') === 0) render();
+    });
+}
 function renderBooksPage(v, l) {
   const B = S.browse;
-  if (l && ensureCatalog('series', v)) return;
-  if (ensureCatalog('books', v)) return;
+  const gapBooks = catalogGap('books');
+  const gapSeries = catalogGap('series');
+  loadBookGroups();
   if (B.fmt !== 'all' && ['cbx', 'epub', 'pdf', 'txt'].indexOf(B.fmt) < 0) B.fmt = FMT_GROUP(B.fmt) || 'all';
   const CT2 = catalogTotal();
+  const srcNames = libSourceNames();
+  if (B.src !== 'all' && srcNames.indexOf(B.src) < 0) B.src = 'all';
+  const letterIds = runBookLetter(B);
   let list = (l
     ? BOOKS.filter(b => { const s = series(b.s); return !!s && s.lib === l.id; })
     : BOOKS.slice()).filter(b => {
@@ -3659,10 +3082,15 @@ function renderBooksPage(v, l) {
       if (B.bsrc === 'online') return isOnlineBook(b);
       return true;
     });
+  if (B.src !== 'all') list = list.filter(b => (seriesOf(b).publisher || '') === B.src);
   if (B.fmt !== 'all') list = list.filter(b => FMT_GROUP(b.profile) === B.fmt);
-  if (B.q) list = list.filter(b => b.name.indexOf(B.q) >= 0 || seriesOf(b).t.indexOf(B.q) >= 0);
+  if (B.sstate !== 'all') list = list.filter(b => seriesOf(b).status === B.sstate);
+  if (B.year !== 'all') list = list.filter(b => (String(b.pub || '').slice(0, 4) || String(seriesOf(b).year || '')) === B.year);
+  if (B.genre !== 'all') list = list.filter(b => (seriesOf(b).genres || []).indexOf(B.genre) >= 0);
+  if (B.q) list = list.filter(b => bookTitle(b).indexOf(B.q) >= 0 || b.name.indexOf(B.q) >= 0 || seriesOf(b).t.indexOf(B.q) >= 0);
+  if (letterIds) { const set = new Set(letterIds); list = list.filter(b => set.has(b.id)); }
   const sk = b => String(b.last || b.added || '');
-  list.sort((a, b) => B.sort === 'title' ? a.name.localeCompare(b.name, 'zh')
+  list.sort((a, b) => B.sort === 'title' ? bookTitle(a).localeCompare(bookTitle(b), 'zh')
     : B.sort === 'series' ? (seriesOf(a).t + '\u0000' + String(a.num || '')).localeCompare(seriesOf(b).t + '\u0000' + String(b.num || ''), 'zh')
       : sk(b).localeCompare(sk(a)));
 
@@ -3672,56 +3100,71 @@ function renderBooksPage(v, l) {
   B.pg = clamp(Number(B.pg) || 1, 1, pgMax);
   const pageList = pgAll ? list : list.slice((B.pg - 1) * pgSize, (B.pg - 1) * pgSize + pgSize);
   const sizeAll = list.reduce((a, b) => a + b.size, 0);
+  const letterNote = (B.letter && !letterIds) ? '<span class="badge">检索中</span>' : '';
   const head = l
     ? '<div class="crumb"><a data-go="/browse">书库</a><i>/</i><b>' + esc(l.name) + '</b></div>' +
-      '<div class="ph"><div><h1>' + esc(l.name) + ' <span class="badge ' + (l.type === 'ONLINE' ? 'gold' : 'moss') + '">' + (TYPE_CN[l.type] || l.type) + '</span></h1>' +
+      '<div class="ph"><div><h1>' + esc(l.name) + ' <span class="badge ' + (l.type === 'ONLINE' ? 'gold' : 'moss') + '">' + (TYPE_CN[l.type] || l.type) + '</span>' + gapBooks + '</h1>' +
       '<div class="sub mono">' + esc(l.root) + ' · ' + (INTERVAL_CN[l.interval] || l.interval) + '扫描 · ' + num(list.length) + ' 册 · ' + bytes(sizeAll) + '</div></div>' +
       '<div class="acts">' + (l.type === 'ONLINE'
         ? '<span class="badge warn">' + ico('shield') + ' 受管库 · 扫描入口已隐藏</span><button class="btn" data-go="/online">' + ico('globe') + '在线源入口</button>'
         : '<button class="btn" data-act="scanlib" data-id="' + l.id + '">' + ico('sync') + '扫描库</button><button class="btn" data-editlib="' + l.id + '">' + ico('edit') + '编辑</button>') +
       '<button class="btn pri" data-act="addbook">' + ico('plus') + '导入书籍</button></div></div>'
-    : '<div class="ph"><div><h1>书库</h1><div class="sub">全部 ' + num(CT2.series) + ' 系列 · ' + num(CT2.books) + ' 册 · ' + bytes(sizeAll) + '</div></div>' +
+    : '<div class="ph"><div><h1>书库 ' + letterNote + gapBooks + gapSeries + '</h1><div class="sub">全部 ' + num(CT2.series) + ' 系列 · ' + num(CT2.books) + ' 册 · ' + bytes(sizeAll) + '</div></div>' +
       '<div class="acts"><button class="btn pri" data-go="/scrape">' + ico('wand') + '刮削与元数据</button><button class="btn" data-go="/libraries">' + ico('settings') + '书库设置</button></div></div>';
 
+  const sel = B.sel || (B.sel = {});
+  const picked = Object.keys(sel).filter(id => book(id));
+  const allPicked = pageList.length > 0 && pageList.every(b => sel[b.id]);
+
   v.innerHTML = head + modeBarHtml(B) +
-    '<div class="filters"><span class="lbl" style="margin:0">格式</span><div class="chips">' +
-    '<span class="chip' + (B.fmt === 'all' ? ' on' : '') + '" data-bfmt="all">全部</span>' +
-    ['cbx', 'epub', 'pdf', 'txt'].map(x => '<span class="chip' + (B.fmt === x ? ' on' : '') + '" data-bfmt="' + x + '">' + SCAN_CN[x] + '</span>').join('') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">排序</span><div class="chips">' +
-    '<span class="chip' + (B.sort !== 'title' && B.sort !== 'series' ? ' on' : '') + '" data-bsort="updated">按更新</span>' +
-    '<span class="chip' + (B.sort === 'title' ? ' on' : '') + '" data-bsort="title">按标题</span>' +
-    '<span class="chip' + (B.sort === 'series' ? ' on' : '') + '" data-bsort="series">按系列</span></div>' +
-    '<input class="inp" style="width:190px;height:31px;margin-left:auto" placeholder="搜索书名或系列…" value="' + esc(B.q) + '" data-q>' +
-    '<div class="seg"><button class="' + (B.view === 'grid' ? 'on' : '') + '" data-view="grid">' + ico('grid') + '</button><button class="' + (B.view === 'list' ? 'on' : '') + '" data-view="list">' + ico('list') + '</button></div>' +
-    '</div>';
+    libLetterBarHtml(B, 'books') +
+    libFilterHtml(B, 'books') +
+    libSortBarHtml(B, 'books', pickChipsHtml(B, allPicked, picked.length));
 
   if (!pageList.length) {
-    v.insertAdjacentHTML('beforeend', '<div class="empty"><svg><use href="#i-book"/></svg><h4>没有符合条件的书籍</h4><p>换一个格式或关键词，或切回按系列。</p></div>');
+    const msg = (B.letter || B.fmt !== 'all' || B.sstate !== 'all' || B.year !== 'all' || B.genre !== 'all' || B.src !== 'all' || B.q)
+      ? '<div class="empty"><svg><use href="#i-book"/></svg><h4>没有符合条件的书籍</h4><p>换一个筛选条件，或切回按系列。</p></div>'
+      : '<div class="empty"><svg><use href="#i-book"/></svg><h4>还没有书籍</h4><p>导入或扫描书库后这里会出现全部书籍。</p></div>';
+    v.insertAdjacentHTML('beforeend', msg);
   } else if (B.view === 'grid') {
-    const ck = chunkList(pageList, b => bookCard(b));
+    const ck = chunkList(pageList, b => bookCard(b, B.pick ? !!sel[b.id] : null));
     v.insertAdjacentHTML('beforeend', '<div class="shelf" data-chunk>' + ck.head + '</div>');
     mountChunked(v, ck);
   } else {
-    const ck = chunkList(pageList, b => bookRow(b));
-    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody data-chunk>' + ck.head + '</tbody></table></div>');
+    const ck = chunkList(pageList, b => bookRow(b, B.pick ? !!sel[b.id] : null));
+    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr>' + (B.pick ? '<th></th>' : '') + '<th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody data-chunk>' + ck.head + '</tbody></table></div>');
     mountChunked(v, ck);
   }
   v.setAttribute('data-total', String(list.length));
   v.insertAdjacentHTML('beforeend', pagerHtml(B, list.length));
   wirePager(v, B);
+
+  if (B.pick && picked.length) v.insertAdjacentHTML('beforeend', bulkBarHtml(picked.length, 'books'));
+
   wire(v);
-  v.querySelectorAll('[data-bfmt]').forEach(el => el.onclick = () => { B.fmt = el.dataset.bfmt; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bsort]').forEach(el => el.onclick = () => { B.sort = el.dataset.bsort; B.pg = 1; render(); });
+  wireLibFilters(v, B);
   wireModeChips(v);
+
+  const bm = v.querySelector('[data-bulk-mode]');
+  if (bm) bm.onclick = () => { B.pick = !B.pick; if (!B.pick) B.sel = {}; render(); };
+  v.querySelectorAll('[data-bulk]').forEach(el => el.onclick = () => bulkAction(el.dataset.bulk, 'books'));
+  v.querySelectorAll('[data-pick-b]').forEach(el => el.onclick = e => {
+    e.stopPropagation();
+    const id = el.dataset.pickB;
+    if (B.sel[id]) delete B.sel[id]; else B.sel[id] = 1;
+    render();
+  });
+  const allBtn = v.querySelector('[data-bulk-all]');
+  if (allBtn) allBtn.onclick = () => { pageList.forEach(b => { if (allPicked) delete B.sel[b.id]; else B.sel[b.id] = 1; }); render(); };
+  const clr = v.querySelector('[data-bulk-clear]');
+  if (clr) clr.onclick = () => { B.sel = {}; render(); };
 }
 function renderAllSeries(v) {
   const B = S.browse;
   if (B.mode === 'books') return renderBooksPage(v, null);
   const sel = B.sel;
-  if (B.q || B.letter || B.fmt !== 'all' || B.sstate !== 'all' || B.year !== 'all' || B.genre !== 'all') {
-    if (ensureCatalog('series', v)) return;
-    if (B.fmt !== 'all' && ensureCatalog('books', v)) return;
-  }
+  const gapSeries = catalogGap('series');
+  const gapBooks = B.fmt !== 'all' ? catalogGap('books') : '';
   runBrowseSearch(B);
   loadRef();
   loadGroups(B);
@@ -3749,65 +3192,25 @@ function renderAllSeries(v) {
   B.pg = clamp(Number(B.pg) || 1, 1, pgMax);
   const pageList = pgAll ? list : list.slice((B.pg - 1) * pgSize, (B.pg - 1) * pgSize + pgSize);
 
-  const rawYears = refCache.years && refCache.years.length ? refCache.years : SERIES.map(s => s.year).filter(Boolean);
-  const years = [...new Set(rawYears.map(y => String(y).slice(0, 4)).filter(Boolean))].sort((a, b) => Number(b) - Number(a));
-  const genres = refCache.genres && refCache.genres.length ? refCache.genres : [...new Set(SERIES.flatMap(s => s.genres || []))].sort((a, b) => a.localeCompare(b, 'zh'));
   const CT2 = catalogTotal();
   const picked = Object.keys(sel).filter(id => series(id));
   const allPicked = pageList.length > 0 && pageList.every(s => sel[s.id]);
 
-  const chip = (attr, key, val, label) =>
-    '<span class="chip' + ((B[key] || 'all') === val ? ' on' : '') + '" data-' + attr + '="' + esc(val) + '">' + esc(label) + '</span>';
-
-  const gmap = {};
-  (groupCache.list || []).forEach(g => { gmap[g.group] = g.count; });
-  const groups = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(a => gmap[a]).map(a => ({ group: a, count: gmap[a] }));
-  if (gmap['#']) groups.push({ group: '#', count: gmap['#'] });
-  const letterBar = groups.length
-    ? '<div class="filters"><span class="lbl" style="margin:0">首字母</span><div class="chips">' +
-    '<span class="chip' + (!B.letter ? ' on' : '') + '" data-bletter="">全部</span>' +
-    groups.map(g => '<span class="chip' + (B.letter === g.group ? ' on' : '') + '" data-bletter="' + esc(g.group) + '">' + esc(g.group) +
-      '<span class="mini" style="opacity:.55;margin-left:4px">' + g.count + '</span></span>').join('') + '</div></div>'
-    : '';
   const searchState = (B.q || B.letter)
     ? (browseCache.key === browseKey(B) && browseCache.ids ? '<span class="badge ok">服务端检索</span>'
       : browseCache.busy ? '<span class="badge">检索中</span>' : '<span class="badge warn">本地匹配</span>')
     : '';
 
   v.innerHTML =
-    '<div class="ph"><div><h1>书库 ' + searchState + '</h1><div class="sub">全部 ' + CT2.series + ' 系列 · ' + CT2.books + ' 册' + (CT2.booksDone ? ' · ' + bytes(BOOKS.reduce((a, b) => a + b.size, 0)) : ' · 统计随加载更新') + '</div></div>' +
+    '<div class="ph"><div><h1>书库 ' + searchState + gapSeries + gapBooks + '</h1><div class="sub">全部 ' + CT2.series + ' 系列 · ' + CT2.books + ' 册' + (CT2.booksDone ? ' · ' + bytes(BOOKS.reduce((a, b) => a + b.size, 0)) : ' · 统计随加载更新') + '</div></div>' +
     '<div class="acts">' +
     '<button class="btn pri" data-go="/scrape">' + ico('wand') + '刮削与元数据</button>' +
     '<button class="btn" data-go="/libraries">' + ico('settings') + '书库设置</button>' +
     '</div></div>' +
     modeBarHtml(B) +
-    letterBar +
-    '<div class="filters">' +
-    (srcNames.length
-      ? '<span class="lbl" style="margin:0">图源</span><div class="chips">' +
-        '<span class="chip' + (B.src === 'all' ? ' on' : '') + '" data-libsrc="all">全部（' + srcNames.length + '）</span>' +
-        srcNames.map(x => '<span class="chip' + (B.src === x ? ' on' : '') + '" data-libsrc="' + esc(x) + '">' + esc(x) + '</span>').join('') +
-        '</div><span class="sep"></span>'
-      : '') +
-    '<span class="lbl" style="margin:0">格式</span><div class="chips">' +
-    chip('bfmt', 'fmt', 'all', '全部') + ['cbx', 'epub', 'pdf', 'txt'].map(x => chip('bfmt', 'fmt', x, SCAN_CN[x])).join('') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">连载</span><div class="chips">' +
-    chip('bstate', 'sstate', 'all', '全部') + ['ONGOING', 'COMPLETED', 'HIATUS'].map(x => chip('bstate', 'sstate', x, SERIES_STATUS_CN[x])).join('') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">年份</span><div class="chips">' +
-    chip('byear', 'year', 'all', '全部') + (years.length ? years.map(y => chip('byear', 'year', String(y), String(y))).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
-    '<span class="sep"></span><span class="lbl" style="margin:0">风格</span><div class="chips">' +
-    chip('bgenre', 'genre', 'all', '全部') + (genres.length ? genres.slice(0, 12).map(g => chip('bgenre', 'genre', g, g)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>') + '</div>' +
-    '</div>' +
-    '<div class="filters">' +
-    '<span class="lbl" style="margin:0">排序</span><div class="chips">' +
-    chip('bsort', 'sort', 'updated', '按更新') + chip('bsort', 'sort', 'title', '按标题') + chip('bsort', 'sort', 'count', '按册数') + '</div>' +
-    '<span class="sep"></span><div class="chips">' +
-    '<span class="chip' + (B.pick ? ' on' : '') + '" data-bulk-mode>' + (B.pick ? '退出多选' : '多选') + '</span>' +
-    (B.pick ? '<span class="chip' + (allPicked ? ' on' : '') + '" data-bulk-all>' + (allPicked ? '取消全选' : '全选本页') + '</span>' : '') +
-    (B.pick && picked.length ? '<span class="chip" data-bulk-clear>清空 ' + picked.length + '</span>' : '') + '</div>' +
-    '<input class="inp" style="width:190px;height:31px;margin-left:auto" placeholder="搜索标题或作者…" value="' + esc(B.q) + '" data-q>' +
-    '<div class="seg"><button class="' + (B.view === 'grid' ? 'on' : '') + '" data-view="grid">' + ico('grid') + '</button><button class="' + (B.view === 'list' ? 'on' : '') + '" data-view="list">' + ico('list') + '</button></div>' +
-    '</div>';
+    libLetterBarHtml(B, 'series') +
+    libFilterHtml(B, 'series') +
+    libSortBarHtml(B, 'series', pickChipsHtml(B, allPicked, picked.length));
 
   v.setAttribute('data-total', String(list.length));
   if (!pageList.length) {
@@ -3840,20 +3243,15 @@ function renderAllSeries(v) {
   v.insertAdjacentHTML('beforeend', pagerHtml(B, list.length));
   wirePager(v, B);
 
-  if (B.pick && picked.length) v.insertAdjacentHTML('beforeend', bulkBarHtml(picked.length));
+  if (B.pick && picked.length) v.insertAdjacentHTML('beforeend', bulkBarHtml(picked.length, 'series'));
 
   wire(v);
 
   const bm = v.querySelector('[data-bulk-mode]');
   if (bm) bm.onclick = () => { B.pick = !B.pick; if (!B.pick) S.browse.sel = {}; render(); };
 
-  v.querySelectorAll('[data-bulk]').forEach(el => el.onclick = () => bulkAction(el.dataset.bulk));
-  v.querySelectorAll('[data-bfmt]').forEach(el => el.onclick = () => { B.fmt = el.dataset.bfmt; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bstate]').forEach(el => el.onclick = () => { B.sstate = el.dataset.bstate; B.pg = 1; render(); });
-  v.querySelectorAll('[data-byear]').forEach(el => el.onclick = () => { B.year = el.dataset.byear; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bgenre]').forEach(el => el.onclick = () => { B.genre = el.dataset.bgenre; B.pg = 1; render(); });
-  v.querySelectorAll('[data-bletter]').forEach(el => el.onclick = () => { B.letter = el.dataset.bletter || ''; B.pg = 1; groupCache.key = ''; render(); });
-  v.querySelectorAll('[data-bsort]').forEach(el => el.onclick = () => { B.sort = el.dataset.bsort; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bulk]').forEach(el => el.onclick = () => bulkAction(el.dataset.bulk, 'series'));
+  wireLibFilters(v, B);
   v.querySelectorAll('[data-pick-s]').forEach(el => el.onclick = e => {
     e.stopPropagation();
     const id = el.dataset.pickS;
@@ -4062,6 +3460,8 @@ function editBookMeta(bid) {
       '<div class="grid g-2" style="gap:0 14px">' + mField('出版日期', 'bmDate', md.releaseDate, 'YYYY-MM-DD') + mField('ISBN', 'bmIsbn', md.isbn) + '</div>' +
       mArea('简介', 'bmSummary', md.summary) +
       mField('作者', 'bmAuthors', (md.authors || []).map(a => a.name).join(', '), '逗号分隔') +
+      '<div class="grid g-2" style="gap:0 14px">' + mField('出版社', 'bmPublisher', md.publisher) + mField('语言', 'bmLanguage', md.language) + '</div>' +
+      mField('分类', 'bmGenres', Array.from(md.genres || []).join(', '), '逗号分隔') +
       mField('标签', 'bmTags', Array.from(md.tags || []).join(', '), '逗号分隔'),
       () => {
         const body = {};
@@ -4074,6 +3474,10 @@ function editBookMeta(bid) {
         if (d) body.releaseDate = d;
         const au = mList(mVal('bmAuthors'));
         if (au.length) body.authors = au.map(n => ({ name: n }));
+        put('publisher', mVal('bmPublisher'));
+        put('language', mVal('bmLanguage'));
+        const g = mList(mVal('bmGenres'));
+        if (g.length) body.genres = g;
         const t = mList(mVal('bmTags'));
         if (t.length) body.tags = t;
         return LantaiRuntime.request('api/v1/books/' + bid + '/metadata', { method: 'PATCH', body: body })
@@ -4143,10 +3547,64 @@ function coverModal(kind, id, title) {
   }).catch(e => toast('封面读取失败：' + onlineErrText(e), 'err'));
 }
 
+function coverLightbox(kind, id, title) {
+  if (!window.LantaiRuntime || !id) return toast('后端不可用', 'err');
+  const seg = kind === 'series' ? 'series' : 'books';
+  const path = 'api/v1/' + seg + '/' + id;
+  const src = path + '/thumbnail?t=' + Date.now();
+  openModal({
+    title: title || '封面',
+    width: 760,
+    body:
+      '<div style="background:var(--bg-2);border-radius:8px;padding:12px;text-align:center">' +
+      '<img src="' + src + '" alt="" style="max-width:100%;max-height:68vh;object-fit:contain;border-radius:4px">' +
+      '</div>' +
+      '<div class="note" style="margin-top:10px">替换封面只写库内缩略图（USER_UPLOADED），不改动原始文件；自动封面会随扫描重建。</div>',
+    foot: '<button class="btn" data-x>关闭</button>' +
+      '<button class="btn" data-save>' + ico('dl') + '保存原图</button>' +
+      '<button class="btn" data-rep>' + ico('upload') + '替换封面</button>' +
+      '<button class="btn ghost" data-manage>' + ico('layers') + '封面管理</button>',
+    after() {
+      $('#modal [data-x]').onclick = closeModal;
+      $('#modal [data-save]').onclick = () => {
+        const a = document.createElement('a');
+        a.href = path + '/thumbnail';
+        a.download = String(title || kind) + '.jpg';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast('已开始下载原图', 'ok');
+      };
+      $('#modal [data-rep]').onclick = () => {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/*';
+        inp.onchange = () => {
+          if (!inp.files || !inp.files[0]) return;
+          const fd = new FormData();
+          fd.append('file', inp.files[0]);
+          fd.append('selected', 'true');
+          fetch(path + '/thumbnails', { method: 'POST', credentials: 'same-origin', body: fd })
+            .then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(t || ('HTTP ' + r.status)))))
+            .then(() => {
+              closeModal();
+              toast('封面已替换', 'ok');
+              return LantaiRuntime.hydrate();
+            })
+            .then(() => render())
+            .catch(e => toast('替换失败：' + onlineErrText(e), 'err'));
+        };
+        inp.click();
+      };
+      $('#modal [data-manage]').onclick = () => { closeModal(); coverModal(kind, id, title); };
+    }
+  });
+}
+
 /* ---- 系列详情 ---- */
 Routes.series = (v, seg) => {
   const s = series(seg[0]); if (!s) return go('/browse');
-  const L = lib(s.lib), st = statOf(s.id), p = bestProgress(s.id);
+  const L = lib(s.lib) || { root: '', type: '', interval: '' }, st = statOf(s.id), p = bestProgress(s.id);
   const online = !!s.online;
   const osub = online && onlineSubs ? onlineSubs.find(x => x.seriesId === s.id) : null;
   const och = onlineChapterCache[s.id];
@@ -4154,7 +3612,7 @@ Routes.series = (v, seg) => {
   v.innerHTML =
     '<div class="crumb"><a data-go="/browse">书库</a><i>/</i><b>' + esc(s.t) + '</b></div>' +
     '<div class="card" style="display:flex;gap:20px;padding:20px;margin-bottom:20px;align-items:flex-start">' +
-    '<div style="width:150px;flex:none;cursor:pointer" data-go="/book/' + (booksOf(s.id)[0] || { id: '' }).id + '">' + coverArt(s.t + 'x', s.t, { id: s.id, kind: 'series' }) + '</div>' +
+    '<div style="width:150px;flex:none;cursor:pointer" data-cov="series:' + s.id + '" data-cov-title="' + esc(s.t) + '" title="点击查看大图">' + coverArt(s.t + 'x', s.t, { id: s.id, kind: 'series' }) + '</div>' +
     '<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
     '<h1 style="font-family:var(--f-disp);font-size:26px;letter-spacing:1.5px">' + esc(s.t) + '</h1>' +
     (online ? '<span class="badge gold">在线 · ' + esc(s.publisher || '在线源') + '</span>' : '<span class="badge">' + (SERIES_STATUS_CN[s.status] || s.status) + '</span>') +
@@ -4195,7 +3653,7 @@ Routes.series = (v, seg) => {
 
   if (!online) {
     v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
-      booksOf(s.id).map(bookRow).join('') + '</tbody></table></div>');
+      booksOf(s.id).map(b => bookRow(b)).join('') + '</tbody></table></div>');
   } else if (!och) {
     v.insertAdjacentHTML('beforeend', '<div class="note">正在加载章节…</div>');
     loadOnlineChapters(s.id);
@@ -4223,7 +3681,7 @@ Routes.series = (v, seg) => {
 Routes.book = (v, seg) => {
   const b = book(seg[0]);
   if (!b) return go('/browse');
-  const s = seriesOf(b), L = lib(s.lib), p = prog(b.id);
+  const s = seriesOf(b), L = lib(s.lib) || { root: '', type: '' }, p = prog(b.id);
   const unsup = b.status === 'UNSUPPORTED';
   const online = isOnlineBook(b);
   const pc = p && p.pages ? (p.page / p.pages * 100) : 0;
@@ -4231,17 +3689,19 @@ Routes.book = (v, seg) => {
   const pathText = (s.online ? '在线库/…/' : L.root.replace(/^.*library\//, '') + '/') + b.name;
   v.innerHTML =
     '<div class="crumb"><a data-go="/browse">书库</a><i>/</i>' +
-    (s.t === b.name ? '' : '<a data-go="/series/' + s.id + '">' + esc(s.t) + '</a><i>/</i>') +
-    '<b>' + esc(b.name) + '</b></div>' +
+    (s.t === bookTitle(b) ? '' : '<a data-go="/series/' + s.id + '">' + esc(s.t) + '</a><i>/</i>') +
+    '<b>' + esc(bookTitle(b)) + '</b></div>' +
     '<div class="bk-head">' +
-    '<div class="bk-side">' + coverArt(s.t + b.id, s.t, { id: online ? '' : b.id, kind: 'book', fmt: b.fmt, status: b.status, vert: true }) + '</div>' +
+    '<div class="bk-side" style="cursor:zoom-in" data-cov="books:' + b.id + '" data-cov-title="' + esc(bookTitle(b)) + '" title="点击查看大图">' + coverArt(s.t + b.id, s.t, { id: online ? '' : b.id, kind: 'book', fmt: b.fmt, status: b.status, vert: true }) + '</div>' +
     '<div class="bk-body">' +
-    '<div class="bk-title"><h1>' + esc(b.name) + '</h1>' + statusBadge(b) +
-    '<span class="badge">' + (PROFILE_CN[b.profile] || b.profile) + '</span></div>' +
+    '<div class="bk-title"><h1>' + esc(bookTitle(b)) + '</h1>' + statusBadge(b) +
+    '<span class="badge">' + (PROFILE_CN[b.profile] || b.profile) + '</span>' +
+    (bookNumCn(b) ? '<span class="badge">' + bookNumCn(b) + '</span>' : '') + '</div>' +
+    (bookFileSub(b) ? '<div class="mini mono-sm" id="bkFileSub" style="margin:-2px 0 8px">文件名：' + esc(bookFileSub(b)) + '</div>' : '') +
     (b.note ? '<div class="note" style="margin:8px 0 0">' + esc(b.note) + '</div>' : '') +
-    '<div class="kv-grid">' +
+    '<div class="kv-grid" id="bkFileGrid">' +
     kvSpan('格式', fmtCn(b.fmt)) + kvSpan('大小', bytes(b.size)) +
-    kvSpan('页数 / 章节', num(b.pages) + (b.profile === 'TXT' ? ' 章' : '')) +
+    kvSpan('页数 / 章节', b.pages ? num(b.pages) + ((b.profile === 'EPUB' && !b.divina) || b.profile === 'TXT' ? ' 章' : ' 页') : '—') +
     kvSpan('尺寸', b.w ? b.w + ' × ' + b.h : (b.chs ? b.chs + ' 章' : '—')) +
     kvSpan('编码', b.enc || (b.profile === 'EPUB' ? 'UTF-8' : '—')) +
     kvSpan('来源', online ? (b.downloaded ? '在线订阅 · 已存档' : '在线代取') : '本地扫描') +
@@ -4263,6 +3723,12 @@ Routes.book = (v, seg) => {
     '<button class="btn sm ghost danger" data-bdel="' + b.id + '">' + ico('trash') + '删除文件</button>' +
     '</div>' +
     '</div></div>' +
+
+    '<div class="card" id="bkMetaCard"><div class="card-h">' +
+    '<h3>' + ico('info') + ' 书籍信息</h3>' +
+    '<div class="r"><span class="mini" id="bkMetaState">读取中…</span>' +
+    '<button class="btn sm ghost" data-bmeta="' + b.id + '">' + ico('edit') + '编辑元数据</button></div></div>' +
+    '<div id="bkMetaBody"><div class="mini" style="padding:6px 0">正在读取元数据…</div></div></div>' +
 
     '<div class="bk-pair">' +
     (p ? '<div class="card bk-mini"><div class="card-h"><h3>' + ico('clock') + ' 阅读进度</h3>' +
@@ -4288,8 +3754,118 @@ Routes.book = (v, seg) => {
     '<div id="tocPager" class="toc-pager"></div></div>';
   wire(v);
   openBookToc(b);
+  loadBookMeta(b);
   bookReadingTime(b.id);
 };
+
+const META_LOCK_CN = {
+  title: '书名', summary: '简介', number: '序号', numberSort: '排序序号', releaseDate: '出版日期',
+  authors: '作者', tags: '标签', isbn: 'ISBN', links: '链接', notableEntities: '显著实体'
+};
+
+const META_ROLE_CN = {
+  writer: '作者', author: '作者', artist: '画师', penciller: '铅笔', inker: '勾线',
+  colorist: '上色', letterer: '嵌字', cover: '封面', editor: '编辑', translator: '翻译'
+};
+
+function metaDate(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return String(v);
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function metaUrl(u) {
+  const v = String(u || '').trim();
+  return /^https?:\/\//i.test(v) ? v : '';
+}
+
+function loadBookMeta(b) {
+  if (!window.LantaiRuntime) return;
+  LantaiRuntime.request('api/v1/books/' + b.id).then(raw => {
+    const box = $('#bkMetaBody');
+    if (box) paintBookMeta(b, raw || {});
+  }).catch(e => {
+    const box = $('#bkMetaBody'), st = $('#bkMetaState');
+    if (st) st.textContent = '读取失败';
+    if (box) box.innerHTML = '<div class="mini" style="padding:6px 0">元数据读取失败：' + esc(onlineErrText(e)) + '</div>';
+  });
+}
+
+function paintBookMeta(b, raw) {
+  const box = $('#bkMetaBody');
+  if (!box || !box.isConnected) return;
+  const md = raw.metadata || {};
+  const s = seriesOf(b);
+  const st = $('#bkMetaState');
+  if (st) st.textContent = '';
+  const val = v => (v === undefined || v === null || String(v).trim() === '') ? '—' : String(v);
+  const row = (k, v, cls) => '<div class="kv' + (cls ? ' ' + cls : '') + '"><span class="k">' + esc(k) + '</span><span class="v">' + esc(v) + '</span></div>';
+  const authors = (md.authors || []).map(a => {
+    const role = META_ROLE_CN[String(a.role || '').toLowerCase()] || a.role;
+    return role ? a.name + '（' + role + '）' : a.name;
+  }).join('、');
+  const notable = (md.notableEntities || []).map(e => (e.kind ? e.kind + '：' : '') + e.name).join('、');
+  const tags = Array.from(new Set([].concat(Array.from(md.tags || []), Array.from(s.tags || []))));
+  const genres = Array.from(new Set(Array.from((md.genres && md.genres.length) ? md.genres : (s.genres || []))));
+  const links = (md.links || []).filter(l => metaUrl(l.url));
+  const locked = Object.keys(META_LOCK_CN).filter(k => md[k + 'Lock']).map(k => META_LOCK_CN[k]);
+  const summary = String(md.summary || '').trim();
+
+  box.innerHTML =
+    '<div class="kv-grid" style="grid-template-columns:repeat(auto-fit,minmax(128px,1fr))">' +
+    row('书名', val(md.title || b.name), 'span2') +
+    row('序号', val(md.number)) +
+    row('排序序号', val(md.numberSort)) +
+    row('出版日期', val(md.releaseDate)) +
+    row('ISBN', val(md.isbn)) +
+    row('作者', val(authors), 'span2') +
+    row('出版社', val(md.publisher || s.publisher)) +
+    row('语言', val(md.language || s.lang)) +
+    row('丛书状态', val(SERIES_STATUS_CN[s.status] || s.status)) +
+    row('分类', val(genres.join(' / ')), 'span2') +
+    row('标签', val(tags.join('、')), 'span2') +
+    row('显著实体', val(notable), 'span2') +
+    row('元数据更新', metaDate(md.lastModified)) +
+    row('锁定字段', locked.length ? locked.join('、') : '无', 'span2') +
+    '</div>' +
+    '<div class="mini" style="margin:14px 0 4px">简介</div>' +
+    (summary ? '<div class="note ser-sum" data-sum title="点击展开或收起">' + esc(summary) + '</div>' : '<div class="mini">—</div>') +
+    '<div class="mini" style="margin:14px 0 6px">链接</div>' +
+    (links.length
+      ? '<div style="display:flex;gap:8px;flex-wrap:wrap">' + links.map(l =>
+        '<a class="badge" href="' + esc(metaUrl(l.url)) + '" target="_blank" rel="noreferrer noopener">' +
+        ico('ext') + esc(l.label || l.url) + '</a>').join('') + '</div>'
+      : '<div class="mini">—</div>');
+
+  box.querySelectorAll('[data-sum]').forEach(el => el.onclick = () => el.classList.toggle('open'));
+
+  const fg = $('#bkFileGrid');
+  if (fg) {
+    const media = raw.media || {};
+    fg.insertAdjacentHTML('beforeend',
+      row('媒体类型', val(media.mediaType)) +
+      row('入库时间', metaDate(raw.created)) +
+      row('文件修改', metaDate(raw.fileLastModified)) +
+      row('文件哈希', val(raw.fileHash), 'span2 mono-sm'));
+  }
+
+  const title = String(md.title || '').trim();
+  if (title && title !== b.name) {
+    const h1 = $('#view .bk-title h1');
+    if (h1) h1.textContent = title;
+    if (!$('#bkFileSub')) {
+      const sub = document.createElement('div');
+      sub.id = 'bkFileSub';
+      sub.className = 'mini mono-sm';
+      sub.style.margin = '-2px 0 8px';
+      sub.textContent = '文件名：' + b.name;
+      const head = $('#view .bk-title');
+      if (head && head.parentNode) head.parentNode.insertBefore(sub, head.nextSibling);
+    }
+  }
+}
 
 const TOC = { id: '', page: 1, win: 100, full: false, busy: false, err: '', total: 0, entries: [], volumes: [], scroll: false };
 
@@ -4689,7 +4265,7 @@ Routes.readlists = (v, seg) => {
     v.innerHTML = crumb + '<div class="ph"><div><h1>' + esc(r.name) + '</h1><div class="sub">' + (r.desc || ids.length + ' 册') + '</div></div>' +
       '<div class="acts"><button class="btn danger" data-dellist>删除清单</button></div></div>' +
       (ids.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
-        ids.map(book).filter(Boolean).map(bookRow).join('') + '</tbody></table></div>'
+        ids.map(book).filter(Boolean).map(b => bookRow(b)).join('') + '</tbody></table></div>'
         : '<div class="empty"><h4>清单是空的</h4><p>可在新建时选择书籍。</p></div>');
     v.querySelector('[data-dellist]').onclick = () => {
       openModal({
@@ -4787,7 +4363,7 @@ Routes.search = (v, seg, qs) => {
     (total === 0 && !loading ? '<div class="empty">' + '<svg><use href="#i-search"/></svg><h4>没有命中</h4><p>换个关键词；全文检索覆盖标题、作者、摘要、标签与系列名。</p></div>' : '') +
     (r.series.length ? '<h2 style="font-size:15px;margin:22px 0 12px;font-family:var(--f-disp);letter-spacing:1px">系列 · ' + r.series.length + '</h2><div class="shelf">' + r.series.map(s => seriesCard(s.id)).join('') + '</div>' : '') +
     (r.online.length ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">在线系列 · ' + r.online.length + '</h2><div class="shelf">' + r.online.map(s => seriesCard(s.id)).join('') + '</div>' : '') +
-    (r.books.length ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">书籍 · ' + r.books.length + '</h2><div class="tbl-wrap"><table class="tbl"><tbody>' + r.books.map(bookRow).join('') + '</tbody></table></div>' : '') +
+    (r.books.length ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">书籍 · ' + r.books.length + '</h2><div class="tbl-wrap"><table class="tbl"><tbody>' + r.books.map(b => bookRow(b)).join('') + '</tbody></table></div>' : '') +
     ((r.coll.length || r.lists.length) ? '<h2 style="font-size:15px;margin:24px 0 12px;font-family:var(--f-disp);letter-spacing:1px">合集与清单</h2>' +
       r.coll.map(c => '<div class="list-i" data-coll="' + c.id + '"><span class="gi">' + '<svg width="16" height="16"><use href="#i-collection"/></svg>' + '</span><div><div class="gt">' + esc(c.name) + '</div><div class="gs">合集 · ' + c.n + ' 系列</div></div><div class="gr"><span class="mini">→</span></div></div>').join('') +
       r.lists.map(x => '<div class="list-i" data-list="' + x.id + '"><span class="gi">' + '<svg width="16" height="16"><use href="#i-readlist"/></svg>' + '</span><div><div class="gt">' + esc(x.name) + '</div><div class="gs">阅读清单 · ' + x.n + ' 册</div></div><div class="gr"><span class="mini">→</span></div></div>').join('') : '');
@@ -6024,8 +5600,9 @@ function syncSeries(sid) {
     .catch(e => toast('同步失败：' + onlineErrText(e), 'err', 4200));
 }
 function paintRuntime() {
-  $('#dSwy').className = 'dot ' + (swyRun() ? '' : 'off');
-  $('#swyText').textContent = swyRun() ? L.t('side.onlineUp') : L.t('side.onlineDown');
+  const dot = $('#dSwy'), text = $('#swyText'), run = swyRun();
+  if (dot) dot.className = 'dot ' + (run ? '' : 'off');
+  if (text) text.textContent = run ? L.t('side.onlineUp') : L.t('side.onlineDown');
 }
 
 /* ============================ 批注（R20） ============================ */
@@ -6289,6 +5866,8 @@ function runOfflineSync() {
 
 let scPage = null, scSettings = null, scTokens = null, scErr = '', scBusy = false;
 let scFilter = '', scOffset = 0, scLimit = 50, scOpen = null, scPreview = null, scPicked = {}, scPoll = null;
+let scBooks = null, scBookPick = {};
+let scBookList = null, scBookListFor = '';
 let scSources = null, scSettingsTab = 'general', scSourceBusy = false, scSseRef = null, scAutoSeries = '';
 
 const SC_FIELD_CN = { title: '标题', summary: '简介', publisher: '出版社', language: '语言', genres: '分类', authors: '作者', releaseDate: '出版日期', isbn: 'ISBN', tags: '标签', cover: '封面' };
@@ -6318,6 +5897,7 @@ function loadScrape() {
     if (Array.isArray(out[2])) scTokens = out[2];
     scBusy = false;
     paintScrape();
+    renderNav();
     scWireSse();
   });
 }
@@ -6334,6 +5914,7 @@ function paintScrape() {
   head.innerHTML = scHeadHtml();
   body.innerHTML = scBodyHtml();
   wireScrape();
+  renderNav();
 }
 function scCounts() {
   const p = scPage || {};
@@ -6350,11 +5931,11 @@ function scHeadHtml() {
     '<button class="btn" data-sc-settings>' + ico('settings') + '刮削设置</button>' +
     '</div></div>' +
     '<div class="grid g-kpi" style="margin-bottom:18px">' +
-    kpi('名单总数', (c.total || 0) + '<small>部</small>', '完成即移出名单', c.total > 0) +
-    kpi('待刮', (c.queued || 0) + '<small>部</small>', '尚未开始', c.queued > 0) +
-    kpi('刮削中', (c.running || 0) + '<small>部</small>', '正在处理', c.running > 0) +
-    kpi('待核对', (c.review || 0) + '<small>部</small>', '与现有信息不一致', c.review > 0) +
-    kpi('失败', (c.failed || 0) + '<small>部</small>', '可重试', c.failed > 0) +
+    kpi('名单总数', (c.total || 0) + '<small>册</small>', '完成即移出名单', c.total > 0) +
+    kpi('待刮', (c.queued || 0) + '<small>册</small>', '尚未开始', c.queued > 0) +
+    kpi('刮削中', (c.running || 0) + '<small>册</small>', '正在处理', c.running > 0) +
+    kpi('待核对', (c.review || 0) + '<small>册</small>', '与现有信息不一致', c.review > 0) +
+    kpi('失败', (c.failed || 0) + '<small>册</small>', '可重试', c.failed > 0) +
     '</div>' +
     (scSettings && scSettings.trustResult ? '<div class="note gold" style="margin-bottom:14px">已开启「信任刮削结果」：冲突字段会被自动覆盖，不再进入待核对。</div>' : '') +
     (scErr ? '<div class="note red" style="margin-bottom:14px">' + esc(scErr) + '</div>' : '');
@@ -6363,14 +5944,17 @@ function scBodyHtml() {
   const p = scPage;
   if (!p && scBusy) return '<div class="card"><div class="empty" style="padding:40px"><h4>正在加载名单</h4></div></div>';
   const items = (p && p.items) || [];
-  const filters = [['', '全部'], ['QUEUED', '待刮'], ['REVIEW', '待核对'], ['FAILED', '失败']];
+  const filters = [['', '全部'], ['QUEUED', '待刮'], ['RUNNING', '刮削中'], ['REVIEW', '待核对'], ['FAILED', '失败']];
   let html = '<div class="card"><div class="card-h"><h3>' + ico('list') + ' 刮削名单</h3>' +
     '<div class="r"><div class="seg">' + filters.map(f => '<button class="' + (scFilter === f[0] ? 'on' : '') + '" data-sc-filter="' + f[0] + '">' + f[1] + '</button>').join('') + '</div>' +
+    '<button class="btn xs" data-sc-export>' + ico('dl') + '导出名单</button>' +
+    '<button class="btn xs ghost" data-sc-import>' + ico('upload') + '导入数据</button>' +
+    '<button class="btn xs ghost" data-sc-help>' + ico('file') + '说明</button>' +
     '<button class="btn xs ghost" data-sc-clear="review"' + ((scCounts().review || 0) ? '' : ' disabled') + '>清待核对</button>' +
     '<button class="btn xs danger" data-sc-clear="all"' + ((scCounts().total || 0) ? '' : ' disabled') + '>清空名单</button></div></div>';
   if (!items.length) {
     html += '<div class="empty" style="padding:40px"><svg><use href="#i-list"/></svg><h4>名单是空的</h4>' +
-      '<p>在书库勾选系列点「加入刮削名单」，或在刮削设置里对整库发起刮削。</p>' +
+      '<p>在书库勾选系列或书籍点「加入刮削名单」，或在刮削设置里对整库发起刮削。</p>' +
       '<div style="margin-top:14px"><button class="btn pri sm" data-go="/browse">去书库勾选</button></div></div></div>';
     return html;
   }
@@ -6387,7 +5971,9 @@ function scBodyHtml() {
         : (x.result && x.result.fields && x.result.fields.length ? '已补 ' + x.result.fields.map(f => SC_FIELD_CN[f] || f).join('、') : esc(x.message || '—'));
     const expandable = x.status === 'REVIEW' || x.status === 'FAILED';
     html += '<tr data-sc-row="' + esc(x.id) + '">' +
-      '<td><div style="font-size:13px">' + esc(x.seriesTitle) + '</div><div class="mini">' + esc(SC_ORIGIN[x.origin] || '') + (x.attempt ? ' · 第 ' + (x.attempt + 1) + ' 次' : '') + '</div></td>' +
+      '<td><div style="font-size:13px">' + esc(x.seriesTitle) +
+      (x.bookCount ? ' <span class="badge" style="cursor:pointer" data-sc-books="' + esc(x.id) + '" title="查看这个系列里的具体册">' + x.bookCount + ' 册' + (scBookListFor === x.id ? ' ▴' : ' ▾') + '</span>' : '') +
+      '</div><div class="mini">' + esc(SC_ORIGIN[x.origin] || '') + (x.attempt ? ' · 第 ' + (x.attempt + 1) + ' 次' : '') + '</div></td>' +
       '<td>' + badge + '</td>' +
       '<td class="mini">' + note + '</td>' +
       '<td class="mini">' + esc(x.source || '—') + (x.score != null ? ' · ' + Math.round(x.score * 100) + '%' : '') + '</td>' +
@@ -6400,20 +5986,30 @@ function scBodyHtml() {
     if (scOpen === x.id && scPreview && scPreview.seriesId === x.seriesId) {
       html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scDiffHtml() + '</td></tr>';
     }
+    if (scBookListFor === x.id) {
+      html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scBookListHtml() + '</td></tr>';
+    }
   });
   html += '</tbody></table></div>';
   const total = (p && p.total) || 0;
   const size = (p && p.limit) || scLimit;
-  html += pagerBarHtml({ total: total, page: Math.floor(scOffset / size) + 1, size: size, unit: ' 部', allowAll: false, maxSize: 200 });
+  html += pagerBarHtml({ total: total, page: Math.floor(scOffset / size) + 1, size: size, unit: ' 条', allowAll: false, maxSize: 200 });
   html += '</div>';
   return html;
 }
 function scDiffHtml() {
   const d = scPreview;
-  if (!d) return '<div class="mini" style="padding:16px">正在计算差异…</div>';
+  let html = '<div style="padding:14px 16px">';
+  if (!d) {
+    html += '<div class="mini">正在计算差异…</div>';
+    return html + scBooksHtml() + '</div>';
+  }
   const fields = (d.diff && d.diff.fields) || [];
-  if (!fields.length) return '<div class="mini" style="padding:16px">没有可用的刮削结果。</div>';
-  let html = '<div style="padding:14px 16px"><div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
+  if (!fields.length) {
+    html += '<div class="mini">没有可用的刮削结果。</div>' + scBooksHtml() + '</div>';
+    return html;
+  }
+  html += '<div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
     '<span class="badge">' + esc(d.source || '本地内嵌') + '</span>' +
     (d.score != null ? '<span class="badge">匹配 ' + Math.round(d.score * 100) + '%</span>' : '') +
     '<span class="mini">勾选要写入的字段，默认已选补充与冲突项。</span></div>' +
@@ -6431,13 +6027,98 @@ function scDiffHtml() {
       '<td class="mini">' + esc(f.chosen || '—') + '</td>' +
       '<td><span class="badge ' + meta[0] + '">' + meta[1] + '</span></td></tr>';
   });
-  html += '</tbody></table></div>' +
+  html += '</tbody></table></div>' + scBooksHtml() +
     '<div class="rowflex" style="gap:8px;margin-top:12px">' +
     '<button class="btn pri sm" data-sc-apply>应用选中字段</button>' +
     '<button class="btn sm" data-sc-applyall>全部采用候选</button>' +
     '<button class="btn ghost sm" data-sc-close>收起</button>' +
     '<span class="mini" style="margin-left:auto">应用后该条移出名单</span></div></div>';
   return html;
+}
+function scBookListHtml() {
+  if (!scBookList) return '<div class="mini" style="padding:14px 16px">正在读取册清单…</div>';
+  if (!scBookList.length) return '<div class="mini" style="padding:14px 16px">这个系列没有可读的册记录。</div>';
+  return '<div style="padding:12px 16px">' +
+    '<div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:8px">' +
+    '<span class="badge ok">' + scBookList.length + ' 册</span>' +
+    '<span class="mini">刮削按册写入：书名、序号、作者、出版日期、ISBN 各自独立，不会把一份值抄给全系列</span></div>' +
+    '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
+    '<th style="width:56px">序号</th><th>书名</th><th style="width:170px">作者</th><th style="width:112px">出版日期</th><th style="width:140px">ISBN</th><th>文件名</th>' +
+    '</tr></thead><tbody>' +
+    scBookList.map((b, i) => '<tr>' +
+      '<td class="mono">' + esc(b.number || String(i + 1)) + '</td>' +
+      '<td>' + esc(b.title || '（未填）') + (b.titleLock ? ' <span class="badge">书名锁定</span>' : '') + '</td>' +
+      '<td class="mini">' + esc((b.authors || []).join('、') || '—') + (b.authorsLock ? ' <span class="badge">锁</span>' : '') + '</td>' +
+      '<td class="mini mono">' + esc(b.releaseDate || '—') + '</td>' +
+      '<td class="mini mono">' + esc(b.isbn || '—') + '</td>' +
+      '<td class="mini mono-sm">' + esc(b.fileName || '') + '</td>' +
+      '</tr>').join('') +
+    '</tbody></table></div></div>';
+}
+function scToggleBooks(id) {
+  if (scBookListFor === id) { scBookListFor = ''; scBookList = null; paintScrape(); return; }
+  scOpen = null;
+  scPreview = null;
+  scBooks = null;
+  scBookListFor = id;
+  scBookList = null;
+  paintScrape();
+  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/books')
+    .then(list => { if (scBookListFor === id) { scBookList = list || []; paintScrape(); } })
+    .catch(e => {
+      if (scBookListFor === id) { scBookListFor = ''; scBookList = null; paintScrape(); toast('读取册清单失败：' + onlineErrText(e), 'err'); }
+    });
+}
+function scBooksHtml() {
+  if (!scBooks) return '<div class="mini" style="margin-top:14px">正在读取册清单…</div>';
+  if (!scBooks.length) return '';
+  const picked = scBooks.filter(b => scBookPick[b.bookId]).length;
+  return '<div style="margin-top:16px">' +
+    '<div class="rowflex" style="gap:10px;flex-wrap:wrap;margin-bottom:8px">' +
+    '<span class="badge ok">按册写入</span>' +
+    '<span class="mini">共 ' + scBooks.length + ' 册 · 勾选要写入的册，值可直接改（留空表示该字段不写）</span>' +
+    '<button class="btn xs ghost" data-sc-ball>全选本页</button>' +
+    '<button class="btn xs ghost" data-sc-bnone>清空勾选</button>' +
+    '<span class="mini" id="scBookPicked">已选 ' + picked + ' 册</span></div>' +
+    '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:34px"></th><th>册</th><th>书名</th><th style="width:64px">序号</th><th>作者</th><th style="width:118px">出版日期</th><th style="width:126px">ISBN</th></tr></thead><tbody>' +
+    scBooks.map((b, i) => '<tr>' +
+      '<td><input type="checkbox" data-sc-book="' + esc(b.bookId) + '"' + (scBookPick[b.bookId] ? ' checked' : '') + '></td>' +
+      '<td class="mini">第 ' + (i + 1) + ' 册<div class="mini mono-sm">' + esc(b.fileName) + '</div>' + (b.titleLock ? '<span class="badge">书名锁定</span>' : '') + '</td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="title" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.title) + '"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="number" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.number || '') + '"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="authors" data-sc-bid="' + esc(b.bookId) + '" value="' + esc((b.authors || []).join('、')) + '"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="releaseDate" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.releaseDate || '') + '" placeholder="YYYY-MM-DD"></td>' +
+      '<td><input class="inp" style="height:28px" data-sc-bf="isbn" data-sc-bid="' + esc(b.bookId) + '" value="' + esc(b.isbn || '') + '"></td>' +
+      '</tr>').join('') +
+    '</tbody></table></div></div>';
+}
+function scPaintBookPicked() {
+  const el = $('#scBookPicked');
+  if (!el) return;
+  const n = $$('#view [data-sc-book]').filter(x => x.checked).length;
+  el.textContent = '已选 ' + n + ' 册';
+}
+function collectScBooks() {  const out = [];
+  $$('#view [data-sc-book]').forEach(el => {
+    if (!el.checked) return;
+    const bookId = el.dataset.scBook;
+    const row = { bookId: bookId, fields: [] };
+    $$('#view [data-sc-bf][data-sc-bid="' + bookId + '"]').forEach(inp => {
+      const field = inp.dataset.scBf, value = String(inp.value || '').trim();
+      if (!value) return;
+      if (field === 'authors') {
+        const list = value.split(/[、,，\/]/).map(x => x.trim()).filter(Boolean);
+        if (!list.length) return;
+        row.authors = list;
+        row.fields.push('authors');
+        return;
+      }
+      row[field] = value;
+      row.fields.push(field);
+    });
+    if (row.fields.length) out.push(row);
+  });
+  return out;
 }
 function wireScrape() {
   const start = $('#view [data-sc-start]');
@@ -6457,12 +6138,24 @@ function wireScrape() {
   if (rf) rf.onclick = () => loadScrape();
   const cfg = $('#view [data-sc-settings]');
   if (cfg) cfg.onclick = scSettingsModal;
+  const exp = $('#view [data-sc-export]');
+  if (exp) exp.onclick = scExportModal;
+  const imp = $('#view [data-sc-import]');
+  if (imp) imp.onclick = scImportModal;
+  const hlp = $('#view [data-sc-help]');
+  if (hlp) hlp.onclick = () => scHelpModal('feature');
   $$('#view [data-sc-filter]').forEach(el => el.onclick = () => { scFilter = el.dataset.scFilter; scOffset = 0; scOpen = null; scPreview = null; loadScrape(); });
   $$('#view [data-sc-open]').forEach(el => el.onclick = () => scToggle(el.dataset.scOpen));
+  $$('#view [data-sc-books]').forEach(el => el.onclick = () => scToggleBooks(el.dataset.scBooks));
   $$('#view [data-sc-retry]').forEach(el => el.onclick = () => scRetry(el.dataset.scRetry));
   $$('#view [data-sc-del]').forEach(el => el.onclick = () => scRemove(el.dataset.scDel));
   $$('#view [data-sc-clear]').forEach(el => el.onclick = () => scClear(el.dataset.scClear));
   $$('#view [data-sc-field]').forEach(el => el.onchange = () => { scPicked[el.dataset.scField] = el.checked; });
+  $$('#view [data-sc-book]').forEach(el => el.onchange = () => { scBookPick[el.dataset.scBook] = el.checked; scPaintBookPicked(); });
+  const ball = $('#view [data-sc-ball]');
+  if (ball) ball.onclick = () => { $$('#view [data-sc-book]').forEach(el => { el.checked = true; scBookPick[el.dataset.scBook] = true; }); scPaintBookPicked(); };
+  const bnone = $('#view [data-sc-bnone]');
+  if (bnone) bnone.onclick = () => { scBookPick = {}; $$('#view [data-sc-book]').forEach(el => { el.checked = false; }); scPaintBookPicked(); };
   const ap = $('#view [data-sc-apply]');
   if (ap) ap.onclick = () => scResolve(false);
   const apAll = $('#view [data-sc-applyall]');
@@ -6477,14 +6170,38 @@ function wireScrape() {
   });
 }
 function scToggle(id) {
-  if (scOpen === id) { scOpen = null; scPreview = null; paintScrape(); return; }
+  if (scOpen === id) { scOpen = null; scPreview = null; scBooks = null; paintScrape(); return; }
   scOpen = id;
   scPreview = null;
   scPicked = {};
+  scBooks = null;
+  scBookPick = {};
+  scBookListFor = '';
+  scBookList = null;
   paintScrape();
   LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/diff')
-    .then(d => { if (scOpen === id) { scPreview = d; paintScrape(); } })
+    .then(d => {
+      if (scOpen === id) {
+        scPreview = d;
+        scPicked = {};
+        ((d.diff && d.diff.fields) || []).forEach(f => {
+          if (f.decision === 'FILL' || f.decision === 'CONFLICT') scPicked[f.field] = true;
+        });
+        paintScrape();
+      }
+    })
     .catch(e => toast('差异计算失败：' + onlineErrText(e), 'err', 3600));
+  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/books')
+    .then(list => {
+      if (scOpen !== id) return;
+      scBooks = Array.isArray(list) ? list : [];
+      paintScrape();
+    })
+    .catch(() => {
+      if (scOpen !== id) return;
+      scBooks = [];
+      paintScrape();
+    });
 }
 function scRetry(id) {
   LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/retry', { method: 'POST' })
@@ -6516,9 +6233,10 @@ function scResolve(all) {
   if (!scOpen) return;
   const id = scOpen;
   const fields = all ? [] : Object.keys(scPicked).filter(k => scPicked[k]);
-  if (!all && !fields.length) return toast('先勾选至少一个字段', 'err');
-  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/resolve', { method: 'POST', body: { fields: fields } })
-    .then(r => { toast(r ? '已应用所选字段，仍有字段待核对' : '已应用并移出名单', 'ok'); scOpen = null; scPreview = null; loadScrape(); })
+  const books = collectScBooks();
+  if (!all && !fields.length && !books.length) return toast('先勾选至少一个字段或一册', 'err');
+  LantaiRuntime.request('api/lantai/v1/scrape/queue/' + id + '/resolve', { method: 'POST', body: { fields: fields, books: books } })
+    .then(r => { toast(r ? '已应用所选内容，仍有字段待核对' : '已应用并移出名单', 'ok'); scOpen = null; scPreview = null; scBooks = null; loadScrape(); })
     .catch(e => toast('应用失败：' + onlineErrText(e), 'err', 3600));
 }
 function scPollStart() {
@@ -6566,9 +6284,10 @@ function paintScSettings() {
     const list = scTokens || [];
     html += '<div class="note">刮削令牌只能读取名单与回传刮削结果，权限写死，访问不了书库其他接口。</div>' +
       (list.length
-        ? '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>名称</th><th>令牌</th><th style="width:70px">调用</th><th style="width:120px">创建</th><th style="width:120px"></th></tr></thead><tbody>' +
+        ? '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>名称</th><th>令牌</th><th style="width:70px">调用</th><th style="width:118px">创建</th><th style="width:118px">到期</th><th style="width:118px"></th></tr></thead><tbody>' +
           list.map(t => '<tr><td>' + esc(t.name) + '</td><td class="mono mini">' + esc(t.value) + '</td><td class="mini">' + (t.useCount || 0) + '</td>' +
-            '<td class="mini mono">' + esc(String(t.createdDate || '').slice(0, 16).replace('T', ' ')) + '</td>' +
+            '<td class="mini mono">' + esc(t.createdDate ? String(t.createdDate).slice(0, 16).replace('T', ' ') : '—') + '</td>' +
+            '<td class="mini mono">' + (t.expiresDate ? esc(String(t.expiresDate).slice(0, 16).replace('T', ' ')) : '<span style="color:var(--tx-3)">不限期</span>') + '</td>' +
             '<td style="text-align:right"><button class="btn xs ghost" data-sc-copy="' + esc(t.value) + '">复制</button>' +
             '<button class="btn xs danger" data-sc-tokdel="' + esc(t.id) + '">吊销</button></td></tr>').join('') + '</tbody></table></div>'
         : '<div class="empty" style="padding:22px"><h4>还没有刮削令牌</h4><p>生成后可用于外部抓取脚本或 AI 回填。</p></div>') +
@@ -6609,10 +6328,48 @@ function paintScSettings() {
   wireScSources();
 }
 function scTokenCreate(rotate) {
-  LantaiRuntime.request('api/lantai/v1/scrape/agent/token', { method: 'POST', body: { rotate: rotate } })
-    .then(t => { toast('已生成刮削令牌', 'ok'); return loadScrape(); })
-    .then(() => { if ($('#scCfg')) paintScSettings(); })
-    .catch(e => toast('生成失败：' + onlineErrText(e), 'err'));
+  const body = '<div class="field"><label>令牌名称</label>' +
+    '<input class="inp" id="tkName" style="width:100%" maxlength="60" placeholder="留空自动生成">' +
+    '<div class="mini" style="margin-top:6px;color:var(--tx-3)">同名令牌不能重复，建议写清用途或机器名。</div></div>' +
+    '<div class="field" style="margin-top:16px"><label>有效期</label>' +
+    '<select class="inp" id="tkDays" style="width:100%">' +
+    '<option value="7" selected>7 天（默认）</option>' +
+    '<option value="30">30 天</option>' +
+    '<option value="90">90 天</option>' +
+    '<option value="180">180 天</option>' +
+    '<option value="custom">自定义天数</option>' +
+    '<option value="0">不限期</option></select>' +
+    '<div id="tkCustomBox" style="display:none;margin-top:10px;align-items:center;gap:8px">' +
+    '<input class="inp mono" id="tkCustom" type="number" min="1" max="3650" value="14" style="width:120px;text-align:right">' +
+    '<span class="mini">天后失效</span></div>' +
+    '<div class="mini" style="margin-top:8px;color:var(--tx-3)">到期后令牌自动作废，已接入的脚本需要换新令牌。</div></div>' +
+    (rotate ? '<div class="note gold" style="margin-top:16px">轮换会同时吊销现有的全部刮削令牌，正在跑的脚本会立刻中断。</div>' : '');
+  openModal({
+    title: rotate ? '轮换刮削令牌' : '生成刮削令牌',
+    width: 460,
+    body: body,
+    foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>' + (rotate ? '轮换' : '生成') + '</button>',
+    after() {
+      const sel = $('#tkDays'), box = $('#tkCustomBox');
+      $('#modal [data-x]').onclick = closeModal;
+      sel.onchange = () => { box.style.display = sel.value === 'custom' ? 'flex' : 'none'; };
+      $('#modal [data-ok]').onclick = () => {
+        const name = ($('#tkName').value || '').trim();
+        const days = sel.value === 'custom' ? Math.floor(Number($('#tkCustom').value)) : Number(sel.value);
+        if (sel.value === 'custom' && !(days >= 1)) return toast('自定义天数需 ≥ 1', 'err');
+        const btn = $('#modal [data-ok]');
+        btn.disabled = true;
+        LantaiRuntime.request('api/lantai/v1/scrape/agent/token', {
+          method: 'POST', body: { rotate: rotate, name: name || null, expiresInDays: days }
+        }).then(() => {
+          closeModal();
+          toast(rotate ? '已轮换刮削令牌' : '已生成刮削令牌', 'ok');
+          return loadScrape();
+        }).then(() => { if ($('#scCfg')) paintScSettings(); })
+          .catch(e => { btn.disabled = false; toast('生成失败：' + onlineErrText(e), 'err'); });
+      };
+    }
+  });
 }
 function scSourceListHtml() {
   const list = scSources || [];
@@ -6869,7 +6626,7 @@ function libCfgSet(l, key, on) {
   else if (key === 'scanOnStartup') l.onStartup = on;
   else l[key] = on;
 }
-const STAB2 = [['libraries', 'set.libraries'], ['online', 'set.online'], ['tokens', 'set.tokens'], ['heartbeat', 'set.heartbeat'], ['appearance', 'set.appearance'], ['cache', 'set.cache'], ['system', 'set.system'], ['upgrade', 'set.upgrade']];
+const STAB2 = [['libraries', 'set.libraries'], ['online', 'set.online'], ['tokens', 'set.tokens'], ['heartbeat', 'set.heartbeat'], ['appearance', 'set.appearance'], ['cache', 'set.cache'], ['backup', 'set.backup'], ['system', 'set.system'], ['upgrade', 'set.upgrade']];
 const ROLES = ['ADMIN', 'PAGE_STREAMING', 'FILE_DOWNLOAD', 'KOBO_SYNC', 'KOREADER_SYNC'];
 const ROLE_DESC = { ADMIN: '书库、用户、设置、刮削与在线订阅', PAGE_STREAMING: '查看页图与阅读器资源（阅读必需）', FILE_DOWNLOAD: '下载书籍原文件', KOBO_SYNC: 'Kobo 设备同步', KOREADER_SYNC: 'KOReader 同步' };
 const TOKEN_SCOPES_DEFAULT = [
@@ -6902,6 +6659,7 @@ Routes.settings = (v, seg) => {
   if (t === 'heartbeat') B.innerHTML = stHeartbeat();
   if (t === 'appearance') B.innerHTML = stAppearance();
   if (t === 'cache') B.innerHTML = stCache();
+  if (t === 'backup') { B.innerHTML = stBackup(); wireBackup(B); }
   if (t === 'system') B.innerHTML = stSystem();
   if (t === 'upgrade') { B.innerHTML = stUpgrade(); wireUpgrade(B); }
   $$('#view [data-st]').forEach(el => el.onclick = () => go('/settings/' + el.dataset.st));
@@ -6922,11 +6680,35 @@ function libScope(u) {
   if (!ids.length) return '未分配';
   return ids.map(id => { const l = LIBS.find(x => x.id === id); return l ? l.name : id; }).join('、');
 }
+function loadProfiles(ids, force, silent) {
+  const want = (ids || []).filter(id => id && (force || !PROFILES[id]));
+  if (!want.length || profileBusy || !window.LantaiRuntime) return;
+  profileBusy = true;
+  LantaiRuntime.request('api/lantai/v1/user-profile/map?' + want.map(id => 'ids=' + encodeURIComponent(id)).join('&'))
+    .then(map => { Object.keys(map || {}).forEach(k => { PROFILES[k] = map[k]; }); })
+    .catch(() => { })
+    .then(() => { profileBusy = false; if (!silent && S.route === '/users') render(); });
+}
+function profileOf(userId) { return PROFILES[userId] || null; }
+function displayName(user) {
+  if (!user) return '';
+  const p = profileOf(user.id);
+  return (p && p.nickname) || user.username || (user.email || '').split('@')[0] || '';
+}
+function avatarHtml(userId, name, cls) {
+  const p = profileOf(userId);
+  const label = 'avatar' + (cls ? ' ' + cls : '');
+  if (p && p.hasAvatar) {
+    return '<img class="' + label + '" alt="" style="object-fit:cover" src="' +
+      esc('api/lantai/v1/user-profile/' + userId + '/avatar?v=' + (p.avatarUpdated || 0)) + '">';
+  }
+  return '<span class="' + label + '">' + esc(((p && p.nickname) || name || '?').slice(0, 1).toUpperCase()) + '</span>';
+}
 function loadAdminUsers() {
   if (!window.LantaiRuntime) { adminErr = '后端不可用'; return; }
   adminBusy = true;
   LantaiRuntime.request('api/lantai/v1/users?size=100')
-    .then(page => { adminUsers = Array.isArray(page.content) ? page.content : []; adminErr = ''; })
+    .then(page => { adminUsers = Array.isArray(page.content) ? page.content : []; adminErr = ''; loadProfiles(adminUsers.map(u => u.id), false, true); })
     .catch(e => { adminUsers = []; adminErr = '用户列表加载失败：' + onlineErrText(e); })
     .then(() => { adminBusy = false; if (S.route === '/users') render(); });
 }
@@ -6953,6 +6735,7 @@ function stKeys() {
 Routes.users = v => {
   if (isAdmin() && adminUsers === null && !adminBusy && !adminErr) loadAdminUsers();
   if (myKeys === null && !myKeysBusy && !myKeysErr && window.LantaiRuntime) loadMyKeys();
+  if (window.LantaiRuntime && LantaiRuntime.me && LantaiRuntime.me.id) loadProfiles([LantaiRuntime.me.id]);
   v.innerHTML = '<div class="ph"><div><h1>用户管理</h1><div class="sub">账户资料 · 角色权限 · 密码与访问密钥</div></div>' +
     '<div class="acts"><button class="btn" data-newkey>' + ico('key') + '生成我的密钥</button></div></div>' +
     stMe() +
@@ -6978,6 +6761,8 @@ function stMe() {
   const roles = (me.roles || []).filter(r => r !== 'USER').map(r => ROLE_CN[r] || r).join(' / ') || '普通用户';
   return '<div class="card" style="margin-bottom:18px"><div class="card-h"><h3>' + ico('user') + ' 我的账户</h3>' +
     '<div class="r"><button class="btn sm" data-editme>' + ico('edit') + '编辑资料</button></div></div>' +
+    '<div class="rowflex" style="gap:14px;margin-bottom:14px">' + avatarHtml(me.id, me.username) +
+    '<div><div style="font-size:15px">' + esc(displayName(me)) + '</div><div class="mini mono">' + esc(me.username || '') + '</div></div></div>' +
     '<div class="grid g-2" style="gap:4px 24px">' +
     kvLine('用户名', me.username || '—') + kvLine('邮箱', me.email || '未设置') +
     kvLine('角色', roles) + kvLine('密码', '不可查看 · 只能修改或重置') +
@@ -6985,12 +6770,46 @@ function stMe() {
     '<div class="note" style="margin-top:10px">登录可用用户名或邮箱；密码以哈希保存，管理员也无法查看明文，忘记只能重置。</div></div>';
 }
 function editProfile(u, self) {
+  if (!u) return openProfileModal(u, self);
+  if (!self || !window.LantaiRuntime) return openProfileModal(u, self);
+  LantaiRuntime.request('api/lantai/v1/user-profile/me')
+    .then(p => { PROFILES[u.id] = p; })
+    .catch(() => { })
+    .then(() => openProfileModal(u, self));
+}
+function compressAvatar(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const side = Math.min(img.width, img.height);
+      const size = Math.min(512, side);
+      const c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+      resolve(c.toDataURL('image/png'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('图片读取失败')); };
+    img.src = url;
+  });
+}
+function openProfileModal(u, self) {
   if (!u) return;
+  const p = profileOf(u.id) || {};
+  const nick = p.nickname && p.nickname !== u.username ? p.nickname : '';
+  let avatar = null;
+  let cleared = false;
   openModal({
     title: self ? '编辑我的资料' : '编辑 ' + (u.username || '用户'),
     width: 520,
     body: '<div class="grid" style="gap:12px">' +
+      (self ? '<div class="rowflex" style="gap:14px;align-items:center"><div id="pfAvaWrap">' + avatarHtml(u.id, u.username) + '</div>' +
+        '<div><button class="btn sm" id="pfAvaPick">选择图片</button><button class="btn sm ghost" id="pfAvaClear" style="margin-left:6px">移除</button>' +
+        '<div class="mini" style="margin-top:6px">支持 PNG / JPG / WebP，自动裁成正方形并缩到 256 像素</div></div>' +
+        '<input type="file" id="pfAvaFile" accept="image/*" style="display:none"></div>' : '') +
       '<div class="field"><label>用户名</label><input id="pfName" class="inp" value="' + esc(u.username || '') + '" placeholder="登录名，必填"></div>' +
+      (self ? '<div class="field"><label>昵称（选填）</label><input id="pfNick" class="inp" value="' + esc(nick) + '" placeholder="留空则显示用户名"></div>' : '') +
       '<div class="field"><label>邮箱（选填）</label><input id="pfMail" class="inp" value="' + esc(u.email || '') + '" placeholder="留空表示不设置"></div>' +
       (self ? '<div class="field"><label>新密码（留空不修改）</label><input id="pfPass" class="inp" type="password" autocomplete="new-password" placeholder="至少 8 位"></div>' : '') +
       (self ? '' : '<div class="note gold">管理员不能查看子账户密码，只能重置；重置后新密码只显示一次。</div>') +
@@ -7001,12 +6820,42 @@ function editProfile(u, self) {
       $('#modal [data-x]').onclick = closeModal;
       const rp = $('#modal [data-reset]');
       if (rp) rp.onclick = () => { closeModal(); resetPassword(u.id); };
+      const pick = $('#pfAvaPick');
+      if (pick) {
+        pick.onclick = () => $('#pfAvaFile').click();
+        $('#pfAvaFile').onchange = e => {
+          const f = e.target.files && e.target.files[0];
+          if (!f) return;
+          compressAvatar(f).then(data => {
+            avatar = data; cleared = false;
+            $('#pfAvaWrap').innerHTML = '<img class="avatar" alt="" style="object-fit:cover" src="' + data + '">';
+          }).catch(() => toast('图片读取失败', 'err'));
+        };
+        $('#pfAvaClear').onclick = () => {
+          avatar = null; cleared = true;
+          $('#pfAvaWrap').innerHTML = '<span class="avatar">' + esc((u.username || '?').slice(0, 1).toUpperCase()) + '</span>';
+        };
+      }
       $('#modal [data-ok]').onclick = () => {
         const username = ($('#pfName').value || '').trim();
         const email = ($('#pfMail').value || '').trim();
         const pass = self ? ($('#pfPass').value || '') : '';
+        const nickEl = self ? $('#pfNick') : null;
+        const nick = nickEl ? nickEl.value.trim() : '';
         if (!username) return toast('用户名不能为空', 'err');
         if (pass && pass.length < 8) return toast('密码至少 8 位', 'err');
+        const saveNickname = () => {
+          if (!self) return Promise.resolve();
+          return LantaiRuntime.request('api/lantai/v1/user-profile/me', { method: 'PUT', body: { nickname: nick } })
+            .then(r => { if (r) PROFILES[u.id] = r; }, () => { });
+        };
+        const saveAvatar = () => {
+          if (!self || (!avatar && !cleared)) return Promise.resolve();
+          const req = avatar
+            ? LantaiRuntime.request('api/lantai/v1/user-profile/me/avatar', { method: 'PUT', body: { data: avatar } })
+            : LantaiRuntime.request('api/lantai/v1/user-profile/me/avatar', { method: 'DELETE' });
+          return req.then(r => { if (r) PROFILES[u.id] = r; });
+        };
         LantaiRuntime.request('api/lantai/v1/users/' + u.id + '/profile', {
           method: 'PUT', body: { username: username, email: email || null }
         }).then(r => {
@@ -7016,9 +6865,11 @@ function editProfile(u, self) {
             toast('资料已保存', 'ok');
             if (isAdmin()) loadAdminUsers(); else render();
           };
-          if (!pass) return done();
+          const finishProfile = () => saveNickname().then(saveAvatar).then(done)
+            .catch(e => toast('资料已存，昵称或头像保存失败：' + onlineErrText(e), 'err', 3600));
+          if (!pass) return finishProfile();
           LantaiRuntime.request('api/v2/users/me/password', { method: 'PATCH', body: { password: pass } })
-            .then(done).catch(e => toast('资料已存，改密失败：' + onlineErrText(e), 'err', 3600));
+            .then(finishProfile).catch(e => toast('资料已存，改密失败：' + onlineErrText(e), 'err', 3600));
         }).catch(e => toast('保存失败：' + onlineErrText(e), 'err', 3600));
       };
     }
@@ -7071,23 +6922,56 @@ function newUserModal() {
   const sel = new Set(['PAGE_STREAMING']);
   openModal({
     title: '新建用户', width: 500,
-    body: '<div class="field"><label>用户名（登录名）</label><input class="inp mono" id="nuName" placeholder="如 reader" spellcheck="false"></div>' +
+    body: '<div class="rowflex" style="gap:14px;align-items:center;margin-bottom:14px"><div id="nuAvaWrap"><span class="avatar">?</span></div>' +
+      '<div><button class="btn sm" id="nuAvaPick">选择头像</button><button class="btn sm ghost" id="nuAvaClear" style="margin-left:6px">不用头像</button>' +
+      '<div class="mini" style="margin-top:6px">选填，自动裁成正方形并缩到 256 像素</div></div>' +
+      '<input type="file" id="nuAvaFile" accept="image/*" style="display:none"></div>' +
+      '<div class="field"><label>用户名（登录名）</label><input class="inp mono" id="nuName" placeholder="如 reader" spellcheck="false"></div>' +
+      '<div class="field" style="margin-top:10px"><label>昵称（选填）</label><input class="inp" id="nuNick" placeholder="留空则显示用户名"></div>' +
       '<div class="field" style="margin-top:10px"><label>邮箱（选填）</label><input class="inp mono" id="nuMail" placeholder="reader@example.com"></div>' +
       '<div class="field" style="margin-top:10px"><label>初始密码</label><input class="inp" type="password" id="nuPass" placeholder="至少 8 位"></div>' +
       '<div class="field" style="margin-top:10px"><label>角色</label><div class="chips">' + ROLES.map(r => '<span class="chip' + (sel.has(r) ? ' on' : '') + '" data-ur="' + r + '">' + (ROLE_CN[r] || r) + '</span>').join('') + '</div></div>' +
       '<div class="note" style="margin-top:10px">用户名必填、全局唯一；邮箱可不填，填了也能用它登录。新用户默认共享全部书库。</div>',
     foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>创建</button>',
     after() {
+      let nuAvatar = null;
       $('#modal [data-x]').onclick = closeModal;
+      $('#nuAvaPick').onclick = () => $('#nuAvaFile').click();
+      $('#nuAvaFile').onchange = e => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        compressAvatar(f).then(data => {
+          nuAvatar = data;
+          $('#nuAvaWrap').innerHTML = '<img class="avatar" alt="" style="object-fit:cover" src="' + data + '">';
+        }).catch(() => toast('图片读取失败', 'err'));
+      };
+      $('#nuAvaClear').onclick = () => {
+        nuAvatar = null;
+        $('#nuAvaWrap').innerHTML = '<span class="avatar">?</span>';
+      };
       $$('#modal [data-ur]').forEach(c => c.onclick = () => { sel.has(c.dataset.ur) ? sel.delete(c.dataset.ur) : sel.add(c.dataset.ur); c.classList.toggle('on'); });
       $('#modal [data-ok]').onclick = () => {
         const name = $('#nuName').value.trim(), email = $('#nuMail').value.trim(), pass = $('#nuPass').value;
+        const nick = ($('#nuNick').value || '').trim();
         if (!name) return toast('请填写用户名', 'err');
         if (!/^[A-Za-z0-9._-]{2,32}$/.test(name)) return toast('用户名只能用字母、数字、点、下划线、短横线，2–32 位', 'err');
         if (email && !/^.+@.+\..+$/.test(email)) return toast('邮箱格式不正确', 'err');
         if (pass.length < 8) return toast('密码至少 8 位', 'err');
         LantaiRuntime.request('api/v2/users', { method: 'POST', body: { username: name, email: email || null, password: pass, roles: [...sel], sharedLibraries: { all: true, libraryIds: [] } } })
-          .then(() => { closeModal(); toast('已创建用户 ' + name, 'ok'); loadAdminUsers(); })
+          .then(u => {
+            const userId = u && u.id;
+            const finish = () => {
+              closeModal();
+              toast('已创建用户 ' + name, 'ok');
+              loadAdminUsers();
+              if (userId) loadProfiles([userId], true, true);
+            };
+            if (!userId || (!nick && !nuAvatar)) return finish();
+            const jobs = [];
+            if (nick) jobs.push(LantaiRuntime.request('api/lantai/v1/user-profile/' + userId, { method: 'PUT', body: { nickname: nick } }).catch(() => { }));
+            if (nuAvatar) jobs.push(LantaiRuntime.request('api/lantai/v1/user-profile/' + userId + '/avatar', { method: 'PUT', body: { data: nuAvatar } }).catch(() => { }));
+            Promise.all(jobs).then(finish).catch(finish);
+          })
           .catch(e => toast('创建失败：' + onlineErrText(e), 'err', 3600));
       };
     }
@@ -7363,7 +7247,7 @@ function loadInspect(force) {
     inspectData.dup = out[0] ? unwrapPage(out[0]) : [];
     inspectData.known = out[1] ? unwrapPage(out[1]) : [];
     inspectData.unknown = out[2] ? unwrapPage(out[2]) : [];
-    inspectData.err = (out[0] || out[1]) ? '' : '巡检数据加载失败，需要管理员权限';
+    inspectData.err = (out[0] || out[1]) ? '' : '查重数据加载失败，需要管理员权限';
   }).then(() => {
     inspectData.busy = false;
     if (S.route === '/inspect') render();
@@ -7374,17 +7258,17 @@ Routes.inspect = v => {
   loadInspect();
   const D = inspectData;
   if (D.known === null) {
-    v.innerHTML = '<div class="ph"><div><h1>巡检</h1><div class="sub">重复文件与重复页面</div></div></div>' +
+    v.innerHTML = '<div class="ph"><div><h1>查重</h1><div class="sub">重复文件与重复页面</div></div></div>' +
       '<div class="card"><div class="empty" style="padding:56px 0">' +
-      (D.err ? '<div class="mini">' + esc(D.err) + '</div>' : '<div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在巡检…</div>') + '</div></div>';
+      (D.err ? '<div class="mini">' + esc(D.err) + '</div>' : '<div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在查重…</div>') + '</div></div>';
     return;
   }
   const groups = {};
   (D.dup || []).forEach(x => { const k = x.fileHash || x.hash || ''; if (!k) return; (groups[k] = groups[k] || []).push(x); });
   const dupGroups = Object.keys(groups).filter(k => groups[k].length > 1);
   const known = D.known || [], unknown = D.unknown || [];
-  v.innerHTML = '<div class="ph"><div><h1>巡检</h1><div class="sub">重复文件与重复页面</div></div>' +
-    '<div class="acts"><button class="btn" data-insrefresh>' + ico('sync') + '重新巡检</button></div></div>' +
+  v.innerHTML = '<div class="ph"><div><h1>查重</h1><div class="sub">重复文件与重复页面</div></div>' +
+    '<div class="acts"><button class="btn" data-insrefresh>' + ico('sync') + '重新查重</button></div></div>' +
     (D.err ? '<div class="note red" style="margin-bottom:14px">' + esc(D.err) + '</div>' : '') +
     '<div class="grid g-kpi" style="margin-bottom:20px">' +
     kpi('重复书组', num(dupGroups.length), '文件哈希相同', dupGroups.length === 0) +
@@ -7657,29 +7541,91 @@ function loadCat(page, force) {
       if (S.route.indexOf('/extensions') === 0) render();
     });
 }
+const EXT_LANG_TOP = 8;
 function extLangLabel(lang) {
-  const codes = String(lang || '').split(',').map(x => x.trim()).filter(Boolean);
-  if (!codes.length) return '—';
-  return codes.map(c => LANG_CN[c.toLowerCase().split('-')[0]] || c.toUpperCase()).join(' / ');
+  return window.LantaiLang ? window.LantaiLang.label(lang) : '—';
+}
+function extLangStats() {
+  const src = rtCatLangs && rtCatLangs.length
+    ? rtCatLangs
+    : [{ code: 'zh', count: 0 }, { code: 'en', count: 0 }, { code: 'ja', count: 0 }];
+  const sum = new Map();
+  src.forEach(x => {
+    if (!x || !x.code) return;
+    const code = String(x.code).toLowerCase() === 'all' ? 'multi' : x.code;
+    sum.set(code, (sum.get(code) || 0) + (x.count || 0));
+  });
+  return [...sum.entries()]
+    .map(([code, count]) => ({ code, label: extLangLabel(code), count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+function extLangChip(code, label, count, on) {
+  const title = code === 'all' ? '' : (window.LantaiLang.alias(code) || '');
+  return '<button class="lgchip' + (on ? ' on' : '') + '" data-extlang="' + esc(code) + '"' +
+    (title ? ' title="' + esc(title) + '"' : '') + '>' + esc(label) +
+    (count ? '<i>' + num(count) + '</i>' : '') + '</button>';
 }
 function extLangChips() {
-  const known = rtCatLangs && rtCatLangs.length
-    ? rtCatLangs.map(x => ({ code: x.code, label: extLangLabel(x.code), count: x.count }))
-    : ['zh', 'en', 'ja'].map(c => ({ code: c, label: LANG_CN[c], count: 0 }));
-  const list = [{ code: 'all', label: '全部语言', count: rtCatTotal }].concat(known);
-  return '<div class="seg" style="flex-wrap:wrap;max-width:100%">' +
-    list.map(x => '<button class="' + (S.ext.lang === x.code ? 'on' : '') + '" data-extlang="' + esc(x.code) + '">' +
-      esc(x.label) + (x.count ? '<span class="mini" style="opacity:.55;margin-left:4px">' + num(x.count) + '</span>' : '') + '</button>').join('') +
+  const all = extLangStats();
+  const cur = S.ext.lang || 'all';
+  const topN = (window.innerWidth || 1200) <= 560 ? 4 : EXT_LANG_TOP;
+  const top = all.slice(0, topN);
+  if (cur !== 'all' && !top.some(x => x.code === cur)) {
+    top.push(all.find(x => x.code === cur) || { code: cur, label: extLangLabel(cur), count: 0 });
+  }
+  const rest = all.length - top.length;
+  return '<div class="lgbar">' +
+    extLangChip('all', L.t('ext.lang.all'), rtCatTotal, cur === 'all') +
+    top.map(x => extLangChip(x.code, x.label, x.count, cur === x.code)).join('') +
+    (rest > 0 ? '<button class="lgchip more" data-extlangpick>' + ico('down') + esc(L.t('ext.lang.more', { n: rest })) + '</button>' : '') +
     '</div>';
+}
+function langPickRows(list, cur, q) {
+  const kw = String(q || '').trim().toLowerCase();
+  const hay = x => {
+    const e = window.LantaiLang.entry(x.code);
+    const out = [x.label, x.code];
+    if (e) out.push(e[0], e[1], e[2], e[2].replace(/文$/, '语'));
+    return out.join(' ').toLowerCase();
+  };
+  const hit = kw ? list.filter(x => hay(x).indexOf(kw) >= 0) : list;
+  if (!hit.length) return '<div class="empty" style="padding:22px"><p>' + esc(L.t('ext.lang.empty')) + '</p></div>';
+  const rows = [{ code: 'all', label: L.t('ext.lang.all'), count: rtCatTotal }].concat(hit);
+  return rows.map(x => '<button class="lgrow' + (cur === x.code ? ' on' : '') + '" data-extlang="' + esc(x.code) + '">' +
+    '<span class="nm">' + esc(x.label) + '</span><span class="cd">' + esc(x.code === 'all' ? '' : x.code) + '</span>' +
+    '<span class="ct">' + (x.count ? num(x.count) : '') + '</span></button>').join('');
+}
+function openLangPicker() {
+  const all = extLangStats();
+  openDrawer({
+    title: L.t('ext.lang.pick'),
+    width: 420,
+    body: '<input class="inp" id="lgPickQ" style="width:100%;margin-bottom:12px" placeholder="' + esc(L.t('ext.lang.search')) + '">' +
+      '<div class="lgpicks" id="lgPickList">' + langPickRows(all, S.ext.lang, '') + '</div>',
+    after: () => {
+      const q = $('#lgPickQ'), list = $('#lgPickList');
+      if (!q || !list) return;
+      q.oninput = () => { list.innerHTML = langPickRows(all, S.ext.lang, q.value); };
+      list.onclick = e => {
+        const b = e.target.closest('[data-extlang]');
+        if (!b) return;
+        S.ext.lang = b.dataset.extlang;
+        closeDrawer();
+        rtCat = null; rtCatTotal = 0; rtCatOffset = 0; rtCatPage = 0;
+        loadCat(0, true);
+        render();
+      };
+      q.focus();
+    }
+  });
 }
 function extPagerBar() {
   const pages = catPages(), cur = rtCatPage + 1;
-  return '<div class="rowflex" style="gap:10px;margin-top:14px;flex-wrap:wrap;align-items:flex-start">' +
-    extLangChips() +
-    '<div class="seg" style="margin-left:auto">' +
-    '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + '上一页</button>' +
+  return '<div class="rowflex" style="gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center;justify-content:flex-end">' +
+    '<div class="seg">' +
+    '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + esc(L.t('ext.page.prev')) + '</button>' +
     '<span class="mini" style="padding:0 6px;line-height:30px">' + cur + ' / ' + pages + '</span>' +
-    '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>下一页' + ico('right') + '</button>' +
+    '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>' + esc(L.t('ext.page.next')) + ico('right') + '</button>' +
     '</div></div>';
 }
 function extIcon(url, name) {
@@ -8155,17 +8101,19 @@ function extSwyPage(v, tab) {
   const installed = rtExts || [], upd = installed.filter(e => e.hasUpdate).length;
   const pages = catPages(), cur = rtCatPage + 1;
   const body = tab === 'catalog'
-    ? '<div class="rowflex" style="gap:10px;margin-bottom:14px;flex-wrap:wrap">' +
-      extLangChips() +
-      '<input class="inp" style="width:210px;height:31px" placeholder="搜索扩展…" value="' + esc(S.ext.q) + '" data-extq>' +
+    ? '<div class="card" style="padding:13px 15px 14px;margin-bottom:14px">' +
+      '<div class="rowflex" style="gap:10px;flex-wrap:wrap;align-items:center">' +
+      '<input class="inp" style="width:220px;height:31px" placeholder="' + esc(L.t('ext.searchPh')) + '" value="' + esc(S.ext.q) + '" data-extq>' +
       '<div class="seg" style="margin-left:auto">' +
-      '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + '上一页</button>' +
+      '<button data-extpage="prev"' + (rtCatPage <= 0 ? ' disabled' : '') + '>' + ico('left') + esc(L.t('ext.page.prev')) + '</button>' +
       '<span class="mini" style="padding:0 6px;line-height:30px">' + cur + ' / ' + pages + '</span>' +
-      '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>下一页' + ico('right') + '</button>' +
+      '<button data-extpage="next"' + (cur >= pages ? ' disabled' : '') + '>' + esc(L.t('ext.page.next')) + ico('right') + '</button>' +
       '</div></div>' +
-      '<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>扩展</th><th style="width:66px">语言</th><th style="width:112px">版本</th><th style="width:76px">状态</th><th style="width:152px">操作</th></tr></thead>' +
+      extLangChips() +
+      '</div>' +
+      '<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>' + esc(L.t('ext.col.ext')) + '</th><th style="width:88px">' + esc(L.t('ext.col.lang')) + '</th><th style="width:112px">' + esc(L.t('ext.col.ver')) + '</th><th style="width:76px">' + esc(L.t('ext.col.state')) + '</th><th style="width:152px">' + esc(L.t('ext.col.acts')) + '</th></tr></thead>' +
       '<tbody id="extCat">' + extCatalogRows() + '</tbody></table></div>' +
-      '<div class="mini" style="margin-top:10px">共 ' + num(rtCatTotal) + ' 条 · 第 ' + cur + ' / ' + pages + ' 页 · 本页 ' + num((rtCat || []).length) + ' 条</div></div>' +
+      '<div class="mini" style="margin-top:10px">' + esc(L.t('ext.page.detail', { n: num(rtCatTotal), cur, pages, m: num((rtCat || []).length) })) + '</div></div>' +
       extPagerBar()
     : (rtExtErr ? '<div class="note red" style="margin-bottom:12px">' + esc(rtExtErr) + '</div>' : '') +
       '<div class="grid g-2" id="extGrid">' + (installed.length ? installed.map(extCard).join('')
@@ -8173,7 +8121,8 @@ function extSwyPage(v, tab) {
       (upd ? '<div class="note gold" style="margin-top:14px">' + ico('alert') + ' ' + upd + ' 个插件有可用更新。</div>' : '') +
       '<div class="note" style="margin-top:14px">停用图源不会删除已订阅的存档、进度与书签；要清理内容请到「在线源」订阅列表退订。</div>';
   v.innerHTML = '<div class="ph"><div><h1>图源插件</h1><div class="sub">安装、更新、卸载扩展并控制图源开关</div></div>' +
-    '<div class="acts"><button class="btn" data-extupload>' + ico('up') + '导入插件包</button>' +
+    '<div class="acts"><button class="btn" data-go="/extensions">' + ico('left') + '功能拓展</button>' +
+    '<button class="btn" data-extupload>' + ico('up') + '导入插件包</button>' +
     '<button class="btn" data-extrefresh>' + ico('sync') + '刷新清单</button>' +
     '<button class="btn" data-go="/online">' + ico('globe') + '在线源搜索</button>' +
     '<button class="btn pri" data-extinstall-open>' + ico('plus') + '去清单安装</button>' +
@@ -8348,6 +8297,7 @@ function wireExt(v) {
     rtCat = null; rtCatTotal = 0; rtCatOffset = 0; rtCatPage = 0;
     loadCat(0, true);
   });
+  v.querySelectorAll('[data-extlangpick]').forEach(el => el.onclick = openLangPicker);
   v.querySelectorAll('[data-extpage]').forEach(el => el.onclick = () => {
     const next = el.dataset.extpage === 'prev' ? rtCatPage - 1 : rtCatPage + 1;
     if (next < 0 || next >= catPages()) return;
@@ -8616,7 +8566,10 @@ function wireTaskQueue(v) {
   if (poolEl) poolEl.onchange = () => {
     const n = Math.floor(Number(poolEl.value));
     if (!(n >= 1)) { poolEl.value = sysSettings && sysSettings.taskPoolSize != null ? sysSettings.taskPoolSize : ''; return; }
-    saveSysSetting({ taskPoolSize: Math.min(32, n) }).then(() => { if (S.route === '/tasks') render(); });
+    saveSysSetting({ taskPoolSize: Math.min(32, n) }).then(ok => {
+      if (!ok) { poolEl.value = sysSettings && sysSettings.taskPoolSize != null ? sysSettings.taskPoolSize : ''; return; }
+      if (S.route === '/tasks') render();
+    });
   };
   v.querySelectorAll('[data-tqstate]').forEach(el => el.onclick = () => { taskQ.state = el.dataset.tqstate; taskQ.page = 0; taskQ.data = null; render(); });
   v.querySelectorAll('[data-tqtype]').forEach(el => el.onclick = () => { taskQ.type = el.dataset.tqtype; taskQ.page = 0; taskQ.data = null; render(); });
@@ -8676,16 +8629,34 @@ Routes.tasks = v => {
   wireTaskQueue(v);
   wire(v);
 };
+function paintPoolBadge(n) {
+  const el = document.getElementById('stPoolBadge');
+  if (!el) return;
+  const v = Number(n);
+  el.textContent = (n === '' || n == null || isNaN(v)) ? '—' : v + ' 并发';
+  el.className = 'badge ' + (v > 1 ? 'ok' : 'warn');
+}
 function wireSt(B, t) {
   B.querySelectorAll('[data-hist]').forEach(el => el.onclick = () => historyModal(0));
   B.querySelectorAll('[data-sysset]').forEach(el => {
-    const save = () => {
-      const key = el.dataset.sysset;
+    const key = el.dataset.sysset;
+    const kind = el.dataset.kind;
+    if (key === 'taskPoolSize') {
+      el.oninput = () => paintPoolBadge(el.value);
+    }
+    el.onchange = () => {
+      const prev = sysSettings ? sysSettings[key] : null;
       const patch = {};
-      patch[key] = el.dataset.kind === 'bool' ? el.checked : (el.value === '' ? null : Number(el.value));
-      saveSysSetting(patch);
+      patch[key] = kind === 'bool' ? el.checked : (el.value === '' ? null : Number(el.value));
+      saveSysSetting(patch).then(ok => {
+        if (!ok) {
+          if (kind === 'bool') el.checked = !!prev; else el.value = prev == null ? '' : prev;
+          if (key === 'taskPoolSize') paintPoolBadge(el.value);
+          return;
+        }
+        if (key === 'taskPoolSize') paintPoolBadge(el.value);
+      });
     };
-    el.onchange = save;
   });
   B.querySelectorAll('[data-cfg]').forEach(el => el.onchange = () => {
     const k = el.dataset.cfg, on = el.checked;
@@ -8705,7 +8676,7 @@ function wireSt(B, t) {
     }
     if (k === 'online.enabled') CFG.onlineEnabled = on;
     if (k === 'offline.sync') { CFG.offlineSync = on; savePrefs({ offlineSync: on }); }
-    if (k === 'nav.collapsed') { S.collapsed = on; savePrefs({ collapsed: on }); $('#app').classList.toggle('collapsed', on); }
+    if (k === 'nav.collapsed') { S.collapsed = on; savePrefs({ collapsed: on }); $('#app').classList.toggle('collapsed', on); applyCollapseBtn(); renderNav(); }
     if (k === 'ui.dense') { CFG.dense = on; savePrefs({ dense: on }); document.body.classList.toggle('dense', on); }
   });
   B.querySelectorAll('[data-hb]').forEach(el => el.onclick = () => { CFG.heartbeat = +el.dataset.hb; savePrefs({ heartbeat: CFG.heartbeat }); toast('记录间隔 → ' + el.dataset.hb + ' 秒'); render(); });
@@ -8750,7 +8721,7 @@ function wireSt(B, t) {
         $('#modal [data-ok]').onclick = () => {
           closeModal();
           LantaiRuntime.request('api/v1/libraries/' + l.id, { method: 'DELETE' })
-            .then(() => libReload('已删除 ' + l.name))
+            .then(() => libReload('已删除 ' + l.name, true))
             .catch(e => toast('删除失败：' + onlineErrText(e), 'err'));
         };
       }
@@ -8760,8 +8731,8 @@ function wireSt(B, t) {
 function libPatch(id, body) {
   return LantaiRuntime.request('api/v1/libraries/' + id, { method: 'PATCH', body: body });
 }
-function libReload(msg) {
-  return LantaiRuntime.hydrate().then(() => { if (msg) toast(msg, 'ok'); render(); })
+function libReload(msg, force) {
+  return LantaiRuntime.hydrate(force).then(() => { if (msg) toast(msg, 'ok'); render(); })
     .catch(e => toast('刷新失败：' + onlineErrText(e), 'err'));
 }
 function fsBrowse(host, initial, onPick) {
@@ -8838,7 +8809,7 @@ function stPerfCard() {
   if (!G && !sysSettingsErr) loadSysSettings();
   const pool = G ? G.taskPoolSize : null;
   return '<div class="card" style="margin-bottom:18px"><div class="card-h"><h3>' + ico('bolt') + ' 批量导入性能</h3>' +
-    '<div class="r"><span class="badge ' + (pool && pool > 1 ? 'ok' : 'warn') + '">' + (pool == null ? '—' : pool + ' 并发') + '</span></div></div>' +
+    '<div class="r"><span class="badge ' + (pool && pool > 1 ? 'ok' : 'warn') + '" id="stPoolBadge">' + (pool == null ? '—' : pool + ' 并发') + '</span></div></div>' +
     '<div class="list-i" style="border:0;padding:10px 0"><div style="flex:1;min-width:0"><div class="gt">任务池并发数</div>' +
     '<div class="gs mini">同时运行的后台任务上限。大批量导入建议设为 CPU 核心数（如 NAS 4 核填 4）。</div></div>' +
     '<input class="inp mono" style="width:96px;height:30px;text-align:right" type="number" min="1" data-sysset="taskPoolSize" data-kind="num" value="' + (pool == null ? '' : pool) + '"></div></div>' +
@@ -8976,8 +8947,8 @@ function stUsers() {
     '<div class="r"><span class="badge">' + list.length + ' 个账号</span><button class="btn sm pri" data-newuser>' + ico('plus') + '新建用户</button></div></div>' +
     (list.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>用户</th><th>角色</th><th>库范围</th><th>状态</th><th></th></tr></thead><tbody>' +
       list.map(u => {
-        const me = isMe(u), roles = u.roles || [], name = u.username || (u.email || '').split('@')[0] || '';
-        return '<tr><td><div class="rowflex"><span class="avatar sm">' + esc(name.slice(0, 1).toUpperCase()) + '</span><div><div>' + esc(name) + (me ? ' <span class="badge gold">我</span>' : '') + '</div>' +
+        const me = isMe(u), roles = u.roles || [], name = displayName(u);
+        return '<tr><td><div class="rowflex">' + avatarHtml(u.id, u.username, 'sm') + '<div><div>' + esc(name) + (me ? ' <span class="badge gold">我</span>' : '') + '</div>' +
           '<div class="mini mono">' + esc(u.email || '未设置邮箱') + '</div></div></div></td>' +
           '<td><div class="chips">' + ROLES.map(r => '<span class="chip' + (roles.indexOf(r) >= 0 ? ' on' : '') + '" data-urole="' + esc(u.id + ':' + r) + '">' + (ROLE_CN[r] || r) + '</span>').join('') + '</div></td>' +
           '<td class="mini">' + esc(libScope(u)) + '</td>' +
@@ -9127,20 +9098,21 @@ function loadSysSettings(force, silent) {
     });
 }
 function saveSysSetting(patch) {
-  if (!window.LantaiRuntime) return Promise.resolve();
+  if (!window.LantaiRuntime) return Promise.resolve(false);
   return LantaiRuntime.request('api/v1/settings', { method: 'PATCH', body: patch })
-    .then(() => { sysSettings = Object.assign({}, sysSettings, patch); toast('全局设置已保存', 'ok'); })
-    .catch(e => toast('保存失败：' + onlineErrText(e), 'err'));
+    .then(() => { sysSettings = Object.assign({}, sysSettings, patch); toast('全局设置已保存', 'ok'); return true; })
+    .catch(e => { toast('保存失败：' + onlineErrText(e), 'err'); return false; });
 }
 let upSt = null, upInfo = null, upBusy = false, upErr = '', upApplying = false, upPoll = null;
 let upProg = { phase: '', pct: 0, label: '' };
 function upProgHtml() {
   if (!upProg.phase) return '';
   const indet = upProg.pct < 0;
+  const tag = upProg.phase === 'upload' ? '上传 ' : upProg.phase === 'unzip' ? '解压 ' : '';
   return '<div style="margin-top:14px">' +
     '<div class="rowflex" style="justify-content:space-between;gap:12px;margin-bottom:7px">' +
     '<span class="mini">' + esc(upProg.label || '处理中…') + '</span>' +
-    '<span class="mini mono">' + (indet ? '请稍候' : upProg.pct + '%') + '</span></div>' +
+    '<span class="mini mono">' + (indet ? (upProg.phase === 'verify' ? '校验中' : '请稍候') : tag + upProg.pct + '%') + '</span></div>' +
     '<div class="uprog"><i' + (indet ? ' class="indet"' : ' style="width:' + upProg.pct + '%"') + '></i></div></div>';
 }
 function upPaintProg() {
@@ -9192,46 +9164,15 @@ function waitRestart() {
   }, 6000);
 }
 function upRestartHint(mode) {
-  return mode === 'container'
-    ? '兰台会自行退出，由容器重启策略拉起新版本。页面将在 15 秒后自动重连。'
-    : '兰台会自行退出。请重新双击「启动兰台.bat」启动新版本，之后刷新本页。';
+  return L.t(mode === 'container' ? 'up.restartContainer' : 'up.manualHint');
 }
 function stUpgrade() {
-  if (!upSt) {
-    if (!upErr) loadUpgrade();
-    return '<div class="card"><div class="empty" style="padding:44px 0">' +
-      (upErr ? '<div class="mini">' + esc(upErr) + '</div>' : '<div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在读取升级状态…</div>') +
-      '</div></div>';
+  if (window.LantaiUpdateCenter && LantaiUpdateCenter.html) return LantaiUpdateCenter.html();
+  if (!CHUNK_OK.sysx && !CHUNK_FAIL.sysx) {
+    loadChunk('sysx').then(function () { render(); });
+    return '<div class="card"><div class="empty" style="padding:44px 0"><div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在载入升级模块…</div></div></div>';
   }
-  const S1 = upSt;
-  const ok = S1.jarPath && S1.jarWritable;
-  return '<div id="upResult"></div>' +
-    '<div class="card" style="margin-bottom:16px"><div class="card-h"><h3>' + ico('server') + ' 当前版本</h3>' +
-    '<div class="r"><span class="badge ok">' + esc(S1.version) + '</span></div></div>' +
-    kvMono('运行文件', S1.jarPath || '未识别（可能以解压目录方式运行）') +
-    kvMono('写入权限', S1.jarWritable ? '可替换' : '不可写，无法在线升级') +
-    kvMono('部署形态', S1.containerized ? '容器内' : '裸机 / 桌面') +
-    kvMono('升级后', upRestartHint(S1.restartMode)) +
-    kvMono('可用备份', S1.backupVersion || '无') +
-    (ok ? '' : '<div class="note red" style="margin-top:11px">当前运行环境不允许在线替换 jar。容器部署请确认挂载不是只读，或改用挂载卷内的 jar 启动。</div>') +
-    '</div>' +
-    '<div class="card" style="margin-bottom:16px"><div class="card-h"><h3>' + ico('layers') + ' 导入升级包</h3></div>' +
-    '<div class="note">升级包只包含应用 jar，不含镜像、JDK、配置与数据。上传后先校验，确认无误才替换文件。整个过程中数据库与书籍文件不受影响。</div>' +
-    '<div class="rowflex" style="gap:10px;margin-top:12px;flex-wrap:wrap"><input class="inp" type="file" accept=".zip,.lup" id="upFile" style="flex:1;min-width:240px">' +
-    '<button class="btn pri" data-upcheck' + (ok ? '' : ' disabled') + '>' + ico('check') + '校验</button></div>' +
-    '<div id="upProg"></div>' +
-    (upInfo ? '<div style="margin-top:16px"><div class="note ' + (upApplying ? 'gold' : '') + '">升级包校验通过</div>' +
-      kvMono('目标版本', upInfo.version + '（当前 ' + upInfo.currentVersion + '）') +
-      kvMono('文件', upInfo.fileName + ' · ' + bytes(upInfo.sizeBytes)) +
-      kvMono('SHA-256', upInfo.sha256) +
-      (upInfo.builtAt ? kvMono('构建时间', upInfo.builtAt) : '') +
-      (upInfo.notes ? kvMono('说明', upInfo.notes) : '') +
-      '<div class="rowflex" style="gap:8px;margin-top:14px"><button class="btn pri" data-upapply>' + ico('bolt') + '立即升级并重启</button>' +
-      '<button class="btn ghost" data-updiscard>放弃这个包</button></div></div>' : '') +
-    '</div>' +
-    '<div class="card"><div class="card-h"><h3>' + ico('clock') + ' 回退</h3></div>' +
-    '<div class="note">每次升级前会把当前 jar 备份到配置目录 <span class="mono">upgrade/backup/</span>，只保留一份，更早的备份会自动清理。回退等于把这一份换回去并重启。</div>' +
-    '<div class="rowflex" style="margin-top:12px"><button class="btn danger" data-uprollback' + (S1.backupVersion ? '' : ' disabled') + '>' + ico('sync') + '回退到 ' + esc(S1.backupVersion || '（无备份）') + '</button></div></div>';
+  return '<div class="card"><div class="note red">升级模块没有载入：升级后浏览器可能还缓存着旧页面，脚本文件名已经变了。请按 <span class="mono">Ctrl+F5</span> 强制刷新；仍失败说明当前包的网页文件不完整。</div></div>';
 }
 function upResult(html) {
   const box = $('#upResult');
@@ -9247,70 +9188,7 @@ function doUpgrade(url, onDone) {
     .catch(e => { upApplying = false; upSetProg('', 0, ''); toast('失败：' + onlineErrText(e), 'err', 8000); render(); });
 }
 function wireUpgrade(B) {
-  const file = B.querySelector('#upFile');
-  const btn = B.querySelector('[data-upcheck]');
-  if (btn && file) btn.onclick = () => {
-    const f = file.files && file.files[0];
-    if (!f) return toast('先选择升级包', 'err');
-    const fd = new FormData();
-    fd.append('file', f);
-    btn.disabled = true;
-    upInfo = null;
-    upSetProg('upload', 0, '正在上传 ' + f.name + '（0 B / ' + bytes(f.size) + '）');
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', LantaiRuntime.base + 'api/lantai/v1/system/upgrade/inspect', true);
-    xhr.withCredentials = true;
-    xhr.upload.onprogress = ev => {
-      if (!ev.lengthComputable) return;
-      const pct = Math.min(100, Math.round(ev.loaded / ev.total * 100));
-      upSetProg('upload', pct, '正在上传 ' + f.name + '（' + bytes(ev.loaded) + ' / ' + bytes(ev.total) + '）');
-    };
-    xhr.upload.onload = () => { upSetProg('unzip', 0, '上传完成，正在解压并校验包内容…'); upStartPoll(); };
-    xhr.onload = () => {
-      upStopPoll();
-      let data = null;
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try { data = JSON.parse(xhr.responseText); } catch (_) { data = null; }
-      }
-      if (data) {
-        upInfo = data;
-        upSetProg('', 0, '');
-        toast('校验通过：' + data.version, 'ok');
-        render();
-        return;
-      }
-      upSetProg('', 0, '');
-      btn.disabled = false;
-      const detail = String(xhr.responseText || ('HTTP ' + xhr.status)).slice(0, 400);
-      toast(xhr.status === 401 ? '登录状态已失效，请重新登录。' : '校验失败：' + detail, 'err', 9000);
-    };
-    xhr.onerror = () => { upStopPoll(); upSetProg('', 0, ''); btn.disabled = false; toast('网络错误，上传中断', 'err', 8000); };
-    xhr.onabort = () => { upStopPoll(); upSetProg('', 0, ''); btn.disabled = false; };
-    xhr.send(fd);
-  };
-  const ap = B.querySelector('[data-upapply]');
-  if (ap) ap.onclick = () => {
-    if (!window.confirm('确认用 ' + upInfo.version + ' 替换当前 ' + upInfo.currentVersion + '？替换后兰台会自行退出并重启。')) return;
-    doUpgrade('api/lantai/v1/system/upgrade/apply', d => {
-      upResult('<div class="note gold">已替换为 ' + esc(d.version) + '，' + esc(upRestartHint(d.restartMode)) + '</div>');
-      waitRestart();
-    });
-  };
-  const dc = B.querySelector('[data-updiscard]');
-  if (dc) dc.onclick = () => {
-    LantaiRuntime.request('api/lantai/v1/system/upgrade/staged', { method: 'DELETE' })
-      .then(() => { upInfo = null; toast('已放弃暂存的升级包', 'ok'); render(); })
-      .catch(e => toast('操作失败：' + onlineErrText(e), 'err'));
-  };
-  const rb = B.querySelector('[data-uprollback]');
-  if (rb) rb.onclick = () => {
-    if (!window.confirm('确认回退到 ' + upSt.backupVersion + '？兰台会自行退出并重启。')) return;
-    doUpgrade('api/lantai/v1/system/upgrade/rollback', d => {
-      upResult('<div class="note gold">已回退到 ' + esc(d.version) + '，' + esc(upRestartHint(d.restartMode)) + '</div>');
-      waitRestart();
-    });
-  };
-  upPaintProg();
+  if (window.LantaiUpdateCenter && LantaiUpdateCenter.wire) return LantaiUpdateCenter.wire(B);
 }
 function stSystem() {
   if (!sysSettings) {
@@ -9392,6 +9270,186 @@ function stCache() {
     ['格式转换文件', 'MOBI/AZW3/FB2 的转换产物']].map(r => kvLine(r[0], r[1])).join('') +
     '<div class="hr"></div><div class="rowflex" style="gap:9px"><button class="btn sm" data-go="/trash">' + ico('trash') + '打开回收站</button></div>' +
     '<div class="mini" style="margin-top:10px">回收站里是被删除的原文件，缓存是可重建的中间产物，两者互不影响。</div></div>';
+}
+let bkList = null, bkBusy = false, bkErr = '', bkNote = '', bkRestore = null, bkPick = '';
+let bkJob = null, bkJobBusy = false, bkJobPoll = null, bkJobUsed = '', bkJobErr = '';
+function bkJobHtml() {
+  const j = bkJob;
+  if (!j || !j.running) return '';
+  const pct = Math.max(0, Math.min(100, j.pct || 0));
+  return '<div style="margin-top:12px">' +
+    '<div class="rowflex" style="justify-content:space-between;gap:12px;margin-bottom:7px">' +
+    '<span class="mini">' + esc(j.label || '正在生成备份…') + '</span>' +
+    '<span class="mini mono">' + pct + '%</span></div>' +
+    '<div class="uprog"><i style="width:' + pct + '%"></i></div></div>' +
+    '<div class="mini" style="margin-top:8px">可以离开本页，任务在后台继续；回来或刷新后进度会接着显示。</div>';
+}
+function paintJob() {
+  const box = $('#bkJob');
+  if (box) box.innerHTML = bkJobHtml();
+}
+function stopJobPoll() {
+  if (bkJobPoll) { clearInterval(bkJobPoll); bkJobPoll = null; }
+}
+function checkJobDone() {
+  const j = bkJob;
+  if (!j) return;
+  if (j.error) {
+    bkJobErr = '生成失败：' + j.error;
+    toast(bkJobErr, 'err', 5000);
+  } else if (!j.running && j.result && j.result.name && bkJobUsed !== j.result.name) {
+    bkJobUsed = j.result.name;
+    bkNote = '已生成 ' + j.result.name + '（' + bkSize(j.result.bytes) + '，' + j.result.entries + ' 个文件）';
+    bkList = null;
+    toast('备份已生成', 'ok');
+    loadBackups();
+  }
+  if (String(S.route).indexOf('/settings') === 0 && S.settingsTab === 'backup') render();
+}
+function startJobPoll() {
+  if (bkJobPoll) return;
+  bkJobPoll = setInterval(() => {
+    LantaiRuntime.request('api/lantai/v1/system/archive/export/status')
+      .then(j => {
+        bkJob = j || null;
+        if (bkJob && bkJob.running) { paintJob(); return; }
+        stopJobPoll();
+        checkJobDone();
+      })
+      .catch(() => { });
+  }, 800);
+}
+function loadJob() {
+  if (!window.LantaiRuntime || bkJobBusy) return;
+  bkJobBusy = true;
+  LantaiRuntime.request('api/lantai/v1/system/archive/export/status')
+    .then(j => { bkJob = j || null; bkJobErr = ''; })
+    .catch(e => { bkJobErr = onlineErrText(e); })
+    .then(() => {
+      bkJobBusy = false;
+      if (bkJob && bkJob.running) startJobPoll();
+      if (String(S.route).indexOf('/settings') === 0 && S.settingsTab === 'backup') render();
+    });
+}
+function bkSize(n) {
+  const unit = ['B', 'KB', 'MB', 'GB'];
+  let i = 0, v = n || 0;
+  while (v >= 1024 && i < unit.length - 1) { v /= 1024; i++; }
+  return (i ? v.toFixed(1) : v) + ' ' + unit[i];
+}
+function loadBackups() {
+  if (!window.LantaiRuntime) { bkErr = '后端不可用'; bkList = []; return; }
+  bkBusy = true;
+  Promise.all([
+    LantaiRuntime.request('api/lantai/v1/system/archive/archives').catch(() => []),
+    LantaiRuntime.request('api/lantai/v1/system/archive/restore').catch(() => null)
+  ]).then(r => {
+    bkList = Array.isArray(r[0]) ? r[0] : [];
+    bkRestore = r[1];
+    bkErr = '';
+  }).catch(e => { bkList = []; bkErr = '备份信息加载失败：' + onlineErrText(e); })
+    .then(() => { bkBusy = false; if (S.route.indexOf('/settings') === 0) render(); });
+}
+function stBackup() {
+  if (!isAdmin()) return '<div class="card"><div class="empty" style="padding:28px"><h4>仅管理员可用</h4><p>全量备份与还原会带走全部账户与配置，需要管理员权限。</p></div></div>';
+  if (bkList === null && !bkBusy && !bkErr) loadBackups();
+  if (bkJob === null && !bkJobBusy) loadJob();
+  return (bkRestore && bkRestore.pending
+    ? '<div class="note gold" style="margin-bottom:14px">有一份备份已就位，重启兰台后自动覆盖当前数据；覆盖前会把现有数据库另存为 pre-restore-*，过程记录在配置目录的 restore.log。</div>' : '') +
+    '<div class="card"><div class="card-h"><h3>' + ico('disk') + ' 生成备份</h3>' +
+    '<div class="r"><button class="btn sm pri" data-bkexport' + (bkJob && bkJob.running ? ' disabled' : '') + '>' +
+    (bkJob && bkJob.running ? '<span class="spinner"></span> 生成中' : '立即生成') + '</button></div></div>' +
+    '<div class="note">打包内容：主库、任务库、会话库三个 SQLite 快照，账户昵称与头像，已安装的运行时与插件，配置 yml，以及同级 suwayomi 目录。<b>不含书籍文件</b>，书籍请自行备份各库根目录。</div>' +
+    '<div id="bkJob">' + bkJobHtml() + '</div>' +
+    (bkNote ? '<div class="note gold" style="margin-top:10px">' + esc(bkNote) + '</div>' : '') +
+    (bkJobErr ? '<div class="note red" style="margin-top:10px">' + esc(bkJobErr) + '</div>' : '') + '</div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-h"><h3>' + ico('folder') + ' 已有备份' +
+    (bkList && bkList.length ? ' <span class="badge">' + bkList.length + ' 份</span>' : '') + '</h3>' +
+    '<div class="r"><button class="btn sm" data-bkrefresh>' + ico('sync') + '刷新</button></div></div>' +
+    (bkErr ? '<div class="note red">' + esc(bkErr) + '</div>'
+      : bkList && bkList.length
+        ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>文件</th><th>大小</th><th>创建时间</th><th></th></tr></thead><tbody>' +
+          bkList.map(a => '<tr><td class="mono mini">' + esc(a.name) + '</td><td class="mini">' + bkSize(a.bytes) + '</td>' +
+            '<td class="mini mono">' + esc(uStamp(a.createdAt)) + '</td>' +
+            '<td style="text-align:right;white-space:nowrap"><a class="btn xs" download href="' + esc('api/lantai/v1/system/archive/download/' + encodeURIComponent(a.name)) + '">' + ico('dl') + '下载</a> ' +
+            '<button class="btn xs danger" data-bkdel="' + esc(a.name) + '">' + ico('trash') + '删除</button></td></tr>').join('') +
+          '</tbody></table></div>'
+        : '<div class="note">还没有备份包，点右上角「立即生成」。</div>') + '</div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-h"><h3>' + ico('up') + ' 从备份还原</h3></div>' +
+    '<div class="note red">还原会覆盖当前全部数据：账户与角色、书库记录、刮削结果、插件与运行时会一并换成备份里的状态。</div>' +
+    '<div class="dropzone sm" data-bkdrop tabindex="0" role="button" style="margin-top:12px">' +
+    '<input type="file" accept=".zip" id="bkFile" hidden>' +
+    '<svg class="dz-ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-up"/></svg>' +
+    '<div style="min-width:0"><div class="dz-t">拖入备份包，或点击选择</div><div class="dz-s">只接受 .zip · 上传后不会立即生效，需重启兰台</div></div>' +
+    (bkPick ? '<div class="dz-file">' + ico('check') + esc(bkPick) + '</div>' : '') +
+    '</div>' +
+    '<div class="mini" style="margin-top:9px">重启时先备份当前数据，再覆盖。</div>' +
+    (bkRestore && bkRestore.pending ? '<div class="note gold" style="margin-top:12px">待还原包时间戳：' + esc(bkRestore.staging || '') + '</div>' : '') +
+    '</div>';
+}
+function wireBackup(B) {
+  const ex = B.querySelector('[data-bkexport]');
+  if (ex) ex.onclick = () => {
+    if (ex.disabled) return;
+    ex.disabled = true;
+    ex.innerHTML = '<span class="spinner"></span> 生成中';
+    bkNote = '';
+    bkJobErr = '';
+    LantaiRuntime.request('api/lantai/v1/system/archive/export', { method: 'POST' })
+      .then(j => { bkJob = j || null; ex.disabled = false; startJobPoll(); render(); })
+      .catch(e => { ex.disabled = false; bkJobErr = '无法开始生成：' + onlineErrText(e); toast(bkJobErr, 'err', 4000); render(); });
+  };
+  B.querySelectorAll('[data-bkdel]').forEach(el => el.onclick = () => {
+    const name = el.dataset.bkdel;
+    if (!name) return;
+    if (!window.confirm('删除备份 ' + name + ' ？删除后不可恢复，需要重新生成。')) return;
+    el.disabled = true;
+    LantaiRuntime.request('api/lantai/v1/system/archive/archives/' + encodeURIComponent(name), { method: 'DELETE' })
+      .then(() => { toast('已删除 ' + name, 'ok'); bkList = null; loadBackups(); })
+      .catch(e => { el.disabled = false; toast('删除失败：' + onlineErrText(e), 'err', 3600); });
+  });
+  const rf = B.querySelector('[data-bkrefresh]');
+  if (rf) rf.onclick = () => { bkList = null; bkNote = ''; bkJobErr = ''; loadBackups(); loadJob(); };
+  const dz = B.querySelector('[data-bkdrop]');
+  if (dz) {
+    const inp = dz.querySelector('#bkFile');
+    if (inp) inp.onclick = e => e.stopPropagation();
+    dz.onclick = e => { if (e.target === inp || !inp || bkBusy) return; inp.click(); };
+    dz.onkeydown = e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      if (inp && !bkBusy) inp.click();
+    };
+    if (inp) inp.onchange = () => { if (inp.files && inp.files[0]) uploadBackup(inp.files[0], dz); };
+    dz.ondragover = e => { e.preventDefault(); dz.classList.add('over'); };
+    dz.ondragleave = () => dz.classList.remove('over');
+    dz.ondrop = e => {
+      e.preventDefault();
+      dz.classList.remove('over');
+      if (bkBusy) return;
+      const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) uploadBackup(f, dz);
+    };
+  }
+}
+function uploadBackup(f, dz) {
+  if (bkBusy) return;
+  if (!/\.zip$/i.test(f.name)) return toast('只支持 zip 备份包', 'err');
+  bkBusy = true;
+  dz.classList.add('on');
+  const t = dz.querySelector('.dz-t');
+  const label = t ? t.textContent : '';
+  if (t) t.textContent = '正在上传并校验…';
+  const reset = () => { bkBusy = false; dz.classList.remove('on'); if (t) t.textContent = label; };
+  const fd = new FormData();
+  fd.append('file', f);
+  fetch('api/lantai/v1/system/archive/import', { method: 'POST', body: fd, credentials: 'same-origin' })
+    .then(res => {
+      if (!res.ok) return res.text().then(x => { throw new Error(x || ('HTTP ' + res.status)); });
+      return res.json();
+    })
+    .then(() => { reset(); bkPick = f.name; bkList = null; bkNote = ''; toast('备份已就位，请重启兰台完成还原', 'ok'); loadBackups(); })
+    .catch(e => { reset(); toast('导入失败：' + onlineErrText(e), 'err', 3600); });
 }
 function tokenStamp(v) { return v ? String(v).replace('T', ' ').slice(0, 16) : '—'; }
 function tokenScopeLabel(name) {
@@ -9821,197 +9879,9 @@ function mountLogRun(v) {
 }
 Routes.logs = (v, seg) => logPage(v, seg && seg[0] === 'audit' ? 'audit' : 'run');
 Routes.audit = v => logPage(v, 'audit');
-const API_GROUP_CN = {
-  Deprecation: '已废弃', Libraries: '书库', Series: '系列', Books: '书籍',
-  Collections: '合集', Readlists: '阅读清单', Referential: '参考数据',
-  Users: '用户与权限', Server: '服务端', Integrations: '集成',
-  lantai: '兰台自有', other: '其他'
-};
-const API_VERS = [['all', '全部'], ['lantai', '兰台'], ['v1', 'v1'], ['v2', 'v2']];
-const API_VER_CN = { lantai: '兰台', v1: 'v1', v2: 'v2', other: '—' };
-
-function apiDocState() {
-  if (!S.api) S.api = { doc: null, err: '', busy: false, group: 'all', ver: 'all', q: '', open: {} };
-  return S.api;
-}
-
-function loadApiDoc(attempt) {
-  const P = apiDocState();
-  const n = attempt || 1;
-  if (n === 1 && P.busy) return;
-  P.busy = true;
-  P.err = '';
-  fetch('v3/api-docs', { credentials: 'same-origin', cache: 'no-store' })
-    .then(r => {
-      if (r.status === 401 || r.status === 403) {
-        const err = new Error('需要管理员权限');
-        err.fatal = true;
-        return Promise.reject(err);
-      }
-      return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status));
-    })
-    .then(doc => { P.doc = doc; P.busy = false; if (S.route === '/protocol') render(); })
-    .catch(e => {
-      if (n < 2 && !e.fatal) { setTimeout(() => loadApiDoc(n + 1), 800); return; }
-      P.err = '读取接口文档失败：' + e.message;
-      P.busy = false;
-      if (S.route === '/protocol') render();
-    });
-}
-
-function apiTagMap(doc) {
-  const groups = (doc && (doc['x-tagGroups'] || (doc.info && doc.info['x-tagGroups']))) || [];
-  const map = {}, order = [];
-  groups.forEach(g => {
-    order.push(g.name);
-    (g.tags || []).forEach(t => { map[t] = g.name; });
-  });
-  return { map: map, order: order.concat(['lantai', 'other']) };
-}
-
-function apiOps(doc) {
-  const out = [];
-  if (!doc || !doc.paths) return out;
-  const tagMap = apiTagMap(doc).map;
-  Object.keys(doc.paths).forEach(p => {
-    const item = doc.paths[p] || {};
-    ['get', 'post', 'put', 'patch', 'delete'].forEach(m => {
-      const op = item[m];
-      if (!op) return;
-      const tag = (op.tags && op.tags[0]) || '(untagged)';
-      const group = tagMap[tag] || (/^lantai/i.test(tag) || /^lantai-/i.test(tag) ? 'lantai' : 'other');
-      out.push({ method: m.toUpperCase(), path: p, summary: op.summary || '', tag: tag, group: group, ver: apiVersionOf(p) });
-    });
-  });
-  return out;
-}
-
-function apiVersionOf(p) {
-  if (p.indexOf('/api/lantai/') === 0) return 'lantai';
-  if (p.indexOf('/api/v2/') === 0) return 'v2';
-  if (p.indexOf('/api/v1/') === 0) return 'v1';
-  return 'other';
-}
-
-function apiAuthBlock() {
-  return '<div class="note">所有接口基地址 <span class="mono">' + esc(CFG.host) + '</span>，局域网内其他设备需放行 25600 端口。</div>' +
-    '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th style="width:120px">方式</th><th>用法</th></tr></thead><tbody>' +
-    '<tr><td>Basic Auth</td><td class="mini mono">Authorization: Basic base64(邮箱:密码)</td></tr>' +
-    '<tr><td>API Key</td><td class="mini mono">X-API-Key: 访问密钥</td></tr>' +
-    '<tr><td>Agent Token</td><td class="mini mono">Authorization: Bearer 令牌（<span style="opacity:.7">config-dir/agent-token.txt</span>）</td></tr>' +
-    '<tr><td>会话</td><td class="mini">登录后返回 <span class="mono">LANTAI-SESSION</span> Cookie；加 <span class="mono">X-Auth-Token</span> 头可改用该头传会话</td></tr>' +
-    '</tbody></table></div>' +
-    '<pre class="mono" style="font-size:11.5px;line-height:1.8;background:var(--bg-2);padding:14px;border-radius:8px;margin-top:12px;overflow:auto">' +
-    '# 局域网客户端\ncurl -u 邮箱:密码 http://127.0.0.1:25600/api/v2/users/me\n\n' +
-    '# 用 API Key 调兰台自有接口\ncurl -H "X-API-Key: 密钥" http://127.0.0.1:25600/api/lantai/v1/system\n\n' +
-    '# 用 Agent Token 拉待补全元数据名单\ncurl -H "Authorization: Bearer $(cat agent-token.txt)" \\\n' +
-    '  "http://127.0.0.1:25600/api/lantai/v1/bulk/metadata/pending?limit=20"</pre>';
-}
-
 Routes.protocol = (v) => {
-  if (!isAdmin()) {
-    v.innerHTML = '<div class="ph"><div><h1>API 接口</h1><div class="sub">全部对外接口与鉴权说明</div></div></div>' +
-      '<div class="card"><div class="empty">' + ico('key') + '<h4>需要管理员权限</h4>' +
-      '<p>接口清单包含全部对外端点与鉴权方式，仅管理员账户可查看。<br>请使用管理员账号登录，或联系管理员授予管理员角色。</p></div></div>';
-    return;
-  }
-  const P = apiDocState();
-  if (!P.doc && !P.busy && !P.err) loadApiDoc();
-  const doc = P.doc;
-  const all = apiOps(doc);
-  const tagOrder = apiTagMap(doc).order;
-  const q = (P.q || '').toLowerCase();
-  const filtered = all.filter(o =>
-    (P.ver === 'all' || o.ver === P.ver) &&
-    (P.group === 'all' || o.group === P.group) &&
-    (!q || o.path.toLowerCase().indexOf(q) >= 0 || (o.summary || '').toLowerCase().indexOf(q) >= 0 || o.tag.toLowerCase().indexOf(q) >= 0)
-  );
-  const verScoped = all.filter(o => P.ver === 'all' || o.ver === P.ver);
-  const countBy = g => verScoped.filter(o => o.group === g).length;
-
-  const chips = '<div class="filters" style="margin-bottom:0">' +
-    '<span class="lbl" style="margin:0">功能</span><div class="chips">' +
-    '<span class="chip' + (P.group === 'all' ? ' on' : '') + '" data-apigroup="all">全部 ' + verScoped.length + '</span>' +
-    tagOrder.filter(g => countBy(g) > 0).map(g => '<span class="chip' + (P.group === g ? ' on' : '') + '" data-apigroup="' + esc(g) + '">' + esc(API_GROUP_CN[g] || g) + ' ' + countBy(g) + '</span>').join('') +
-    '</div></div>' +
-    '<div class="filters" style="margin-bottom:20px">' +
-    '<span class="lbl" style="margin:0">版本</span><div class="seg">' +
-    API_VERS.map(x => '<button class="' + (P.ver === x[0] ? 'on' : '') + '" data-apiver="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
-    '<span class="sep"></span><span class="mini">' + filtered.length + ' 个端点</span>' +
-    '<input class="inp" style="width:230px;height:31px;margin-left:auto" placeholder="搜索路径、说明或标签…" value="' + esc(P.q) + '" data-apiq>' +
-    '</div>';
-
-  const body = tagOrder.map(g => {
-    const list = filtered.filter(o => o.group === g);
-    if (!list.length) return '';
-    const open = !!P.open[g];
-    return '<div class="card" style="margin-bottom:14px"><div class="card-h" data-apigrp="' + esc(g) + '" style="cursor:pointer">' +
-      '<h3>' + ico('file') + ' ' + esc(API_GROUP_CN[g] || g) + '</h3>' +
-      '<div class="r"><span class="badge">' + list.length + '</span><span class="mini">' + (open ? '收起' : '展开') + '</span></div></div>' +
-      (open ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:78px">方法</th><th>路径</th><th>说明</th><th style="width:62px">版本</th><th style="width:130px">标签</th></tr></thead><tbody>' +
-        list.map(o => '<tr>' +
-          '<td class="mono" style="font-size:11px;' + (o.method === 'DELETE' ? 'color:var(--cinnabar)' : 'color:var(--acc-2)') + '">' + o.method + '</td>' +
-          '<td class="mono" style="font-size:11.5px;word-break:break-all">' + esc(o.path) + '</td>' +
-          '<td class="mini">' + esc(o.summary || '—') + '</td>' +
-          '<td><span class="badge">' + esc(API_VER_CN[o.ver]) + '</span></td>' +
-          '<td class="mini" style="color:var(--tx-3)">' + esc(o.tag) + '</td></tr>').join('') +
-        '</tbody></table></div>' : '') + '</div>';
-  }).join('');
-
-  v.innerHTML =
-    '<div class="ph"><div><h1>API 接口</h1><div class="sub">全部对外接口 · ' + all.length + ' 个端点 · 基地址 <span class="mono">' + esc(CFG.host) + '</span></div></div>' +
-    '<div class="acts"><button class="btn" data-act="copyapi">' + ico('key') + '复制基地址</button>' +
-    '<button class="btn" data-apijson>' + ico('file') + 'OpenAPI JSON</button>' +
-    '<button class="btn pri" data-go="/users">' + ico('user') + '用户与角色</button></div></div>' +
-    (P.err ? '<div class="note red" style="margin-bottom:16px;display:flex;align-items:center;gap:12px">' + esc(P.err) +
-      '<button class="btn sm" data-apiretry style="margin-left:auto;flex:none">重新加载</button></div>' : '') +
-    (P.busy || !doc ? (P.err ? '' : '<div class="card"><div class="empty" style="padding:48px 0"><div class="spinner" style="margin:0 auto 12px"></div><div class="mini">正在读取接口文档…</div></div></div>')
-      : '<div class="card" style="margin-bottom:18px"><div class="card-h" data-apiauth style="cursor:pointer"><h3>' + ico('key') + ' 调用说明</h3>' +
-        '<div class="r"><span class="mini">鉴权与示例</span><span class="mini" id="apiAuthTog">展开</span></div></div>' +
-        '<div id="apiAuth" style="display:none">' + apiAuthBlock() + '</div></div>' +
-        chips + body +
-        '<div class="grid g-2" style="margin-top:20px">' +
-        '<div class="card"><div class="card-h"><h3>' + ico('cpu') + ' 客户端适用内容</h3></div>' +
-        '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>客户端</th><th>适合</th><th>不支持</th></tr></thead><tbody>' +
-        [['Mihon / Tachiyomi 系', '漫画库（在线 + 本地 CBZ）', 'EPUB / TXT'],
-          ['Komelia（KMP 原生）', '漫画 + 合集 + 阅读清单', '电子书重排'],
-          ['KOReader', 'EPUB / PDF / TXT', '—'],
-          ['兰台网页端', '全部格式 + 批注 + 统计 + 在线源', '—'],
-          ['Kobo', 'KEPUB · Kobo 同步（需访问密钥）', '—']]
-          .map(r => '<tr><td>' + esc(r[0]) + '</td><td class="mini">' + esc(r[1]) + '</td><td class="mini" style="color:var(--cinnabar)">' + esc(r[2]) + '</td></tr>').join('') +
-        '</tbody></table></div></div>' +
-        '<div class="card"><div class="card-h"><h3>' + ico('ext') + ' 接入方式</h3></div>' +
-        '<div class="mono mini" style="line-height:1.9;padding:2px 0">地址 ' + esc(CFG.host) + '<br>账号 任一用户的邮箱 + 密码（或访问密钥）<br>局域网访问需放行 25600 端口</div>' +
-        '<div class="rowflex" style="margin-top:12px;gap:8px"><button class="btn sm" data-act="copyapi">' + ico('key') + '复制 ' + esc(CFG.host) + '</button>' +
-        '<span class="mini">客户端与电脑须在同一局域网</span></div>' +
-        '<div class="hr"></div>' + kvLine('OPDS v1.2 / v2', '目录与页图') +
-        kvLine('OPDS-PSE', '支持阅读进度回传') + kvLine('WebPub Manifest', '用于 EPUB / TXT') +
-        kvLine('可用角色', '阅读页 · 下载原文件 · 管理员 · Kobo 同步') + '</div></div>');
-
-  $$('#view [data-apigroup]').forEach(el => el.onclick = () => { P.group = el.dataset.apigroup; render(); });
-  $$('#view [data-apiver]').forEach(el => el.onclick = () => { P.ver = el.dataset.apiver; render(); });
-  $$('#view [data-apigrp]').forEach(el => el.onclick = () => { P.open[el.dataset.apigrp] = !P.open[el.dataset.apigrp]; render(); });
-  const auth = $('#view [data-apiauth]');
-  if (auth) auth.onclick = () => {
-    const box = $('#apiAuth'), tog = $('#apiAuthTog');
-    const open = box.style.display === 'none';
-    box.style.display = open ? '' : 'none';
-    if (tog) tog.textContent = open ? '收起' : '展开';
-  };
-  const js = $('#view [data-apijson]');
-  if (js) js.onclick = () => window.open('v3/api-docs', '_blank');
-  const rt = $('#view [data-apiretry]');
-  if (rt) rt.onclick = () => {
-    P.doc = null; P.err = ''; P.busy = false;
-    loadApiDoc();
-    render();
-  };
-  const qi = $('#view [data-apiq]');
-  if (qi) qi.oninput = () => {
-    P.q = qi.value; clearTimeout(qi._t);
-    qi._t = setTimeout(() => { render(); const f = $('#view [data-apiq]'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 260);
-  };
-  wire(v);
+  if (window.LantaiApiDoc && LantaiApiDoc.render) return LantaiApiDoc.render(v);
+  v.innerHTML = '<div class="card"><div class="note red">API module not loaded, reload the page.</div></div>';
 };
 
 CFG.onlineEnabled = true;
@@ -10100,7 +9970,7 @@ function libModal(l) {
         const req = isNew
           ? LantaiRuntime.request('api/v1/libraries', { method: 'POST', body })
           : LantaiRuntime.request('api/v1/libraries/' + l.id, { method: 'PATCH', body });
-        req.then(() => { closeModal(); return libReload(isNew ? '已建库 ' + name : '已保存 ' + name); })
+        req.then(() => { closeModal(); return libReload(isNew ? '已建库 ' + name : '已保存 ' + name, isNew); })
           .catch(e => toast((isNew ? '建库失败：' : '保存失败：') + onlineErrText(e), 'err'))
           .then(() => { btn.disabled = false; });
       };
@@ -10129,6 +9999,11 @@ function wire(root) {
   root.querySelectorAll('[data-sana]').forEach(el => el.onclick = () => singleTask('series', el.dataset.sana, 'analyze', '重新分析'));
   root.querySelectorAll('[data-bmeta]').forEach(el => el.onclick = () => editBookMeta(el.dataset.bmeta));
   root.querySelectorAll('[data-bcover]').forEach(el => el.onclick = () => coverModal('books', el.dataset.bcover, '书籍封面'));
+  root.querySelectorAll('[data-cov]').forEach(el => el.onclick = e => {
+    e.stopPropagation();
+    const v = String(el.dataset.cov || '').split(':');
+    coverLightbox(v[0], v[1], el.dataset.covTitle || '封面');
+  });
   root.querySelectorAll('[data-bref]').forEach(el => el.onclick = () => singleTask('books', el.dataset.bref, 'metadata/refresh', '刷新元数据'));
   root.querySelectorAll('[data-bana]').forEach(el => el.onclick = () => singleTask('books', el.dataset.bana, 'analyze', '重新分析'));
   root.querySelectorAll('[data-szip]').forEach(el => el.onclick = () => window.open('api/v1/series/' + el.dataset.szip + '/file', '_blank'));
@@ -10245,15 +10120,8 @@ function bootHtml() {
   setTimeout(() => { const el = $('#bIn1').value ? $('#bGo') : $('#bIn1'); if (el) el.focus(); }, 40);
 }
 function applyLang(code) {
-  L.lang(code);
-  L.apply(document);
-  bootHtml();
-  const appEl = $('#app');
-  if (appEl && appEl.style.display !== 'none') {
-    renderNav();
-    paintRuntime();
-    render();
-  }
+  try { localStorage.setItem('lantai.lang', code); } catch (e) { }
+  location.reload();
 }
 function submitLogin() {
   if (window.LantaiRuntime) { LantaiRuntime.login(); return; }
@@ -10302,10 +10170,11 @@ function bootTop() {
   $('#taskBtn').onclick = openTasks;
   $('#userChip').onclick = () => {
     const me = USERS.find(u => u.me);
+    if (me && me.id) loadProfiles([me.id]);
     openDrawer({
       title: '账户', width: 400,
-      body: '<div class="rowflex" style="gap:12px;margin-bottom:14px"><span class="avatar" style="width:44px;height:44px;font-size:17px">' + esc(me.name[0]) + '</span>' +
-        '<div><div style="font-size:15px">' + esc(me.name) + '</div><div class="mini mono">' + esc(me.email ? me.username + ' · ' + me.email : me.username) + '</div></div></div>' +
+      body: '<div class="rowflex" style="gap:12px;margin-bottom:14px">' + avatarHtml(me.id, me.username, 'lg') +
+        '<div><div style="font-size:15px">' + esc(displayName(me)) + '</div><div class="mini mono">' + esc(me.email ? me.username + ' · ' + me.email : me.username) + '</div></div></div>' +
         '<div class="chips" style="margin-bottom:14px">' + me.roles.map(r => '<span class="chip on">' + (ROLE_CN[r] || r) + '</span>').join('') + '</div>' +
         kvLine('库范围', me.libs) + kvLine('登录方式', '密码 / 访问密钥') + kvLine('最近活动', me.last) +
         '<div class="hr"></div><div class="row2" style="margin-bottom:12px"><button class="btn ghost blk" id="goUsers">' + ico('user') + '用户与角色</button>' +
@@ -10351,6 +10220,7 @@ try {
     if (pr.idleCap) CFG.idleCap = +pr.idleCap;
     if (typeof pr.offlineSync === 'boolean') CFG.offlineSync = pr.offlineSync;
     if (typeof pr.collapsed === 'boolean') S.collapsed = pr.collapsed;
+    if (pr.navFold && typeof pr.navFold === 'object') S.navFold = pr.navFold;
     if (pr.dense) { CFG.dense = true; document.body.classList.add('dense'); }
   }
 } catch (e) { }
@@ -10360,6 +10230,7 @@ bootHtml();
 bootTop();
 paintBell();
 if (S.collapsed) $('#app').classList.add('collapsed');
+applyCollapseBtn();
 if (!location.hash) history.replaceState(null, '', '#/home');
 if (window.LantaiRuntime) window.LantaiRuntime.start(); else render();
 startPagePoll();
@@ -10370,3605 +10241,3 @@ startPagePoll();
   b.onclick = () => v.scrollTo({ top: 0, behavior: 'smooth' });
 })();
 
-
-(function () {
-  'use strict';
-
-  var MODES = [['single', '单页', 'single'], ['dual', '双页', 'double'], ['webtoon', '长条', 'flow'], ['paged', '分页', 'snap']];
-  var FITS = [['contain', '适应'], ['width', '满宽'], ['height', '满高'], ['orig', '原始']];
-  var QS = [[0, '原图'], [1600, '高清'], [1080, '省流']];
-  var MARGIN_PRESETS = [['none', '无', 0], ['narrow', '窄', 16], ['std', '标准', 32], ['wide', '宽', 72]];
-  var COLORS = ['#C9A24B', '#B0402C', '#46523F', '#2F5D8A', '#7B4F6B', '#E3C377'];
-  var MARK_CN = { highlight: '高亮', underline: '下划线', bookmark: '书签', comment: '标注' };
-  var MAX_ZIP = 300;
-
-  var PRE = { mode: 'single', dir: 'LTR', fit: 'contain', quality: 0, preload: 2, gap: 8, bg: 'auto', imm: false, margins: { t: 0, b: 0, l: 0, r: 0 }, marginPreset: 'none' };
-  try {
-    var saved = JSON.parse(localStorage.getItem('lantai-comic') || '{}');
-    Object.assign(PRE, saved);
-    PRE.margins = Object.assign({ t: 0, b: 0, l: 0, r: 0 }, saved.margins || {});
-  } catch (e) { }
-  if (PRE.dir === 'TTB') PRE.dir = 'LTR';
-
-  var CS = {
-    open: false, bookId: '', book: null, total: 0, page: 1, seen: 1, wantPage: 0,
-    refs: new Map(), refq: new Map(), fails: new Set(),
-    mode: PRE.mode, dir: PRE.dir, fit: PRE.fit, quality: PRE.quality,
-    anns: [], drawMode: null, drawColor: COLORS[0], drawing: null, annTab: 'all', annQ: '', annQT: 0,
-    thumbs: false, side: null, zoom: 1, panX: 0, panY: 0,
-    drag: null, ptrs: new Map(), pinch: null,
-    wheelAt: 0, offTimer: null, idle: null,
-    session: null, beats: 0, hbTimer: null, progTimer: null, started: false,
-    lo: 0, hi: 0, flowObserver: null, scrollTimer: null, tinted: ''
-  };
-
-  function rt() { return window.LantaiRuntime; }
-  function base() { return String((window.LantaiRuntime && LantaiRuntime.base) || '/'); }
-  function req(p, o) {
-    var opt = o || {};
-    if (PRE.imm) opt = Object.assign({}, opt, { headers: Object.assign({ 'X-Lantai-Incognito': '1' }, opt.headers || {}) });
-    return rt().request(p, opt);
-  }
-  function el(tag, cls, html) {
-    var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (html != null) n.innerHTML = html;
-    return n;
-  }
-  function svg(name, size) {
-    return '<svg width="' + (size || 15) + '" height="' + (size || 15) + '"><use href="#i-' + name + '"/></svg>';
-  }
-  function $(id) { return document.getElementById(id); }
-  function all(sel) { return [].slice.call(document.querySelectorAll(sel)); }
-  function savePrefs() {
-    try { localStorage.setItem('lantai-comic', JSON.stringify(PRE)); } catch (e) { }
-  }
-  function immKey() { return 'lantai.imm.c.' + CS.bookId; }
-  function immResume(bookId) {
-    if (!PRE.imm) return 0;
-    try { return +sessionStorage.getItem('lantai.imm.c.' + bookId) || 0; } catch (e) { return 0; }
-  }
-  function imgW() { return CS.quality > 0 ? CS.quality : 0; }
-  function errText(e) {
-    if (!e) return '请求失败';
-    if (e.status === 403) return '没有这个书库的阅读权限';
-    if (e.status === 404) return '书籍或页面不存在';
-    return e.message ? String(e.message).slice(0, 120) : 'HTTP ' + (e.status || 'err');
-  }
-
-  function imgUrl(page, w) {
-    var ref = CS.refs.get(page);
-    if (!ref) return '';
-    return base() + 'api/lantai/v1/read/' + CS.bookId + '/img/' + encodeURIComponent(ref) + '?w=' + (w == null ? imgW() : w) + '&fmt=orig';
-  }
-
-  function ensureRef(page) {
-    if (CS.refs.has(page)) return Promise.resolve(CS.refs.get(page));
-    if (CS.refq.has(page)) return CS.refq.get(page);
-    var p = req('api/lantai/v1/read/' + CS.bookId + '/chapter/' + page + '?images=url&w=0')
-      .then(function (dto) {
-        var ref = dto && dto.images && dto.images[0] && dto.images[0].ref;
-        if (!ref) throw new Error('这一页没有图片');
-        CS.refs.set(page, ref);
-        CS.refq.delete(page);
-        return ref;
-      })
-      .catch(function (e) { CS.refq.delete(page); throw e; });
-    CS.refq.set(page, p);
-    return p;
-  }
-
-  function mount() {
-    var r = $('cm');
-    if (r) return r;
-    r = el('div', 'cm');
-    r.id = 'cm';
-    r.innerHTML =
-      '<div class="cm-glow" id="cmGlow"></div>' +
-      '<div class="cm-flow" id="cmFlow" style="display:none"></div>' +
-      '<div class="cm-stage" id="cmStage"></div>' +
-      '<div class="cm-top" id="cmTop"></div>' +
-      '<div class="cm-bot" id="cmBot"></div>' +
-      '<div class="cm-thumbs" id="cmThumbs"><div class="cm-strip" id="cmStrip"></div></div>' +
-      '<div class="cm-side" id="cmSide"></div>' +
-      '<div class="cm-hint" id="cmHint"></div>' +
-      '<div class="cm-toast" id="cmToast"></div>' +
-      '<div class="cm-float" id="cmFloat"></div>' +
-      '<div class="cm-offline" id="cmOffline">网络已断开<br><span style="color:rgba(233,228,216,.6);font-size:11px">已载入的页面仍可继续阅读</span></div>';
-    document.body.appendChild(r);
-    r.addEventListener('pointerdown', onDown);
-    r.addEventListener('pointermove', onMove);
-    r.addEventListener('pointerup', onUp);
-    r.addEventListener('pointercancel', onUp);
-    r.addEventListener('wheel', onWheel, { passive: false });
-    r.addEventListener('dblclick', function (ev) {
-      if (ev.target.closest('.cm-top,.cm-bot,.cm-side,.cm-thumbs,.cm-float')) return;
-      CS.zoom = CS.zoom > 1 ? 1 : 2;
-      CS.panX = 0; CS.panY = 0;
-      applyVars();
-    });
-    return r;
-  }
-
-  function open(bookId, opts) {
-    opts = opts || {};
-    if (!rt()) return toast('后端不可用', 'err');
-    if (CS.open && CS.bookId === bookId) {
-      if (opts.page) goto(opts.page);
-      return;
-    }
-    if (CS.open) close(false);
-    var b = book(bookId);
-    if (!b) return toast('这本书不在书库里', 'err');
-    if (b.status === 'UNSUPPORTED') return toast('这本书需要先转成 CBZ 才能阅读', 'err');
-
-    mount();
-    CS.open = true; CS.bookId = bookId; CS.book = b;
-    if (opts.imm) { CS.immOnce = !PRE.imm; PRE.imm = true; }
-    CS.total = b.pages > 0 ? b.pages : 0;
-    CS.wantPage = Math.max(0, opts.page || immResume(bookId) || 0);
-    CS.page = CS.wantPage || 1; CS.seen = CS.page;
-    CS.refs.clear(); CS.refq.clear(); CS.fails.clear();
-    CS.anns = []; CS.zoom = 1; CS.panX = 0; CS.panY = 0; CS.tinted = '';
-    CS.mode = PRE.mode; CS.dir = PRE.dir; CS.fit = PRE.fit; CS.quality = PRE.quality;
-    CS.beats = 0; CS.started = false; CS.ptrs.clear(); CS.pinch = null; CS.drag = null;
-    CS.session = {
-      id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'cm_' + bookId + '_' + Date.now(),
-      book: bookId, dur: 0, pages: CS.page, dev: 'webui', devName: '网页端', start: Date.now(), end: Date.now(), offline: false
-    };
-
-    $('cm').classList.add('on');
-    applyVars();
-    paintTop(); paintBot(); syncMode();
-    $('cmFlow').style.display = 'none';
-    $('cmStage').style.display = 'flex';
-    $('cmStage').innerHTML = '<div class="cm-skel">正在读取这本书</div>';
-    if (location.hash !== '#/read/' + bookId) history.pushState(null, '', '#/read/' + bookId);
-    var s = series(b.s);
-    document.title = (s ? s.t : b.name) + ' · 兰台阅读';
-
-    load();
-    startBeat();
-    wakeUp();
-  }
-
-  function load() {
-    var url = 'api/lantai/v1/read/' + CS.bookId + '/bootstrap?images=url&w=0';
-    if (CS.wantPage) url += '&chapter=' + CS.wantPage;
-    req(url).then(function (dto) {
-      if (!CS.open) return;
-      CS.total = dto.total || CS.total;
-      CS.book = Object.assign({}, CS.book, { title: dto.book.title, name: dto.book.title, seriesTitle: dto.book.seriesTitle, profile: dto.book.profile });
-      var rd = dto.book.readingDirection;
-      if (rd === 'RTL') CS.dir = 'RTL';
-      else if (rd !== 'TTB' && rd !== 'WEBTOON') CS.dir = 'LTR';
-      if (rd === 'TTB' || rd === 'WEBTOON') { if (!PRE.modeTouched) { PRE.mode = 'webtoon'; CS.mode = 'webtoon'; } }
-      if (CS.dir === 'TTB') { CS.dir = 'LTR'; PRE.dir = 'LTR'; }
-      var start = CS.wantPage || (dto.progress && dto.progress.chapter) || 1;
-      CS.page = clamp(start, 1, CS.total || 1);
-      CS.seen = Math.max(CS.seen, CS.page);
-      if (dto.first && dto.first.images && dto.first.images[0]) CS.refs.set(dto.first.chapter, dto.first.images[0].ref);
-      CS.started = true;
-      CS.anns = (dto.annotations || []).map(mapAnn).filter(function (a) { return a.page > 0; });
-      applyVars(); syncMode(); paintTop(); paintBot();
-      renderAll();
-      sendProgress();
-      hint('左右点击翻页 · 中间呼出工具栏 · 长按拖动也能翻');
-      bumpIdle();
-    }).catch(function (e) {
-      if (!CS.open) return;
-      $('cmStage').innerHTML = '<div class="cm-fail">这本书打不开<br><span style="opacity:.7">' + esc(errText(e)) + '</span>' +
-        '<button class="cm-btn" data-retry>重试</button></div>';
-      var rb = $('cmStage').querySelector('[data-retry]');
-      if (rb) rb.onclick = function () { $('cmStage').innerHTML = '<div class="cm-skel">正在读取这本书</div>'; load(); };
-    });
-  }
-
-  function close(settle) {
-    if (!CS.open) return;
-    var id = CS.bookId;
-    CS.open = false;
-    clearInterval(CS.hbTimer); CS.hbTimer = null;
-    clearTimeout(CS.progTimer); clearTimeout(CS.offTimer); clearTimeout(CS.idle);
-    if (CS.flowObserver) { CS.flowObserver.disconnect(); CS.flowObserver = null; }
-    releaseWake();
-    var r = $('cm');
-    if (r) { r.classList.remove('on'); r.remove(); }
-    if (CS.session && settle !== false) {
-      CS.session.end = Date.now();
-      if (PRE.imm) {
-        toast('隐身阅读 · 本次不留记录', 'ok');
-      } else {
-        pushSession(CS.session);
-        req('api/lantai/v1/reading/stop', { method: 'POST', body: { bookId: id, deviceId: 'webui' } }).catch(function () { });
-        toast('已读 ' + dur(CS.session.dur) + ' · 停在第 ' + CS.page + ' 页', 'ok');
-      }
-    }
-    CS.session = null;
-    if (CS.immOnce) { PRE.imm = false; CS.immOnce = false; }
-    if (location.hash.indexOf('#/read/') === 0) {
-      history.replaceState(null, '', '#/book/' + id);
-      if (typeof render === 'function') render();
-    }
-  }
-
-  function isOpen(id) { return CS.open && (!id || CS.bookId === id); }
-
-  function applyVars() {
-    var r = $('cm'); if (!r) return;
-    var m = PRE.margins;
-    r.style.setProperty('--cmt', m.t + 'px');
-    r.style.setProperty('--cmb', m.b + 'px');
-    r.style.setProperty('--cml', m.l + 'px');
-    r.style.setProperty('--cmr', m.r + 'px');
-    r.style.setProperty('--cmgap', PRE.gap + 'px');
-    r.classList.toggle('cm-fit-width', CS.fit === 'width');
-    r.classList.toggle('cm-fit-height', CS.fit === 'height');
-    r.classList.toggle('cm-fit-orig', CS.fit === 'orig');
-    r.classList.toggle('cm-zoom', CS.zoom > 1);
-    r.style.setProperty('--cmz', String(CS.zoom));
-    r.style.setProperty('--cmx', CS.panX + 'px');
-    r.style.setProperty('--cmy', CS.panY + 'px');
-    $('cmGlow').style.display = PRE.bg === 'black' ? 'none' : '';
-  }
-
-  function syncMode() {
-    var flow = $('cmFlow'), stage = $('cmStage');
-    var scroll = CS.mode === 'webtoon' || CS.mode === 'paged';
-    flow.style.display = scroll ? '' : 'none';
-    stage.style.display = scroll ? 'none' : 'flex';
-    flow.classList.toggle('snap', CS.mode === 'paged');
-  }
-
-  function spreadPages(page) {
-    if (CS.mode !== 'dual') return [page];
-    if (page <= 1) return [1];
-    var start = page % 2 === 0 ? page : page - 1;
-    var out = [start];
-    if (start + 1 <= CS.total) out.push(start + 1);
-    return out;
-  }
-
-  function pageBox(page, inFlow) {
-    var box = el('div', 'cm-page');
-    box.dataset.p = page;
-    var img = el('img', 'cm-img');
-    img.alt = '第 ' + page + ' 页';
-    img.draggable = false;
-    img.decoding = 'async';
-    box.appendChild(img);
-    box.appendChild(el('div', 'cm-ann'));
-    if (CS.refs.has(page)) setSrc(box, page);
-    else {
-      img.style.display = 'none';
-      var sk = el('div', 'cm-skel', '第 ' + page + ' 页');
-      if (inFlow) {
-        var fw = $('cmFlow') ? $('cmFlow').clientWidth : innerWidth;
-        sk.style.minHeight = Math.round(fw * 1.42) + 'px';
-      }
-      box.insertBefore(sk, img);
-      ensureRef(page).then(function () {
-        if (!box.isConnected) return;
-        setSrc(box, page);
-        preload();
-      }).catch(function (e) {
-        if (!box.isConnected) return;
-        if (sk.parentNode) sk.remove();
-        if (img.parentNode) img.remove();
-        var f = el('div', 'cm-fail', '第 ' + page + ' 页载入失败<br><span style="opacity:.65">' + esc(errText(e)) + '</span><button class="cm-btn sm" data-re>重试</button>');
-        box.appendChild(f);
-        var rb = f.querySelector('[data-re]');
-        if (rb) rb.onclick = function (ev) { ev.stopPropagation(); CS.fails.delete(page); renderAll(); };
-      });
-    }
-    paintPageAnns(box, page);
-    return box;
-  }
-
-  function setSrc(box, page) {
-    var img = box.querySelector('img.cm-img');
-    if (!img) return;
-    img.onload = function () {
-      img.classList.add('ready');
-      img.style.display = '';
-      var sk = box.querySelector('.cm-skel');
-      if (sk && sk.parentNode) sk.remove();
-      paintPageAnns(box, page);
-      if (CS.mode !== 'webtoon' && page === CS.page) tint(img);
-    };
-    img.onerror = function () {
-      img.classList.remove('ready');
-      if (CS.fails.has(page)) return;
-      CS.fails.add(page);
-      var sk = box.querySelector('.cm-skel');
-      if (sk && sk.parentNode) sk.remove();
-      img.style.display = 'none';
-      if (box.querySelector('.cm-fail')) return;
-      var f = el('div', 'cm-fail', '第 ' + page + ' 页载入失败<button class="cm-btn sm" data-re>重试</button>');
-      box.appendChild(f);
-      var rb = f.querySelector('[data-re]');
-      if (rb) rb.onclick = function (ev) { ev.stopPropagation(); CS.fails.delete(page); CS.refs.delete(page); renderAll(); };
-    };
-    img.src = imgUrl(page);
-  }
-
-  function tint(img) {
-    if (PRE.bg !== 'auto') return;
-    try {
-      var c = document.createElement('canvas');
-      c.width = 1; c.height = 1;
-      var g = c.getContext('2d');
-      g.drawImage(img, 0, 0, 1, 1);
-      var d = g.getImageData(0, 0, 1, 1).data;
-      var key = d[0] + ',' + d[1] + ',' + d[2];
-      if (key === CS.tinted) return;
-      CS.tinted = key;
-      $('cmGlow').style.background = 'radial-gradient(62% 62% at 50% 44%, rgba(' + d[0] + ',' + d[1] + ',' + d[2] + ',.34), transparent 74%)';
-    } catch (e) { }
-  }
-
-  function renderAll() {
-    if (!CS.open || !CS.started) return;
-    if (CS.mode === 'webtoon' || CS.mode === 'paged') renderFlow();
-    else renderPaged();
-    paintBot();
-    paintThumbs();
-    preload();
-  }
-
-  function renderPaged() {
-    var stage = $('cmStage');
-    var pages = spreadPages(CS.page);
-    var frame = el('div', 'cm-frame out' + (pages.length > 1 ? ' dual' : ''));
-    pages.forEach(function (p) { frame.appendChild(pageBox(p, false)); });
-    stage.innerHTML = '';
-    stage.appendChild(frame);
-    var flow = $('cmFlow');
-    if (flow) { flow.innerHTML = ''; CS.lo = 0; CS.hi = 0; }
-    var dir = CS.dir === 'RTL' ? -1 : 1;
-    frame.style.transform = 'translateX(' + (dir * 34) + 'px)';
-    requestAnimationFrame(function () {
-      if (!frame.isConnected) return;
-      frame.classList.remove('out');
-      frame.style.transform = '';
-    });
-    CS.zoom = 1; CS.panX = 0; CS.panY = 0;
-    applyVars();
-  }
-
-  function renderFlow() {
-    var flow = $('cmFlow');
-    var anchor = CS.page;
-    var from = Math.max(1, anchor - 3);
-    var to = Math.min(CS.total, anchor + 8);
-    CS.lo = from; CS.hi = to;
-    flow.innerHTML = '';
-    var st = $('cmStage');
-    if (st) st.innerHTML = '';
-    for (var p = from; p <= to; p++) flow.appendChild(pageBox(p, true));
-    bindFlow();
-    requestAnimationFrame(function () {
-      var target = flow.querySelector('[data-p="' + anchor + '"]');
-      if (target) flow.scrollTop = Math.max(0, target.offsetTop - (flow.clientHeight - target.clientHeight) / 2);
-    });
-  }
-
-  function extend(dir) {
-    var flow = $('cmFlow');
-    if (!flow) return;
-    if (dir > 0) {
-      if (CS.hi >= CS.total) return;
-      var to = Math.min(CS.total, CS.hi + 8);
-      for (var p = CS.hi + 1; p <= to; p++) flow.appendChild(pageBox(p, true));
-      CS.hi = to;
-    } else {
-      if (CS.lo <= 1) return;
-      var from = Math.max(1, CS.lo - 8);
-      var before = flow.scrollHeight;
-      var frag = document.createDocumentFragment();
-      for (var p2 = from; p2 < CS.lo; p2++) frag.appendChild(pageBox(p2, true));
-      flow.insertBefore(frag, flow.firstChild);
-      CS.lo = from;
-      flow.scrollTop += flow.scrollHeight - before;
-    }
-  }
-
-  function goto(page, silent) {
-    if (!CS.open) return;
-    page = clamp(Math.round(page), 1, CS.total || 1);
-    if (CS.mode === 'dual' && page > 1) page = page % 2 === 0 ? page : page - 1;
-    var changed = page !== CS.page;
-    CS.page = page;
-    CS.seen = Math.max(CS.seen, page);
-    if (!silent) {
-      if (CS.mode === 'webtoon' || CS.mode === 'paged') {
-        var flow = $('cmFlow');
-        var box = flow && flow.querySelector('[data-p="' + page + '"]');
-        if (box) flow.scrollTo({ top: Math.max(0, box.offsetTop - (flow.clientHeight - box.clientHeight) / 2), behavior: CS.mode === 'paged' ? 'smooth' : 'auto' });
-        else renderFlow();
-      } else renderPaged();
-      paintBot();
-    } else paintBotLight();
-    paintThumbs();
-    if (changed) { queueProgress(); preload(); }
-    if (!silent) bumpIdle();
-  }
-
-  function turn(delta) {
-    if (!CS.open) return;
-    var step = CS.mode === 'dual' ? 2 : 1;
-    var d = CS.dir === 'RTL' ? -delta : delta;
-    goto(CS.page + d * step);
-  }
-
-  function preload() {
-    var n = PRE.preload || 0;
-    if (!n || CS.mode === 'webtoon' || CS.mode === 'paged') return;
-    var pages = spreadPages(CS.page);
-    var list = [];
-    for (var i = 1; i <= n; i++) { list.push(pages[pages.length - 1] + i); list.push(pages[0] - i); }
-    list.forEach(function (p) {
-      if (p < 1 || p > CS.total) return;
-      ensureRef(p).then(function (ref) {
-        var im = new Image();
-        im.src = base() + 'api/lantai/v1/read/' + CS.bookId + '/img/' + encodeURIComponent(ref) + '?w=' + imgW() + '&fmt=orig';
-      }).catch(function () { });
-    });
-  }
-
-  function paintTop() {
-    var top = $('cmTop'); if (!top) return;
-    var b = CS.book || {};
-    var s = b.seriesTitle || '';
-    top.innerHTML =
-      '<button class="cm-btn" data-a="exit" title="返回书架">' + svg('left', 16) + '</button>' +
-      '<div class="cm-title"><b>' + esc(b.title || b.name || '漫画') + (PRE.imm ? '<i class="cm-imm">隐身</i>' : '') + '</b>' +
-      '<span>' + esc(s) + (b.profile ? ' · ' + esc(PROFILE_CN[b.profile] || b.profile) : '') + ' · ' + num(CS.total) + ' 页</span></div>' +
-      '<div class="cm-tools">' +
-      '<button class="cm-btn" data-a="thumbs" title="缩略图条 T">' + svg('grid') + '</button>' +
-      '<button class="cm-btn" data-a="anns" title="书签与标注 M">' + svg('list') + '</button>' +
-      '<button class="cm-btn" data-a="bookmark" title="加书签 B">' + svg('bookmark') + '</button>' +
-      '<button class="cm-btn" data-a="draw" title="框选标注 R">' + svg('crop') + '</button>' +
-      '<button class="cm-btn" data-a="set" title="阅读设置 S">' + svg('settings') + '</button>' +
-      '<button class="cm-btn" data-a="full" title="全屏 F">' + svg('full') + '</button>' +
-      '</div>';
-    top.querySelector('[data-a="exit"]').onclick = function () { close(); };
-    top.querySelector('[data-a="thumbs"]').onclick = function () { toggleThumbs(); };
-    top.querySelector('[data-a="anns"]').onclick = function () { side('anns'); };
-    top.querySelector('[data-a="bookmark"]').onclick = function () { toggleBookmark(); };
-    top.querySelector('[data-a="draw"]').onclick = function () { setDraw(CS.drawMode ? null : 'rect'); };
-    top.querySelector('[data-a="set"]').onclick = function () { side('set'); };
-    top.querySelector('[data-a="full"]').onclick = function () { fullscreen(); };
-    markToolbar();
-  }
-
-  function markToolbar() {
-    var t = $('cmTop'); if (!t) return;
-    t.querySelector('[data-a="thumbs"]').classList.toggle('on', CS.thumbs);
-    t.querySelector('[data-a="anns"]').classList.toggle('on', CS.side === 'anns');
-    t.querySelector('[data-a="set"]').classList.toggle('on', CS.side === 'set');
-    t.querySelector('[data-a="draw"]').classList.toggle('on', !!CS.drawMode);
-  }
-
-  function pct() { return Math.round(CS.page / (CS.total || 1) * 1000) / 10; }
-
-  function paintBotLight() {
-    var bot = $('cmBot'); if (!bot) return;
-    var total = CS.total || 1, p = pct();
-    var pos = bot.querySelector('[data-pos]');
-    if (pos) pos.textContent = CS.page + ' / ' + num(total);
-    var bar = bot.querySelector('.cm-track i');
-    if (bar) bar.style.width = p + '%';
-    var knob = bot.querySelector('.cm-track b');
-    if (knob) knob.style.left = p + '%';
-    var pc = bot.querySelector('[data-pct]');
-    if (pc) pc.textContent = p + '%';
-    var rest = bot.querySelector('[data-rest]');
-    if (rest) rest.textContent = '剩 ' + num(Math.max(0, total - CS.page)) + ' 页';
-  }
-
-  function paintBot() {
-    var bot = $('cmBot'); if (!bot) return;
-    var total = CS.total || 1, p = pct();
-    var marks = CS.anns.filter(function (a) { return a.marker === 'bookmark'; });
-    bot.innerHTML = '<div class="cm-bar">' +
-      '<span data-pos style="min-width:86px;font-variant-numeric:tabular-nums">' + CS.page + ' / ' + num(total) + '</span>' +
-      '<div class="cm-track" id="cmTrack"><i style="width:' + p + '%"></i><b style="left:' + p + '%"></b>' +
-      marks.map(function (a) { return '<em style="left:' + (a.page / total * 100) + '%"></em>'; }).join('') +
-      '<div class="cm-tip" id="cmTip"></div></div>' +
-      '<span data-pct style="min-width:48px;text-align:right;font-variant-numeric:tabular-nums">' + p + '%</span>' +
-      '<span data-rest style="opacity:.5;min-width:64px;text-align:right">剩 ' + num(Math.max(0, total - CS.page)) + ' 页</span>' +
-      MODES.map(function (m) {
-        return '<button class="cm-btn' + (CS.mode === m[0] ? ' on' : '') + '" data-m="' + m[0] + '" title="' + m[1] + '">' + svg(m[2]) + '</button>';
-      }).join('') +
-      '<button class="cm-btn" data-a="quality" title="画质">' + svg('bolt') + '<span style="font-size:10.5px">' + (CS.quality ? CS.quality + 'px' : '原图') + '</span></button>' +
-      '<button class="cm-btn" data-a="export" title="导出">' + svg('dl') + '</button>' +
-      '<button class="cm-btn" data-a="dir" title="阅读方向">' + svg('dir') + '<span style="font-size:10.5px">' + CS.dir + '</span></button>' +
-      '</div>';
-    all('#cmBot [data-m]').forEach(function (b) {
-      b.onclick = function () {
-        CS.mode = b.dataset.m; PRE.mode = CS.mode; PRE.modeTouched = true; savePrefs();
-        syncMode(); renderAll();
-      };
-    });
-    bot.querySelector('[data-a="quality"]').onclick = cycleQuality;
-    bot.querySelector('[data-a="export"]').onclick = function () { side('export'); };
-    bot.querySelector('[data-a="dir"]').onclick = function () {
-      if (CS.mode === 'webtoon' || CS.mode === 'paged') {
-        CS.mode = 'single'; PRE.mode = 'single'; PRE.modeTouched = true;
-        syncMode(); renderAll();
-        toast('滚动模式没有左右方向，已切回单页', 'info');
-        return;
-      }
-      CS.dir = CS.dir === 'LTR' ? 'RTL' : 'LTR';
-      PRE.dir = CS.dir; savePrefs(); paintBot();
-      toast('阅读方向：' + (CS.dir === 'RTL' ? '从右往左' : '从左往右'), 'ok');
-    };
-    bindTrack();
-  }
-
-  function bindTrack() {
-    var tr = $('cmTrack'); if (!tr) return;
-    var tip = $('cmTip');
-    var seek = function (ev) {
-      var r = tr.getBoundingClientRect();
-      return Math.max(1, Math.round(clamp((ev.clientX - r.left) / r.width, 0, 1) * CS.total));
-    };
-    tr.onmousedown = function (ev) {
-      ev.preventDefault();
-      var last = seek(ev);
-      goto(last);
-      var move = function (e2) { last = seek(e2); goto(last, true); };
-      var up = function () {
-        document.removeEventListener('mousemove', move);
-        document.removeEventListener('mouseup', up);
-        goto(last);
-      };
-      document.addEventListener('mousemove', move);
-      document.addEventListener('mouseup', up);
-    };
-    tr.onmousemove = function (ev) {
-      if (!tip) return;
-      var page = seek(ev);
-      var r = tr.getBoundingClientRect();
-      tip.classList.add('on');
-      tip.style.left = clamp(ev.clientX - r.left, 62, r.width - 62) + 'px';
-      tip.innerHTML = '<img src="' + base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + page + '?w=120" alt=""><span>第 ' + page + ' 页</span>';
-    };
-    tr.onmouseleave = function () { if (tip) tip.classList.remove('on'); };
-  }
-
-  function cycleQuality() {
-    var i = QS.findIndex(function (x) { return x[0] === CS.quality; });
-    i = (i + 1) % QS.length;
-    CS.quality = QS[i][0]; PRE.quality = CS.quality; savePrefs();
-    CS.refs.clear(); CS.refq.clear(); CS.fails.clear();
-    renderAll(); paintBot();
-    toast('画质：' + QS[i][1] + (CS.quality ? '（宽 ' + CS.quality + 'px）' : '（原图直出）'), 'ok');
-  }
-
-  function toggleThumbs(force) {
-    CS.thumbs = force == null ? !CS.thumbs : force;
-    $('cmThumbs').classList.toggle('on', CS.thumbs);
-    $('cm').classList.toggle('thumbs-open', CS.thumbs);
-    var bot = $('cmBot');
-    if (bot) bot.classList.toggle('off', CS.thumbs);
-    markToolbar();
-    if (CS.thumbs) {
-      paintThumbs();
-      var cur = $('cmStrip').querySelector('.cm-th.on');
-      if (cur) cur.scrollIntoView({ inline: 'center', block: 'nearest' });
-    }
-    bumpIdle();
-  }
-
-  function paintThumbs() {
-    if (!CS.thumbs) return;
-    var strip = $('cmStrip'); if (!strip) return;
-    var marks = {};
-    CS.anns.forEach(function (a) { marks[a.page] = true; });
-    if (strip.dataset.total !== String(CS.total)) {
-      strip.dataset.total = String(CS.total);
-      var html = '';
-      for (var p = 1; p <= CS.total; p++) {
-        html += '<div class="cm-th" data-p="' + p + '"><img loading="lazy" src="' + base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + p + '?w=120" alt=""><b>' + p + '</b></div>';
-      }
-      strip.innerHTML = html;
-      all('#cmStrip .cm-th').forEach(function (c) { c.onclick = function () { goto(+c.dataset.p); }; });
-    }
-    var cur = spreadPages(CS.page);
-    all('#cmStrip .cm-th').forEach(function (c) {
-      var p = +c.dataset.p;
-      c.classList.toggle('on', cur.indexOf(p) >= 0);
-      c.classList.toggle('mark', !!marks[p]);
-    });
-  }
-
-  function side(kind) {
-    CS.side = CS.side === kind ? null : kind;
-    var P = $('cmSide');
-    $('cm').classList.toggle('side-open', !!CS.side);
-    if (!CS.side) { P.classList.remove('on'); markToolbar(); return; }
-    if (kind === 'set') paintSettings(P);
-    else if (kind === 'anns') paintAnnSide(P);
-    else if (kind === 'export') paintExport(P);
-    P.classList.add('on');
-    markToolbar();
-    bumpIdle();
-  }
-
-  function sideHead(title) {
-    return '<div class="cm-side-h"><h4>' + esc(title) + '</h4>' +
-      '<div style="margin-left:auto"><button class="cm-btn sm" data-a="close">' + svg('close', 13) + '</button></div></div>';
-  }
-  function closeSide() {
-    CS.side = null;
-    $('cmSide').classList.remove('on');
-    var r = $('cm');
-    if (r) r.classList.remove('side-open');
-    markToolbar();
-  }
-
-  function paintSettings(P) {
-    var m = PRE.margins;
-    P.innerHTML = sideHead('阅读设置') + '<div class="cm-side-b">' +
-      '<div class="cm-sec"><div class="t">阅读模式</div><div class="cm-chips">' +
-      MODES.map(function (x) { return '<span class="cm-chip' + (CS.mode === x[0] ? ' on' : '') + '" data-mode="' + x[0] + '">' + svg(x[2], 13) + x[1] + '</span>'; }).join('') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">页面适应</div><div class="cm-chips">' +
-      FITS.map(function (x) { return '<span class="cm-chip' + (CS.fit === x[0] ? ' on' : '') + '" data-fit="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">阅读方向</div><div class="cm-chips">' +
-      [['LTR', '从左往右'], ['RTL', '从右往左']].map(function (x) { return '<span class="cm-chip' + (CS.dir === x[0] ? ' on' : '') + '" data-dir="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">' + ((CS.mode === 'webtoon' || CS.mode === 'paged') ? '当前是滚动模式，左右方向不生效；点方向会切回单页' : '方向镜像翻页热区与键盘左右键') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">画质</div><div class="cm-chips">' +
-      QS.map(function (x) { return '<span class="cm-chip' + (CS.quality === x[0] ? ' on' : '') + '" data-q="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">原图零转码最快；高清 / 省流由服务端按宽度降采样，省流量</div></div>' +
-      '<div class="cm-sec"><div class="t">边距</div><div class="cm-chips" style="margin-bottom:9px">' +
-      MARGIN_PRESETS.map(function (x) { return '<span class="cm-chip' + (PRE.marginPreset === x[0] ? ' on' : '') + '" data-mp="' + x[0] + '" data-v="' + x[2] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-mg">' + mr('上', 't', m.t) + mr('下', 'b', m.b) + mr('左', 'l', m.l) + mr('右', 'r', m.r) + '</div></div>' +
-      '<div class="cm-sec"><div class="t">长条页间距</div>' + rg('gap', PRE.gap, 0, 60, 1, PRE.gap + ' px') + '</div>' +
-      '<div class="cm-sec"><div class="t">预加载</div><div class="cm-chips">' +
-      [0, 1, 2, 3, 5].map(function (n) { return '<span class="cm-chip' + (PRE.preload === n ? ' on' : '') + '" data-pre="' + n + '">' + (n ? n + ' 页' : '关闭') + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">提前取相邻页的图片，翻页时直接出图</div></div>' +
-      '<div class="cm-sec"><div class="t">背景光晕</div><div class="cm-chips">' +
-      [['auto', '跟随页面'], ['black', '纯黑']].map(function (x) { return '<span class="cm-chip' + (PRE.bg === x[0] ? ' on' : '') + '" data-bg="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">隐身阅读</div><div class="cm-chips">' +
-      [[0, '关闭'], [1, '开启']].map(function (x) { return '<span class="cm-chip' + ((PRE.imm ? 1 : 0) === x[0] ? ' on' : '') + '" data-imm="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">开启后服务端不写阅读会话与进度，翻到哪页只存本标签页；标注照常保存</div></div>' +
-      '<div class="cm-sec"><div class="t">快捷键</div><div class="cm-keys">' +
-      '<kbd>← →</kbd><span>上一页 / 下一页</span><kbd>Space</kbd><span>下一页</span><kbd>T</kbd><span>缩略图条</span>' +
-      '<kbd>M</kbd><span>标注列表</span><kbd>B</kbd><span>加书签</span><kbd>R</kbd><span>框选标注</span>' +
-      '<kbd>F</kbd><span>全屏</span><kbd>+ −</kbd><span>缩放</span>' +
-      '</div></div></div>';
-
-    P.querySelector('[data-a="close"]').onclick = closeSide;
-    all('#cmSide [data-mode]').forEach(function (c) {
-      c.onclick = function () {
-        CS.mode = c.dataset.mode; PRE.mode = CS.mode; PRE.modeTouched = true; savePrefs();
-        syncMode(); renderAll(); paintSettings(P);
-      };
-    });
-    all('#cmSide [data-fit]').forEach(function (c) {
-      c.onclick = function () { CS.fit = c.dataset.fit; PRE.fit = CS.fit; savePrefs(); applyVars(); paintSettings(P); };
-    });
-    all('#cmSide [data-dir]').forEach(function (c) {
-      c.onclick = function () {
-        CS.dir = c.dataset.dir; PRE.dir = CS.dir; savePrefs();
-        if (CS.mode === 'webtoon' || CS.mode === 'paged') {
-          CS.mode = 'single'; PRE.mode = 'single'; PRE.modeTouched = true;
-          toast('已切到单页，方向生效', 'ok');
-        }
-        syncMode(); renderAll(); paintBot(); paintSettings(P);
-      };
-    });
-    all('#cmSide [data-q]').forEach(function (c) {
-      c.onclick = function () {
-        CS.quality = +c.dataset.q; PRE.quality = CS.quality; savePrefs();
-        CS.refs.clear(); CS.refq.clear(); CS.fails.clear();
-        renderAll(); paintBot(); paintSettings(P);
-      };
-    });
-    all('#cmSide [data-mp]').forEach(function (c) {
-      c.onclick = function () {
-        var v = +c.dataset.v;
-        PRE.margins = { t: v, b: v, l: v, r: v };
-        PRE.marginPreset = c.dataset.mp; savePrefs(); applyVars(); paintSettings(P);
-      };
-    });
-    all('#cmSide [data-mg]').forEach(function (inp) {
-      inp.oninput = function () {
-        PRE.margins[inp.dataset.mg] = +inp.value;
-        PRE.marginPreset = 'custom';
-        var lab = inp.parentNode.querySelector('span');
-        if (lab) lab.textContent = inp.value + ' px';
-        savePrefs(); applyVars();
-      };
-    });
-    var gi = P.querySelector('[data-sl="gap"]');
-    if (gi) gi.oninput = function () {
-      PRE.gap = +gi.value; savePrefs(); applyVars();
-      var lab = gi.parentNode.querySelector('span');
-      if (lab) lab.textContent = gi.value + ' px';
-    };
-    all('#cmSide [data-pre]').forEach(function (c) {
-      c.onclick = function () { PRE.preload = +c.dataset.pre; savePrefs(); preload(); paintSettings(P); };
-    });
-    all('#cmSide [data-bg]').forEach(function (c) {
-      c.onclick = function () {
-        PRE.bg = c.dataset.bg; savePrefs(); applyVars();
-        if (PRE.bg === 'auto') CS.tinted = '';
-        renderAll(); paintSettings(P);
-      };
-    });
-    all('#cmSide [data-imm]').forEach(function (c) {
-      c.onclick = function () {
-        PRE.imm = c.dataset.imm === '1'; savePrefs();
-        try {
-          if (PRE.imm) sessionStorage.setItem(immKey(), String(CS.page));
-          else sessionStorage.removeItem(immKey());
-        } catch (e) { }
-        paintTop(); paintSettings(P);
-        toast(PRE.imm ? '隐身阅读已开启，本次不留记录' : '已恢复记录进度');
-      };
-    });
-  }
-
-  function mr(label, key, val) {
-    return '<div><div style="font-size:10.5px;opacity:.55;margin-bottom:2px">' + label + '</div>' +
-      '<div class="cm-range"><input type="range" data-mg="' + key + '" min="0" max="120" step="2" value="' + val + '"><span>' + val + ' px</span></div></div>';
-  }
-  function rg(sl, val, min, max, step, text) {
-    return '<div class="cm-range"><input type="range" data-sl="' + sl + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + val + '"><span>' + text + '</span></div>';
-  }
-
-  function annList() {
-    var tab = CS.annTab || 'all';
-    var q = String(CS.annQ || '').trim().toLowerCase();
-    return CS.anns.filter(function (a) {
-      if (tab === 'bookmark' && a.marker !== 'bookmark') return false;
-      if (tab === 'mark' && a.marker === 'bookmark') return false;
-      if (!q) return true;
-      return (String(a.note || '') + ' ' + (MARK_CN[a.marker] || '') + ' p' + a.page).toLowerCase().indexOf(q) >= 0;
-    }).sort(function (a, b) { return a.page - b.page || a.at - b.at; });
-  }
-
-  function paintAnnSide(P) {
-    var all = CS.anns.length;
-    var bm = CS.anns.filter(function (a) { return a.marker === 'bookmark'; }).length;
-    var list = annList();
-    var tab = CS.annTab || 'all';
-    P.innerHTML = sideHead('书签与标注') + '<div class="cm-side-b">' +
-      '<div class="cm-chips" style="margin-bottom:9px">' +
-      [['all', '全部 ' + all], ['bookmark', '书签 ' + bm], ['mark', '标注 ' + (all - bm)]].map(function (x) {
-        return '<span class="cm-chip' + (tab === x[0] ? ' on' : '') + '" data-atab="' + x[0] + '">' + x[1] + '</span>';
-      }).join('') + '</div>' +
-      '<div class="cm-annq"><input id="cmAnnQ" placeholder="搜索页码或备注" value="' + esc(CS.annQ || '') + '"></div>' +
-      '<button class="cm-btn cm-annadd" data-bmadd="1">' + svg('bookmark', 13) + '给第 ' + CS.page + ' 页加书签</button>' +
-      (list.length ? list.map(function (a) {
-        var shapes = a.shapes || [];
-        var desc = a.marker === 'bookmark' ? '书签' : (shapes.length ? (shapes[0].t === 'p' ? '画笔' : '框选') + ' · ' + shapes.length + ' 处' : '标注');
-        return '<div class="cm-annitem" data-id="' + a.id + '" data-page="' + a.page + '"><i class="dot" style="background:' + esc(a.color) + '"></i>' +
-          '<div class="tx"><b>第 ' + a.page + ' 页 · ' + desc + '</b><span>' + (a.note ? esc(a.note) : (MARK_CN[a.marker] || '')) + '</span></div>' +
-          '<span class="x" data-edit="' + a.id + '">' + svg('edit', 12) + '</span>' +
-          '<span class="x" data-del="' + a.id + '">' + svg('close', 13) + '</span></div>';
-      }).join('') : '<div class="cm-note">' + (all ? '没有匹配的条目' : '还没有书签和标注。按 R 框选区域标注；按 B 给当前页加书签。') + '</div>') +
-      '</div>';
-    P.querySelector('[data-a="close"]').onclick = closeSide;
-    all('#cmSide [data-atab]').forEach(function (c) {
-      c.onclick = function () { CS.annTab = c.dataset.atab; paintAnnSide(P); };
-    });
-    var q = $('cmAnnQ');
-    if (q) q.oninput = function () {
-      CS.annQ = this.value;
-      clearTimeout(CS.annQT);
-      CS.annQT = setTimeout(function () { paintAnnSide(P); var n = $('cmAnnQ'); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 240);
-    };
-    var addBtn = P.querySelector('[data-bmadd]');
-    if (addBtn) addBtn.onclick = function () { toggleBookmark(); };
-    all('#cmSide .cm-annitem').forEach(function (item) {
-      item.onclick = function (ev) {
-        if (ev.target.closest('[data-del]') || ev.target.closest('[data-edit]')) return;
-        goto(+item.dataset.page);
-        closeSide();
-      };
-    });
-    all('#cmSide [data-del]').forEach(function (btn) {
-      btn.onclick = function (ev) { ev.stopPropagation(); delAnn(btn.dataset.del); };
-    });
-    all('#cmSide [data-edit]').forEach(function (btn) {
-      btn.onclick = function (ev) {
-        ev.stopPropagation();
-        var a = null;
-        CS.anns.forEach(function (x) { if (x.id === btn.dataset.edit) a = x; });
-        if (a) editAnnInline(btn.closest('.cm-annitem'), a, P);
-      };
-    });
-  }
-
-  function editAnnInline(item, a, P) {
-    var pick = a.color;
-    item.innerHTML = '<div style="width:100%;display:flex;flex-direction:column;gap:7px">' +
-      '<div class="cm-chips">' + COLORS.map(function (c) {
-        return '<span class="cm-chip' + (a.color === c ? ' on' : '') + '" data-ec="' + c + '" style="min-width:26px;padding:0 4px"><i class="dot" style="background:' + c + ';display:inline-block;width:12px;height:12px;border-radius:50%"></i></span>';
-      }).join('') + '</div>' +
-      '<input id="cmAnnNote" placeholder="备注" value="' + esc(a.note || '') + '" style="width:100%;height:28px;border-radius:7px;border:1px solid var(--line);background:transparent;color:inherit;font-size:12px;padding:0 8px">' +
-      '<div class="cm-chips"><span class="cm-chip" data-ecancel="1">取消</span><span class="cm-chip on" data-esave="1">保存</span></div></div>';
-    item.onclick = null;
-    all('#cmSide [data-ec]').forEach(function (b) {
-      b.onclick = function () {
-        pick = b.dataset.ec;
-        all('#cmSide [data-ec]').forEach(function (o) { o.classList.toggle('on', o === b); });
-      };
-    });
-    item.querySelector('[data-ecancel]').onclick = function () { paintAnnSide(P); };
-    item.querySelector('[data-esave]').onclick = function () {
-      var note = (item.querySelector('#cmAnnNote') || {}).value || '';
-      req('api/lantai/v1/annotations/' + a.id, { method: 'PATCH', body: { color: pick, note: note } })
-        .then(function () {
-          a.color = pick; a.note = note; a.at = Date.now();
-          renderAll();
-          paintAnnSide(P);
-          toast('已更新标注');
-        }).catch(function (e) { toast('更新失败：' + errText(e), 'err'); });
-    };
-  }
-
-  function paintExport(P) {
-    var pages = spreadPages(CS.page);
-    P.innerHTML = sideHead('导出') + '<div class="cm-side-b">' +
-      '<div class="cm-sec"><div class="t">当前页</div>' +
-      '<button class="cm-btn" data-exp="cur" style="width:100%;height:34px">' + svg('dl') + '下载第 ' + pages.join('、') + ' 页（原图）</button>' +
-      '<div class="cm-note">直接取服务端原图，不经画布重编码，保留原始格式与画质</div></div>' +
-      '<div class="cm-sec"><div class="t">页区间</div><div class="cm-export">' +
-      '<div class="row"><input type="number" id="cmFrom" min="1" max="' + CS.total + '" value="' + Math.max(1, CS.page - 9) + '">' +
-      '<span style="opacity:.6">至</span><input type="number" id="cmTo" min="1" max="' + CS.total + '" value="' + CS.page + '">' +
-      '<span style="opacity:.5;font-size:10.5px">共 ' + num(CS.total) + ' 页</span></div>' +
-      '<button class="cm-btn" data-exp="range" style="width:100%;height:34px">' + svg('dl') + '打包下载 ZIP</button>' +
-      '<div class="cm-note">服务端按原图打包，单次最多 ' + MAX_ZIP + ' 页</div></div></div>' +
-      '<div class="cm-sec"><div class="t">整本</div>' +
-      '<button class="cm-btn" data-exp="all" style="width:100%;height:34px">' + svg('dl') + '整本打包（分批）</button>' +
-      '<div class="cm-note">按 ' + MAX_ZIP + ' 页一批连续下载，浏览器可能提示允许多文件下载</div></div></div>';
-    P.querySelector('[data-a="close"]').onclick = closeSide;
-    P.querySelector('[data-exp="cur"]').onclick = function () { downloadPages(pages, pages[0], pages[pages.length - 1]); };
-    P.querySelector('[data-exp="range"]').onclick = function () {
-      var a = clamp(+$('cmFrom').value || 1, 1, CS.total);
-      var b = clamp(+$('cmTo').value || a, a, CS.total);
-      if (b - a + 1 > MAX_ZIP) return toast('一次最多 ' + MAX_ZIP + ' 页，请缩小范围', 'err');
-      exportZip(a, b);
-    };
-    P.querySelector('[data-exp="all"]').onclick = function () { exportWhole(); };
-  }
-
-  function bookName() {
-    var b = CS.book || {};
-    return String(b.title || b.name || 'comic').replace(/[\\/:*?"<>|]/g, '_');
-  }
-
-  function downloadPages(pages, a, b) {
-    if (pages.length > 1) return exportZip(a, b);
-    var p = pages[0];
-    ensureRef(p).then(function () {
-      var link = document.createElement('a');
-      link.href = imgUrl(p, 0);
-      link.download = bookName() + '-p' + p;
-      document.body.appendChild(link); link.click(); link.remove();
-      toast('开始下载第 ' + p + ' 页', 'ok');
-    }).catch(function (e) { toast('导出失败：' + errText(e), 'err'); });
-  }
-
-  function exportZip(a, b) {
-    var link = document.createElement('a');
-    link.href = base() + 'api/lantai/v1/read/' + CS.bookId + '/export?from=' + a + '&to=' + b;
-    link.download = bookName() + '-' + a + '-' + b + '.zip';
-    document.body.appendChild(link); link.click(); link.remove();
-    toast('正在打包第 ' + a + '–' + b + ' 页', 'ok');
-  }
-
-  function exportWhole() {
-    var i = 1;
-    var step = function () {
-      var to = Math.min(CS.total, i + MAX_ZIP - 1);
-      exportZip(i, to);
-      i = to + 1;
-      if (i <= CS.total) setTimeout(step, 1500);
-    };
-    step();
-  }
-
-  function bindFlow() {
-    var flow = $('cmFlow');
-    if (!flow || flow.dataset.bound === '1') return;
-    flow.dataset.bound = '1';
-    var last = 0;
-    flow.addEventListener('scroll', function () {
-      var now = Date.now();
-      if (now - last < 80) return;
-      last = now;
-      if (flow.scrollTop + flow.clientHeight > flow.scrollHeight - 1400) extend(1);
-      if (flow.scrollTop < 1600) extend(-1);
-      syncCurrent(flow);
-    }, { passive: true });
-  }
-
-  function syncCurrent(flow) {
-    var boxes = [].slice.call(flow.children);
-    if (!boxes.length) return;
-    var mid = flow.scrollTop + flow.clientHeight / 2;
-    var best = boxes.reduce(function (a, c) {
-      return Math.abs(c.offsetTop + c.clientHeight / 2 - mid) < Math.abs(a.offsetTop + a.clientHeight / 2 - mid) ? c : a;
-    }, boxes[0]);
-    var p = +best.dataset.p;
-    if (!p || p === CS.page) return;
-    CS.page = p;
-    CS.seen = Math.max(CS.seen, p);
-    paintBotLight();
-    paintThumbs();
-    queueProgress();
-  }
-
-  function onDown(ev) {
-    if (!CS.open) return;
-    if (ev.target.closest('.cm-top,.cm-bot,.cm-side,.cm-thumbs,.cm-float,.cm-btn')) return;
-    if (CS.drawMode) return startDraw(ev);
-    CS.ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
-    if (CS.ptrs.size === 2) {
-      var p = Array.from(CS.ptrs.values());
-      CS.pinch = { d: Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y), z: CS.zoom };
-      CS.drag = null;
-      clearTimeout(CS.idle);
-      return;
-    }
-    CS.drag = { x: ev.clientX, y: ev.clientY, sx: ev.clientX, sy: ev.clientY, t: Date.now(), on: false, px: CS.panX, py: CS.panY };
-    clearTimeout(CS.idle);
-    CS.idle = setTimeout(function () {
-      if (!CS.drag) return;
-      CS.drag.on = true;
-      var f = currentFrame();
-      if (f) f.classList.add('drag');
-    }, 220);
-  }
-
-  function onMove(ev) {
-    if (!CS.open) return;
-    if (CS.ptrs.has(ev.pointerId)) CS.ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
-    if (CS.pinch && CS.ptrs.size === 2) {
-      var arr = Array.from(CS.ptrs.values());
-      var d = Math.hypot(arr[0].x - arr[1].x, arr[0].y - arr[1].y);
-      CS.zoom = clamp(CS.pinch.z * (d / CS.pinch.d), 1, 4);
-      if (CS.zoom <= 1.02) { CS.zoom = 1; CS.panX = 0; CS.panY = 0; }
-      applyVars();
-      return;
-    }
-    var dg = CS.drag;
-    if (!dg) return;
-    var dx = ev.clientX - dg.sx, dy = ev.clientY - dg.sy;
-    if (!dg.on) {
-      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-        if (Date.now() - dg.t < 220) { CS.drag = null; return; }
-        dg.on = true;
-      } else return;
-    }
-    var f = currentFrame();
-    if (!f) return;
-    if (CS.zoom > 1) {
-      CS.panX = dg.px + dx; CS.panY = dg.py + dy;
-      applyVars();
-      return;
-    }
-    f.style.transform = 'translateX(' + clamp(dx, -innerWidth * 0.42, innerWidth * 0.42) + 'px)';
-    f.style.opacity = String(1 - Math.min(0.35, Math.abs(dx) / (innerWidth * 1.6)));
-  }
-
-  function onUp(ev) {
-    if (!CS.open) return;
-    CS.ptrs.delete(ev.pointerId);
-    if (CS.pinch) {
-      if (CS.ptrs.size < 2) CS.pinch = null;
-      CS.drag = null;
-      return;
-    }
-    clearTimeout(CS.idle);
-    var dg = CS.drag;
-    CS.drag = null;
-    var f = currentFrame();
-    if (!dg) return;
-    if (f) {
-      f.classList.remove('drag');
-      f.style.transform = '';
-      f.style.opacity = '';
-    }
-    var dx = ev.clientX - dg.sx, dy = ev.clientY - dg.sy;
-    if (CS.zoom > 1) return;
-    if (dg.on) {
-      var th = Math.min(160, innerWidth * 0.18);
-      if (Math.abs(dx) > th) return turn(dx < 0 ? 1 : -1);
-      return;
-    }
-    if (Math.abs(dx) < 9 && Math.abs(dy) < 9) tap(ev.clientX);
-  }
-
-  function tap(x) {
-    if (CS.mode === 'webtoon' || CS.mode === 'paged') return toggleToolbar();
-    if (x < innerWidth * 0.22) return turn(-1);
-    if (x > innerWidth * 0.78) return turn(1);
-    toggleToolbar();
-  }
-
-  function toggleToolbar(force) {
-    var top = $('cmTop'), bot = $('cmBot');
-    if (!top || !bot) return;
-    var hidden = top.classList.contains('off');
-    var show = force == null ? hidden : force;
-    top.classList.toggle('off', !show);
-    bot.classList.toggle('off', !show);
-    if (!show) { toggleThumbs(false); if (CS.side) closeSide(); }
-    bumpIdle();
-  }
-
-  function bumpIdle() {
-    clearTimeout(CS.offTimer);
-    CS.offTimer = setTimeout(function () {
-      if (!CS.open || CS.thumbs || CS.side) return;
-      var top = $('cmTop'), bot = $('cmBot');
-      if (top) top.classList.add('off');
-      if (bot) bot.classList.add('off');
-    }, 3200);
-  }
-
-  function currentFrame() {
-    var st = $('cmStage');
-    return st ? st.querySelector('.cm-frame') : null;
-  }
-
-  function onWheel(ev) {
-    if (!CS.open) return;
-    if (ev.target.closest('.cm-top,.cm-bot,.cm-side,.cm-thumbs')) return;
-    if (ev.ctrlKey) {
-      ev.preventDefault();
-      CS.zoom = clamp(CS.zoom - ev.deltaY * 0.004, 1, 4);
-      if (CS.zoom <= 1.02) { CS.zoom = 1; CS.panX = 0; CS.panY = 0; }
-      applyVars();
-      return;
-    }
-    if (CS.mode === 'webtoon' || CS.mode === 'paged') return;
-    ev.preventDefault();
-    if (CS.zoom > 1) return;
-    var now = Date.now();
-    if (now - CS.wheelAt < 280 || Math.abs(ev.deltaY) < 6) return;
-    CS.wheelAt = now;
-    turn(ev.deltaY > 0 ? 1 : -1);
-  }
-
-  function setDraw(mode) {
-    CS.drawMode = mode;
-    all('#cm .cm-ann[data-draw]').forEach(function (n) { n.remove(); });
-    if (mode) hint(mode === 'brush' ? '自由画笔：在页面上拖动画线，松手后选颜色保存' : '框选：在页面上拖出矩形，松手后选颜色保存');
-    else hint('');
-    markToolbar();
-  }
-
-  function pageAt(x, y) {
-    var list = document.elementsFromPoint(x, y);
-    for (var i = 0; i < list.length; i++) {
-      var c = list[i].closest ? list[i].closest('.cm-page') : null;
-      if (c) return c;
-    }
-    return null;
-  }
-
-  function startDraw(ev) {
-    var box = pageAt(ev.clientX, ev.clientY);
-    if (!box) return;
-    var img = box.querySelector('img.cm-img');
-    if (!img || !img.complete || !img.naturalWidth) return toast('等图片载入完成再框选', 'info');
-    var r = img.getBoundingClientRect();
-    var layer = el('div', 'cm-ann');
-    layer.dataset.draw = '1';
-    box.appendChild(layer);
-    var x = clamp((ev.clientX - r.left) / r.width, 0, 1);
-    var y = clamp((ev.clientY - r.top) / r.height, 0, 1);
-    CS.drawing = { page: +box.dataset.p, box: box, img: img, rect: r, pts: [[x, y]], x0: x, y0: y, x1: x, y1: y };
-    drawPreview(layer, CS.drawing);
-    var move = function (e2) {
-      var d = CS.drawing; if (!d) return;
-      var x2 = clamp((e2.clientX - d.rect.left) / d.rect.width, 0, 1);
-      var y2 = clamp((e2.clientY - d.rect.top) / d.rect.height, 0, 1);
-      d.x1 = x2; d.y1 = y2;
-      if (CS.drawMode === 'brush') d.pts.push([x2, y2]);
-      drawPreview(layer, d);
-    };
-    var up = function () {
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-      var d = CS.drawing; if (!d) return;
-      drawPreview(layer, d);
-      showFloat(d, layer);
-    };
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-  }
-
-  function drawPreview(layer, d) {
-    var w = d.img.naturalWidth || d.rect.width;
-    var h = d.img.naturalHeight || d.rect.height;
-    var shape;
-    if (CS.drawMode === 'brush') {
-      shape = '<polyline class="sh p" points="' + d.pts.map(function (p) { return (p[0] * w).toFixed(1) + ',' + (p[1] * h).toFixed(1); }).join(' ') + '" stroke="' + CS.drawColor + '"/>';
-    } else {
-      var x = Math.min(d.x0, d.x1) * w, y = Math.min(d.y0, d.y1) * h;
-      var ww = Math.abs(d.x1 - d.x0) * w, hh = Math.abs(d.y1 - d.y0) * h;
-      shape = '<rect class="sh r" x="' + x + '" y="' + y + '" width="' + ww + '" height="' + hh + '" stroke="' + CS.drawColor + '" fill="' + CS.drawColor + '22"/>';
-    }
-    layer.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' + shape + '</svg>';
-  }
-
-  function showFloat(d, layer) {
-    var fl = $('cmFloat');
-    var r = d.rect;
-    fl.innerHTML = COLORS.map(function (c) {
-      return '<i class="cm-sw' + (c === CS.drawColor ? ' on' : '') + '" data-c="' + c + '" style="background:' + c + '"></i>';
-    }).join('') +
-      '<button class="cm-btn sm" data-ok title="保存">' + svg('check', 13) + '</button>' +
-      '<button class="cm-btn sm" data-no title="取消">' + svg('close', 13) + '</button>';
-    fl.style.left = clamp(r.left + r.width / 2 - 118, 8, innerWidth - 250) + 'px';
-    fl.style.top = Math.max(58, r.top + 10) + 'px';
-    fl.classList.add('on');
-    all('#cmFloat [data-c]').forEach(function (s) {
-      s.onclick = function () { CS.drawColor = s.dataset.c; drawPreview(layer, d); showFloat(d, layer); };
-    });
-    fl.querySelector('[data-ok]').onclick = function () { fl.classList.remove('on'); saveShape(d, layer); };
-    fl.querySelector('[data-no]').onclick = function () {
-      fl.classList.remove('on');
-      layer.remove();
-      CS.drawing = null;
-      setDraw(null);
-    };
-  }
-
-  function round3(v) { return Math.round(v * 1000) / 1000; }
-
-  function saveShape(d, layer) {
-    var shapes = [];
-    if (CS.drawMode === 'brush') {
-      if (d.pts.length < 3) { layer.remove(); CS.drawing = null; return setDraw(null); }
-      shapes.push({ t: 'p', c: CS.drawColor, pts: d.pts.map(function (p) { return [round3(p[0]), round3(p[1])]; }) });
-    } else {
-      var x = Math.min(d.x0, d.x1), y = Math.min(d.y0, d.y1);
-      var w = Math.abs(d.x1 - d.x0), h = Math.abs(d.y1 - d.y0);
-      if (w < 0.008 || h < 0.008) { layer.remove(); CS.drawing = null; return setDraw(null); }
-      shapes.push({ t: 'r', c: CS.drawColor, x: round3(x), y: round3(y), w: round3(w), h: round3(h) });
-    }
-    var page = d.page;
-    postAnn({ page: page, color: CS.drawColor, marker: 'COMMENT', note: '', shapes: shapes }).then(function () {
-      CS.drawing = null;
-      setDraw(null);
-      renderAll();
-      toast('标注已保存 · 第 ' + page + ' 页', 'ok');
-    }).catch(function (e) { toast('标注保存失败：' + errText(e), 'err'); });
-  }
-
-  function postAnn(o) {
-    return req('api/lantai/v1/annotations', {
-      method: 'POST',
-      body: {
-        bookId: CS.bookId,
-        href: '#page=' + o.page,
-        progression: CS.total ? o.page / CS.total : 0,
-        textBefore: '', textHighlight: '', textAfter: '',
-        color: o.color, marker: o.marker, note: o.note || '',
-        selection: o.shapes ? JSON.stringify(o.shapes) : null
-      }
-    }).then(function (dto) {
-      CS.anns.push(mapAnn(dto));
-      return dto;
-    });
-  }
-
-  function mapAnn(dto) {
-    var shapes = [];
-    if (dto.selection) { try { shapes = JSON.parse(dto.selection) || []; } catch (e) { shapes = []; } }
-    var page = 0;
-    var m = /#page=(\d+)/.exec(dto.href || '');
-    if (m) page = +m[1];
-    else if (dto.progression && CS.total) page = clamp(Math.round(dto.progression * CS.total), 1, CS.total);
-    return {
-      id: dto.id, page: page, href: dto.href, color: dto.color || '#C9A24B',
-      marker: String(dto.marker || 'HIGHLIGHT').toLowerCase(), note: dto.note || '',
-      shapes: shapes, at: new Date(dto.createdDate || dto.lastModifiedDate || Date.now()).getTime()
-    };
-  }
-
-  function delAnn(id) {
-    req('api/lantai/v1/annotations/' + id, { method: 'DELETE' }).then(function () {
-      CS.anns = CS.anns.filter(function (a) { return a.id !== id; });
-      renderAll();
-      if (CS.side === 'anns') paintAnnSide($('cmSide'));
-      toast('标注已删除', 'ok');
-    }).catch(function (e) { toast('删除失败：' + errText(e), 'err'); });
-  }
-
-  function toggleBookmark() {
-    var exists = CS.anns.filter(function (a) { return a.marker === 'bookmark' && a.page === CS.page; })[0];
-    if (exists) return delAnn(exists.id);
-    postAnn({ page: CS.page, color: COLORS[0], marker: 'BOOKMARK', note: '', shapes: null })
-      .then(function () { renderAll(); toast('已在第 ' + CS.page + ' 页加书签', 'ok'); })
-      .catch(function (e) { toast('书签保存失败：' + errText(e), 'err'); });
-  }
-
-  function paintPageAnns(box, page) {
-    var layer = box.querySelector('.cm-ann');
-    if (!layer || layer.dataset.draw === '1') return;
-    var list = CS.anns.filter(function (a) { return a.page === page && a.shapes && a.shapes.length; });
-    if (!list.length) { layer.innerHTML = ''; return; }
-    var img = box.querySelector('img.cm-img');
-    if (!img) return;
-    if (!img.complete || !img.naturalWidth) {
-      img.addEventListener('load', function once() { img.removeEventListener('load', once); paintPageAnns(box, page); });
-      return;
-    }
-    var w = img.naturalWidth, h = img.naturalHeight;
-    var shapes = '';
-    list.forEach(function (a) {
-      a.shapes.forEach(function (s) {
-        if (s.t === 'p') {
-          shapes += '<polyline class="sh p" points="' + (s.pts || []).map(function (p) { return (p[0] * w).toFixed(1) + ',' + (p[1] * h).toFixed(1); }).join(' ') + '" stroke="' + esc(s.c) + '"/>';
-        } else {
-          shapes += '<rect class="sh r" x="' + (s.x * w) + '" y="' + (s.y * h) + '" width="' + (s.w * w) + '" height="' + (s.h * h) + '" stroke="' + esc(s.c) + '" fill="' + esc(s.c) + '22"/>';
-        }
-      });
-    });
-    layer.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' + shapes + '</svg>';
-  }
-
-  function hint(text) {
-    var h = $('cmHint'); if (!h) return;
-    if (!text) { h.classList.remove('on'); return; }
-    h.textContent = text;
-    h.classList.add('on');
-    clearTimeout(h._t);
-    h._t = setTimeout(function () { h.classList.remove('on'); }, 3600);
-  }
-
-  function startBeat() {
-    clearInterval(CS.hbTimer);
-    CS.hbTimer = setInterval(function () {
-      if (!CS.open) return;
-      CS.beats++;
-      CS.session.dur += 30000;
-      CS.session.pages = Math.max(CS.session.pages, CS.seen);
-      if (!PRE.imm) {
-        pushSession(CS.session);
-        req('api/lantai/v1/reading/heartbeat', {
-          method: 'POST',
-          body: { bookId: CS.bookId, page: CS.page, deviceId: 'webui', deviceName: '网页端', client: 'lantai-webui' }
-        }).catch(function () { });
-      }
-    }, 30000);
-  }
-
-  function queueProgress() {
-    clearTimeout(CS.progTimer);
-    CS.progTimer = setTimeout(sendProgress, 900);
-  }
-
-  function sendProgress() {
-    if (!CS.open) return;
-    var total = CS.total || 1, p = CS.page;
-    if (PRE.imm) {
-      try { sessionStorage.setItem(immKey(), String(p)); } catch (e) { }
-      return;
-    }
-    if (typeof PROGRESS !== 'undefined') {
-      PROGRESS[CS.bookId] = { page: p, pages: total, completed: p >= total, device: 'webui', at: Date.now(), locator: { href: '#page=' + p, position: p, totalProgression: p / total } };
-    }
-    req('api/v1/books/' + CS.bookId + '/progression', {
-      method: 'PUT',
-      body: {
-        modified: new Date().toISOString(),
-        device: { id: 'webui', name: '网页端' },
-        locator: { href: '#page=' + p, type: 'image/jpeg', locations: { position: p, progression: p / total, totalProgression: p / total } }
-      }
-    }).catch(function () { });
-  }
-
-  var wake = null;
-  function wakeUp() {
-    if (!navigator.wakeLock || !navigator.wakeLock.request) {
-      hint('当前环境不支持屏幕常亮（HTTPS 或 localhost 才可用）');
-      return;
-    }
-    var ask = function () {
-      if (!CS.open || wake) return;
-      navigator.wakeLock.request('screen').then(function (s) {
-        wake = s;
-        s.addEventListener('release', function () { wake = null; });
-      }).catch(function () { });
-    };
-    ask();
-    document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'visible' && CS.open && !wake) ask();
-    });
-  }
-  function releaseWake() {
-    if (!wake) return;
-    try { wake.release(); } catch (e) { }
-    wake = null;
-  }
-
-  function fullscreen() {
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(function () { });
-      return;
-    }
-    var r = $('cm');
-    (r || document.documentElement).requestFullscreen().catch(function () {
-      toast('浏览器拒绝了全屏请求', 'err');
-    });
-  }
-
-  window.addEventListener('offline', function () {
-    var n = $('cmOffline');
-    if (n && CS.open) n.classList.add('on');
-  });
-  window.addEventListener('online', function () {
-    var n = $('cmOffline');
-    if (n) n.classList.remove('on');
-  });
-  document.addEventListener('fullscreenchange', function () {
-    var t = $('cmTop');
-    if (!t) return;
-    var b = t.querySelector('[data-a="full"]');
-    if (b) b.classList.toggle('on', !!document.fullscreenElement);
-  });
-
-  document.addEventListener('keydown', function (ev) {
-    if (!CS.open) return;
-    if (ev.target && /INPUT|TEXTAREA|SELECT/.test(ev.target.tagName)) return;
-    var k = ev.key;
-    if (k === 'Escape') {
-      if ($('cmFloat').classList.contains('on')) { $('cmFloat').classList.remove('on'); setDraw(null); return; }
-      if (CS.side) return closeSide();
-      if (CS.drawMode) return setDraw(null);
-      if (CS.thumbs) return toggleThumbs(false);
-      if (CS.zoom > 1) { CS.zoom = 1; CS.panX = 0; CS.panY = 0; return applyVars(); }
-      return close();
-    }
-    if (k === 'ArrowRight' || k === 'PageDown') { ev.preventDefault(); return turn(1); }
-    if (k === 'ArrowLeft' || k === 'PageUp') { ev.preventDefault(); return turn(-1); }
-    if (k === ' ') { ev.preventDefault(); return turn(ev.shiftKey ? -1 : 1); }
-    if (k === 'Home') { ev.preventDefault(); return goto(1); }
-    if (k === 'End') { ev.preventDefault(); return goto(CS.total); }
-    if (k === 't' || k === 'T') return toggleThumbs();
-    if (k === 'm' || k === 'M') return side('anns');
-    if (k === 's' || k === 'S') return side('set');
-    if (k === 'b' || k === 'B') return toggleBookmark();
-    if (k === 'r' || k === 'R') return setDraw(CS.drawMode ? null : 'rect');
-    if (k === 'f' || k === 'F') return fullscreen();
-    if (k === '+' || k === '=') { CS.zoom = clamp(CS.zoom + 0.25, 1, 4); return applyVars(); }
-    if (k === '-') { CS.zoom = clamp(CS.zoom - 0.25, 1, 4); if (CS.zoom <= 1.02) CS.zoom = 1; return applyVars(); }
-  });
-
-  window.ComicReader = { open: open, close: close, isOpen: isOpen, goto: goto, prefs: PRE, state: CS };
-})();
-
-(function () {
-  'use strict';
-
-  var THEMES = [
-    ['paper', '纸白', '#fbf9f3', '#1f1e1a', '#ffffff', '#f3efe4', '#8a6d2f'],
-    ['sepia', '牛皮纸', '#f0e5cf', '#4a3f2b', '#f8f0de', '#e6d8bd', '#8a5a26'],
-    ['green', '护眼', '#dde8d6', '#2b362a', '#e8f0e2', '#cfdcc6', '#4c6b45'],
-    ['ink', '墨黑', '#0c0d0f', '#9fa6ad', '#15171a', '#1b1e22', '#7a8fa6'],
-    ['night', '夜间', '#14171c', '#b4c0cc', '#1b1f25', '#20252c', '#6f8aa6']
-  ];
-  var FONTS = [
-    ['serif', '宋体', '"Songti SC","SimSun",Georgia,"Times New Roman",serif'],
-    ['sans', '黑体', '"PingFang SC","Microsoft YaHei",system-ui,sans-serif'],
-    ['kai', '楷体', '"Kaiti SC",KaiTi,STKaiti,"Songti SC",serif'],
-    ['book', '原书', 'inherit']
-  ];
-  var COLORS = ['#C9A24B', '#B0402C', '#46523F', '#2F5D8A', '#7B4F6B', '#E3C377'];
-  var MARK_CN = { highlight: '高亮', underline: '下划线', bookmark: '书签', comment: '笔记' };
-
-  var PRE = {
-    theme: 'paper', size: 18, lh: 1.85, para: 0.9, font: 'serif', measure: 38, indent: true,
-    pubcss: true, wake: false, imm: false, ttsRate: 1, ttsVoice: '', sink: 0,
-    layout: 'scroll', dir: 'LTR'
-  };
-  try { Object.assign(PRE, JSON.parse(localStorage.getItem('lantai-ebook') || '{}')); } catch (e) { }
-  if (!localStorage.getItem('lantai-ebook.pub1')) {
-    PRE.pubcss = true;
-    try { localStorage.setItem('lantai-ebook.pub1', '1'); } catch (e) { }
-  }
-
-  var EB = {
-    open: false, bookId: '', book: null, total: 0, ch: 1, seen: 1,
-    chs: new Map(), secs: new Map(), pending: {},
-    lo: 0, hi: 0, outline: null, outlineLoading: false,
-    anns: [], links: [], inlines: [],
-    panel: null, shadow: null, docEl: null, view: null,
-    shadowSeeded: false, progTimer: null, hbTimer: null, session: null, beats: 0,
-    restore: -1, restoreT: null, idle: null, raf: 0, bootAt: 0,
-    sel: null, tts: null, ttsIdx: 0, ttsOn: false, wakeLock: null,
-    toastT: null, lastCh: 0, ready: false, warmF: false, warmB: false,
-    page: 0, pages: 1, annTab: 'all', annQ: '', annQT: 0,
-    findQ: '', findMark: '', fontFams: null
-  };
-
-  function rt() { return window.LantaiRuntime; }
-  function req(p, o) {
-    var opt = o || {};
-    if (PRE.imm) opt = Object.assign({}, opt, { headers: Object.assign({ 'X-Lantai-Incognito': '1' }, opt.headers || {}) });
-    return rt().request(p, opt);
-  }
-  function $(id) { return document.getElementById(id); }
-  function el(tag, cls, html) {
-    var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (html != null) n.innerHTML = html;
-    return n;
-  }
-  function ico(name, size) {
-    return '<svg width="' + (size || 16) + '" height="' + (size || 16) + '"><use href="#i-' + name + '"/></svg>';
-  }
-  function errText(e) {
-    if (!e) return '请求失败';
-    if (e.status === 403) return '没有这个书库的阅读权限';
-    if (e.status === 404) return '书籍或章节不存在';
-    return e.message ? String(e.message).slice(0, 120) : 'HTTP ' + (e.status || 'err');
-  }
-
-  function toast(text, kind) {
-    var t = $('ebToast'); if (!t) return;
-    t.textContent = text;
-    t.className = 'eb-toast on' + (kind === 'err' ? ' err' : '');
-    clearTimeout(EB.toastT);
-    EB.toastT = setTimeout(function () { t.className = 'eb-toast'; }, 2600);
-  }
-  function tip(title, body) {
-    var t = $('ebTip'); if (!t) return;
-    if (!title) { t.classList.remove('on'); return; }
-    t.innerHTML = '<b>' + esc(title) + '</b>' + (body || '');
-    t.classList.add('on');
-  }
-
-  function savePrefs() {
-    try { localStorage.setItem('lantai-ebook', JSON.stringify(PRE)); } catch (e) { }
-  }
-  function immKey() { return 'lantai.imm.e.' + EB.bookId; }
-  function immResume(bookId) {
-    try { return JSON.parse(sessionStorage.getItem('lantai.imm.e.' + bookId) || 'null'); } catch (e) { return null; }
-  }
-
-  function themeOf(key) {
-    for (var i = 0; i < THEMES.length; i++) if (THEMES[i][0] === key) return THEMES[i];
-    return THEMES[0];
-  }
-
-  function applyTheme() {
-    var r = $('eb'); if (!r) return;
-    var t = themeOf(PRE.theme);
-    r.style.setProperty('--eb-bg', t[2]);
-    r.style.setProperty('--eb-tx', t[3]);
-    r.style.setProperty('--eb-card', t[4]);
-    r.style.setProperty('--eb-sunk', t[5]);
-    r.style.setProperty('--eb-acc', t[6]);
-    r.style.setProperty('--eb-dim', t[0] === 'ink' || t[0] === 'night' ? '#8b939b' : '#6f6a5e');
-    r.style.setProperty('--eb-line', t[0] === 'ink' || t[0] === 'night' ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.1)');
-    r.style.setProperty('--eb-shadow', t[0] === 'ink' || t[0] === 'night' ? '0 16px 48px rgba(0,0,0,.55)' : '0 16px 48px rgba(48,40,24,.16)');
-    r.classList.toggle('night', t[0] === 'ink' || t[0] === 'night');
-    if (EB.shadow) applyBase();
-  }
-
-  function applyType() {
-    var r = $('eb'); if (!r) return;
-    r.style.setProperty('--eb-fs', PRE.size + 'px');
-    r.style.setProperty('--eb-lh', PRE.lh);
-    r.style.setProperty('--eb-para', PRE.para + 'em');
-    r.style.setProperty('--eb-ti', PRE.indent ? '2em' : '0');
-    r.style.setProperty('--eb-measure', PRE.measure + 'rem');
-    r.style.setProperty('--eb-fam', fontFamily());
-    if (PRE.font.indexOf('srv:') === 0) fontFaceOf(PRE.font.slice(4));
-    if (EB.shadow) applyBase();
-  }
-
-  function fontFamily() {
-    for (var i = 0; i < FONTS.length; i++) if (FONTS[i][0] === PRE.font) return FONTS[i][2];
-    return FONTS[0][2];
-  }
-
-  var fontFaceState = { family: '', css: {} };
-
-  function loadFontFamilies() {
-    if (EB.fontFams !== null) return;
-    EB.fontFams = [];
-    req('api/v1/fonts/families').then(function (list) {
-      var names = (list || []).filter(function (x) { return typeof x === 'string' && x; });
-      EB.fontFams = names;
-      names.forEach(function (name) {
-        var key = 'srv:' + name;
-        if (!FONTS.some(function (f) { return f[0] === key; })) FONTS.push([key, name, "'" + name + "',serif"]);
-      });
-      if (EB.panel === 'set') paintSet('set');
-    }).catch(function () { });
-  }
-
-  function fontFaceOf(name) {
-    if (!EB.shadow || !name) return;
-    var style = EB.shadow.getElementById('ebFont');
-    if (!style) {
-      style = document.createElement('style');
-      style.id = 'ebFont';
-      var anchor = EB.shadow.getElementById('ebPub') || EB.shadow.getElementById('ebDoc');
-      if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(style, anchor);
-      else EB.shadow.appendChild(style);
-    }
-    if (fontFaceState.family === name) return;
-    if (fontFaceState.css[name]) {
-      style.textContent = fontFaceState.css[name];
-      fontFaceState.family = name;
-      return;
-    }
-    var base = (window.resourceBaseUrl || '/').replace(/\/?$/, '/') + 'api/v1/fonts/resource/' + encodeURIComponent(name) + '/';
-    fetch(base + 'css', { credentials: 'same-origin' })
-      .then(function (res) { return res.ok ? res.text() : ''; })
-      .then(function (css) {
-        var fixed = String(css || '').replace(/url\((['"]?)([^'")]+)\1\)/g, function (whole, quote, url) {
-          if (/^(data:|https?:|\/\/|\/)/.test(url)) return whole;
-          return "url('" + base + url + "')";
-        });
-        fontFaceState.css[name] = fixed;
-        if (PRE.font !== 'srv:' + name) return;
-        fontFaceState.family = name;
-        style.textContent = fixed;
-      })
-      .catch(function () { });
-  }
-
-  function isPaged() { return PRE.layout !== 'scroll'; }
-
-  function colsOf(w) { return PRE.layout === 'double' && w >= 860 ? 2 : 1; }
-
-  function viewHeight() {
-    var v = EB.view;
-    var h = (v && (v.clientHeight || v.offsetHeight)) || 0;
-    return Math.max(280, Math.round(h || window.innerHeight * 0.8));
-  }
-
-  function layoutMetrics() {
-    var v = EB.view;
-    var cw = (v && (v.clientWidth || v.offsetWidth)) || 600;
-    var gut = Math.round(Math.min(72, Math.max(16, cw * 0.045)));
-    var cols = colsOf(cw);
-    var gap = gut * 2;
-    var pw = Math.max(180, Math.floor((cw - gut * 2 - (cols - 1) * gap) / cols));
-    return { gut: gut, gap: gap, pw: pw, cols: cols, step: cw };
-  }
-
-  function measure() {
-    var v = EB.view;
-    if (!v || !isPaged()) { EB.pages = 1; EB.page = 0; return; }
-    var m = layoutMetrics();
-    EB.pages = Math.max(1, Math.ceil((v.scrollWidth - 2) / Math.max(1, m.step)));
-    EB.page = clamp(Math.ceil((v.scrollLeft - 1) / Math.max(1, m.step)), 0, EB.pages - 1);
-  }
-
-  function goPage(n) {
-    var v = EB.view; if (!v || !isPaged()) return;
-    measure();
-    EB.page = clamp(n, 0, EB.pages - 1);
-    var max = Math.max(0, v.scrollWidth - v.clientWidth);
-    v.scrollLeft = Math.min(EB.page * layoutMetrics().step, max);
-  }
-
-  function turnPage(d) {
-    if (!isPaged()) return false;
-    measure();
-    var next = EB.page + (PRE.dir === 'RTL' ? -d : d);
-    if (next < 0) {
-      if (EB.ch > 1) { gotoChapter(EB.ch - 1, 1); return true; }
-      return false;
-    }
-    if (next > EB.pages - 1) {
-      if (EB.ch < EB.total) { gotoChapter(EB.ch + 1, 0); return true; }
-      return false;
-    }
-    goPage(next);
-    queueProgress();
-    paintProgressBar();
-    return true;
-  }
-
-  function applyLayout() {
-    var r = $('eb'); if (!r) return;
-    var m = layoutMetrics();
-    r.style.setProperty('--eb-gut', m.gut + 'px');
-    r.style.setProperty('--eb-gap', m.gap + 'px');
-    r.style.setProperty('--eb-pagew', m.pw + 'px');
-    r.style.setProperty('--eb-vh', viewHeight() + 'px');
-    r.classList.toggle('paged', isPaged());
-    r.classList.toggle('rtl', PRE.dir === 'RTL');
-    if (EB.docEl) EB.docEl.classList.toggle('paged', isPaged());
-    if (isPaged()) {
-      measure();
-      goPage(EB.page);
-    } else if (EB.view) {
-      EB.view.scrollLeft = 0;
-      EB.pages = 1; EB.page = 0;
-    }
-    paintProgressBar();
-  }
-
-  function switchLayout(v) {
-    if (PRE.layout === v) return;
-    PRE.layout = v;
-    savePrefs();
-    applyLayout();
-    paintBot();
-    if (!EB.ready) { paintSet('set'); return; }
-    tip('正在重排', v === 'scroll' ? '连续滚动' : v === 'double' ? '双栏分页' : '单栏分页');
-    reset(EB.ch).then(function () {
-      tip('');
-      applyLayout();
-      if (isPaged()) requestAnimationFrame(function () { measure(); goPage(0); paintProgressBar(); });
-      paintBot();
-      paintSet('set');
-    }).catch(function () { tip(''); paintSet('set'); });
-  }
-
-  var BASE_CSS = [
-    ':host{display:block}',
-    ':where(.doc){color:var(--eb-tx)}',
-    '.doc.doc{box-sizing:border-box;max-width:var(--eb-measure);margin:0 auto;padding:0 26px;text-align:justify;' +
-    'font-size:var(--eb-fs);line-height:var(--eb-lh);' +
-    'word-break:break-word;overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}',
-    '.doc .sec{position:relative}',
-    '.doc .sec+.sec{margin-top:2.6em}',
-    '.doc .sec.artpage{min-height:var(--eb-vh,100vh);background-position:center;background-repeat:no-repeat;' +
-    'background-size:contain!important;break-inside:avoid}',
-    '.doc.doc.paged .sec.artpage{min-height:100%;break-before:column;break-inside:avoid}',
-    '.doc.doc.paged{max-width:none;width:calc(100% - var(--eb-gut,24px) * 2);margin:0 auto;padding:0;height:100%;' +
-    'column-width:var(--eb-pagew,600px);column-gap:var(--eb-gap,48px);column-fill:auto}',
-    '.doc.doc.paged img,.doc.doc.paged figure,.doc.doc.paged pre,.doc.doc.paged table{break-inside:avoid}',
-    '.doc .eb-head{display:flex;align-items:baseline;gap:10px;margin:0 0 1.1em;padding-top:1.1em;' +
-    'border-top:1px solid var(--eb-line);color:var(--eb-dim);font-size:.66em;letter-spacing:.05em;user-select:none;text-indent:0}',
-    '.doc .sec:first-child .eb-head{border-top:0;padding-top:0}',
-    '.doc .eb-head .n{font-family:var(--f-mono);font-size:1.02em;opacity:.75;flex:none}',
-    '.doc .eb-head .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
-    '.doc .eb-head .w{flex:none;opacity:.6;font-family:var(--f-mono);font-size:.94em}',
-    '.doc .skel{min-height:320px;border-radius:8px;background:linear-gradient(110deg,var(--eb-sunk) 8%,var(--eb-card) 22%,var(--eb-sunk) 36%);' +
-    'background-size:220% 100%;animation:ebshine 1.4s linear infinite}',
-    '@keyframes ebshine{0%{background-position:120% 0}100%{background-position:-60% 0}}',
-    '.doc.doc p{line-height:var(--eb-lh)}',
-    ':where(.doc) p{margin:0 0 var(--eb-para);text-indent:var(--eb-ti)}',
-    ':where(.doc) .ct>p:first-child,:where(.doc) h1+p,:where(.doc) h2+p,:where(.doc) h3+p,:where(.doc) .eb-head+p{text-indent:0}',
-    '.doc .ct.txt p{line-break:strict;text-justify:inter-ideograph;word-break:normal}',
-    '.doc .ct.txt>p:first-child{text-indent:var(--eb-ti)}',
-    ':where(.doc) h1,:where(.doc) h2,:where(.doc) h3,:where(.doc) h4,:where(.doc) h5,:where(.doc) h6{' +
-    'line-height:1.45;margin:1.2em 0 .7em;text-align:left;text-indent:0;font-weight:600}',
-    ':where(.doc) h1{font-size:1.5em}:where(.doc) h2{font-size:1.32em}:where(.doc) h3{font-size:1.16em}',
-    '.doc.doc img,.doc.doc svg,.doc.doc video{max-width:100%!important;height:auto!important;display:block;margin:.9em auto}',
-    ':where(.doc) figure{margin:1em 0}',
-    ':where(.doc) blockquote{margin:.35em 0;padding-left:.9em;border-left:2px solid var(--eb-line)}',
-    ':where(.doc) blockquote p{text-indent:0}',
-    ':where(.doc) pre,:where(.doc) code{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}',
-    ':where(.doc) table{max-width:100%;border-collapse:collapse}',
-    ':where(.doc) td,:where(.doc) th{padding:2px 6px;border:1px solid currentColor}',
-    ':where(.doc) hr{border:0;height:1px;background:currentColor;opacity:.22;margin:1.6em 0}',
-    ':where(.doc) a{color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}',
-    ':where(.doc) sup,:where(.doc) sub{font-size:.72em;line-height:0}',
-    ':where(.doc) ul,:where(.doc) ol{padding-left:1.4em;margin:0 0 var(--eb-para)}',
-    '.doc mark[data-ann]{cursor:pointer;border-radius:2px;color:inherit}',
-    '.doc [data-ch]{cursor:pointer}',
-    '.doc .eb-ill{cursor:zoom-in}',
-    '::highlight(eb-tts){background-color:rgba(201,162,75,.30);color:inherit}',
-    '::highlight(eb-find){background-color:rgba(90,150,235,.32);color:inherit}',
-    ':where(.doc) .tts-cur{background-color:rgba(201,162,75,.18);border-radius:3px}'
-  ].join('\n');
-
-  var PUB_LAYOUT_DROP = /^(?:-(?:webkit|moz|ms|o)-)?(position|top|right|bottom|left|inset[\w-]*|margin[\w-]*|padding[\w-]*|width|height|min-[\w-]+|max-[\w-]+|inline-size|block-size|display|float|clear|overflow[\w-]*|column[\w-]*|break-[\w-]+|page-break[\w-]*|z-index|transform[\w-]*|flex[\w-]*|grid[\w-]*|gap|box-sizing|contain|content-visibility|writing-mode|text-orientation|background-attachment)\s*:/i;
-  var PUB_ROOT_DROP = /^background[\w-]*\s*:/i;
-  var PUB_KEEP_BODY = /^(color|font-style|font-weight)\s*:/i;
-  var PUB_CACHE = {};
-  var pubSeq = 0;
-  var pubKey = '';
-
-  function famCss() {
-    return (PRE.font === 'book' ? ':where(.doc)' : '.doc.doc') + '{font-family:var(--eb-fam)}';
-  }
-
-  function ensureShadow() {
-    var v = $('ebView');
-    if (!v) return null;
-    if (!v.shadowRoot) {
-      EB.shadow = v.attachShadow({ mode: 'open' });
-      EB.shadow.innerHTML = '<style id="ebBase"></style><style id="ebPub"></style><article class="doc" id="ebDoc"></article>';
-    }
-    EB.shadow = v.shadowRoot;
-    EB.view = v;
-    EB.docEl = EB.shadow.getElementById('ebDoc');
-    applyBase();
-    applyLayout();
-    return EB.shadow;
-  }
-
-  function applyBase() {
-    if (!EB.shadow) return;
-    var st = EB.shadow.getElementById('ebBase');
-    if (st) st.textContent = famCss() + '\n' + BASE_CSS;
-  }
-
-  function dropDecls(body, root) {
-    var safe = body.replace(/(data:[^"')]+)/gi, function (m) { return m.replace(/;/g, '\u0002'); });
-    var kept = safe.split(';').filter(function (d) {
-      var t = d.trim();
-      if (!t || PUB_LAYOUT_DROP.test(t)) return false;
-      if (root && PUB_ROOT_DROP.test(t)) return false;
-      return true;
-    }).map(function (d) {
-      return /background/i.test(d) ? d.replace(/\bfixed\b/gi, 'scroll') : d;
-    });
-    return kept.join(';').replace(/\u0002/g, ';');
-  }
-
-  function pubRewrite(css) {
-    return String(css || '').replace(/([^{}]+)\{([^{}]*)\}/g, function (m, sel, body) {
-      if (sel.indexOf('@') >= 0) return m;
-      var root = /(^|[\s,>+~()])html(?=$|[\s,>+~{.#:\[])/i.test(sel);
-      var s = sel
-        .replace(/(^|[\s,>+~()])html(?=$|[\s,>+~{.#:\[])/gi, '$1:host')
-        .replace(/(^|[\s,>+~()])body(?=$|[\s,>+~{.#:\[])/gi, '$1:where(.doc .sec)');
-      return s + '{' + dropDecls(body, root) + '}';
-    });
-  }
-
-  function pubUrls(css, base) {
-    return String(css || '').replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, function (m, q, u) {
-      if (/^(data:|https?:|\/\/|#)/i.test(u)) return m;
-      try { return 'url("' + new URL(u, base).href + '")'; } catch (e) { return m; }
-    });
-  }
-
-  var PUB_IMPORT = /@import\s+(?:url\(\s*(['"]?)([^'")]+)\1\s*\)|(['"])([^'"]+)\3)\s*[^;]*;/gi;
-
-  function fetchPub(href, depth) {
-    var abs;
-    try { abs = new URL(href, location.href).href; } catch (e) { abs = href; }
-    if (PUB_CACHE[abs]) return PUB_CACHE[abs];
-    PUB_CACHE[abs] = fetch(abs, { credentials: 'same-origin' })
-      .then(function (r) { return r.ok ? r.text() : ''; })
-      .then(function (text) {
-        if (!text) return '';
-        var jobs = [];
-        var body = text.replace(PUB_IMPORT, function (m, q1, u1, q2, u2) {
-          var raw = u1 || u2 || '';
-          if (!raw || /^(data:|https?:|\/\/)/i.test(raw) || (depth || 0) >= 3) return '';
-          var next;
-          try { next = new URL(raw, abs).href; } catch (e) { return ''; }
-          jobs.push(fetchPub(next, (depth || 0) + 1));
-          return '\u0001' + (jobs.length - 1) + '\u0001';
-        });
-        return Promise.all(jobs).then(function (list) {
-          var merged = body.replace(/\u0001(\d+)\u0001/g, function (m, i) { return list[+i] || ''; });
-          return pubRewrite(pubUrls(merged, abs));
-        });
-      })
-      .catch(function () { return ''; });
-    return PUB_CACHE[abs];
-  }
-
-  function clearPub(sh) {
-    [].slice.call(sh.querySelectorAll('style[data-eb],link[data-eb]')).forEach(function (n) { n.remove(); });
-  }
-
-  function syncPub() {
-    if (!EB.shadow) return;
-    var sh = EB.shadow;
-    var seq = ++pubSeq;
-    if (!PRE.pubcss) { pubKey = ''; clearPub(sh); return; }
-    var inl = EB.inlines.map(pubRewrite);
-    var links = EB.links.slice();
-    Promise.all(links.map(function (h) { return fetchPub(h, 0); })).then(function (list) {
-      if (seq !== pubSeq || !EB.shadow || !PRE.pubcss) return;
-      var css = list.filter(Boolean).concat(inl).filter(Boolean);
-      var key = css.join('\u0000');
-      if (key === pubKey) return;
-      pubKey = key;
-      clearPub(sh);
-      var anchor = sh.getElementById('ebPub') || sh.getElementById('ebDoc');
-      if (!anchor || !anchor.parentNode) return;
-      css.forEach(function (t) {
-        var s = document.createElement('style');
-        s.textContent = t;
-        s.setAttribute('data-eb', '1');
-        anchor.parentNode.insertBefore(s, anchor);
-      });
-    });
-  }
-
-  function mount() {
-    var r = $('eb');
-    if (r) return r;
-    r = el('div', 'eb');
-    r.id = 'eb';
-    r.innerHTML =
-      '<div class="eb-bg"></div>' +
-      '<div class="eb-view" id="ebView"></div>' +
-      '<div class="eb-top" id="ebTop"></div>' +
-      '<div class="eb-bot" id="ebBot"></div>' +
-      '<div class="eb-panel l" id="ebToc"></div>' +
-      '<div class="eb-panel r" id="ebSet"></div>' +
-      '<div class="eb-sel" id="ebSel"></div>' +
-      '<div class="eb-tts" id="ebTts"></div>' +
-      '<div class="eb-lb" id="ebLb"><img id="ebLbImg" alt=""></div>' +
-      '<div class="eb-ask" id="ebAsk"></div>' +
-      '<div class="eb-toast" id="ebToast"></div>' +
-      '<div class="eb-tip" id="ebTip"></div>';
-    document.body.appendChild(r);
-    r.addEventListener('mousemove', bumpIdle);
-    r.addEventListener('pointerdown', bumpIdle, { passive: true });
-    $('ebLb').addEventListener('click', function () { $('ebLb').classList.remove('on'); });
-    $('ebView').addEventListener('scroll', onScroll, { passive: true });
-    document.addEventListener('selectionchange', function () {
-      if (!EB.open) return;
-      clearTimeout(EB.selT);
-      EB.selT = setTimeout(onSelect, 160);
-    });
-    document.addEventListener('keydown', onKey);
-    var rz = null;
-    window.addEventListener('resize', function () {
-      if (!EB.open) return;
-      clearTimeout(rz);
-      rz = setTimeout(applyLayout, 160);
-    });
-    if (window.speechSynthesis) {
-      window.speechSynthesis.onvoiceschanged = function () {
-        if (EB.panel === 'set') fillVoices();
-      };
-    }
-    return r;
-  }
-
-  function bumpIdle() {
-    var r = $('eb'); if (!r) return;
-    r.classList.remove('idle');
-    clearTimeout(EB.idle);
-    EB.idle = setTimeout(function () {
-      if (!EB.open) return;
-      if (EB.panel || EB.sel) return;
-      r.classList.add('idle');
-    }, 3200);
-  }
-
-  function paintTop() {
-    var t = $('ebTop'); if (!t) return;
-    var b = EB.book || {};
-    var cur = EB.chs.get(EB.ch) || {};
-    t.innerHTML =
-      '<button class="eb-btn" data-a="exit" title="返回（Esc）">' + ico('left') + '</button>' +
-      '<div class="eb-title"><b>' + esc(b.title || '') + (PRE.imm ? '<i class="eb-imm">隐身</i>' : '') + '</b><small id="ebCrumb">' +
-      esc(cur.title || '第 ' + EB.ch + ' 章') + ' · ' + EB.ch + ' / ' + num(EB.total) + '</small></div>' +
-      '<button class="eb-btn" data-a="toc" title="目录（T）">' + ico('toc') + '</button>' +
-      '<button class="eb-btn" data-a="find" title="全书搜索（Ctrl+F）">' + ico('search') + '</button>' +
-      '<button class="eb-btn" data-a="bm" title="书签（B）">' + ico('bookmark') + '</button>' +
-      '<button class="eb-btn" data-a="mark" title="标注（A）">' + ico('marker') + '</button>' +
-      '<button class="eb-btn" data-a="tts" title="朗读（D）">' + ico('volume') + '</button>' +
-      '<button class="eb-btn" data-a="set" title="设置（S）">' + ico('settings') + '</button>' +
-      '<button class="eb-btn hide-s" data-a="full" title="全屏（F）">' + ico('expand') + '</button>';
-    [].slice.call(t.querySelectorAll('[data-a]')).forEach(function (btn) {
-      btn.onclick = function () {
-        var a = btn.dataset.a;
-        if (a === 'exit') close();
-        else if (a === 'toc') openPanel('toc');
-        else if (a === 'find') openPanel('find');
-        else if (a === 'bm') { EB.annTab = 'bookmark'; openPanel('ann'); }
-        else if (a === 'mark') { EB.annTab = 'mark'; openPanel('ann'); }
-        else if (a === 'set') openPanel('set');
-        else if (a === 'tts') ttsToggle();
-        else if (a === 'full') fullscreen();
-      };
-    });
-    markTop();
-  }
-
-  function markTop() {
-    var t = $('ebTop'); if (!t) return;
-    [].slice.call(t.querySelectorAll('[data-a]')).forEach(function (b) {
-      var a = b.dataset.a;
-      var tab = EB.annTab || 'all';
-      b.classList.toggle('on', (a === 'toc' && EB.panel === 'toc') ||
-        (a === 'find' && EB.panel === 'find') ||
-        (a === 'bm' && EB.panel === 'ann' && tab === 'bookmark') ||
-        (a === 'mark' && EB.panel === 'ann' && tab !== 'bookmark') ||
-        (a === 'set' && EB.panel === 'set') || (a === 'tts' && EB.ttsOn));
-    });
-  }
-
-  function paintBot() {
-    var b = $('ebBot'); if (!b) return;
-    b.innerHTML =
-      '<span class="mono hide-s" id="ebPos">' + EB.ch + ' / ' + num(EB.total) + '</span>' +
-      '<div class="eb-track" id="ebTrack"><div class="rail"></div><div class="fill" id="ebFill"></div><div class="knob" id="ebKnob"></div></div>' +
-      '<span class="mono" id="ebPct">0%</span>' +
-      '<button class="eb-btn hide-s" data-a="prev" title="上一章">' + ico('left') + '</button>' +
-      '<button class="eb-btn hide-s" data-a="next" title="下一章">' + ico('right') + '</button>';
-    var track = $('ebTrack');
-    track.addEventListener('click', function (ev) {
-      var r = track.getBoundingClientRect();
-      var f = clamp((ev.clientX - r.left) / Math.max(1, r.width), 0, 1);
-      seek(f);
-    });
-    [].slice.call(b.querySelectorAll('[data-a]')).forEach(function (btn) {
-      btn.onclick = function () {
-        var d = btn.dataset.a === 'prev' ? -1 : 1;
-        if (isPaged()) { turnPage(d); return; }
-        d < 0 ? prevChapter() : nextChapter();
-      };
-    });
-    paintProgressBar();
-  }
-
-  function paintProgressBar() {
-    var fill = $('ebFill'), knob = $('ebKnob'), pct = $('ebPct'), pos = $('ebPos');
-    if (!fill) return;
-    var f = totalProgress();
-    fill.style.width = (f * 100).toFixed(2) + '%';
-    if (knob) knob.style.left = (f * 100).toFixed(2) + '%';
-    if (pct) pct.textContent = (f * 100).toFixed(2) + '%';
-    if (pos) {
-      if (isPaged()) {
-        measure();
-        pos.textContent = EB.ch + ' / ' + num(EB.total) + ' · ' + (EB.page + 1) + ' / ' + EB.pages + ' 页';
-      } else {
-        pos.textContent = EB.ch + ' / ' + num(EB.total);
-      }
-    }
-  }
-
-  function totalProgress() {
-    if (!EB.total) return 0;
-    return clamp((EB.ch - 1 + chapterProgress()) / EB.total, 0, 1);
-  }
-
-  function chapterProgress() {
-    var sec = EB.secs.get(EB.ch);
-    if (!sec || !EB.view) return 0;
-    if (isPaged()) {
-      measure();
-      return EB.pages > 1 ? clamp(EB.page / (EB.pages - 1), 0, 1) : 0;
-    }
-    var vr = EB.view.getBoundingClientRect();
-    var sr = sec.getBoundingClientRect();
-    var top = EB.view.scrollTop + (sr.top - vr.top);
-    var span = sr.height - EB.view.clientHeight;
-    if (span <= 8) return 0;
-    return clamp((EB.view.scrollTop - top) / span, 0, 1);
-  }
-
-  function parseHtml(html) {
-    var doc = new DOMParser().parseFromString(html || '', 'text/html');
-    var b = doc.body;
-    var body = b ? b.innerHTML : '';
-    var links = [].slice.call(doc.querySelectorAll('link[rel~="stylesheet"]')).map(function (l) { return l.getAttribute('href'); }).filter(Boolean);
-    var styles = [].slice.call(doc.querySelectorAll('style')).map(function (s) { return s.textContent || ''; }).filter(Boolean);
-    return {
-      body: body, links: links, styles: styles,
-      cls: b ? (b.getAttribute('class') || '') : '',
-      sty: b ? (b.getAttribute('style') || '') : ''
-    };
-  }
-
-  function applyBody(sec, parsed) {
-    if (!sec || !parsed) return;
-    (parsed.cls || '').split(/\s+/).forEach(function (c) {
-      if (c && c !== 'sec' && c !== 'doc') sec.classList.add(c);
-    });
-    (parsed.sty || '').split(';').forEach(function (decl) {
-      var i = decl.indexOf(':');
-      if (i < 1) return;
-      var k = decl.slice(0, i).trim();
-      var v = decl.slice(i + 1).trim();
-      if (!k || !v || !PUB_KEEP_BODY.test(k + ':')) return;
-      sec.style.setProperty(k, v);
-    });
-  }
-
-  function pushUniq(list, items) {
-    items.forEach(function (x) { if (x && list.indexOf(x) < 0) list.push(x); });
-  }
-
-  function artPage(sec, ct) {
-    if (!ct) return false;
-    if (ct.querySelector('img,video,audio,canvas,iframe,object,embed')) return false;
-    if (!sec || sec.classList.length < 2) return false;
-    return (ct.textContent || '').replace(/[\s\u00a0\u3000]+/g, '').length < 24;
-  }
-
-  function buildSec(dto, inline) {
-    var n = dto.chapter;
-    EB.chs.set(n, { n: n, title: dto.title || '', chars: dto.chars || 0, href: dto.href || '' });
-    var sec = el('section', 'sec');
-    sec.dataset.ch = String(n);
-    var head = el('div', 'eb-head');
-    head.innerHTML = '<span class="n">' + n + '</span><span class="t">' + esc(dto.title || '') + '</span>' +
-      '<span class="w">' + (dto.chars ? num(dto.chars) + ' 字' : '') + '</span>';
-    var ct = el('div', EB.book && EB.book.profile === 'TXT' ? 'ct txt' : 'ct');
-    var parsed = parseHtml(dto.html);
-    ct.innerHTML = parsed.body || '';
-    applyBody(sec, parsed);
-    pushUniq(EB.links, parsed.links);
-    pushUniq(EB.inlines, parsed.styles);
-    sec.appendChild(head);
-    sec.appendChild(ct);
-    tidy(ct, n);
-    if (artPage(sec, ct)) sec.classList.add('artpage');
-    EB.secs.set(n, sec);
-    EB.lo = EB.lo ? Math.min(EB.lo, n) : n;
-    EB.hi = Math.max(EB.hi, n);
-    return sec;
-  }
-
-  function tidy(root, n) {
-    [].slice.call(root.querySelectorAll('svg')).forEach(function (svg) {
-      var pics = [].slice.call(svg.querySelectorAll('image'));
-      if (!pics.length) return;
-      var box = el('div', 'eb-svgimg');
-      pics.forEach(function (node) {
-        var src = node.getAttribute('xlink:href') || node.getAttribute('href') || node.getAttribute('src');
-        if (!src) return;
-        var img = el('img', 'eb-ill');
-        img.src = src;
-        img.alt = '';
-        box.appendChild(img);
-      });
-      if (box.childNodes.length) svg.parentNode.replaceChild(box, svg);
-      else svg.remove();
-    });
-    [].slice.call(root.querySelectorAll('image')).forEach(function (node) {
-      var src = node.getAttribute('xlink:href') || node.getAttribute('href') || node.getAttribute('src');
-      if (!src) return node.remove();
-      var img = el('img', 'eb-ill');
-      img.src = src;
-      img.alt = '';
-      node.parentNode.replaceChild(img, node);
-    });
-    [].slice.call(root.querySelectorAll('img')).forEach(function (img) {
-      img.classList.add('eb-ill');
-      img.loading = 'lazy';
-      img.style.setProperty('max-width', '100%', 'important');
-      img.style.setProperty('height', 'auto', 'important');
-      img.removeAttribute('width');
-      img.removeAttribute('height');
-      img.addEventListener('click', function () { zoomImg(img.src); });
-    });
-    [].slice.call(root.querySelectorAll('a')).forEach(function (a) {
-      var ch = a.getAttribute('data-ch');
-      if (ch) {
-        a.addEventListener('click', function (ev) {
-          ev.preventDefault();
-          gotoChapter(+ch, 0);
-        });
-        return;
-      }
-      var href = a.getAttribute('href') || '';
-      if (href.indexOf('#') === 0 && href.length > 1) {
-        a.addEventListener('click', function (ev) {
-          ev.preventDefault();
-          jumpAnchor(href.slice(1));
-        });
-      } else if (/^(https?:)?\/\//i.test(href)) {
-        a.setAttribute('target', '_blank');
-        a.setAttribute('rel', 'noopener noreferrer');
-      } else {
-        a.addEventListener('click', function (ev) { ev.preventDefault(); });
-      }
-    });
-    paintMarks(root, n);
-  }
-
-  function jumpAnchor(id) {
-    if (!EB.shadow) return;
-    var target = EB.shadow.getElementById(id);
-    if (!target) return;
-    var vr = EB.view.getBoundingClientRect();
-    var tr = target.getBoundingClientRect();
-    EB.view.scrollTop += tr.top - vr.top - EB.view.clientHeight * 0.3;
-    target.style.transition = 'background .4s';
-    target.style.background = 'rgba(201,162,75,.3)';
-    setTimeout(function () { target.style.background = ''; }, 900);
-  }
-
-  function zoomImg(src) {
-    if (!src) return;
-    $('ebLbImg').src = src;
-    $('ebLb').classList.add('on');
-  }
-
-  function load(n, where) {
-    if (n < 1 || n > EB.total) return Promise.resolve(null);
-    if (EB.secs.has(n)) return Promise.resolve(EB.secs.get(n));
-    var key = 'k' + n;
-    if (EB.pending[key]) return EB.pending[key];
-    var p = req('api/lantai/v1/read/' + EB.bookId + '/chapter/' + n + '?images=url&w=0&fmt=orig')
-      .then(function (dto) {
-        delete EB.pending[key];
-        if (!EB.open) return null;
-        var sec = buildSec(dto, false);
-        insertSec(sec);
-        return sec;
-      })
-      .catch(function (e) {
-        delete EB.pending[key];
-        throw e;
-      });
-    EB.pending[key] = p;
-    return p;
-  }
-
-  function insertSec(sec) {
-    if (!EB.docEl) return;
-    var n = +sec.dataset.ch;
-    var kids = [].slice.call(EB.docEl.children);
-    var anchor = null;
-    for (var i = 0; i < kids.length; i++) {
-      if ((+kids[i].dataset.ch || 0) > n) { anchor = kids[i]; break; }
-    }
-    if (!anchor) {
-      EB.docEl.appendChild(sec);
-      syncPub();
-      return;
-    }
-    var vr = EB.view.getBoundingClientRect();
-    var visible = anchor.getBoundingClientRect().top < vr.bottom;
-    var before = EB.view.scrollHeight;
-    EB.docEl.insertBefore(sec, anchor);
-    if (visible) EB.view.scrollTop += EB.view.scrollHeight - before;
-    syncPub();
-  }
-
-  function reset(n) {
-    if (!EB.docEl) return Promise.resolve();
-    EB.secs.clear();
-    EB.docEl.innerHTML = '';
-    EB.lo = 0;
-    EB.hi = 0;
-    EB.links = [];
-    EB.inlines = [];
-    EB.ch = n;
-    return load(n, 'after').then(function () {
-      paintTop();
-      paintBot();
-      if (isPaged()) {
-        requestAnimationFrame(function () { measure(); goPage(0); paintProgressBar(); });
-        return null;
-      }
-      return Promise.all([
-        load(n - 1, 'before').catch(function () { }),
-        load(n + 1, 'after').catch(function () { })
-      ]);
-    });
-  }
-
-  function onScroll() {
-    if (!EB.open) return;
-    bumpIdle();
-    if (EB.raf) return;
-    EB.raf = requestAnimationFrame(function () {
-      EB.raf = 0;
-      if (isPaged()) measure();
-      var n = chapterAt();
-      if (n && n !== EB.ch) {
-        EB.ch = n;
-        EB.seen = Math.max(EB.seen, n);
-        var crumb = $('ebCrumb');
-        var cur = EB.chs.get(n) || {};
-        if (crumb) crumb.textContent = (cur.title || '第 ' + n + ' 章') + ' · ' + n + ' / ' + num(EB.total);
-        markToc();
-        queueProgress();
-      }
-      paintProgressBar();
-      extend();
-    });
-  }
-
-  function chapterAt() {
-    if (!EB.docEl || !EB.view) return 0;
-    if (isPaged()) return EB.ch;
-    var vr = EB.view.getBoundingClientRect();
-    var line = vr.top + 96;
-    var secs = [].slice.call(EB.docEl.children);
-    for (var i = 0; i < secs.length; i++) {
-      var r = secs[i].getBoundingClientRect();
-      if (r.bottom > line) return +secs[i].dataset.ch || EB.ch;
-    }
-    return EB.ch;
-  }
-
-  function extend() {
-    if (!EB.view) return;
-    if (isPaged()) return;
-    var v = EB.view;
-    if (!EB.warmF && v.scrollTop + v.clientHeight > v.scrollHeight - 1400 && EB.hi < EB.total) {
-      EB.warmF = true;
-      load(EB.hi + 1, 'after')
-        .then(function () { if (EB.open && EB.hi < EB.total) return load(EB.hi + 1, 'after'); })
-        .catch(function () { })
-        .then(function () { EB.warmF = false; });
-    }
-    if (!EB.warmB && v.scrollTop < 1400 && EB.lo > 1) {
-      EB.warmB = true;
-      load(EB.lo - 1, 'before')
-        .then(function () { if (EB.open && EB.lo > 1) return load(EB.lo - 1, 'before'); })
-        .catch(function () { })
-        .then(function () { EB.warmB = false; });
-    }
-  }
-
-  function scrollToSec(sec, prog) {
-    if (!sec || !EB.view) return;
-    if (isPaged()) {
-      measure();
-      if (clamp(prog || 0, 0, 1) >= 0.999) { goPage(EB.pages - 1); return; }
-      var bv = EB.view.getBoundingClientRect();
-      var bs = sec.getBoundingClientRect();
-      var st = layoutMetrics().step;
-      goPage(Math.max(0, Math.round((EB.view.scrollLeft + bs.left - bv.left) / st)));
-      return;
-    }
-    var vr = EB.view.getBoundingClientRect();
-    var sr = sec.getBoundingClientRect();
-    var pad = parseFloat(getComputedStyle(EB.view).paddingTop) || 0;
-    var top = EB.view.scrollTop + (sr.top - vr.top) - pad;
-    var span = Math.max(0, sr.height - EB.view.clientHeight);
-    EB.view.scrollTop = Math.max(0, top + span * clamp(prog || 0, 0, 1));
-  }
-
-  function gotoChapter(n, prog) {
-    n = Math.round(clamp(n, 1, EB.total));
-    var sec = EB.secs.get(n);
-    if (sec) {
-      scrollToSec(sec, prog || 0);
-      EB.ch = n;
-      paintProgressBar();
-      queueProgress();
-      setTimeout(function () {
-        if (!EB.open) return;
-        var s = EB.secs.get(n);
-        if (s) scrollToSec(s, prog || 0);
-      }, 240);
-      return;
-    }
-    tip('正在载入', '第 ' + n + ' 章 · 共 ' + num(EB.total) + ' 章');
-    reset(n).then(function () {
-      tip('');
-      scrollToSec(EB.secs.get(n), prog || 0);
-      EB.ch = n;
-      paintProgressBar();
-      queueProgress();
-      setTimeout(function () {
-        if (!EB.open) return;
-        var s = EB.secs.get(n);
-        if (s) scrollToSec(s, prog || 0);
-      }, 240);
-    }).catch(function (e) {
-      tip('');
-      toast('载入失败：' + errText(e), 'err');
-    });
-  }
-
-  function prevChapter() { if (EB.ch > 1) gotoChapter(EB.ch - 1, 0); }
-  function nextChapter() { if (EB.ch < EB.total) gotoChapter(EB.ch + 1, 0); }
-
-  function seek(f) {
-    var target = clamp(Math.ceil(f * EB.total), 1, EB.total);
-    gotoChapter(target, 0);
-  }
-
-  function queueProgress() {
-    clearTimeout(EB.progTimer);
-    EB.progTimer = setTimeout(sendProgress, 900);
-  }
-
-  function sendProgress() {
-    if (!EB.open) return;
-    var ref = EB.chs.get(EB.ch) || {};
-    var p = chapterProgress();
-    var tp = totalProgress();
-    if (PRE.imm) {
-      try { sessionStorage.setItem(immKey(), JSON.stringify({ ch: EB.ch, p: p })); } catch (e) { }
-      return;
-    }
-    if (typeof PROGRESS !== 'undefined') {
-      PROGRESS[EB.bookId] = {
-        page: EB.ch, pages: EB.total, completed: tp >= 0.999, device: 'webui', at: Date.now(),
-        locator: { href: ref.href || ('#page=' + EB.ch), position: EB.ch, totalProgression: tp }
-      };
-    }
-    req('api/v1/books/' + EB.bookId + '/progression', {
-      method: 'PUT',
-      body: {
-        modified: new Date().toISOString(),
-        device: { id: 'webui', name: '网页端' },
-        locator: {
-          href: ref.href || ('#page=' + EB.ch),
-          type: (EB.book && EB.book.profile === 'TXT') ? 'text/plain' : 'application/xhtml+xml',
-          locations: { position: EB.ch, progression: p, totalProgression: tp }
-        }
-      }
-    }).catch(function () { });
-  }
-
-  function startBeat() {
-    clearInterval(EB.hbTimer);
-    EB.hbTimer = setInterval(function () {
-      if (!EB.open || PRE.imm || !EB.session) return;
-      EB.beats++;
-      EB.session.dur += 30000;
-      EB.session.pages = Math.max(EB.session.pages, EB.seen);
-      if (typeof pushSession === 'function') pushSession(EB.session);
-      req('api/lantai/v1/reading/heartbeat', {
-        method: 'POST',
-        body: { bookId: EB.bookId, page: EB.ch, deviceId: 'webui', deviceName: '网页端', client: 'lantai-webui' }
-      }).catch(function () { });
-    }, 30000);
-  }
-
-  function loadOutline() {
-    if (EB.outline || EB.outlineLoading) return Promise.resolve(EB.outline);
-    EB.outlineLoading = true;
-    return req('api/lantai/v1/read/' + EB.bookId + '/chapters?outline=true')
-      .then(function (dto) {
-        EB.outline = (dto && dto.outline) || [];
-        EB.outlineLoading = false;
-        if (!EB.outline.length) EB.outline = null;
-        return EB.outline;
-      })
-      .catch(function () { EB.outlineLoading = false; return null; });
-  }
-
-  function openPanel(which) {
-    var r = $('eb');
-    if (EB.panel === which) {
-      EB.panel = null;
-      $('ebToc').classList.remove('on');
-      $('ebSet').classList.remove('on');
-      r.classList.remove('toc-open', 'set-open');
-      markTop();
-      return;
-    }
-    EB.panel = which;
-    if (which === 'toc') {
-      $('ebSet').classList.remove('on');
-      paintToc();
-      $('ebToc').classList.add('on');
-      r.classList.add('toc-open');
-      r.classList.remove('set-open');
-    } else {
-      $('ebToc').classList.remove('on');
-      r.classList.remove('toc-open');
-      r.classList.add('set-open');
-      if (which === 'find') paintFind(); else paintSet(which);
-      $('ebSet').classList.add('on');
-    }
-    markTop();
-  }
-
-  function closePanels() {
-    EB.panel = null;
-    $('ebToc').classList.remove('on');
-    $('ebSet').classList.remove('on');
-    var r = $('eb'); if (r) r.classList.remove('toc-open', 'set-open');
-    markTop();
-  }
-
-  function paintFind() {
-    var P = $('ebSet');
-    P.innerHTML =
-      '<div class="eb-panel-h"><b>全书搜索</b><span class="mono" id="ebFindN"></span>' +
-      '<button class="eb-btn" data-a="close">' + ico('close') + '</button></div>' +
-      '<div class="eb-search">' + ico('search') + '<input id="ebFindQ" placeholder="搜索正文，回车开始" autocomplete="off" value="' + esc(EB.findQ || '') + '"></div>' +
-      '<div class="eb-list" id="ebFindList"><div class="eb-empty">输入关键词后回车</div></div>';
-    P.querySelector('[data-a=close]').onclick = function () { closePanels(); };
-    var input = $('ebFindQ');
-    input.addEventListener('keydown', function (e) {
-      if (e.key !== 'Enter') return;
-      e.preventDefault();
-      runFind(this.value.trim());
-    });
-    if (EB.findQ) runFind(EB.findQ);
-    setTimeout(function () { try { input.focus(); } catch (e) { } }, 40);
-  }
-
-  function markText(text, q) {
-    var s = esc(text);
-    var k = esc(q);
-    if (!k) return s;
-    var i = s.toLowerCase().indexOf(k.toLowerCase());
-    if (i < 0) return s;
-    return s.slice(0, i) + '<mark>' + s.slice(i, i + k.length) + '</mark>' + s.slice(i + k.length);
-  }
-
-  function runFind(q) {
-    EB.findQ = q;
-    var box = $('ebFindList'), n = $('ebFindN');
-    if (!box) return;
-    if (!q) {
-      box.innerHTML = '<div class="eb-empty">输入关键词后回车</div>';
-      if (n) n.textContent = '';
-      return;
-    }
-    box.innerHTML = '<div class="eb-empty">正在搜索…</div>';
-    if (n) n.textContent = '';
-    var slow = setTimeout(function () {
-      if (EB.panel === 'find' && box && !box.querySelector('.eb-find-i')) {
-        box.innerHTML = '<div class="eb-empty">首次搜索要建立正文索引，请稍候…</div>';
-      }
-    }, 1500);
-    req('api/lantai/v1/read/' + EB.bookId + '/search?limit=60&q=' + encodeURIComponent(q))
-      .then(function (d) {
-        clearTimeout(slow);
-        if (EB.panel !== 'find') return;
-        var hits = (d && d.hits) || [];
-        if (n) n.textContent = d && d.total ? num(d.total) + ' 处 · ' + num(d.matchedChapters) + ' 章' : '无结果';
-        if (!hits.length) {
-          box.innerHTML = '<div class="eb-empty">没有找到「' + esc(q) + '」</div>';
-          return;
-        }
-        box.innerHTML = hits.map(function (h, i) {
-          return '<div class="eb-find-i" data-hit="' + i + '">' +
-            '<div class="h"><span class="mono">' + h.chapter + '</span>' + esc(h.title) + '</div>' +
-            '<div class="s">' + markText(h.snippet, q) + '</div></div>';
-        }).join('');
-        [].slice.call(box.querySelectorAll('[data-hit]')).forEach(function (el) {
-          el.onclick = function () { gotoHit(hits[+el.dataset.hit], q); };
-        });
-      })
-      .catch(function (e) {
-        clearTimeout(slow);
-        box.innerHTML = '<div class="eb-empty">搜索失败：' + esc(errText(e)) + '</div>';
-      });
-  }
-
-  function gotoHit(hit, q) {
-    closePanels();
-    if (hit.chapter === EB.ch) {
-      findInView(q);
-      return;
-    }
-    gotoChapter(hit.chapter, 0);
-    setTimeout(function () { findInView(q); }, 800);
-  }
-
-  function findInView(q) {
-    var sec = EB.secs.get(EB.ch);
-    if (!sec || !q) return;
-    var ct = sec.querySelector('.ct') || sec;
-    var low = q.toLowerCase();
-    var ranges = [];
-    var w = document.createTreeWalker(ct, NodeFilter.SHOW_TEXT, null);
-    var node;
-    while ((node = w.nextNode())) {
-      var value = node.nodeValue || '';
-      var vl = value.toLowerCase();
-      var at = 0;
-      while (at < vl.length) {
-        var i = vl.indexOf(low, at);
-        if (i < 0) break;
-        ranges.push({ node: node, s: i, e: i + q.length });
-        at = i + q.length;
-      }
-    }
-    if (!ranges.length) return;
-    if (window.CSS && CSS.highlights && typeof window.Highlight === 'function') {
-      var hl = new window.Highlight();
-      var first = null;
-      ranges.forEach(function (r) {
-        var rg = document.createRange();
-        try {
-          rg.setStart(r.node, r.s);
-          rg.setEnd(r.node, r.e);
-        } catch (e) { return; }
-        if (!first) first = rg;
-        hl.add(rg);
-      });
-      CSS.highlights.set('eb-find', hl);
-      if (first) {
-        var holder = first.startContainer.parentElement || ct;
-        ttsReveal(holder);
-      }
-    }
-  }
-
-  function paintToc() {
-    var P = $('ebToc');
-    P.innerHTML =
-      '<div class="eb-panel-h"><b>目录</b><span class="mono" id="ebTocN">' + num(EB.total) + ' 章</span>' +
-      '<button class="eb-btn" data-a="close">' + ico('close') + '</button></div>' +
-      '<div class="eb-search">' + ico('search') + '<input id="ebTocQ" placeholder="搜索章节" autocomplete="off"></div>' +
-      '<div class="eb-list" id="ebTocList"><div class="eb-empty">正在读取目录…</div></div>';
-    P.querySelector('[data-a=close]').onclick = function () { closePanels(); };
-    $('ebTocQ').addEventListener('input', function () { renderToc(this.value.trim()); });
-    loadOutline().then(function (list) {
-      if (EB.panel !== 'toc') return;
-      renderToc('');
-      if (list && list.length) $('ebTocN').textContent = num(list.length) + ' 节';
-    });
-  }
-
-  function renderToc(q) {
-    var box = $('ebTocList'); if (!box) return;
-    var list = EB.outline;
-    var items = list && list.length ? list : [].slice.call(EB.chs.keys()).sort(function (a, b) { return a - b; }).map(function (n) {
-      var c = EB.chs.get(n);
-      return { n: n, title: c.title, depth: 0, chars: c.chars };
-    });
-    if (q) {
-      var low = q.toLowerCase();
-      items = items.filter(function (x) { return String(x.title || '').toLowerCase().indexOf(low) >= 0; });
-    }
-    if (!items.length) { box.innerHTML = '<div class="eb-empty">没有匹配的章节</div>'; return; }
-    var hasKids = items.some(function (x) { return (x.depth || 0) > 0; });
-    box.innerHTML = items.map(function (x) {
-      var vol = hasKids && !q && (x.depth || 0) === 0;
-      return '<div class="eb-toc-i lv' + Math.min(2, x.depth || 0) + (vol ? ' vol' : '') + (x.n === EB.ch ? ' on' : '') + '" data-n="' + x.n + '">' +
-        '<span class="lv">' + (vol ? '卷' : x.n) + '</span><span class="nm">' + esc(x.title || '第 ' + x.n + ' 章') + '</span>' +
-        (x.chars ? '<span class="pg">' + (x.chars > 10000 ? (x.chars / 10000).toFixed(1) + '万' : num(x.chars)) + '</span>' : '') +
-        '</div>';
-    }).join('');
-    [].slice.call(box.querySelectorAll('[data-n]')).forEach(function (n) {
-      n.onclick = function () {
-        gotoChapter(+n.dataset.n, 0);
-        closePanels();
-      };
-    });
-    var cur = box.querySelector('.on');
-    if (cur) cur.scrollIntoView({ block: 'center' });
-  }
-
-  function markToc() {
-    if (EB.panel !== 'toc') return;
-    var box = $('ebTocList'); if (!box) return;
-    [].slice.call(box.querySelectorAll('[data-n]')).forEach(function (n) {
-      n.classList.toggle('on', +n.dataset.n === EB.ch);
-    });
-  }
-
-  function paintSet(which) {
-    var P = $('ebSet');
-    if (which === 'ann') { paintAnns(); return; }
-    loadFontFamilies();
-    P.innerHTML =
-      '<div class="eb-panel-h"><b>阅读设置</b><button class="eb-btn" data-a="close">' + ico('close') + '</button></div>' +
-      '<div class="eb-list">' +
-      '<div class="eb-group">底色</div>' +
-      '<div class="eb-row"><label>主题</label><div class="grow"><div class="eb-swatches">' +
-      THEMES.map(function (t) {
-        return '<div class="eb-sw-dot' + (PRE.theme === t[0] ? ' on' : '') + '" data-th="' + t[0] + '" title="' + t[1] + '">' +
-          '<span style="background:' + t[2] + ';border:1px solid ' + t[3] + '22"></span></div>';
-      }).join('') + '</div></div></div>' +
-      '<div class="eb-group">排版</div>' +
-      '<div class="eb-row"><label>字号</label><div class="grow" style="flex-wrap:nowrap">' +
-      '<button class="eb-chip sq" data-sz="-1">A-</button>' +
-      '<span class="mono" style="flex:1;text-align:center;font-size:12px">' + PRE.size + '</span>' +
-      '<button class="eb-chip sq" data-sz="1">A+</button></div></div>' +
-      '<div class="eb-row"><label>行距</label><div class="grow">' +
-      [[1.55, '紧'], [1.85, '中'], [2.15, '松']].map(function (x) {
-        return '<button class="eb-chip' + (Math.abs(PRE.lh - x[0]) < .01 ? ' on' : '') + '" data-lh="' + x[0] + '">' + x[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="eb-row"><label>段距</label><div class="grow">' +
-      [[0.4, '窄'], [0.9, '中'], [1.5, '宽']].map(function (x) {
-        return '<button class="eb-chip' + (Math.abs(PRE.para - x[0]) < .01 ? ' on' : '') + '" data-pa="' + x[0] + '">' + x[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="eb-row"><label>字体</label><div class="grow">' +
-      FONTS.map(function (f) {
-        return '<button class="eb-chip' + (PRE.font === f[0] ? ' on' : '') + '" data-ft="' + f[0] + '" style="font-family:' + f[2] + '">' + f[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="eb-row"><label>缩进</label><div class="grow"><button class="eb-sw' + (PRE.indent ? ' on' : '') + '" data-sw="indent"></button></div></div>' +
-      '<div class="eb-row"><label>版心</label><div class="eb-slider"><input type="range" id="ebMeasure" min="26" max="64" step="2" value="' + PRE.measure + '"><span class="v" id="ebMeasureV">' + PRE.measure + '</span></div></div>' +
-      '<div class="eb-row"><label>原书样式</label><div class="grow"><button class="eb-sw' + (PRE.pubcss ? ' on' : '') + '" data-sw="pubcss"></button></div></div>' +
-      '<div class="eb-note">关闭原书样式使用兰台排版，字号与行距调整才会生效；打开可还原出版社版式。</div>' +
-      '<div class="eb-group">翻页</div>' +
-      '<div class="eb-row"><label>方式</label><div class="grow">' +
-      [['scroll', '连续滚动'], ['paged', '单栏分页'], ['double', '双栏分页']].map(function (x) {
-        return '<button class="eb-chip' + (PRE.layout === x[0] ? ' on' : '') + '" data-lt="' + x[0] + '">' + x[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="eb-row' + (PRE.layout === 'scroll' ? ' dim' : '') + '"><label>方向</label><div class="grow">' +
-      [['LTR', '从左往右'], ['RTL', '从右往左']].map(function (x) {
-        return '<button class="eb-chip' + (PRE.dir === x[0] ? ' on' : '') + '" data-dr="' + x[0] + '"' +
-          (PRE.layout === 'scroll' ? ' disabled' : '') + '>' + x[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="eb-note">分页模式下方向决定翻页键与左右点击区；连续滚动时方向不生效。</div>' +
-      '<div class="eb-group">朗读</div>' +
-      '<div class="eb-row"><label>语速</label><div class="grow">' +
-      [[0.8, '慢'], [1, '常'], [1.2, '快'], [1.5, '极快']].map(function (x) {
-        return '<button class="eb-chip' + (Math.abs(PRE.ttsRate - x[0]) < .01 ? ' on' : '') + '" data-tr="' + x[0] + '">' + x[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="eb-row"><label>音色</label><div class="grow"><select id="ebVoice" style="width:100%;height:28px;border-radius:7px;border:1px solid var(--eb-line);background:var(--eb-sunk);color:var(--eb-tx);font-size:11.5px;padding:0 6px"></select></div></div>' +
-      '<div class="eb-group">阅读</div>' +
-      '<div class="eb-row"><label>屏幕常亮</label><div class="grow"><button class="eb-sw' + (PRE.wake ? ' on' : '') + '" data-sw="wake"></button></div></div>' +
-      '<div class="eb-row"><label>隐身阅读</label><div class="grow"><button class="eb-sw' + (PRE.imm ? ' on' : '') + '" data-sw="imm"></button></div></div>' +
-      '<div class="eb-note">隐身阅读不写入进度、不上报时长，本次阅读不会出现在统计里。</div>' +
-      '</div>';
-    P.querySelector('[data-a=close]').onclick = function () { closePanels(); };
-    [].slice.call(P.querySelectorAll('[data-th]')).forEach(function (d) {
-      d.onclick = function () { PRE.theme = d.dataset.th; savePrefs(); applyTheme(); paintSet('set'); };
-    });
-    [].slice.call(P.querySelectorAll('[data-lt]')).forEach(function (b) {
-      b.onclick = function () { switchLayout(b.dataset.lt); };
-    });
-    [].slice.call(P.querySelectorAll('[data-dr]')).forEach(function (b) {
-      b.onclick = function () {
-        if (PRE.layout === 'scroll') return toast('连续滚动下方向不生效，先切到分页');
-        PRE.dir = b.dataset.dr; savePrefs(); applyLayout(); paintSet('set');
-      };
-    });
-    [].slice.call(P.querySelectorAll('[data-sz]')).forEach(function (b) {
-      b.onclick = function () {
-        PRE.size = clamp(PRE.size + (+b.dataset.sz), 13, 32);
-        savePrefs(); applyType(); paintSet('set');
-      };
-    });
-    [].slice.call(P.querySelectorAll('[data-lh]')).forEach(function (b) {
-      b.onclick = function () { PRE.lh = +b.dataset.lh; savePrefs(); applyType(); paintSet('set'); };
-    });
-    [].slice.call(P.querySelectorAll('[data-pa]')).forEach(function (b) {
-      b.onclick = function () { PRE.para = +b.dataset.pa; savePrefs(); applyType(); paintSet('set'); };
-    });
-    [].slice.call(P.querySelectorAll('[data-ft]')).forEach(function (b) {
-      b.onclick = function () { PRE.font = b.dataset.ft; savePrefs(); applyType(); paintSet('set'); };
-    });
-    [].slice.call(P.querySelectorAll('[data-tr]')).forEach(function (b) {
-      b.onclick = function () {
-        PRE.ttsRate = +b.dataset.tr; savePrefs(); paintSet('set');
-        if (EB.ttsOn) ttsRestart();
-      };
-    });
-    [].slice.call(P.querySelectorAll('[data-sw]')).forEach(function (b) {
-      b.onclick = function () {
-        var k = b.dataset.sw;
-        PRE[k] = !PRE[k];
-        savePrefs();
-        b.classList.toggle('on', PRE[k]);
-        if (k === 'pubcss') syncPub();
-        if (k === 'wake') PRE.wake ? wakeOn() : wakeOff();
-        if (k === 'imm') {
-          try {
-            if (PRE.imm) sessionStorage.setItem(immKey(), JSON.stringify({ ch: EB.ch, p: chapterProgress() }));
-            else sessionStorage.removeItem(immKey());
-          } catch (e) { }
-          paintTop();
-          toast(PRE.imm ? '隐身阅读已开启，本次不记录进度' : '已恢复记录进度');
-        }
-      };
-    });
-    var range = $('ebMeasure');
-    range.addEventListener('input', function () {
-      PRE.measure = +range.value;
-      $('ebMeasureV').textContent = PRE.measure;
-      applyType();
-    });
-    range.addEventListener('change', savePrefs);
-    fillVoices();
-  }
-
-  function fillVoices() {
-    var sel = $('ebVoice'); if (!sel) return;
-    var list = ttsVoices();
-    sel.innerHTML = '<option value="">系统默认</option>' + list.map(function (v) {
-      return '<option value="' + esc(v.name) + '"' + (PRE.ttsVoice === v.name ? ' selected' : '') + '>' + esc(v.name + ' · ' + v.lang) + '</option>';
-    }).join('');
-    sel.onchange = function () { PRE.ttsVoice = sel.value; savePrefs(); };
-  }
-
-  function ttsVoices() {
-    if (!window.speechSynthesis) return [];
-    var all = window.speechSynthesis.getVoices() || [];
-    var zh = all.filter(function (v) { return /^zh|^cmn|Chinese|中文|普通话/i.test(v.lang + ' ' + v.name); });
-    return zh.length ? zh : all;
-  }
-
-  function annFiltered() {
-    var tab = EB.annTab || 'all';
-    var q = String(EB.annQ || '').trim().toLowerCase();
-    return EB.anns.filter(function (a) {
-      if (tab === 'bookmark' && a.kind !== 'bookmark') return false;
-      if (tab === 'mark' && a.kind === 'bookmark') return false;
-      if (!q) return true;
-      var title = (EB.chs.get(a.ch) || {}).title || '';
-      return (String(a.mark || '') + ' ' + String(a.note || '') + ' ' + title).toLowerCase().indexOf(q) >= 0;
-    }).sort(function (a, b) { return a.ch - b.ch || (a.at || 0) - (b.at || 0); });
-  }
-
-  function paintAnns() {
-    var P = $('ebSet');
-    var bm = 0;
-    EB.anns.forEach(function (a) { if (a.kind === 'bookmark') bm++; });
-    var list = annFiltered();
-    var tab = EB.annTab || 'all';
-    P.innerHTML =
-      '<div class="eb-panel-h"><b>书签与标注</b><span class="mono">' + bm + ' 书签 · ' + (EB.anns.length - bm) + ' 标注</span>' +
-      '<button class="eb-btn" data-a="close">' + ico('close') + '</button></div>' +
-      '<div class="eb-seg">' +
-      [['all', '全部'], ['bookmark', '书签'], ['mark', '标注']].map(function (x) {
-        return '<button class="eb-chip' + (tab === x[0] ? ' on' : '') + '" data-atab="' + x[0] + '">' + x[1] + '</button>';
-      }).join('') + '</div>' +
-      '<div class="eb-search">' + ico('search') + '<input id="ebAnnQ" placeholder="搜索书签、标注或笔记" autocomplete="off" value="' + esc(EB.annQ || '') + '"></div>' +
-      '<div style="padding:0 12px 8px"><button class="eb-chip" data-bmadd="1" style="width:100%">' + ico('bookmark', 13) + ' 给第 ' + EB.ch + ' 章加书签</button></div>' +
-      '<div class="eb-list" id="ebAnnList"></div>';
-    P.querySelector('[data-a=close]').onclick = function () { closePanels(); };
-    [].slice.call(P.querySelectorAll('[data-atab]')).forEach(function (b) {
-      b.onclick = function () { EB.annTab = b.dataset.atab; paintAnns(); markTop(); };
-    });
-    var qi = $('ebAnnQ');
-    qi.addEventListener('input', function () {
-      EB.annQ = this.value;
-      clearTimeout(EB.annQT);
-      EB.annQT = setTimeout(paintAnns, 200);
-    });
-    P.querySelector('[data-bmadd]').onclick = addBookmark;
-    var box = $('ebAnnList');
-    if (!list.length) {
-      box.innerHTML = '<div class="eb-empty">' + (EB.anns.length ? '没有匹配的条目' : '还没有书签和标注<br><span style="font-size:11px">按 B 给当前章加书签；选中文字可高亮、划下划线或写笔记</span>') + '</div>';
-      return;
-    }
-    box.innerHTML = list.map(function (a) {
-      var col = a.kind === 'bookmark' ? 'var(--eb-acc)' : a.color;
-      return '<div class="eb-ann" data-annjump="' + a.id + '" style="border-left-color:' + col + '">' +
-        (a.note ? '<div class="n">' + esc(a.note) + '</div>' : '') +
-        (a.mark ? '<div class="q">' + esc(a.mark) + '</div>' : '') +
-        '<div class="m"><span>' + (MARK_CN[a.kind] || '标注') + '</span><span>' + (a.ch || 0) + ' 章</span><span>' + ago(a.at) + '</span>' +
-        '<button class="x" data-annedit="' + a.id + '">编辑</button><button class="x" data-anndel="' + a.id + '">删除</button></div></div>';
-    }).join('');
-    [].slice.call(box.querySelectorAll('[data-annjump]')).forEach(function (n) {
-      n.onclick = function (ev) {
-        if (ev.target.closest('[data-anndel]') || ev.target.closest('[data-annedit]')) return;
-        jumpAnn(n.dataset.annjump);
-      };
-    });
-    [].slice.call(box.querySelectorAll('[data-anndel]')).forEach(function (n) {
-      n.onclick = function (ev) { ev.stopPropagation(); delAnn(n.dataset.anndel); };
-    });
-    [].slice.call(box.querySelectorAll('[data-annedit]')).forEach(function (n) {
-      n.onclick = function (ev) { ev.stopPropagation(); editAnn(n.dataset.annedit); };
-    });
-  }
-
-  function addBookmark() {
-    if (!EB.ready) return toast('章节还在载入', 'err');
-    var ch = EB.ch;
-    var ref = EB.chs.get(ch) || {};
-    if (!ref.href) return toast('这一章还没有可锚定的位置', 'err');
-    var dup = null;
-    EB.anns.forEach(function (a) { if (a.kind === 'bookmark' && a.ch === ch) dup = a; });
-    if (dup) { EB.annTab = 'bookmark'; paintAnns(); return toast('第 ' + ch + ' 章已有书签'); }
-    var p = chapterProgress();
-    req('api/lantai/v1/annotations', {
-      method: 'POST',
-      body: {
-        bookId: EB.bookId, href: ref.href, progression: (ch - 1 + p) / Math.max(1, EB.total),
-        textBefore: '', textHighlight: '', textAfter: '', color: '#C9A24B', marker: 'BOOKMARK',
-        note: isPaged() ? '第 ' + (EB.page + 1) + ' / ' + EB.pages + ' 页' : ''
-      }
-    }).then(function (dto) {
-      EB.anns.unshift({
-        id: dto.id, href: ref.href, ch: ch, color: '#C9A24B', kind: 'bookmark',
-        note: dto.note || '', before: '', mark: '', after: '', progression: 0, at: Date.now()
-      });
-      toast('已在第 ' + ch + ' 章加书签', 'ok');
-      if (EB.panel === 'ann') paintAnns();
-    }).catch(function (e) { toast('书签保存失败：' + errText(e), 'err'); });
-  }
-
-  function editAnn(id) {
-    var a = null;
-    EB.anns.forEach(function (x) { if (x.id === id) a = x; });
-    if (!a) return;
-    var pick = { color: a.color, kind: a.kind };
-    var ask = $('ebAsk');
-    ask.innerHTML = '<div class="card"><h4>编辑' + (MARK_CN[a.kind] || '标注') + '</h4>' +
-      '<div class="q">' + esc(a.mark || ('第 ' + a.ch + ' 章')) + '</div>' +
-      '<div style="display:flex;gap:8px;margin:10px 0">' +
-      COLORS.map(function (c) {
-        return '<button data-ec="' + c + '" style="width:26px;height:26px;border-radius:50%;border:2px solid ' +
-          (a.color === c ? 'var(--eb-acc)' : 'transparent') + ';background:' + c + ';cursor:pointer"></button>';
-      }).join('') + '</div>' +
-      '<div class="eb-seg" style="margin-bottom:10px">' +
-      [['highlight', '高亮'], ['underline', '下划线'], ['comment', '笔记'], ['bookmark', '书签']].map(function (x) {
-        return '<button class="eb-chip' + (a.kind === x[0] ? ' on' : '') + '" data-ek="' + x[0] + '">' + x[1] + '</button>';
-      }).join('') + '</div>' +
-      '<textarea id="ebEditNote" placeholder="笔记…">' + esc(a.note || '') + '</textarea>' +
-      '<div class="ft"><button data-x>取消</button><button class="pri" data-ok>保存</button></div></div>';
-    ask.classList.add('on');
-    ask.querySelector('[data-x]').onclick = function () { ask.classList.remove('on'); };
-    [].slice.call(ask.querySelectorAll('[data-ec]')).forEach(function (b) {
-      b.onclick = function () {
-        pick.color = b.dataset.ec;
-        [].slice.call(ask.querySelectorAll('[data-ec]')).forEach(function (o) {
-          o.style.borderColor = o === b ? 'var(--eb-acc)' : 'transparent';
-        });
-      };
-    });
-    [].slice.call(ask.querySelectorAll('[data-ek]')).forEach(function (b) {
-      b.onclick = function () {
-        pick.kind = b.dataset.ek;
-        [].slice.call(ask.querySelectorAll('[data-ek]')).forEach(function (o) { o.classList.toggle('on', o === b); });
-      };
-    });
-    ask.querySelector('[data-ok]').onclick = function () {
-      var note = $('ebEditNote').value.trim();
-      ask.classList.remove('on');
-      req('api/lantai/v1/annotations/' + a.id, {
-        method: 'PATCH',
-        body: { color: pick.color, marker: String(pick.kind).toUpperCase(), note: note }
-      }).then(function () {
-        a.color = pick.color; a.kind = pick.kind; a.note = note; a.at = Date.now();
-        repaintChapter(a.ch);
-        paintAnns();
-        toast('已更新');
-      }).catch(function (e) { toast('更新失败：' + errText(e), 'err'); });
-    };
-    setTimeout(function () { var t = $('ebEditNote'); if (t) t.focus(); }, 40);
-  }
-
-  function jumpAnn(id) {
-    var a = null;
-    for (var i = 0; i < EB.anns.length; i++) if (EB.anns[i].id === id) a = EB.anns[i];
-    if (!a) return;
-    closePanels();
-    var go = EB.secs.has(a.ch) ? Promise.resolve() : reset(a.ch).then(function () { scrollToSec(EB.secs.get(a.ch), 0); });
-    go.then(function () {
-      setTimeout(function () {
-        var mk = EB.docEl && EB.docEl.querySelector('mark[data-ann="' + id + '"]');
-        if (!mk) return toast('这一章没有找到标注位置', 'err');
-        var vr = EB.view.getBoundingClientRect();
-        var mr = mk.getBoundingClientRect();
-        EB.view.scrollTop += mr.top - vr.top - EB.view.clientHeight * 0.36;
-        mk.style.boxShadow = '0 0 0 3px ' + hexA(a.color, .5);
-        setTimeout(function () { mk.style.boxShadow = ''; }, 1200);
-      }, 120);
-    });
-  }
-
-  function loadAnns() {
-    return req('api/lantai/v1/annotations?bookId=' + EB.bookId)
-      .then(function (list) {
-        EB.anns = (list || []).map(function (a) {
-          var n = chOfHref(a.href);
-          return {
-            id: a.id, href: a.href || '', ch: n, color: a.color || COLORS[0],
-            kind: String(a.marker || 'HIGHLIGHT').toLowerCase(), note: a.note || '',
-            before: a.textBefore || '', mark: a.textHighlight || '', after: a.textAfter || '',
-            progression: typeof a.progression === 'number' ? a.progression : 0,
-            at: new Date(a.lastModifiedDate || a.createdDate || Date.now()).getTime()
-          };
-        });
-        EB.anns.forEach(function (a) { if (a.ch) repaintChapter(a.ch); });
-        if (EB.panel === 'ann') paintAnns();
-      })
-      .catch(function () { });
-  }
-
-  function remapAnns() {
-    var changed = false;
-    EB.anns.forEach(function (a) {
-      if (!a.ch) {
-        var n = chOfHref(a.href);
-        if (n) { a.ch = n; changed = true; }
-      }
-    });
-    if (!changed) return;
-    EB.anns.forEach(function (a) { if (a.ch === EB.ch) repaintChapter(a.ch); });
-    if (EB.panel === 'ann') paintAnns();
-  }
-
-  function chOfHref(href) {
-    var target = String(href || '').split('#')[0];
-    if (!target) return 0;
-    var m = target.match(/^#page=(\d+)$/);
-    if (m) return +m[1];
-    var hit = 0;
-    EB.chs.forEach(function (c, n) { if (c.href === target) hit = n; });
-    return hit;
-  }
-
-  function repaintChapter(n) {
-    var sec = EB.secs.get(n);
-    if (!sec) return;
-    [].slice.call(sec.querySelectorAll('mark[data-ann]')).forEach(function (mk) {
-      var txt = document.createTextNode(mk.textContent);
-      mk.parentNode.replaceChild(txt, mk);
-      txt.parentNode.normalize();
-    });
-    paintMarks(sec, n);
-  }
-
-  function textMap(root) {
-    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-      acceptNode: function (n) {
-        if (!n.nodeValue || !n.nodeValue.length) return NodeFilter.FILTER_REJECT;
-        var p = n.parentNode;
-        if (p && /^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName)) return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    });
-    var segs = [], total = 0, n;
-    while ((n = walker.nextNode())) {
-      segs.push({ node: n, start: total, end: total + n.nodeValue.length });
-      total += n.nodeValue.length;
-    }
-    return { segs: segs, length: total, text: segs.map(function (s) { return s.node.nodeValue; }).join('') };
-  }
-
-  function locate(map, before, mark, after) {
-    if (!mark) return null;
-    var whole = map.text;
-    if (before) {
-      var tail = before.slice(-26);
-      var at = whole.indexOf(tail + mark + (after || '').slice(0, 26));
-      if (at >= 0) return { start: at + tail.length, end: at + tail.length + mark.length };
-    }
-    var idx = whole.indexOf(mark);
-    if (idx < 0) return null;
-    return { start: idx, end: idx + mark.length };
-  }
-
-  function paintMarks(root, n) {
-    var list = EB.anns.filter(function (a) { return a.ch === n && a.mark; });
-    if (!list.length) return;
-    var map = textMap(root);
-    list.forEach(function (a) {
-      if (root.querySelector('mark[data-ann="' + a.id + '"]')) return;
-      var pos = locate(map, a.before, a.mark, a.after);
-      if (!pos) return;
-      wrapRange(root, map, pos.start, pos.end, a);
-    });
-  }
-
-  function wrapRange(root, map, start, end, a) {
-    var segs = map.segs.filter(function (s) { return s.end > start && s.start < end; });
-    for (var i = segs.length - 1; i >= 0; i--) {
-      var s = segs[i];
-      var from = Math.max(0, start - s.start);
-      var to = Math.min(s.node.nodeValue.length, end - s.start);
-      if (to <= from) continue;
-      var node = s.node;
-      if (from > 0) node = node.splitText(from);
-      if (to - from < node.nodeValue.length) node.splitText(to - from);
-      var mk = document.createElement('mark');
-      mk.setAttribute('data-ann', a.id);
-      mk.style.background = hexA(a.color, a.kind === 'highlight' ? .34 : .12);
-      mk.style.borderBottom = a.kind === 'underline' ? '2px solid ' + a.color : 'none';
-      mk.style.padding = '1px 0';
-      mk.addEventListener('click', function (ev) {
-        ev.stopPropagation();
-        jumpAnn(this.getAttribute('data-ann'));
-      });
-      node.parentNode.insertBefore(mk, node);
-      mk.appendChild(node);
-    }
-  }
-
-  function currentSelection() {
-    var sh = EB.shadow;
-    if (sh && typeof sh.getSelection === 'function') {
-      try {
-        var s = sh.getSelection();
-        if (s && s.rangeCount) return s;
-      } catch (e) { }
-    }
-    return document.getSelection();
-  }
-
-  function onSelect() {
-    if (!EB.open || !EB.shadow) return;
-    var box = $('ebSel');
-    var sel = currentSelection();
-    if (!sel || !sel.rangeCount) { box.classList.remove('on'); EB.sel = null; return; }
-    var range = sel.getRangeAt(0);
-    var text = String(sel.toString() || '').replace(/\s+/g, ' ').trim();
-    if (text.length < 2 || sel.isCollapsed) { box.classList.remove('on'); EB.sel = null; return; }
-    var node = range.commonAncestorContainer;
-    if (node.nodeType === 3) node = node.parentNode;
-    if (!node || !EB.shadow.contains(node)) { box.classList.remove('on'); EB.sel = null; return; }
-    var sec = node.closest ? node.closest('.sec') : null;
-    if (!sec) { box.classList.remove('on'); EB.sel = null; return; }
-    var n = +sec.dataset.ch;
-    var ct = sec.querySelector('.ct') || sec;
-    var map = textMap(ct);
-    var probe = document.createRange();
-    probe.setStart(ct, 0);
-    probe.setEnd(range.startContainer, range.startOffset);
-    var start = probe.toString().length;
-    if (start < 0 || start > map.length) start = map.text.indexOf(text);
-    if (start < 0) { box.classList.remove('on'); return; }
-    var end = start + text.length;
-    EB.sel = {
-      ch: n, start: start, end: end, text: text,
-      before: map.text.slice(Math.max(0, start - 40), start),
-      after: map.text.slice(end, end + 40)
-    };
-    var rects = range.getClientRects();
-    var rect = rects.length ? rects[0] : range.getBoundingClientRect();
-    var w = 236;
-    box.innerHTML =
-      COLORS.slice(0, 4).map(function (c) {
-        return '<button data-c="' + c + '" data-k="highlight" title="高亮"><span class="dot" style="background:' + c + '"></span></button>';
-      }).join('') +
-      '<div class="sep"></div>' +
-      '<button data-k="underline" title="下划线">' + ico('edit', 14) + '</button>' +
-      '<button data-note="1" title="写笔记">' + ico('marker', 14) + '</button>' +
-      '<button data-copy="1" title="复制">' + ico('copy', 14) + '</button>' +
-      '<button data-tts="1" title="朗读这段">' + ico('volume', 14) + '</button>';
-    box.style.left = clamp(rect.left + rect.width / 2 - w / 2, 10, innerWidth - w - 10) + 'px';
-    box.style.top = clamp(rect.top - 48, 54, innerHeight - 60) + 'px';
-    box.classList.add('on');
-    [].slice.call(box.querySelectorAll('button')).forEach(function (btn) {
-      btn.onclick = function () {
-        if (btn.dataset.copy) {
-          navigator.clipboard && navigator.clipboard.writeText(text).then(function () { toast('已复制'); }).catch(function () { });
-          clearSel();
-          return;
-        }
-        if (btn.dataset.tts) {
-          speakText(text);
-          clearSel();
-          return;
-        }
-        if (btn.dataset.note) createAnn('#C9A24B', 'comment', true);
-        else createAnn(btn.dataset.c || '#C9A24B', btn.dataset.k || 'highlight', false);
-      };
-    });
-  }
-
-  function clearSel() {
-    $('ebSel').classList.remove('on');
-    EB.sel = null;
-    var s = currentSelection();
-    if (s) s.removeAllRanges();
-  }
-
-  function createAnn(color, kind, withNote) {
-    var sel = EB.sel;
-    if (!sel) return;
-    clearSel();
-    var a = {
-      id: '', ch: sel.ch, color: color, kind: kind, note: '',
-      before: sel.before, mark: sel.text.slice(0, 400), after: sel.after,
-      progression: (sel.ch - 1) / Math.max(1, EB.total)
-    };
-    if (!withNote) return saveAnn(a);
-    var ask = $('ebAsk');
-    ask.innerHTML = '<div class="card"><h4>写一条笔记</h4><div class="q">' + esc(sel.text) + '</div>' +
-      '<textarea id="ebNote" placeholder="想法、出处、待查…"></textarea>' +
-      '<div class="ft"><button data-x>取消</button><button class="pri" data-ok>保存</button></div></div>';
-    ask.classList.add('on');
-    ask.querySelector('[data-x]').onclick = function () { ask.classList.remove('on'); };
-    ask.querySelector('[data-ok]').onclick = function () {
-      a.note = $('ebNote').value.trim();
-      ask.classList.remove('on');
-      saveAnn(a);
-    };
-    setTimeout(function () { var t = $('ebNote'); if (t) t.focus(); }, 40);
-  }
-
-  function saveAnn(a) {
-    if (!rt()) return toast('后端不可用', 'err');
-    var ref = EB.chs.get(a.ch) || {};
-    if (!ref.href) return toast('这一章还没有可锚定的位置', 'err');
-    req('api/lantai/v1/annotations', {
-      method: 'POST',
-      body: {
-        bookId: EB.bookId, href: ref.href, progression: a.progression,
-        textBefore: a.before, textHighlight: a.mark, textAfter: a.after,
-        color: a.color, marker: String(a.kind).toUpperCase(), note: a.note || ''
-      }
-    }).then(function (dto) {
-      var item = {
-        id: dto.id, href: ref.href, ch: a.ch, color: a.color, kind: a.kind, note: a.note || '',
-        before: a.before, mark: a.mark, after: a.after, progression: a.progression,
-        at: Date.now()
-      };
-      EB.anns.unshift(item);
-      var sec = EB.secs.get(a.ch);
-      if (sec) paintMarks(sec, a.ch);
-      if (EB.panel === 'ann') paintAnns();
-      if (typeof renderNav === 'function') renderNav();
-      toast('已保存「' + (MARK_CN[a.kind] || '标注') + '」');
-    }).catch(function (e) { toast('保存失败：' + errText(e), 'err'); });
-  }
-
-  function delAnn(id) {
-    req('api/lantai/v1/annotations/' + id, { method: 'DELETE' })
-      .then(function () {
-        var ch = 0;
-        EB.anns = EB.anns.filter(function (a) { if (a.id === id) { ch = a.ch; return false; } return true; });
-        if (ch) repaintChapter(ch);
-        paintAnns();
-        toast('标注已删除');
-      })
-      .catch(function (e) { toast('删除失败：' + errText(e), 'err'); });
-  }
-
-  function chapterText(n) {
-    var sec = EB.secs.get(n);
-    if (!sec) return '';
-    var ct = sec.querySelector('.ct') || sec;
-    return String(ct.textContent || '').replace(/\s+/g, ' ').trim();
-  }
-
-  function splitSentences(text) {
-    var out = [];
-    var buf = '';
-    for (var i = 0; i < text.length; i++) {
-      buf += text[i];
-      if (/[。！？!?；;…]/.test(text[i]) || (text[i] === '.' && i + 1 < text.length && /\s/.test(text[i + 1]))) {
-        if (buf.trim()) out.push(buf.trim());
-        buf = '';
-      }
-      if (buf.length > 220) { if (buf.trim()) out.push(buf.trim()); buf = ''; }
-    }
-    if (buf.trim()) out.push(buf.trim());
-    return out.filter(function (s) { return s.length > 0; });
-  }
-
-  var BLOCK_SEL = 'p,div,h1,h2,h3,h4,h5,h6,li,td,blockquote,section,article,figcaption,pre';
-  var ttsHL = null;
-
-  function nodePoints(el) {
-    var nodes = [], off = 0;
-    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
-    var n;
-    while ((n = w.nextNode())) {
-      var p = n.parentNode;
-      if (p && /^(SCRIPT|STYLE)$/i.test(p.tagName)) continue;
-      var v = n.nodeValue || '';
-      if (!v) continue;
-      nodes.push({ node: n, start: off, end: off + v.length });
-      off += v.length;
-    }
-    return nodes;
-  }
-
-  function pointAt(nodes, offset) {
-    for (var i = 0; i < nodes.length; i++) {
-      if (offset <= nodes[i].end) return { node: nodes[i].node, offset: Math.max(0, Math.min(nodes[i].node.nodeValue.length, offset - nodes[i].start)) };
-    }
-    var last = nodes[nodes.length - 1];
-    return { node: last.node, offset: last.node.nodeValue.length };
-  }
-
-  function sentenceRanges(text) {
-    var out = [], start = 0, buf = 0;
-    for (var i = 0; i < text.length; i++) {
-      buf++;
-      if (/[。！？!?；;…]/.test(text[i]) || (text[i] === '.' && i + 1 < text.length && /\s/.test(text[i + 1]))) {
-        if (text.slice(start, i + 1).trim()) out.push([start, i + 1]);
-        start = i + 1; buf = 0;
-      } else if (buf > 220) {
-        if (text.slice(start, i + 1).trim()) out.push([start, i + 1]);
-        start = i + 1; buf = 0;
-      }
-    }
-    if (text.slice(start).trim()) out.push([start, text.length]);
-    return out;
-  }
-
-  function ttsSegments(sec) {
-    var ct = sec.querySelector('.ct') || sec;
-    var out = [];
-    var blocks = [].slice.call(ct.querySelectorAll(BLOCK_SEL)).filter(function (el) {
-      return !el.querySelector(BLOCK_SEL) && !/^(SCRIPT|STYLE|SVG)$/i.test(el.tagName);
-    });
-    if (!blocks.length) blocks = [ct];
-    blocks.forEach(function (el) {
-      var nodes = nodePoints(el);
-      if (!nodes.length) return;
-      var flat = '';
-      nodes.forEach(function (x) { flat += x.node.nodeValue; });
-      if (!flat.replace(/[\s\u00a0\u3000]+/g, '')) return;
-      sentenceRanges(flat).forEach(function (r) {
-        var t = flat.slice(r[0], r[1]).replace(/[\s\u00a0\u3000]+/g, ' ').trim();
-        if (!t) return;
-        out.push({ text: t, el: el, s: r[0], e: r[1], nodes: nodes });
-      });
-    });
-    return out;
-  }
-
-  function ttsPaint(seg) {
-    if (!seg || !seg.el) return;
-    var nodes = seg.nodes || nodePoints(seg.el);
-    if (!nodes.length) return;
-    var a = pointAt(nodes, seg.s), b = pointAt(nodes, seg.e);
-    var r = document.createRange();
-    try {
-      r.setStart(a.node, a.offset);
-      r.setEnd(b.node, b.offset);
-    } catch (e) { return; }
-    if (window.CSS && CSS.highlights && typeof window.Highlight === 'function') {
-      if (!ttsHL) ttsHL = new window.Highlight();
-      ttsHL.clear();
-      ttsHL.add(r);
-      CSS.highlights.set('eb-tts', ttsHL);
-    } else {
-      seg.el.classList.add('tts-cur');
-    }
-    ttsReveal(seg.el);
-  }
-
-  function ttsClear() {
-    if (window.CSS && CSS.highlights) CSS.highlights.delete('eb-tts');
-    if (EB.shadow) [].slice.call(EB.shadow.querySelectorAll('.tts-cur')).forEach(function (el) { el.classList.remove('tts-cur'); });
-  }
-
-  function ttsReveal(el) {
-    var v = EB.view;
-    if (!v || !el) return;
-    var er = el.getBoundingClientRect(), vr = v.getBoundingClientRect();
-    if (!er.height) return;
-    if (PRE.layout === 'paged') {
-      if (er.left < vr.left - 1 || er.right > vr.right + 1) {
-        v.scrollLeft += er.left - vr.left - 24;
-        EB.page = Math.max(0, Math.round(v.scrollLeft / (v.clientWidth || 1)));
-      }
-    } else if (er.top < vr.top || er.bottom > vr.bottom) {
-      v.scrollTop += er.top - vr.top - vr.height * 0.34;
-    }
-  }
-
-  function pickVoice() {
-    var list = ttsVoices();
-    for (var i = 0; i < list.length; i++) if (list[i].name === PRE.ttsVoice) return list[i];
-    return null;
-  }
-
-  function ttsToggle() {
-    if (!window.speechSynthesis) return toast('当前浏览器不支持朗读', 'err');
-    if (EB.ttsOn) return ttsStop();
-    ttsStart();
-  }
-
-  function ttsStart(text) {
-    var sec = text ? null : EB.secs.get(EB.ch);
-    var list = sec ? ttsSegments(sec) : null;
-    if (!list || !list.length) {
-      var body = text || chapterText(EB.ch);
-      if (!body) return toast('这一章没有可朗读的文字', 'err');
-      list = splitSentences(body).map(function (t) { return { text: t }; });
-    }
-    if (!list.length) return toast('这一章没有可朗读的文字', 'err');
-    EB.tts = { list: list, idx: 0 };
-    EB.ttsOn = true;
-    $('ebTts').classList.add('on');
-    $('ebTts').innerHTML =
-      '<button class="eb-btn" data-a="prev">' + ico('left') + '</button>' +
-      '<button class="eb-btn" data-a="play">' + ico('pause') + '</button>' +
-      '<button class="eb-btn" data-a="next">' + ico('right') + '</button>' +
-      '<span class="tx" id="ebTtsTx"></span>' +
-      '<button class="eb-btn" data-a="close">' + ico('close') + '</button>';
-    [].slice.call($('ebTts').querySelectorAll('[data-a]')).forEach(function (b) {
-      b.onclick = function () {
-        var a = b.dataset.a;
-        if (a === 'close') return ttsStop();
-        if (a === 'prev') return ttsSeek(Math.max(0, EB.tts.idx - 1));
-        if (a === 'next') return ttsSeek(Math.min(EB.tts.list.length - 1, EB.tts.idx + 1));
-        if (a === 'play') ttsPauseToggle(b);
-      };
-    });
-    speakCurrent();
-    markTop();
-  }
-
-  function ttsPauseToggle(btn) {
-    if (!window.speechSynthesis) return;
-    if (window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
-      btn.innerHTML = ico('pause');
-    } else {
-      window.speechSynthesis.pause();
-      btn.innerHTML = ico('play');
-    }
-  }
-
-  function ttsSeek(i) {
-    if (!EB.tts) return;
-    EB.tts.idx = i;
-    window.speechSynthesis.cancel();
-    setTimeout(speakCurrent, 60);
-  }
-
-  function speakCurrent() {
-    if (!EB.tts || !EB.ttsOn) return;
-    var s = EB.tts.list[EB.tts.idx];
-    if (!s) return ttsStop();
-    var text = typeof s === 'string' ? s : s.text;
-    var tx = $('ebTtsTx');
-    if (tx) tx.textContent = (EB.tts.idx + 1) + '/' + EB.tts.list.length + ' ' + text.slice(0, 40);
-    if (s && s.el) ttsPaint(s);
-    var u = new SpeechSynthesisUtterance(text);
-    u.rate = PRE.ttsRate;
-    u.pitch = 1;
-    var v = pickVoice();
-    if (v) { u.voice = v; u.lang = v.lang; }
-    else u.lang = 'zh-CN';
-    u.onend = function () {
-      if (!EB.ttsOn || !EB.tts) return;
-      if (EB.tts.idx >= EB.tts.list.length - 1) {
-        if (EB.ch < EB.total) {
-          gotoChapter(EB.ch + 1, 0);
-          setTimeout(ttsStart, 900);
-          return;
-        }
-        return ttsStop();
-      }
-      EB.tts.idx++;
-      speakCurrent();
-    };
-    u.onerror = function (ev) {
-      if (!EB.ttsOn) return;
-      if (ev && (ev.error === 'interrupted' || ev.error === 'canceled')) return;
-      ttsStop();
-      toast('朗读不可用：' + ((ev && ev.error) || '浏览器没有可用语音'), 'err');
-    };
-    window.speechSynthesis.speak(u);
-  }
-
-  function speakText(text) {
-    if (!window.speechSynthesis) return toast('当前浏览器不支持朗读', 'err');
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.rate = PRE.ttsRate;
-    u.lang = 'zh-CN';
-    var v = pickVoice();
-    if (v) { u.voice = v; u.lang = v.lang; }
-    window.speechSynthesis.speak(u);
-    toast('正在朗读选中的 ' + text.length + ' 字');
-  }
-
-  function ttsRestart() {
-    if (!EB.ttsOn || !EB.tts) return;
-    var i = EB.tts.idx;
-    window.speechSynthesis.cancel();
-    setTimeout(function () {
-      if (!EB.tts) return;
-      EB.tts.idx = i;
-      speakCurrent();
-    }, 80);
-  }
-
-  function ttsStop() {
-    EB.ttsOn = false;
-    EB.tts = null;
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    ttsClear();
-    var p = $('ebTts'); if (p) { p.classList.remove('on'); p.innerHTML = ''; }
-    markTop();
-  }
-
-  function wakeOn() {
-    if (!navigator.wakeLock || !navigator.wakeLock.request) {
-      toast('屏幕常亮需要 HTTPS 或 localhost');
-      PRE.wake = false;
-      savePrefs();
-      if (EB.panel === 'set') paintSet('set');
-      return;
-    }
-    navigator.wakeLock.request('screen').then(function (s) {
-      EB.wakeLock = s;
-      s.addEventListener('release', function () { EB.wakeLock = null; });
-    }).catch(function () { toast('屏幕常亮申请被拒绝', 'err'); });
-  }
-
-  function wakeOff() {
-    if (!EB.wakeLock) return;
-    try { EB.wakeLock.release(); } catch (e) { }
-    EB.wakeLock = null;
-  }
-
-  function fullscreen() {
-    if (document.fullscreenElement) { document.exitFullscreen().catch(function () { }); return; }
-    var r = $('eb');
-    (r || document.documentElement).requestFullscreen().catch(function () { toast('浏览器拒绝了全屏请求', 'err'); });
-  }
-
-  function onKey(ev) {
-    if (!EB.open) return;
-    if (ev.target && /INPUT|TEXTAREA|SELECT/.test(ev.target.tagName)) return;
-    var k = ev.key;
-    if (k === 'Escape') {
-      if ($('ebLb').classList.contains('on')) { $('ebLb').classList.remove('on'); return; }
-      if ($('ebAsk').classList.contains('on')) { $('ebAsk').classList.remove('on'); return; }
-      if (EB.panel) { closePanels(); return; }
-      if (EB.sel) { clearSel(); return; }
-      return close();
-    }
-    if ((ev.ctrlKey || ev.metaKey) && (k === 'f' || k === 'F')) { ev.preventDefault(); openPanel('find'); return; }
-    if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
-    if (k === 'ArrowLeft') { ev.preventDefault(); if (isPaged()) turnPage(-1); else prevChapter(); }
-    else if (k === 'ArrowRight') { ev.preventDefault(); if (isPaged()) turnPage(1); else nextChapter(); }
-    else if (k === 'PageDown' || (k === ' ' && isPaged())) { ev.preventDefault(); turnPage(1); }
-    else if (k === 'PageUp' && isPaged()) { ev.preventDefault(); turnPage(-1); }
-    else if (k === 't' || k === 'T') { ev.preventDefault(); openPanel('toc'); }
-    else if (k === 's' || k === 'S') { ev.preventDefault(); openPanel('set'); }
-    else if (k === 'a' || k === 'A') { ev.preventDefault(); EB.annTab = 'all'; openPanel('ann'); }
-    else if (k === 'b' || k === 'B') { ev.preventDefault(); addBookmark(); }
-    else if (k === 'd' || k === 'D') { ev.preventDefault(); ttsToggle(); }
-    else if (k === 'f' || k === 'F') { ev.preventDefault(); fullscreen(); }
-  }
-
-  function open(bookId, opts) {
-    opts = opts || {};
-    if (!rt()) return toast('后端不可用', 'err');
-    if (EB.open && EB.bookId === bookId) {
-      if (opts.chapter) gotoChapter(opts.chapter, opts.progress || 0);
-      return;
-    }
-    if (EB.open) close(false);
-    var b = book(bookId);
-    if (!b) return toast('这本书不在书库里', 'err');
-    if (b.status === 'UNSUPPORTED') return toast('这本书需要先安装转换器', 'err');
-
-    mount();
-    EB.open = true;
-    if (opts.imm) { EB.immOnce = !PRE.imm; PRE.imm = true; }
-    var sm = null;
-    try { sm = series(b.s); } catch (e) { }
-    EB.book = { title: (sm && sm.t) || b.name || '', profile: b.profile };
-    EB.bookId = bookId;
-    EB.total = b.chs > 0 ? b.chs : (b.pages > 0 ? b.pages : 1);
-    EB.chs.clear();
-    EB.secs.clear();
-    EB.pending = {};
-    EB.warmF = false; EB.warmB = false;
-    EB.anns = [];
-    EB.outline = null;
-    EB.links = [];
-    EB.inlines = [];
-    pubKey = '';
-    var resume = PRE.imm ? immResume(bookId) : null;
-    var startOpt = opts.chapter || (resume && resume.ch) || 0;
-    EB.ch = startOpt || 1;
-    EB.seen = EB.ch;
-    EB.ready = false;
-    EB.bootDone = false;
-    EB.bootAt = Date.now();
-    EB.lo = 0;
-    EB.hi = 0;
-    EB.panel = null;
-    $('ebToc').classList.remove('on');
-    $('ebSet').classList.remove('on');
-    $('eb').classList.add('on');
-    $('eb').classList.remove('toc-open', 'set-open', 'idle');
-    applyTheme();
-    applyType();
-    ensureShadow();
-    if (EB.docEl) {
-      EB.docEl.className = 'doc' + (isPaged() ? ' paged' : '');
-      EB.docEl.removeAttribute('style');
-    }
-    if (EB.shadow) clearPub(EB.shadow);
-    EB.docEl.innerHTML = '';
-    paintTop();
-    paintBot();
-    $('ebView').scrollTop = 0;
-    $('ebView').scrollLeft = 0;
-    EB.page = 0;
-    EB.pages = 1;
-
-    EB.session = {
-      id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'eb_' + bookId + '_' + Date.now(),
-      book: bookId, dur: 0, pages: EB.ch, dev: 'webui', devName: '网页端', start: Date.now(), end: Date.now(), offline: false
-    };
-    if (typeof pushSession === 'function' && !PRE.imm) pushSession(EB.session);
-    startBeat();
-    if (PRE.wake) wakeOn();
-    if (location.hash.indexOf('#/read/') !== 0) {
-      history.replaceState(null, '', '#/read/' + bookId);
-      document.title = '兰台 · ' + (EB.book.title || '') + ' · 阅读';
-    }
-    loadAnns();
-    var q = 'api/lantai/v1/read/' + bookId + '/bootstrap?images=inline&w=0&window=3' +
-      (startOpt ? '&chapter=' + startOpt : '');
-    EB.docEl.innerHTML = '<div class="sec skel" style="min-height:340px"></div>';
-    req(q).then(function (dto) {
-      if (!EB.open || EB.bookId !== bookId) return;
-      EB.total = dto.total || EB.total;
-      (dto.chapters || []).forEach(function (c) { EB.chs.set(c.n, c); });
-      EB.book = Object.assign({}, dto.book || {}, { profile: (dto.book && dto.book.profile) || b.profile });
-      EB.docEl.innerHTML = '';
-      EB.lo = 0; EB.hi = 0;
-      var first = buildSec(dto.first, true);
-      EB.docEl.appendChild(first);
-      syncPub();
-      EB.ready = true;
-      var startCh = dto.first.chapter;
-      EB.ch = startCh;
-      EB.seen = startCh;
-      paintTop();
-      paintBot();
-      var restore = 0;
-      if (opts.chapter) restore = opts.progress || 0;
-      else if (PRE.imm && resume && resume.ch === startCh) restore = resume.p || 0;
-      else if (dto.progress && dto.progress.chapter === startCh) restore = dto.progress.progression || 0;
-      else restore = opts.progress || 0;
-      if (restore > 0.005) restoreTo(restore);
-      else scrollToSec(first, 0);
-      load(startCh + 1, 'after')
-        .then(function () { return load(startCh + 2, 'after'); })
-        .catch(function () { });
-      load(startCh - 1, 'before').catch(function () { });
-      if (startCh > 1) load(startCh - 2, 'before').catch(function () { });
-      if (dto.annotations && dto.annotations.length && !EB.anns.length) loadAnns();
-      EB.bootDone = true;
-      remapAnns();
-      bumpIdle();
-    }).catch(function (e) {
-      if (!EB.open) return;
-      EB.docEl.innerHTML = '';
-      tip('打不开这本书', errText(e) + '<br><span style="font-size:11px;opacity:.7">' + esc(EB.bookId) + '</span>');
-    });
-  }
-
-  function restoreTo(prog) {
-    EB.restore = prog;
-    var tries = 0;
-    var run = function () {
-      if (!EB.open || EB.restore < 0) return;
-      var sec = EB.secs.get(EB.ch);
-      if (!sec) return;
-      scrollToSec(sec, EB.restore);
-      tries++;
-      if (tries < 4) setTimeout(run, 260 + tries * 200);
-      else EB.restore = -1;
-    };
-    setTimeout(run, 60);
-  }
-
-  function close(settle) {
-    if (!EB.open) return;
-    var id = EB.bookId;
-    clearTimeout(EB.progTimer);
-    clearTimeout(EB.restoreT);
-    if (settle !== false) {
-      if (PRE.imm) {
-        try { sessionStorage.setItem(immKey(), JSON.stringify({ ch: EB.ch, p: chapterProgress() })); } catch (e) { }
-        if (EB.session) toast('隐身阅读 · 本次不留记录');
-      } else if (EB.session) {
-        EB.session.end = Date.now();
-        if (typeof pushSession === 'function') pushSession(EB.session);
-        sendProgress();
-        req('api/lantai/v1/reading/stop', { method: 'POST', body: { bookId: id, deviceId: 'webui' } }).catch(function () { });
-        toast('已读 ' + dur(EB.session.dur) + ' · 停在第 ' + EB.ch + ' 章');
-      }
-    }
-    EB.session = null;
-    if (EB.immOnce) { PRE.imm = false; EB.immOnce = false; }
-    EB.open = false;
-    clearInterval(EB.hbTimer);
-    ttsStop();
-    wakeOff();
-    var r = $('eb');
-    if (r) r.classList.remove('on', 'idle');
-    $('ebLb').classList.remove('on');
-    $('ebAsk').classList.remove('on');
-    $('ebSel').classList.remove('on');
-    $('ebTip').classList.remove('on');
-    closePanels();
-    if (EB.shadow && EB.docEl) EB.docEl.innerHTML = '';
-    EB.secs.clear();
-    EB.pending = {};
-    EB.warmF = false; EB.warmB = false;
-    if (location.hash.indexOf('#/read/') === 0) {
-      history.replaceState(null, '', '#/book/' + id);
-      if (typeof render === 'function') render();
-    }
-  }
-
-  window.EbookReader = {
-    open: open,
-    close: close,
-    goto: gotoChapter,
-    isOpen: function () { return EB.open; },
-    current: function () { return { open: EB.open, chapter: EB.ch, total: EB.total, panel: EB.panel, theme: PRE.theme }; },
-    prefs: PRE
-  };
-})();

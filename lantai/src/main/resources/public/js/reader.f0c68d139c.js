@@ -30,7 +30,7 @@
 
   var EB = {
     open: false, bookId: '', book: null, total: 0, ch: 1, seen: 1,
-    chs: new Map(), secs: new Map(), pending: {},
+    chs: new Map(), secs: new Map(), pending: {}, park: new Map(),
     lo: 0, hi: 0, outline: null, outlineLoading: false,
     anns: [], links: [], inlines: [],
     panel: null, shadow: null, docEl: null, view: null,
@@ -254,10 +254,10 @@
     paintBot();
     if (!EB.ready) { paintSet('set'); return; }
     tip('正在重排', v === 'scroll' ? '连续滚动' : v === 'double' ? '双栏分页' : '单栏分页');
-    reset(EB.ch).then(function () {
+    reset(EB.ch, 0).then(function () {
       tip('');
       applyLayout();
-      if (isPaged()) requestAnimationFrame(function () { measure(); goPage(0); paintProgressBar(); });
+      if (isPaged()) requestAnimationFrame(function () { measure(); scrollToSec(EB.secs.get(EB.ch), 0); paintProgressBar(); });
       paintBot();
       paintSet('set');
     }).catch(function () { tip(''); paintSet('set'); });
@@ -274,6 +274,8 @@
     '.doc .sec.artpage{min-height:var(--eb-vh,100vh);background-position:center;background-repeat:no-repeat;' +
     'background-size:contain!important;break-inside:avoid}',
     '.doc.doc.paged .sec.artpage{min-height:100%;break-before:column;break-inside:avoid}',
+    '.doc.doc.paged .sec{break-before:column}',
+    '.doc.doc.paged .sec:first-child{break-before:auto}',
     '.doc.doc.paged{max-width:none;width:calc(100% - var(--eb-gut,24px) * 2);margin:0 auto;padding:0;height:100%;' +
     'column-width:var(--eb-pagew,600px);column-gap:var(--eb-gap,48px);column-fill:auto}',
     '.doc.doc.paged img,.doc.doc.paged figure,.doc.doc.paged pre,.doc.doc.paged table{break-inside:avoid}',
@@ -565,7 +567,17 @@
     if (pos) {
       if (isPaged()) {
         measure();
-        pos.textContent = EB.ch + ' / ' + num(EB.total) + ' · ' + (EB.page + 1) + ' / ' + EB.pages + ' 页';
+        var txt = EB.ch + ' / ' + num(EB.total);
+        var cur = EB.secs.get(EB.ch);
+        if (cur) {
+          var vr2 = EB.view.getBoundingClientRect();
+          var sr2 = cur.getBoundingClientRect();
+          var st2 = Math.max(1, layoutMetrics().step);
+          var cols = Math.max(1, Math.ceil((sr2.width - 2) / st2));
+          var startPage = Math.round((EB.view.scrollLeft + sr2.left - vr2.left) / st2);
+          txt += ' · ' + clamp(EB.page - startPage + 1, 1, cols) + ' / ' + cols + ' 页';
+        }
+        pos.textContent = txt;
       } else {
         pos.textContent = EB.ch + ' / ' + num(EB.total);
       }
@@ -581,8 +593,11 @@
     var sec = EB.secs.get(EB.ch);
     if (!sec || !EB.view) return 0;
     if (isPaged()) {
-      measure();
-      return EB.pages > 1 ? clamp(EB.page / (EB.pages - 1), 0, 1) : 0;
+      var pv = EB.view.getBoundingClientRect();
+      var ps = sec.getBoundingClientRect();
+      var span2 = ps.width - EB.view.clientWidth;
+      if (span2 <= 8) return 0;
+      return clamp((pv.left - ps.left) / span2, 0, 1);
     }
     var vr = EB.view.getBoundingClientRect();
     var sr = sec.getBoundingClientRect();
@@ -682,8 +697,11 @@
     [].slice.call(root.querySelectorAll('img')).forEach(function (img) {
       img.classList.add('eb-ill');
       img.loading = 'lazy';
+      var iw = parseInt(img.getAttribute('width'), 10);
+      var ih = parseInt(img.getAttribute('height'), 10);
       img.style.setProperty('max-width', '100%', 'important');
       img.style.setProperty('height', 'auto', 'important');
+      if (iw > 0 && ih > 0) img.style.setProperty('aspect-ratio', iw + ' / ' + ih);
       img.removeAttribute('width');
       img.removeAttribute('height');
       img.addEventListener('click', function () { zoomImg(img.src); });
@@ -734,6 +752,15 @@
   function load(n, where) {
     if (n < 1 || n > EB.total) return Promise.resolve(null);
     if (EB.secs.has(n)) return Promise.resolve(EB.secs.get(n));
+    if (EB.park.has(n)) {
+      var parked = EB.park.get(n);
+      EB.park.delete(n);
+      EB.secs.set(n, parked);
+      EB.lo = EB.lo ? Math.min(EB.lo, n) : n;
+      EB.hi = Math.max(EB.hi, n);
+      insertSec(parked);
+      return Promise.resolve(parked);
+    }
     var key = 'k' + n;
     if (EB.pending[key]) return EB.pending[key];
     var p = req('api/lantai/v1/read/' + EB.bookId + '/chapter/' + n + '?images=url&w=0&fmt=orig')
@@ -767,15 +794,63 @@
     }
     var vr = EB.view.getBoundingClientRect();
     var visible = anchor.getBoundingClientRect().top < vr.bottom;
-    var before = EB.view.scrollHeight;
+    var beforeH = EB.view.scrollHeight;
+    var beforeW = EB.view.scrollWidth;
     EB.docEl.insertBefore(sec, anchor);
-    if (visible) EB.view.scrollTop += EB.view.scrollHeight - before;
+    if (isPaged()) EB.view.scrollLeft += EB.view.scrollWidth - beforeW;
+    else if (visible) EB.view.scrollTop += EB.view.scrollHeight - beforeH;
     syncPub();
   }
 
-  function reset(n) {
+  var KEEP_BEHIND = 4, KEEP_AHEAD = 6, PARK_MAX = 48;
+
+  function trimWindow() {
+    if (!EB.open || !EB.docEl || !EB.view) return;
+    var paged = isPaged();
+    var wLo = EB.ch - (paged ? 1 : KEEP_BEHIND);
+    var wHi = EB.ch + (paged ? 1 : KEEP_AHEAD);
+    var kids = [].slice.call(EB.docEl.children);
+    var hasLeft = false, hasRight = false, hit = false;
+    for (var i = 0; i < kids.length; i++) {
+      var c = +kids[i].dataset.ch || 0;
+      if (!c || (c >= wLo && c <= wHi)) continue;
+      hit = true;
+      if (c < wLo) hasLeft = true; else hasRight = true;
+    }
+    if (!hit) { trimPark(); return; }
+    var span = paged ? EB.view.scrollWidth : EB.view.scrollHeight;
+    for (var j = 0; j < kids.length; j++) {
+      var sec = kids[j];
+      var n = +sec.dataset.ch || 0;
+      if (!n || (n >= wLo && n <= wHi)) continue;
+      EB.docEl.removeChild(sec);
+      EB.secs.delete(n);
+      EB.park.set(n, sec);
+    }
+    var drop = span - (paged ? EB.view.scrollWidth : EB.view.scrollHeight);
+    if (drop > 0 && hasLeft && !hasRight) {
+      if (paged) EB.view.scrollLeft = Math.max(0, EB.view.scrollLeft - drop);
+      else EB.view.scrollTop = Math.max(0, EB.view.scrollTop - drop);
+    }
+    trimPark();
+  }
+
+  function trimPark() {
+    if (EB.park.size <= PARK_MAX) return;
+    var keys = [].slice.call(EB.park.keys()).sort(function (a, b) { return Math.abs(b - EB.ch) - Math.abs(a - EB.ch); });
+    for (var i = 0; i < keys.length && EB.park.size > PARK_MAX; i++) EB.park.delete(keys[i]);
+  }
+
+  function ensureWindow() {
+    if (!EB.open || !isPaged()) return;
+    load(EB.ch + 1, 'after').catch(function () { });
+    load(EB.ch - 1, 'before').catch(function () { });
+  }
+
+  function reset(n, prog) {
     if (!EB.docEl) return Promise.resolve();
     EB.secs.clear();
+    EB.park.clear();
     EB.docEl.innerHTML = '';
     EB.lo = 0;
     EB.hi = 0;
@@ -785,14 +860,20 @@
     return load(n, 'after').then(function () {
       paintTop();
       paintBot();
-      if (isPaged()) {
-        requestAnimationFrame(function () { measure(); goPage(0); paintProgressBar(); });
-        return null;
-      }
       return Promise.all([
         load(n - 1, 'before').catch(function () { }),
         load(n + 1, 'after').catch(function () { })
-      ]);
+      ]).then(function () {
+        if (!EB.open) return null;
+        if (isPaged()) {
+          requestAnimationFrame(function () {
+            measure();
+            scrollToSec(EB.secs.get(n), prog || 0);
+            paintProgressBar();
+          });
+        }
+        return null;
+      });
     });
   }
 
@@ -812,6 +893,8 @@
         if (crumb) crumb.textContent = (cur.title || '第 ' + n + ' 章') + ' · ' + n + ' / ' + num(EB.total);
         markToc();
         queueProgress();
+        trimWindow();
+        ensureWindow();
       }
       paintProgressBar();
       extend();
@@ -820,15 +903,25 @@
 
   function chapterAt() {
     if (!EB.docEl || !EB.view) return 0;
-    if (isPaged()) return EB.ch;
+    var secs = EB.docEl.children;
+    if (!secs.length) return EB.ch;
     var vr = EB.view.getBoundingClientRect();
-    var line = vr.top + 96;
-    var secs = [].slice.call(EB.docEl.children);
-    for (var i = 0; i < secs.length; i++) {
-      var r = secs[i].getBoundingClientRect();
-      if (r.bottom > line) return +secs[i].dataset.ch || EB.ch;
+    if (isPaged()) {
+      var x = vr.left + 2;
+      for (var i = 0; i < secs.length; i++) {
+        var pr = secs[i].getBoundingClientRect();
+        if (pr.right > x) return +secs[i].dataset.ch || EB.ch;
+      }
+      return +secs[secs.length - 1].dataset.ch || EB.ch;
     }
-    return EB.ch;
+    var line = vr.top + 96;
+    var lo = 0, hi = secs.length - 1, res = +secs[secs.length - 1].dataset.ch || EB.ch;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      var r = secs[mid].getBoundingClientRect();
+      if (r.bottom > line) { res = +secs[mid].dataset.ch || EB.ch; hi = mid - 1; } else lo = mid + 1;
+    }
+    return res;
   }
 
   function extend() {
@@ -855,11 +948,13 @@
     if (!sec || !EB.view) return;
     if (isPaged()) {
       measure();
-      if (clamp(prog || 0, 0, 1) >= 0.999) { goPage(EB.pages - 1); return; }
       var bv = EB.view.getBoundingClientRect();
       var bs = sec.getBoundingClientRect();
-      var st = layoutMetrics().step;
-      goPage(Math.max(0, Math.round((EB.view.scrollLeft + bs.left - bv.left) / st)));
+      var st = Math.max(1, layoutMetrics().step);
+      var startPage = Math.max(0, Math.round((EB.view.scrollLeft + bs.left - bv.left) / st));
+      var secCols = Math.max(1, Math.ceil((bs.width - 2) / st));
+      var rel = clamp(prog || 0, 0, 1);
+      goPage(rel >= 0.999 ? startPage + secCols - 1 : startPage + Math.round(rel * (secCols - 1)));
       return;
     }
     var vr = EB.view.getBoundingClientRect();
@@ -886,7 +981,7 @@
       return;
     }
     tip('正在载入', '第 ' + n + ' 章 · 共 ' + num(EB.total) + ' 章');
-    reset(n).then(function () {
+    reset(n, prog || 0).then(function () {
       tip('');
       scrollToSec(EB.secs.get(n), prog || 0);
       EB.ch = n;
@@ -1394,7 +1489,7 @@
       body: {
         bookId: EB.bookId, href: ref.href, progression: (ch - 1 + p) / Math.max(1, EB.total),
         textBefore: '', textHighlight: '', textAfter: '', color: '#C9A24B', marker: 'BOOKMARK',
-        note: isPaged() ? '第 ' + (EB.page + 1) + ' / ' + EB.pages + ' 页' : ''
+        note: isPaged() ? '本章 ' + Math.round(p * 100) + '% 处' : ''
       }
     }).then(function (dto) {
       EB.anns.unshift({
@@ -2065,6 +2160,7 @@
     EB.total = b.chs > 0 ? b.chs : (b.pages > 0 ? b.pages : 1);
     EB.chs.clear();
     EB.secs.clear();
+    EB.park.clear();
     EB.pending = {};
     EB.warmF = false; EB.warmB = false;
     EB.anns = [];
@@ -2203,6 +2299,7 @@
     closePanels();
     if (EB.shadow && EB.docEl) EB.docEl.innerHTML = '';
     EB.secs.clear();
+    EB.park.clear();
     EB.pending = {};
     EB.warmF = false; EB.warmB = false;
     if (location.hash.indexOf('#/read/') === 0) {

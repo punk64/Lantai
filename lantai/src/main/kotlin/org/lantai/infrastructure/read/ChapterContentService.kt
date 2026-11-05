@@ -58,11 +58,28 @@ class ChapterContentService(
         '.', '!', '?', ';', ':', ')', ']', '"', '\'',
       )
     private const val MAX_PARAGRAPH = 600
+    private const val INDEX_CACHE_BOOKS = 4
   }
 
   private val headingCache = ConcurrentHashMap<String, String>()
+  private val indexCache = ConcurrentHashMap<String, ChapterContext>()
 
   fun context(media: Media): ChapterContext {
+    val key = media.bookId + "@" + media.lastModifiedDate
+    indexCache[key]?.let { return it }
+    val built = buildContext(media)
+    indexCache.keys.removeIf { it.startsWith(media.bookId + "@") }
+    if (indexCache.size >= INDEX_CACHE_BOOKS) indexCache.clear()
+    indexCache[key] = built
+    return built
+  }
+
+  fun clearIndex() {
+    indexCache.clear()
+    headingCache.clear()
+  }
+
+  private fun buildContext(media: Media): ChapterContext {
     val isEpub = media.profile == MediaProfile.EPUB
     val toc = if (isEpub) epubExtension(media)?.toc.orEmpty() else emptyList()
     val titles = titlesOf(toc)

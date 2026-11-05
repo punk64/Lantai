@@ -5,6 +5,7 @@ import org.jooq.DSLContext
 import org.lantai.infrastructure.cache.TransientBookCache
 import org.lantai.infrastructure.configuration.LantaiSettingsProvider
 import org.lantai.infrastructure.jooq.tasks.LantaiTaskQueryDao
+import org.lantai.infrastructure.read.ChapterContentService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -24,6 +25,7 @@ class LantaiMemoryReclaimer(
   private val lantaiSettingsProvider: LantaiSettingsProvider,
   private val idleTracker: LantaiIdleTracker,
   private val transientBookCache: TransientBookCache,
+  private val chapterContentService: ChapterContentService,
   private val lantaiTaskQueryDao: LantaiTaskQueryDao,
   private val dslRW: DSLContext,
   @Qualifier("tasksDslContextRW") private val tasksDslRW: DSLContext,
@@ -110,6 +112,8 @@ class LantaiMemoryReclaimer(
       runCatching { transientBookCache.invalidateAll() }
         .onFailure { logger.warn(it) { "Failed to clear transient book cache" } }
         .isSuccess
+    runCatching { chapterContentService.clearIndex() }
+      .onFailure { logger.warn(it) { "Failed to clear chapter index cache" } }
     var gcRan = false
     var gcSkipped: String? = null
     if (lantaiSettingsProvider.memoryGcEnabled) {

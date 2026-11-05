@@ -17,6 +17,8 @@ class EtagFilterConfiguration {
       PathPatternParser.defaultInstance.parse("/api/v1/readlists/*/file/**"),
       PathPatternParser.defaultInstance.parse("/api/v1/series/*/file/**"),
       PathPatternParser.defaultInstance.parse("/kobo/*/v1/books/*/file/**"),
+      PathPatternParser.defaultInstance.parse("/api/lantai/v1/read/*/img/**"),
+      PathPatternParser.defaultInstance.parse("/api/lantai/v1/read/*/thumb/**"),
     )
 
   @Bean

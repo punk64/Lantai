@@ -31,7 +31,7 @@
   var EB = {
     open: false, bookId: '', book: null, total: 0, ch: 1, seen: 1,
     chs: new Map(), secs: new Map(), pending: {}, park: new Map(),
-    lo: 0, hi: 0, outline: null, outlineLoading: false,
+    lo: 0, hi: 0, outline: null, outlineLoading: false, outlinePending: null,
     anns: [], links: [], inlines: [],
     panel: null, shadow: null, docEl: null, view: null,
     shadowSeeded: false, progTimer: null, hbTimer: null, session: null, beats: 0,
@@ -39,7 +39,8 @@
     sel: null, tts: null, ttsIdx: 0, ttsOn: false, wakeLock: null,
     toastT: null, lastCh: 0, ready: false, warmF: false, warmB: false,
     page: 0, pages: 1, annTab: 'all', annQ: '', annQT: 0,
-    findQ: '', findMark: '', fontFams: null
+    findQ: '', findMark: '', fontFams: null,
+    wsum: null, wtotal: 0, vols: null, seeking: null, drag: null, hold: null
   };
 
   function rt() { return window.LantaiRuntime; }
@@ -310,6 +311,12 @@
     '.doc mark[data-ann]{cursor:pointer;border-radius:2px;color:inherit}',
     '.doc [data-ch]{cursor:pointer}',
     '.doc .eb-ill{cursor:zoom-in}',
+    '.doc .eb-ill{background:linear-gradient(110deg,var(--eb-sunk) 8%,var(--eb-card) 22%,var(--eb-sunk) 36%);' +
+    'background-size:220% 100%;animation:ebshine 1.4s linear infinite;border-radius:4px;color:var(--eb-dim);' +
+    'font-size:.74em;text-align:center;line-height:2.4}',
+    '.doc .eb-ill.nosize{aspect-ratio:auto 2/3;min-height:120px;width:100%}',
+    '.doc .eb-ill.ok{animation:none;background:none;border-radius:0;min-height:0}',
+    '.doc .eb-ill.bad{animation:none;background:var(--eb-sunk);color:var(--eb-dim);font-size:.72em}',
     '::highlight(eb-tts){background-color:rgba(201,162,75,.30);color:inherit}',
     '::highlight(eb-find){background-color:rgba(90,150,235,.32);color:inherit}',
     ':where(.doc) .tts-cur{background-color:rgba(201,162,75,.18);border-radius:3px}'
@@ -484,7 +491,7 @@
     clearTimeout(EB.idle);
     EB.idle = setTimeout(function () {
       if (!EB.open) return;
-      if (EB.panel || EB.sel) return;
+      if (EB.panel || EB.sel || EB.seeking != null) return;
       r.classList.add('idle');
     }, 3200);
   }
@@ -536,17 +543,12 @@
   function paintBot() {
     var b = $('ebBot'); if (!b) return;
     b.innerHTML =
-      '<span class="mono hide-s" id="ebPos">' + EB.ch + ' / ' + num(EB.total) + '</span>' +
+      '<span class="mono hide-s" id="ebPos">' + posText(EB.ch) + '</span>' +
       '<div class="eb-track" id="ebTrack"><div class="rail"></div><div class="fill" id="ebFill"></div><div class="knob" id="ebKnob"></div></div>' +
       '<span class="mono" id="ebPct">0%</span>' +
       '<button class="eb-btn hide-s" data-a="prev" title="上一章">' + ico('left') + '</button>' +
       '<button class="eb-btn hide-s" data-a="next" title="下一章">' + ico('right') + '</button>';
-    var track = $('ebTrack');
-    track.addEventListener('click', function (ev) {
-      var r = track.getBoundingClientRect();
-      var f = clamp((ev.clientX - r.left) / Math.max(1, r.width), 0, 1);
-      seek(f);
-    });
+    wireTrack($('ebTrack'));
     [].slice.call(b.querySelectorAll('[data-a]')).forEach(function (btn) {
       btn.onclick = function () {
         var d = btn.dataset.a === 'prev' ? -1 : 1;
@@ -554,44 +556,149 @@
         d < 0 ? prevChapter() : nextChapter();
       };
     });
-    paintProgressBar();
+    paintProgressBar(true);
   }
 
-  function paintProgressBar() {
+  function wireTrack(track) {
+    if (!track) return;
+    var frac = function (ev) {
+      var r = track.getBoundingClientRect();
+      return clamp((ev.clientX - r.left) / Math.max(1, r.width), 0, 1);
+    };
+    var stop = function (id) {
+      EB.drag = null;
+      EB.seeking = null;
+      track.classList.remove('drag');
+      try { track.releasePointerCapture(id); } catch (e) { }
+    };
+    track.addEventListener('pointerdown', function (ev) {
+      if (ev.button != null && ev.button > 0) return;
+      ev.preventDefault();
+      clearTimeout(EB.idle);
+      var r = $('eb'); if (r) r.classList.remove('idle');
+      EB.drag = { f: frac(ev), x: ev.clientX, moved: false };
+      EB.seeking = EB.drag.f;
+      track.classList.add('drag');
+      try { track.setPointerCapture(ev.pointerId); } catch (e) { }
+      paintBar(EB.drag.f, true);
+    });
+    track.addEventListener('pointermove', function (ev) {
+      var d = EB.drag; if (!d) return;
+      if (!d.moved && Math.abs(ev.clientX - d.x) < 3) return;
+      d.moved = true;
+      d.f = frac(ev);
+      EB.seeking = d.f;
+      paintBar(d.f, true);
+    });
+    track.addEventListener('pointerup', function (ev) {
+      var d = EB.drag; if (!d) return;
+      stop(ev.pointerId);
+      seek(d.f);
+    });
+    track.addEventListener('pointercancel', function (ev) {
+      if (!EB.drag) return;
+      stop(ev.pointerId);
+      paintProgressBar(true);
+    });
+  }
+
+  function paintBar(f, preview) {
     var fill = $('ebFill'), knob = $('ebKnob'), pct = $('ebPct'), pos = $('ebPos');
     if (!fill) return;
-    var f = totalProgress();
-    fill.style.width = (f * 100).toFixed(2) + '%';
-    if (knob) knob.style.left = (f * 100).toFixed(2) + '%';
-    if (pct) pct.textContent = (f * 100).toFixed(2) + '%';
-    if (pos) {
-      if (isPaged()) {
-        measure();
-        var txt = EB.ch + ' / ' + num(EB.total);
-        var cur = EB.secs.get(EB.ch);
-        if (cur) {
-          var vr2 = EB.view.getBoundingClientRect();
-          var sr2 = cur.getBoundingClientRect();
-          var st2 = Math.max(1, layoutMetrics().step);
-          var cols = Math.max(1, Math.ceil((sr2.width - 2) / st2));
-          var startPage = Math.round((EB.view.scrollLeft + sr2.left - vr2.left) / st2);
-          txt += ' · ' + clamp(EB.page - startPage + 1, 1, cols) + ' / ' + cols + ' 页';
-        }
-        pos.textContent = txt;
-      } else {
-        pos.textContent = EB.ch + ' / ' + num(EB.total);
-      }
-    }
+    var w = (clamp(f, 0, 1) * 100).toFixed(2) + '%';
+    fill.style.width = w;
+    if (knob) knob.style.left = w;
+    if (pct) pct.textContent = w;
+    if (pos) pos.textContent = preview ? posText(previewChapter(f)) : posText(EB.ch) + pageSuffix();
+  }
+
+  function paintProgressBar(force) {
+    if (EB.seeking != null && !force) return;
+    paintBar(totalProgress(), false);
   }
 
   function totalProgress() {
     if (!EB.total) return 0;
-    return clamp((EB.ch - 1 + chapterProgress()) / EB.total, 0, 1);
+    var cp = chapterProgress();
+    if (EB.wsum && EB.wtotal > 0) {
+      var a = EB.wsum[EB.ch - 1] || 0;
+      var b = EB.wsum[EB.ch] || a;
+      return clamp((a + (b - a) * cp) / EB.wtotal, 0, 1);
+    }
+    return clamp((EB.ch - 1 + cp) / EB.total, 0, 1);
+  }
+
+  function previewChapter(f) {
+    if (!EB.total) return 1;
+    var t = clamp(f, 0, 1);
+    if (!EB.wsum || !EB.wtotal) return clamp(Math.ceil(t * EB.total), 1, EB.total);
+    var x = t * EB.wtotal, lo = 1, hi = EB.total, n = EB.total;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (EB.wsum[mid] >= x) { n = mid; hi = mid - 1; } else lo = mid + 1;
+    }
+    return n;
+  }
+
+  function posText(n) {
+    var v = volInfo(n);
+    if (v) return '第 ' + v.i + ' / ' + v.total + ' 卷 · 第 ' + v.j + ' / ' + v.count + ' 节';
+    return '第 ' + n + ' / ' + num(EB.total) + ' 章';
+  }
+
+  function pageSuffix() {
+    if (!isPaged() || !EB.view || !EB.pages || EB.pages < 2) return '';
+    var sec = EB.secs.get(EB.ch); if (!sec) return '';
+    var vr = EB.view.getBoundingClientRect();
+    var sr = sec.getBoundingClientRect();
+    var st = Math.max(1, layoutMetrics().step);
+    var cols = Math.max(1, Math.ceil((sr.width - 2) / st));
+    if (cols < 2) return '';
+    var start = Math.round((EB.view.scrollLeft + sr.left - vr.left) / st);
+    return ' · ' + clamp(EB.page - start + 1, 1, cols) + ' / ' + cols + ' 页';
+  }
+
+  function volInfo(n) {
+    var vs = EB.vols; if (!vs) return null;
+    var k = 0;
+    for (var i = 0; i < vs.length; i++) { if (vs[i].n <= n) k = i; else break; }
+    var start = vs[k].n;
+    var end = vs[k + 1] ? vs[k + 1].n : EB.total + 1;
+    return { i: k + 1, total: vs.length, j: n - start + 1, count: Math.max(1, end - start) };
+  }
+
+  function buildIndex() {
+    EB.wsum = null;
+    EB.wtotal = 0;
+    EB.vols = null;
+    var n = EB.total;
+    if (!n) return;
+    var map = {};
+    var known = 0, sum = 0, child = 0;
+    var vols = [];
+    (EB.outline || []).forEach(function (e) {
+      if (!e || !(e.n >= 1) || e.n > n) return;
+      if ((e.depth || 0) === 0) vols.push({ n: e.n, title: e.title || '' });
+      else child++;
+      if (e.chars > 0) { map[e.n] = e.chars; known++; sum += e.chars; }
+    });
+    if (known > 0) {
+      var mean = sum / known;
+      var arr = new Array(n + 1);
+      arr[0] = 0;
+      for (var i = 1; i <= n; i++) arr[i] = arr[i - 1] + (map[i] > 0 ? map[i] : mean);
+      EB.wsum = arr;
+      EB.wtotal = arr[n];
+    }
+    if (vols.length >= 2 && child > 0) {
+      if (vols[0].n !== 1) vols.unshift({ n: 1, title: '' });
+      EB.vols = vols;
+    }
   }
 
   function chapterProgress() {
     var sec = EB.secs.get(EB.ch);
-    if (!sec || !EB.view) return 0;
+    if (!sec || !EB.view) return (EB.hold && EB.hold.n === EB.ch) ? EB.hold.p : 0;
     if (isPaged()) {
       var pv = EB.view.getBoundingClientRect();
       var ps = sec.getBoundingClientRect();
@@ -681,6 +788,9 @@
         var img = el('img', 'eb-ill');
         img.src = src;
         img.alt = '';
+        var sw = parseInt(node.getAttribute('width'), 10);
+        var sh = parseInt(node.getAttribute('height'), 10);
+        if (sw > 0 && sh > 0) { img.setAttribute('width', sw); img.setAttribute('height', sh); }
         box.appendChild(img);
       });
       if (box.childNodes.length) svg.parentNode.replaceChild(box, svg);
@@ -692,6 +802,9 @@
       var img = el('img', 'eb-ill');
       img.src = src;
       img.alt = '';
+      var iw2 = parseInt(node.getAttribute('width'), 10);
+      var ih2 = parseInt(node.getAttribute('height'), 10);
+      if (iw2 > 0 && ih2 > 0) { img.setAttribute('width', iw2); img.setAttribute('height', ih2); }
       node.parentNode.replaceChild(img, node);
     });
     [].slice.call(root.querySelectorAll('img')).forEach(function (img) {
@@ -701,9 +814,14 @@
       var ih = parseInt(img.getAttribute('height'), 10);
       img.style.setProperty('max-width', '100%', 'important');
       img.style.setProperty('height', 'auto', 'important');
-      if (iw > 0 && ih > 0) img.style.setProperty('aspect-ratio', iw + ' / ' + ih);
+      if (iw > 0 && ih > 0) img.style.setProperty('aspect-ratio', 'auto ' + iw + ' / ' + ih);
+      else img.classList.add('nosize');
       img.removeAttribute('width');
       img.removeAttribute('height');
+      img.alt = '加载中';
+      img.addEventListener('load', function () { img.classList.add('ok'); img.classList.remove('nosize'); img.alt = ''; });
+      img.addEventListener('error', function () { img.classList.add('bad'); img.alt = '图片未能加载'; });
+      if (img.complete && img.naturalWidth > 0) { img.classList.add('ok'); img.classList.remove('nosize'); img.alt = ''; }
       img.addEventListener('click', function () { zoomImg(img.src); });
     });
     [].slice.call(root.querySelectorAll('a')).forEach(function (a) {
@@ -967,6 +1085,7 @@
 
   function gotoChapter(n, prog) {
     n = Math.round(clamp(n, 1, EB.total));
+    EB.hold = { n: n, p: clamp(prog || 0, 0, 1) };
     var sec = EB.secs.get(n);
     if (sec) {
       scrollToSec(sec, prog || 0);
@@ -1002,8 +1121,15 @@
   function nextChapter() { if (EB.ch < EB.total) gotoChapter(EB.ch + 1, 0); }
 
   function seek(f) {
-    var target = clamp(Math.ceil(f * EB.total), 1, EB.total);
-    gotoChapter(target, 0);
+    if (!EB.total) return;
+    var n = previewChapter(f);
+    var p = 0;
+    if (EB.wsum && EB.wtotal > 0) {
+      var a = EB.wsum[n - 1] || 0;
+      var b = EB.wsum[n] || a;
+      if (b > a) p = clamp((clamp(f, 0, 1) * EB.wtotal - a) / (b - a), 0, 1);
+    }
+    gotoChapter(n, p);
   }
 
   function queueProgress() {
@@ -1056,16 +1182,21 @@
   }
 
   function loadOutline() {
-    if (EB.outline || EB.outlineLoading) return Promise.resolve(EB.outline);
+    if (EB.outline) return Promise.resolve(EB.outline);
+    if (EB.outlinePending) return EB.outlinePending;
+    var bid = EB.bookId;
     EB.outlineLoading = true;
-    return req('api/lantai/v1/read/' + EB.bookId + '/chapters?outline=true')
+    EB.outlinePending = req('api/lantai/v1/read/' + bid + '/chapters?outline=true')
       .then(function (dto) {
-        EB.outline = (dto && dto.outline) || [];
         EB.outlineLoading = false;
+        EB.outlinePending = null;
+        if (EB.bookId !== bid) return null;
+        EB.outline = (dto && dto.outline) || [];
         if (!EB.outline.length) EB.outline = null;
         return EB.outline;
       })
-      .catch(function () { EB.outlineLoading = false; return null; });
+      .catch(function () { EB.outlineLoading = false; EB.outlinePending = null; return null; });
+    return EB.outlinePending;
   }
 
   function openPanel(which) {
@@ -2165,6 +2296,13 @@
     EB.warmF = false; EB.warmB = false;
     EB.anns = [];
     EB.outline = null;
+    EB.outlinePending = null;
+    EB.wsum = null;
+    EB.wtotal = 0;
+    EB.vols = null;
+    EB.seeking = null;
+    EB.drag = null;
+    EB.hold = null;
     EB.links = [];
     EB.inlines = [];
     pubKey = '';
@@ -2242,6 +2380,11 @@
       load(startCh - 1, 'before').catch(function () { });
       if (startCh > 1) load(startCh - 2, 'before').catch(function () { });
       if (dto.annotations && dto.annotations.length && !EB.anns.length) loadAnns();
+      loadOutline().then(function () {
+        if (!EB.open || EB.bookId !== bookId) return;
+        buildIndex();
+        paintProgressBar();
+      });
       EB.bootDone = true;
       remapAnns();
       bumpIdle();

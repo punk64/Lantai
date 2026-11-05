@@ -9,7 +9,7 @@
 > This is not an official Komga project and is not affiliated with gotson/komga or its author.
 > The original project is copyright Gauthier Roebroeck, licensed under MIT.
 
-The name comes from *Lantai* (兰台), the Han-dynasty imperial library. The relationship with Komga in one phrase: **same origin, different road**.
+The name comes from *Lantai* (兰台), the imperial library and archive of Han-dynasty China — established in the Western Han (202 BC – AD 8) at Chang'an, continued through the Eastern Han (AD 25–220), where Ban Gu once served as Lantai ling-shi. The relationship with Komga in one phrase: **same origin, different road**.
 
 ## Release status
 
@@ -224,12 +224,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.4.21}-ubuntu
+    image: lantai:${LANTAI_VERSION:-0.5.0}-ubuntu
     build:
       context: ..
       dockerfile: docker/Dockerfile.lantai
       args:
-        VERSION: ${LANTAI_VERSION:-0.4.21}
+        VERSION: ${LANTAI_VERSION:-0.5.0}
         WITH_KEPUBIFY: "true"
     container_name: lantai
     network_mode: host
@@ -268,12 +268,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.4.21}-alpine
+    image: lantai:${LANTAI_VERSION:-0.5.0}-alpine
     build:
       context: ..
       dockerfile: docker/Dockerfile.alpine
       args:
-        VERSION: ${LANTAI_VERSION:-0.4.21}
+        VERSION: ${LANTAI_VERSION:-0.5.0}
     container_name: lantai
     ports:
       - "${LANTAI_PORT:-25600}:25600"

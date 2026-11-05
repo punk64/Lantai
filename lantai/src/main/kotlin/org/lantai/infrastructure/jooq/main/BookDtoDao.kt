@@ -78,6 +78,7 @@ class BookDtoDao(
 
   private val sorts =
     mapOf(
+      "id" to b.ID,
       "name" to b.NAME.unicode3(),
       "series" to sd.TITLE_SORT.unicode3(),
       "created" to b.CREATED_DATE,

@@ -86,6 +86,7 @@ class SeriesDtoDao(
 
   private val sorts =
     mapOf(
+      "id" to s.ID,
       "metadata.titleSort" to d.TITLE_SORT.unicode3(),
       "createdDate" to s.CREATED_DATE,
       "created" to s.CREATED_DATE,

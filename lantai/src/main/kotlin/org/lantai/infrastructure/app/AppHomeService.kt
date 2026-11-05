@@ -40,20 +40,29 @@ class AppHomeService(
   ): AppHomeResult {
     val size = limit.coerceIn(1, appProperties.maxHomeLimit)
     val context = SearchContext(user)
-    val authorized = user.getAuthorizedLibraryIds(null)
 
-    val continueReading =
-      bookDtoRepository.findAllOnDeck(user.id, authorized, PageRequest.of(0, size), user.restrictions, readerView = true)
     val readerStatus =
       SearchCondition.AnyOfBook(
         SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.READY)),
         SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.UNSUPPORTED)),
       )
+    val continueReading =
+      bookDtoRepository.findAll(
+        BookSearch(
+          condition =
+            SearchCondition.AllOfBook(
+              SearchCondition.ReadStatus(SearchOperator.Is(ReadStatus.IN_PROGRESS)),
+              readerStatus,
+            ),
+        ),
+        context,
+        newest(size, "readProgress.readDate"),
+      )
     val added =
       bookDtoRepository.findAll(
         BookSearch(condition = readerStatus),
         context,
-        newest(size, "lastModifiedDate"),
+        newest(size, "created"),
       )
     val published =
       bookDtoRepository.findAll(
@@ -72,7 +81,10 @@ class AppHomeService(
         BookSearch(
           condition =
             SearchCondition.AllOfBook(
-              SearchCondition.ReadStatus(SearchOperator.Is(ReadStatus.READ)),
+              SearchCondition.AnyOfBook(
+                SearchCondition.ReadStatus(SearchOperator.Is(ReadStatus.IN_PROGRESS)),
+                SearchCondition.ReadStatus(SearchOperator.Is(ReadStatus.READ)),
+              ),
               readerStatus,
             ),
         ),
@@ -139,7 +151,7 @@ class AppHomeService(
   private fun newest(
     size: Int,
     field: String,
-  ): Pageable = PageRequest.of(0, size, Sort.by(Sort.Order.desc(field)))
+  ): Pageable = PageRequest.of(0, size, Sort.by(Sort.Order.desc(field), Sort.Order.desc("id")))
 
   private fun BookDto.toCard(at: LocalDateTime?) =
     AppBookCard(

@@ -35,6 +35,7 @@ data class ReadBookDto(
   val chapterCount: Int,
   val readingDirection: String,
   val coverUrl: String,
+  val modified: Long,
 )
 
 data class ReadProgressDto(

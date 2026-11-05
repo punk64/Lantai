@@ -70,6 +70,9 @@ class WebMvcConfiguration(
           "/opds/**",
         )
       },
+    ).excludePathPatterns(
+      "/api/lantai/v1/read/*/img/**",
+      "/api/lantai/v1/read/*/thumb/**",
     )
   }
 

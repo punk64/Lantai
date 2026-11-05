@@ -46,6 +46,7 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.io.BufferedOutputStream
 import java.nio.charset.StandardCharsets
+import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -366,6 +367,7 @@ class LantaiReadController(
       chapterCount = total,
       readingDirection = directionOf(seriesMetadata),
       coverUrl = "$contextPath/api/v1/books/${book.id}/thumbnail",
+      modified = media.lastModifiedDate.toEpochSecond(ZoneOffset.UTC),
     )
   }
 

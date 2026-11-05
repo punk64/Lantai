@@ -7,7 +7,7 @@
 > 本项目非 Komga 官方项目，与 gotson/komga 及其作者无隶属关系。
 > 原项目版权归 Gauthier Roebroeck 所有，依 MIT 协议授权。
 
-名字取自汉代藏书之所「兰台」。与 Komga 的关系用一个词概括：**同源，不同路**。
+名字取自中国古代汉代的宫廷藏书之所「兰台」——西汉（公元前 202 年—公元 8 年）设于长安，东汉（公元 25—220 年）沿置，班固曾任兰台令史。与 Komga 的关系用一个词概括：**同源，不同路**。
 
 > English: [README.en.md](README.en.md)
 
@@ -224,12 +224,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.4.21}-ubuntu
+    image: lantai:${LANTAI_VERSION:-0.5.0}-ubuntu
     build:
       context: ..
       dockerfile: docker/Dockerfile.lantai
       args:
-        VERSION: ${LANTAI_VERSION:-0.4.21}
+        VERSION: ${LANTAI_VERSION:-0.5.0}
         WITH_KEPUBIFY: "true"
     container_name: lantai
     network_mode: host
@@ -268,12 +268,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.4.21}-alpine
+    image: lantai:${LANTAI_VERSION:-0.5.0}-alpine
     build:
       context: ..
       dockerfile: docker/Dockerfile.alpine
       args:
-        VERSION: ${LANTAI_VERSION:-0.4.21}
+        VERSION: ${LANTAI_VERSION:-0.5.0}
     container_name: lantai
     ports:
       - "${LANTAI_PORT:-25600}:25600"

@@ -311,13 +311,36 @@ class ChapterContentService(
     prev: Int?,
     next: Int?,
   ): ChapterBundleDto {
-    val bytes = bookAnalyzer.getPageContent(BookWithMedia(book, media), number)
-    val rendered = readImageService.render(bytes, width, format)
     val reference =
       when (media.profile) {
         MediaProfile.DIVINA -> readImageService.refOfEntry(media.pages[number - 1].fileName)
         else -> readImageService.refOfPage(number)
       }
+    if (mode == "url" || mode == "none") {
+      val src = if (mode == "none") SVG_PLACEHOLDER else imageUrl(book.id, reference, width, format, contextPath)
+      val html = "<img src=\"$src\" alt=\"${escapeHtml(ref.title)}\" data-ref=\"$reference\">"
+      val images =
+        if (mode == "url") {
+          val type = if (media.profile == MediaProfile.DIVINA) media.pages[number - 1].mediaType else "image/jpeg"
+          listOf(ChapterImageDto(reference, 0L, type))
+        } else {
+          emptyList()
+        }
+      return ChapterBundleDto(
+        chapter = number,
+        title = ref.title,
+        href = "#page=$number",
+        total = total,
+        chars = 0,
+        mediaType = "text/html",
+        html = html,
+        images = images,
+        prev = prev,
+        next = next,
+      )
+    }
+    val bytes = bookAnalyzer.getPageContent(BookWithMedia(book, media), number)
+    val rendered = readImageService.render(bytes, width, format)
     val src =
       when (mode) {
         "none" -> SVG_PLACEHOLDER

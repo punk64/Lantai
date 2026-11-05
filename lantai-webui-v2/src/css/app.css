@@ -40,10 +40,19 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 html[data-theme=light] body:before{background:radial-gradient(1100px 600px at 10% -10%,var(--acc-bg),transparent 60%),
              radial-gradient(900px 520px at 100% 0%,rgba(160,140,90,.12),transparent 60%)}
 ::selection{background:var(--acc-line);color:var(--tx)}
-::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar{width:12px;height:12px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
-::-webkit-scrollbar-thumb:hover{background:var(--line-3);background-clip:padding-box}
+::-webkit-scrollbar-thumb{background:var(--line-3);border-radius:8px;border:3px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--tx-4);background-clip:padding-box}
+::-webkit-scrollbar-thumb:active{background:var(--acc);background-clip:padding-box}
+.page,.nav,.modal-b,.drawer-b{scrollbar-color:var(--line-3) var(--bg-3)}
+.page{scrollbar-gutter:stable}
+.page::-webkit-scrollbar-track,.nav::-webkit-scrollbar-track,
+.modal-b::-webkit-scrollbar-track,.drawer-b::-webkit-scrollbar-track{background:var(--bg-3)}
+.nav{scrollbar-width:thin}
+.nav::-webkit-scrollbar{width:8px}
+.nav::-webkit-scrollbar-thumb{border-width:2px}
+.modal-b::-webkit-scrollbar,.drawer-b::-webkit-scrollbar{width:10px}
 h1,h2,h3,h4{margin:0;font-weight:600}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit}

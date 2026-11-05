@@ -31,7 +31,7 @@
   var EB = {
     open: false, bookId: '', book: null, total: 0, ch: 1, seen: 1,
     chs: new Map(), secs: new Map(), pending: {}, park: new Map(),
-    lo: 0, hi: 0, outline: null, outlineLoading: false,
+    lo: 0, hi: 0, outline: null, outlineLoading: false, outlinePending: null,
     anns: [], links: [], inlines: [],
     panel: null, shadow: null, docEl: null, view: null,
     shadowSeeded: false, progTimer: null, hbTimer: null, session: null, beats: 0,
@@ -39,7 +39,8 @@
     sel: null, tts: null, ttsIdx: 0, ttsOn: false, wakeLock: null,
     toastT: null, lastCh: 0, ready: false, warmF: false, warmB: false,
     page: 0, pages: 1, annTab: 'all', annQ: '', annQT: 0,
-    findQ: '', findMark: '', fontFams: null
+    findQ: '', findMark: '', fontFams: null,
+    wsum: null, wtotal: 0, vols: null, seeking: null, drag: null, hold: null
   };
 
   function rt() { return window.LantaiRuntime; }
@@ -310,6 +311,12 @@
     '.doc mark[data-ann]{cursor:pointer;border-radius:2px;color:inherit}',
     '.doc [data-ch]{cursor:pointer}',
     '.doc .eb-ill{cursor:zoom-in}',
+    '.doc .eb-ill{background:linear-gradient(110deg,var(--eb-sunk) 8%,var(--eb-card) 22%,var(--eb-sunk) 36%);' +
+    'background-size:220% 100%;animation:ebshine 1.4s linear infinite;border-radius:4px;color:var(--eb-dim);' +
+    'font-size:.74em;text-align:center;line-height:2.4}',
+    '.doc .eb-ill.nosize{aspect-ratio:auto 2/3;min-height:120px;width:100%}',
+    '.doc .eb-ill.ok{animation:none;background:none;border-radius:0;min-height:0}',
+    '.doc .eb-ill.bad{animation:none;background:var(--eb-sunk);color:var(--eb-dim);font-size:.72em}',
     '::highlight(eb-tts){background-color:rgba(201,162,75,.30);color:inherit}',
     '::highlight(eb-find){background-color:rgba(90,150,235,.32);color:inherit}',
     ':where(.doc) .tts-cur{background-color:rgba(201,162,75,.18);border-radius:3px}'
@@ -484,7 +491,7 @@
     clearTimeout(EB.idle);
     EB.idle = setTimeout(function () {
       if (!EB.open) return;
-      if (EB.panel || EB.sel) return;
+      if (EB.panel || EB.sel || EB.seeking != null) return;
       r.classList.add('idle');
     }, 3200);
   }
@@ -536,17 +543,12 @@
   function paintBot() {
     var b = $('ebBot'); if (!b) return;
     b.innerHTML =
-      '<span class="mono hide-s" id="ebPos">' + EB.ch + ' / ' + num(EB.total) + '</span>' +
+      '<span class="mono hide-s" id="ebPos">' + posText(EB.ch) + '</span>' +
       '<div class="eb-track" id="ebTrack"><div class="rail"></div><div class="fill" id="ebFill"></div><div class="knob" id="ebKnob"></div></div>' +
       '<span class="mono" id="ebPct">0%</span>' +
       '<button class="eb-btn hide-s" data-a="prev" title="上一章">' + ico('left') + '</button>' +
       '<button class="eb-btn hide-s" data-a="next" title="下一章">' + ico('right') + '</button>';
-    var track = $('ebTrack');
-    track.addEventListener('click', function (ev) {
-      var r = track.getBoundingClientRect();
-      var f = clamp((ev.clientX - r.left) / Math.max(1, r.width), 0, 1);
-      seek(f);
-    });
+    wireTrack($('ebTrack'));
     [].slice.call(b.querySelectorAll('[data-a]')).forEach(function (btn) {
       btn.onclick = function () {
         var d = btn.dataset.a === 'prev' ? -1 : 1;
@@ -554,44 +556,149 @@
         d < 0 ? prevChapter() : nextChapter();
       };
     });
-    paintProgressBar();
+    paintProgressBar(true);
   }
 
-  function paintProgressBar() {
+  function wireTrack(track) {
+    if (!track) return;
+    var frac = function (ev) {
+      var r = track.getBoundingClientRect();
+      return clamp((ev.clientX - r.left) / Math.max(1, r.width), 0, 1);
+    };
+    var stop = function (id) {
+      EB.drag = null;
+      EB.seeking = null;
+      track.classList.remove('drag');
+      try { track.releasePointerCapture(id); } catch (e) { }
+    };
+    track.addEventListener('pointerdown', function (ev) {
+      if (ev.button != null && ev.button > 0) return;
+      ev.preventDefault();
+      clearTimeout(EB.idle);
+      var r = $('eb'); if (r) r.classList.remove('idle');
+      EB.drag = { f: frac(ev), x: ev.clientX, moved: false };
+      EB.seeking = EB.drag.f;
+      track.classList.add('drag');
+      try { track.setPointerCapture(ev.pointerId); } catch (e) { }
+      paintBar(EB.drag.f, true);
+    });
+    track.addEventListener('pointermove', function (ev) {
+      var d = EB.drag; if (!d) return;
+      if (!d.moved && Math.abs(ev.clientX - d.x) < 3) return;
+      d.moved = true;
+      d.f = frac(ev);
+      EB.seeking = d.f;
+      paintBar(d.f, true);
+    });
+    track.addEventListener('pointerup', function (ev) {
+      var d = EB.drag; if (!d) return;
+      stop(ev.pointerId);
+      seek(d.f);
+    });
+    track.addEventListener('pointercancel', function (ev) {
+      if (!EB.drag) return;
+      stop(ev.pointerId);
+      paintProgressBar(true);
+    });
+  }
+
+  function paintBar(f, preview) {
     var fill = $('ebFill'), knob = $('ebKnob'), pct = $('ebPct'), pos = $('ebPos');
     if (!fill) return;
-    var f = totalProgress();
-    fill.style.width = (f * 100).toFixed(2) + '%';
-    if (knob) knob.style.left = (f * 100).toFixed(2) + '%';
-    if (pct) pct.textContent = (f * 100).toFixed(2) + '%';
-    if (pos) {
-      if (isPaged()) {
-        measure();
-        var txt = EB.ch + ' / ' + num(EB.total);
-        var cur = EB.secs.get(EB.ch);
-        if (cur) {
-          var vr2 = EB.view.getBoundingClientRect();
-          var sr2 = cur.getBoundingClientRect();
-          var st2 = Math.max(1, layoutMetrics().step);
-          var cols = Math.max(1, Math.ceil((sr2.width - 2) / st2));
-          var startPage = Math.round((EB.view.scrollLeft + sr2.left - vr2.left) / st2);
-          txt += ' · ' + clamp(EB.page - startPage + 1, 1, cols) + ' / ' + cols + ' 页';
-        }
-        pos.textContent = txt;
-      } else {
-        pos.textContent = EB.ch + ' / ' + num(EB.total);
-      }
-    }
+    var w = (clamp(f, 0, 1) * 100).toFixed(2) + '%';
+    fill.style.width = w;
+    if (knob) knob.style.left = w;
+    if (pct) pct.textContent = w;
+    if (pos) pos.textContent = preview ? posText(previewChapter(f)) : posText(EB.ch) + pageSuffix();
+  }
+
+  function paintProgressBar(force) {
+    if (EB.seeking != null && !force) return;
+    paintBar(totalProgress(), false);
   }
 
   function totalProgress() {
     if (!EB.total) return 0;
-    return clamp((EB.ch - 1 + chapterProgress()) / EB.total, 0, 1);
+    var cp = chapterProgress();
+    if (EB.wsum && EB.wtotal > 0) {
+      var a = EB.wsum[EB.ch - 1] || 0;
+      var b = EB.wsum[EB.ch] || a;
+      return clamp((a + (b - a) * cp) / EB.wtotal, 0, 1);
+    }
+    return clamp((EB.ch - 1 + cp) / EB.total, 0, 1);
+  }
+
+  function previewChapter(f) {
+    if (!EB.total) return 1;
+    var t = clamp(f, 0, 1);
+    if (!EB.wsum || !EB.wtotal) return clamp(Math.ceil(t * EB.total), 1, EB.total);
+    var x = t * EB.wtotal, lo = 1, hi = EB.total, n = EB.total;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (EB.wsum[mid] >= x) { n = mid; hi = mid - 1; } else lo = mid + 1;
+    }
+    return n;
+  }
+
+  function posText(n) {
+    var v = volInfo(n);
+    if (v) return '第 ' + v.i + ' / ' + v.total + ' 卷 · 第 ' + v.j + ' / ' + v.count + ' 节';
+    return '第 ' + n + ' / ' + num(EB.total) + ' 章';
+  }
+
+  function pageSuffix() {
+    if (!isPaged() || !EB.view || !EB.pages || EB.pages < 2) return '';
+    var sec = EB.secs.get(EB.ch); if (!sec) return '';
+    var vr = EB.view.getBoundingClientRect();
+    var sr = sec.getBoundingClientRect();
+    var st = Math.max(1, layoutMetrics().step);
+    var cols = Math.max(1, Math.ceil((sr.width - 2) / st));
+    if (cols < 2) return '';
+    var start = Math.round((EB.view.scrollLeft + sr.left - vr.left) / st);
+    return ' · ' + clamp(EB.page - start + 1, 1, cols) + ' / ' + cols + ' 页';
+  }
+
+  function volInfo(n) {
+    var vs = EB.vols; if (!vs) return null;
+    var k = 0;
+    for (var i = 0; i < vs.length; i++) { if (vs[i].n <= n) k = i; else break; }
+    var start = vs[k].n;
+    var end = vs[k + 1] ? vs[k + 1].n : EB.total + 1;
+    return { i: k + 1, total: vs.length, j: n - start + 1, count: Math.max(1, end - start) };
+  }
+
+  function buildIndex() {
+    EB.wsum = null;
+    EB.wtotal = 0;
+    EB.vols = null;
+    var n = EB.total;
+    if (!n) return;
+    var map = {};
+    var known = 0, sum = 0, child = 0;
+    var vols = [];
+    (EB.outline || []).forEach(function (e) {
+      if (!e || !(e.n >= 1) || e.n > n) return;
+      if ((e.depth || 0) === 0) vols.push({ n: e.n, title: e.title || '' });
+      else child++;
+      if (e.chars > 0) { map[e.n] = e.chars; known++; sum += e.chars; }
+    });
+    if (known > 0) {
+      var mean = sum / known;
+      var arr = new Array(n + 1);
+      arr[0] = 0;
+      for (var i = 1; i <= n; i++) arr[i] = arr[i - 1] + (map[i] > 0 ? map[i] : mean);
+      EB.wsum = arr;
+      EB.wtotal = arr[n];
+    }
+    if (vols.length >= 2 && child > 0) {
+      if (vols[0].n !== 1) vols.unshift({ n: 1, title: '' });
+      EB.vols = vols;
+    }
   }
 
   function chapterProgress() {
     var sec = EB.secs.get(EB.ch);
-    if (!sec || !EB.view) return 0;
+    if (!sec || !EB.view) return (EB.hold && EB.hold.n === EB.ch) ? EB.hold.p : 0;
     if (isPaged()) {
       var pv = EB.view.getBoundingClientRect();
       var ps = sec.getBoundingClientRect();
@@ -681,6 +788,9 @@
         var img = el('img', 'eb-ill');
         img.src = src;
         img.alt = '';
+        var sw = parseInt(node.getAttribute('width'), 10);
+        var sh = parseInt(node.getAttribute('height'), 10);
+        if (sw > 0 && sh > 0) { img.setAttribute('width', sw); img.setAttribute('height', sh); }
         box.appendChild(img);
       });
       if (box.childNodes.length) svg.parentNode.replaceChild(box, svg);
@@ -692,6 +802,9 @@
       var img = el('img', 'eb-ill');
       img.src = src;
       img.alt = '';
+      var iw2 = parseInt(node.getAttribute('width'), 10);
+      var ih2 = parseInt(node.getAttribute('height'), 10);
+      if (iw2 > 0 && ih2 > 0) { img.setAttribute('width', iw2); img.setAttribute('height', ih2); }
       node.parentNode.replaceChild(img, node);
     });
     [].slice.call(root.querySelectorAll('img')).forEach(function (img) {
@@ -701,9 +814,14 @@
       var ih = parseInt(img.getAttribute('height'), 10);
       img.style.setProperty('max-width', '100%', 'important');
       img.style.setProperty('height', 'auto', 'important');
-      if (iw > 0 && ih > 0) img.style.setProperty('aspect-ratio', iw + ' / ' + ih);
+      if (iw > 0 && ih > 0) img.style.setProperty('aspect-ratio', 'auto ' + iw + ' / ' + ih);
+      else img.classList.add('nosize');
       img.removeAttribute('width');
       img.removeAttribute('height');
+      img.alt = '加载中';
+      img.addEventListener('load', function () { img.classList.add('ok'); img.classList.remove('nosize'); img.alt = ''; });
+      img.addEventListener('error', function () { img.classList.add('bad'); img.alt = '图片未能加载'; });
+      if (img.complete && img.naturalWidth > 0) { img.classList.add('ok'); img.classList.remove('nosize'); img.alt = ''; }
       img.addEventListener('click', function () { zoomImg(img.src); });
     });
     [].slice.call(root.querySelectorAll('a')).forEach(function (a) {
@@ -967,6 +1085,7 @@
 
   function gotoChapter(n, prog) {
     n = Math.round(clamp(n, 1, EB.total));
+    EB.hold = { n: n, p: clamp(prog || 0, 0, 1) };
     var sec = EB.secs.get(n);
     if (sec) {
       scrollToSec(sec, prog || 0);
@@ -1002,8 +1121,15 @@
   function nextChapter() { if (EB.ch < EB.total) gotoChapter(EB.ch + 1, 0); }
 
   function seek(f) {
-    var target = clamp(Math.ceil(f * EB.total), 1, EB.total);
-    gotoChapter(target, 0);
+    if (!EB.total) return;
+    var n = previewChapter(f);
+    var p = 0;
+    if (EB.wsum && EB.wtotal > 0) {
+      var a = EB.wsum[n - 1] || 0;
+      var b = EB.wsum[n] || a;
+      if (b > a) p = clamp((clamp(f, 0, 1) * EB.wtotal - a) / (b - a), 0, 1);
+    }
+    gotoChapter(n, p);
   }
 
   function queueProgress() {
@@ -1056,16 +1182,21 @@
   }
 
   function loadOutline() {
-    if (EB.outline || EB.outlineLoading) return Promise.resolve(EB.outline);
+    if (EB.outline) return Promise.resolve(EB.outline);
+    if (EB.outlinePending) return EB.outlinePending;
+    var bid = EB.bookId;
     EB.outlineLoading = true;
-    return req('api/lantai/v1/read/' + EB.bookId + '/chapters?outline=true')
+    EB.outlinePending = req('api/lantai/v1/read/' + bid + '/chapters?outline=true')
       .then(function (dto) {
-        EB.outline = (dto && dto.outline) || [];
         EB.outlineLoading = false;
+        EB.outlinePending = null;
+        if (EB.bookId !== bid) return null;
+        EB.outline = (dto && dto.outline) || [];
         if (!EB.outline.length) EB.outline = null;
         return EB.outline;
       })
-      .catch(function () { EB.outlineLoading = false; return null; });
+      .catch(function () { EB.outlineLoading = false; EB.outlinePending = null; return null; });
+    return EB.outlinePending;
   }
 
   function openPanel(which) {
@@ -2165,6 +2296,13 @@
     EB.warmF = false; EB.warmB = false;
     EB.anns = [];
     EB.outline = null;
+    EB.outlinePending = null;
+    EB.wsum = null;
+    EB.wtotal = 0;
+    EB.vols = null;
+    EB.seeking = null;
+    EB.drag = null;
+    EB.hold = null;
     EB.links = [];
     EB.inlines = [];
     pubKey = '';
@@ -2242,6 +2380,11 @@
       load(startCh - 1, 'before').catch(function () { });
       if (startCh > 1) load(startCh - 2, 'before').catch(function () { });
       if (dto.annotations && dto.annotations.length && !EB.anns.length) loadAnns();
+      loadOutline().then(function () {
+        if (!EB.open || EB.bookId !== bookId) return;
+        buildIndex();
+        paintProgressBar();
+      });
       EB.bootDone = true;
       remapAnns();
       bumpIdle();
@@ -2339,7 +2482,7 @@
 
   var CS = {
     open: false, bookId: '', book: null, total: 0, page: 1, seen: 1, wantPage: 0,
-    refs: new Map(), refq: new Map(), fails: new Set(),
+    refs: new Map(), refq: new Map(), fails: new Set(), preloaded: new Set(),
     mode: PRE.mode, dir: PRE.dir, fit: PRE.fit, quality: PRE.quality,
     anns: [], drawMode: null, drawColor: COLORS[0], drawing: null, annTab: 'all', annQ: '', annQT: 0,
     thumbs: false, side: null, zoom: 1, panX: 0, panY: 0,
@@ -2347,7 +2490,8 @@
     wheelAt: 0, offTimer: null, idle: null,
     session: null, beats: 0, hbTimer: null, progTimer: null, started: false,
     lo: 0, hi: 0, flowObserver: null, scrollTimer: null, tinted: '',
-    preTimer: null, preReady: false
+    preTimer: null, preReady: false, trackDrag: false, tipAt: 0, ver: 0,
+    barHover: false, thIO: null, thTick: null, thDown: null, thMoved: 0
   };
 
   function rt() { return window.LantaiRuntime; }
@@ -2384,15 +2528,25 @@
     return e.message ? String(e.message).slice(0, 120) : 'HTTP ' + (e.status || 'err');
   }
 
+  function b64url(s) {
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function verQ() { return CS.ver ? '&v=' + CS.ver : ''; }
   function imgUrl(page, w) {
     var ref = CS.refs.get(page);
     if (!ref) return '';
     var ww = w == null ? imgW() : w;
-    return base() + 'api/lantai/v1/read/' + CS.bookId + '/img/' + encodeURIComponent(ref) + '?w=' + ww + '&fmt=' + (ww > 0 ? 'jpeg' : 'orig');
+    return base() + 'api/lantai/v1/read/' + CS.bookId + '/img/' + encodeURIComponent(ref) + '?w=' + ww + '&fmt=' + (ww > 0 ? 'jpeg' : 'orig') + verQ();
   }
-
+  function localRef(page) {
+    var profile = (CS.book && CS.book.profile) || '';
+    if (profile !== 'DIVINA' && profile !== 'PDF') return '';
+    return b64url('p:' + page);
+  }
   function ensureRef(page) {
     if (CS.refs.has(page)) return Promise.resolve(CS.refs.get(page));
+    var local = localRef(page);
+    if (local) { CS.refs.set(page, local); return Promise.resolve(local); }
     if (CS.refq.has(page)) return CS.refq.get(page);
     var p = req('api/lantai/v1/read/' + CS.bookId + '/chapter/' + page + '?images=url&w=0')
       .then(function (dto) {
@@ -2436,6 +2590,13 @@
       CS.panX = 0; CS.panY = 0;
       applyVars();
     });
+    ['cmTop', 'cmBot', 'cmSide', 'cmThumbs'].forEach(function (id) {
+      var n = $(id); if (!n) return;
+      n.addEventListener('pointerenter', function () { CS.barHover = true; clearTimeout(CS.offTimer); });
+      n.addEventListener('pointerleave', function () { CS.barHover = false; bumpIdle(); });
+      n.addEventListener('pointerdown', function () { bumpIdle(); });
+    });
+    wireStrip($('cmStrip'));
     return r;
   }
 
@@ -2457,11 +2618,13 @@
     CS.total = b.pages > 0 ? b.pages : 0;
     CS.wantPage = Math.max(0, opts.page || immResume(bookId) || 0);
     CS.page = CS.wantPage || 1; CS.seen = CS.page;
-    CS.refs.clear(); CS.refq.clear(); CS.fails.clear();
+    CS.refs.clear(); CS.refq.clear(); CS.fails.clear(); CS.preloaded.clear();
     CS.anns = []; CS.zoom = 1; CS.panX = 0; CS.panY = 0; CS.tinted = '';
     CS.mode = PRE.mode; CS.dir = PRE.dir; CS.fit = PRE.fit; CS.quality = PRE.quality;
     CS.beats = 0; CS.started = false; CS.ptrs.clear(); CS.pinch = null; CS.drag = null;
     CS.preReady = false; clearTimeout(CS.preTimer); CS.preTimer = null;
+    CS.trackDrag = false; CS.tipAt = 0; CS.ver = 0; CS.barHover = false; CS.thumbs = false;
+    resetThumbs();
     CS.session = {
       id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'cm_' + bookId + '_' + Date.now(),
       book: bookId, dur: 0, pages: CS.page, dev: 'webui', devName: '网页端', start: Date.now(), end: Date.now(), offline: false
@@ -2489,6 +2652,7 @@
       if (!CS.open) return;
       CS.total = dto.total || CS.total;
       CS.book = Object.assign({}, CS.book, { title: dto.book.title, name: dto.book.title, seriesTitle: dto.book.seriesTitle, profile: dto.book.profile });
+      CS.ver = dto.book.modified || 0;
       var rd = dto.book.readingDirection;
       if (rd === 'RTL') CS.dir = 'RTL';
       else if (rd !== 'TTB' && rd !== 'WEBTOON') CS.dir = 'LTR';
@@ -2522,6 +2686,8 @@
     clearTimeout(CS.progTimer); clearTimeout(CS.offTimer); clearTimeout(CS.idle); clearTimeout(CS.preTimer);
     CS.preTimer = null; CS.preReady = false;
     if (CS.flowObserver) { CS.flowObserver.disconnect(); CS.flowObserver = null; }
+    stopThumbWatch();
+    CS.barHover = false;
     releaseWake();
     var r = $('cm');
     if (r) { r.classList.remove('on'); r.remove(); }
@@ -2589,6 +2755,10 @@
     img.decoding = 'async';
     box.appendChild(img);
     box.appendChild(el('div', 'cm-ann'));
+    if (!CS.refs.has(page)) {
+      var local = localRef(page);
+      if (local) CS.refs.set(page, local);
+    }
     if (CS.refs.has(page)) setSrc(box, page);
     else {
       img.style.display = 'none';
@@ -2663,16 +2833,26 @@
     if (!CS.open || !CS.started) return;
     CS.preReady = false;
     if (CS.mode === 'webtoon' || CS.mode === 'paged') renderFlow();
-    else renderPaged();
+    else renderPaged(true);
     paintBot();
     paintThumbs();
     schedulePreload(3000);
   }
 
-  function renderPaged() {
+  function renderPaged(force) {
     var stage = $('cmStage');
     var pages = spreadPages(CS.page);
-    var frame = el('div', 'cm-frame out' + (pages.length > 1 ? ' dual' : ''));
+    var key = pages.join(',');
+    var frame = force ? null : stage.querySelector('.cm-frame');
+    if (frame && frame.dataset.key === key) {
+      frame.classList.remove('out');
+      frame.style.transform = '';
+      CS.zoom = 1; CS.panX = 0; CS.panY = 0;
+      applyVars();
+      return;
+    }
+    frame = el('div', 'cm-frame out' + (pages.length > 1 ? ' dual' : ''));
+    frame.dataset.key = key;
     pages.forEach(function (p) { frame.appendChild(pageBox(p, false)); });
     stage.innerHTML = '';
     stage.appendChild(frame);
@@ -2743,7 +2923,7 @@
       paintBot();
     } else paintBotLight();
     paintThumbs();
-    if (changed) { queueProgress(); preload(); }
+    if (changed) { queueProgress(); if (!CS.trackDrag) preload(); }
     if (!silent) bumpIdle();
   }
 
@@ -2755,7 +2935,7 @@
   }
 
   function preload() {
-    if (!CS.open || !CS.preReady) return;
+    if (!CS.open || !CS.preReady || CS.trackDrag) return;
     var n = PRE.preload || 0;
     if (!n || CS.mode === 'webtoon' || CS.mode === 'paged') return;
     var pages = spreadPages(CS.page);
@@ -2763,10 +2943,13 @@
     for (var i = 1; i <= n; i++) { list.push(pages[pages.length - 1] + i); list.push(pages[0] - i); }
     list.forEach(function (p) {
       if (p < 1 || p > CS.total) return;
+      var key = p + '@' + CS.quality;
+      if (CS.preloaded.has(key)) return;
+      CS.preloaded.add(key);
       ensureRef(p).then(function () {
         var im = new Image();
         im.src = imgUrl(p);
-      }).catch(function () { });
+      }).catch(function () { CS.preloaded.delete(key); });
     });
   }
 
@@ -2898,26 +3081,42 @@
       var r = tr.getBoundingClientRect();
       return Math.max(1, Math.round(clamp((ev.clientX - r.left) / r.width, 0, 1) * CS.total));
     };
+    var showTip = function (page, ev) {
+      if (!tip) return;
+      var r = tr.getBoundingClientRect();
+      tip.classList.add('on');
+      tip.style.left = clamp(ev.clientX - r.left, 62, r.width - 62) + 'px';
+      if (CS.tipAt === page) return;
+      CS.tipAt = page;
+      tip.innerHTML = '<img src="' + base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + page + '?w=120' + verQ() + '" alt=""><span>第 ' + page + ' 页</span>';
+    };
+    var preview = function (page, ev) {
+      CS.page = page;
+      CS.seen = Math.max(CS.seen, page);
+      paintBotLight();
+      paintThumbs();
+      showTip(page, ev);
+    };
     tr.onmousedown = function (ev) {
       ev.preventDefault();
+      CS.trackDrag = true;
       var last = seek(ev);
-      goto(last);
-      var move = function (e2) { last = seek(e2); goto(last, true); };
+      preview(last, ev);
+      var move = function (e2) { last = seek(e2); preview(last, e2); };
       var up = function () {
         document.removeEventListener('mousemove', move);
         document.removeEventListener('mouseup', up);
+        CS.trackDrag = false;
         goto(last);
+        queueProgress();
+        preload();
       };
       document.addEventListener('mousemove', move);
       document.addEventListener('mouseup', up);
     };
     tr.onmousemove = function (ev) {
       if (!tip) return;
-      var page = seek(ev);
-      var r = tr.getBoundingClientRect();
-      tip.classList.add('on');
-      tip.style.left = clamp(ev.clientX - r.left, 62, r.width - 62) + 'px';
-      tip.innerHTML = '<img src="' + base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + page + '?w=120" alt=""><span>第 ' + page + ' 页</span>';
+      showTip(seek(ev), ev);
     };
     tr.onmouseleave = function () { if (tip) tip.classList.remove('on'); };
   }
@@ -2926,7 +3125,7 @@
     var i = QS.findIndex(function (x) { return x[0] === CS.quality; });
     i = (i + 1) % QS.length;
     CS.quality = QS[i][0]; PRE.quality = CS.quality; savePrefs();
-    CS.refs.clear(); CS.refq.clear(); CS.fails.clear();
+    CS.refs.clear(); CS.refq.clear(); CS.fails.clear(); CS.preloaded.clear();
     renderAll(); paintBot();
     toast('画质：' + QS[i][1] + (CS.quality ? '（宽 ' + CS.quality + 'px）' : '（原图直出）'), 'ok');
   }
@@ -2946,6 +3145,144 @@
     bumpIdle();
   }
 
+  var TH_PAD = 320;
+  var TH_LEAD = 8;
+  var TH_DRAG_MIN = 6;
+  var TH_CLICK_SLOP = 10;
+
+  function wireStrip(strip) {
+    if (!strip || strip.dataset.wired) return;
+    strip.dataset.wired = '1';
+    var st = null;
+    var stop = function (ev) {
+      if (!st || (ev && ev.pointerId !== st.id)) return;
+      if (st.on) {
+        strip.classList.remove('thdrag');
+        CS.thMoved = Date.now();
+        try { strip.releasePointerCapture(st.id); } catch (e) { }
+      }
+      st = null;
+    };
+    strip.addEventListener('pointerdown', function (ev) {
+      CS.thDown = { x: ev.clientX, y: ev.clientY };
+      if (ev.pointerType === 'touch' || ev.button !== 0) return;
+      st = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, sl: strip.scrollLeft, on: false };
+    });
+    strip.addEventListener('pointermove', function (ev) {
+      if (!st || ev.pointerId !== st.id) return;
+      var dx = ev.clientX - st.x;
+      var dy = ev.clientY - st.y;
+      if (!st.on) {
+        if (Math.abs(dx) < TH_DRAG_MIN || Math.abs(dx) < Math.abs(dy)) return;
+        st.on = true;
+        strip.classList.add('thdrag');
+        try { strip.setPointerCapture(ev.pointerId); } catch (e) { }
+      }
+      strip.scrollLeft = st.sl - dx;
+    });
+    strip.addEventListener('pointerup', stop);
+    strip.addEventListener('pointercancel', stop);
+    strip.addEventListener('dragstart', function (ev) { ev.preventDefault(); });
+    strip.addEventListener('click', function (ev) {
+      var c = ev.target.closest ? ev.target.closest('.cm-th') : null;
+      if (!c) return;
+      var down = CS.thDown;
+      CS.thDown = null;
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (CS.thMoved && Date.now() - CS.thMoved < 320) return;
+      if (down) {
+        var dx = ev.clientX - down.x;
+        var dy = ev.clientY - down.y;
+        if (Math.abs(dx) > TH_CLICK_SLOP && Math.abs(dx) > Math.abs(dy)) return;
+      }
+      if (!c.dataset.p) return;
+      goto(+c.dataset.p);
+    }, true);
+    strip.addEventListener('wheel', function (ev) {
+      if (Math.abs(ev.deltaX) >= Math.abs(ev.deltaY)) return;
+      if (strip.scrollWidth <= strip.clientWidth) return;
+      ev.preventDefault();
+      strip.scrollLeft += ev.deltaMode === 1 ? ev.deltaY * 16 : ev.deltaY;
+    }, { passive: false });
+  }
+
+  function thumbUrl(p) {
+    return base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + p + '?w=120' + verQ();
+  }
+
+  function fillThumb(c) {
+    if (!c || c.dataset.loaded || !c.dataset.src) return;
+    c.dataset.loaded = '1';
+    var im = el('img');
+    im.loading = 'lazy';
+    im.alt = '';
+    im.onload = function () { c.classList.add('ok'); };
+    im.src = c.dataset.src;
+    c.insertBefore(im, c.firstChild);
+  }
+
+  function primeThumbs() {
+    if (!CS.thumbs) return;
+    var strip = $('cmStrip'); if (!strip) return;
+    var kids = strip.children, n = CS.total, p = CS.page, i;
+    for (i = 0; i < TH_LEAD; i++) {
+      if (p + i <= n) fillThumb(kids[p + i - 1]);
+      if (i && p - i >= 1) fillThumb(kids[p - i - 1]);
+    }
+  }
+
+  function stopThumbWatch() {
+    if (CS.thIO) { CS.thIO.disconnect(); CS.thIO = null; }
+    if (CS.thTick) {
+      var strip = $('cmStrip');
+      if (strip) strip.removeEventListener('scroll', CS.thTick);
+      window.removeEventListener('resize', CS.thTick);
+      CS.thTick = null;
+    }
+  }
+
+  function thumbWatch() {
+    var strip = $('cmStrip'); if (!strip) return;
+    stopThumbWatch();
+    if (typeof IntersectionObserver === 'function') {
+      var io = new IntersectionObserver(function (list) {
+        list.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          fillThumb(e.target);
+          io.unobserve(e.target);
+        });
+      }, { root: strip, rootMargin: '0px ' + TH_PAD + 'px' });
+      CS.thIO = io;
+      [].slice.call(strip.children).forEach(function (c) { io.observe(c); });
+      return;
+    }
+    var tick = null;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 60); };
+    var scan = function () {
+      tick = null;
+      var kids = strip.children;
+      if (!kids.length) return;
+      var x0 = kids[0].offsetLeft;
+      var step = kids.length > 1 ? kids[1].offsetLeft - x0 : 82;
+      if (!(step > 0)) step = 82;
+      var from = Math.max(0, Math.floor((strip.scrollLeft - TH_PAD - x0) / step));
+      var to = Math.min(kids.length - 1, Math.ceil((strip.scrollLeft + strip.clientWidth + TH_PAD - x0) / step));
+      for (var i = from; i <= to; i++) fillThumb(kids[i]);
+    };
+    var queue = function () { if (!tick) tick = raf(scan); };
+    CS.thTick = queue;
+    strip.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    queue();
+  }
+
+  function resetThumbs() {
+    stopThumbWatch();
+    var strip = $('cmStrip');
+    if (strip) { strip.dataset.total = ''; strip.innerHTML = ''; }
+  }
+
   function paintThumbs() {
     if (!CS.thumbs) return;
     var strip = $('cmStrip'); if (!strip) return;
@@ -2955,11 +3292,13 @@
       strip.dataset.total = String(CS.total);
       var html = '';
       for (var p = 1; p <= CS.total; p++) {
-        html += '<div class="cm-th" data-p="' + p + '"><img loading="lazy" src="' + base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + p + '?w=120" alt=""><b>' + p + '</b></div>';
+        html += '<div class="cm-th" data-p="' + p + '" data-src="' + thumbUrl(p) + '"><b>' + p + '</b></div>';
       }
       strip.innerHTML = html;
-      all('#cmStrip .cm-th').forEach(function (c) { c.onclick = function () { goto(+c.dataset.p); }; });
+      wireStrip(strip);
+      thumbWatch();
     }
+    primeThumbs();
     var cur = spreadPages(CS.page);
     all('#cmStrip .cm-th').forEach(function (c) {
       var p = +c.dataset.p;
@@ -3388,10 +3727,18 @@
     bumpIdle();
   }
 
+  function barHold() {
+    return CS.barHover || CS.trackDrag;
+  }
+
   function bumpIdle() {
     clearTimeout(CS.offTimer);
+    CS.offTimer = null;
+    if (barHold()) return;
     CS.offTimer = setTimeout(function () {
+      CS.offTimer = null;
       if (!CS.open || CS.thumbs || CS.side) return;
+      if (barHold()) return;
       var top = $('cmTop'), bot = $('cmBot');
       if (top) top.classList.add('off');
       if (bot) bot.classList.add('off');

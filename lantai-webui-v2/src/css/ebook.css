@@ -50,6 +50,9 @@
   box-shadow:0 0 0 3px color-mix(in srgb,var(--eb-acc) 22%,transparent);opacity:0;transition:opacity .15s}
 .eb-track:hover .knob{opacity:1}
 .eb-track .tick{position:absolute;top:calc(50% - 5px);width:1px;height:10px;background:var(--eb-line)}
+.eb-track{touch-action:none}
+.eb-track.drag .fill{transition:none}
+.eb-track.drag .knob{opacity:1;box-shadow:0 0 0 5px color-mix(in srgb,var(--eb-acc) 26%,transparent)}
 .eb-panel{position:absolute;top:48px;bottom:34px;z-index:16;display:flex;flex-direction:column;background:var(--eb-card);
   color:var(--eb-tx);box-shadow:var(--eb-shadow);transition:transform .28s cubic-bezier(.22,.84,.28,1)}
 .eb-panel.l{left:0;width:var(--eb-side);border-right:1px solid var(--eb-line);transform:translateX(-102%)}

@@ -116,7 +116,7 @@ class LantaiScrapeAgentController(
         expiresDate = expires,
       )
     apiTokenRepository.insert(token)
-    return apiTokenRepository.findByIdOrNull(token.id)?.toDto() ?: token.toDto()
+    return token.toDto(token.tokenValue)
   }
 
   @DeleteMapping("token/{id}")
@@ -133,11 +133,14 @@ class LantaiScrapeAgentController(
     apiTokenRepository.deleteById(id)
   }
 
-  private fun ApiToken.toDto() =
+  private fun maskValue(raw: String): String =
+    if (raw.length <= 12) "****" else raw.take(10) + "…" + raw.takeLast(4)
+
+  private fun ApiToken.toDto(plainValue: String? = null) =
     ScrapeAgentTokenDto(
       id = id,
       name = name,
-      value = tokenValue,
+      value = plainValue ?: maskValue(tokenValue),
       enabled = enabled,
       expiresDate = expiresDate?.toString(),
       lastUsedDate = lastUsedDate?.toString(),

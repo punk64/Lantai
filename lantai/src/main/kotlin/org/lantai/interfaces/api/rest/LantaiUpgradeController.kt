@@ -2,8 +2,8 @@ package org.lantai.interfaces.api.rest
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.lantai.infrastructure.upgrade.UpgradeAccepted
 import org.lantai.infrastructure.upgrade.UpgradeApply
-import org.lantai.infrastructure.upgrade.UpgradeInspect
 import org.lantai.infrastructure.upgrade.UpgradeProgress
 import org.lantai.infrastructure.upgrade.UpgradeService
 import org.lantai.infrastructure.upgrade.UpgradeStatus
@@ -32,10 +32,10 @@ class LantaiUpgradeController(
 
   @PostMapping(value = ["inspect"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Upload an upgrade package and validate it without touching the running jar")
+  @Operation(summary = "Upload an upgrade package; validation runs in the background")
   fun inspect(
     @RequestPart("file") file: MultipartFile,
-  ): UpgradeInspect = upgradeService.inspect(file)
+  ): UpgradeAccepted = upgradeService.inspect(file)
 
   @GetMapping(value = ["inspect/status"], produces = [MediaType.APPLICATION_JSON_VALUE])
   @PreAuthorize("hasRole('ADMIN')")

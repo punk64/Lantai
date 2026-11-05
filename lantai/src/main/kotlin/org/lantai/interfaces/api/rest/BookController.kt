@@ -140,6 +140,7 @@ class BookController(
     releasedAfter: LocalDate? = null,
     @RequestParam(name = "tag", required = false) tags: List<String>? = null,
     @RequestParam(name = "deleted", required = false) deleted: Boolean? = null,
+    @RequestParam(name = "readerView", required = false) readerView: Boolean = false,
     @RequestParam(name = "unpaged", required = false) unpaged: Boolean = false,
     @Parameter(hidden = true) page: Pageable,
   ): Page<BookDto> {
@@ -176,7 +177,7 @@ class BookController(
       )
 
     return bookDtoRepository
-      .findAll(bookSearch, SearchContext(principal.user), pageRequest)
+      .findAll(bookSearch, SearchContext(principal.user, readerView), pageRequest)
       .map { it.restrictUrl(!principal.user.isAdmin) }
   }
 
@@ -186,6 +187,7 @@ class BookController(
   fun getBooks(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @RequestBody search: BookSearch,
+    @RequestParam(name = "readerView", required = false) readerView: Boolean = false,
     @RequestParam(name = "unpaged", required = false) unpaged: Boolean = false,
     @Parameter(hidden = true) page: Pageable,
   ): Page<BookDto> {
@@ -207,7 +209,7 @@ class BookController(
         )
 
     return bookDtoRepository
-      .findAll(search, SearchContext(principal.user), pageRequest)
+      .findAll(search, SearchContext(principal.user, readerView), pageRequest)
       .map { it.restrictUrl(!principal.user.isAdmin) }
   }
 
@@ -216,6 +218,7 @@ class BookController(
   @GetMapping("api/v1/books/latest")
   fun getBooksLatest(
     @AuthenticationPrincipal principal: LantaiPrincipal,
+    @RequestParam(name = "readerView", required = false) readerView: Boolean = false,
     @RequestParam(name = "unpaged", required = false) unpaged: Boolean = false,
     @Parameter(hidden = true) page: Pageable,
   ): Page<BookDto> {
@@ -233,7 +236,7 @@ class BookController(
 
     return bookDtoRepository
       .findAll(
-        SearchContext(principal.user),
+        SearchContext(principal.user, readerView),
         pageRequest,
       ).map { it.restrictUrl(!principal.user.isAdmin) }
   }
@@ -244,6 +247,7 @@ class BookController(
   fun getBooksOnDeck(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @RequestParam(name = "library_id", required = false) libraryIds: List<String>? = null,
+    @RequestParam(name = "readerView", required = false) readerView: Boolean = false,
     @Parameter(hidden = true) page: Pageable,
   ): Page<BookDto> =
     bookDtoRepository
@@ -252,6 +256,7 @@ class BookController(
         principal.user.getAuthorizedLibraryIds(libraryIds),
         page,
         principal.user.restrictions,
+        readerView,
       ).map { it.restrictUrl(!principal.user.isAdmin) }
 
   @Operation(summary = "List duplicate books", description = "Return books that have the same file hash.", tags = [OpenApiConfiguration.TagNames.BOOKS])

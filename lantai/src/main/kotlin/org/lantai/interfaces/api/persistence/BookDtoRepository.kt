@@ -54,10 +54,16 @@ interface BookDtoRepository {
     filterOnLibraryIds: Collection<String>?,
     pageable: Pageable,
     restrictions: ContentRestrictions = ContentRestrictions(),
+    readerView: Boolean = false,
   ): Page<BookDto>
 
   fun findAllDuplicates(
     userId: String,
     pageable: Pageable,
   ): Page<BookDto>
+
+  fun findAllByIds(
+    ids: Collection<String>,
+    context: SearchContext,
+  ): List<BookDto>
 }

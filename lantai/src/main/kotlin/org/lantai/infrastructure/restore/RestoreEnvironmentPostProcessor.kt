@@ -9,6 +9,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
+import java.security.MessageDigest
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Properties
@@ -44,18 +45,49 @@ class RestoreEnvironmentPostProcessor : EnvironmentPostProcessor, Ordered {
     }
     val backup = STAMP_FORMAT.format(LocalDateTime.now())
     try {
+      verifyPayload(payload)
       replaceDatabase(environment, "lantai.database.file", payload.resolve("db/database.sqlite"), backup)
       replaceDatabase(environment, "lantai.tasks-db.file", payload.resolve("db/tasks.sqlite"), backup)
       replaceDatabase(environment, "lantai.sessions-db.file", payload.resolve("db/sessions.sqlite"), backup)
       copyTree(payload.resolve("config/profile"), root.resolve("profile"))
       copyTree(payload.resolve("config/runtime"), root.resolve("runtime"))
-      copyConfigFiles(payload.resolve("config"), root)
       copyTree(payload.resolve("suwayomi"), root.resolveSibling("suwayomi"))
       Files.deleteIfExists(pending)
       note(root, "还原完成，包时间戳 $stamp，原数据已备份为 pre-restore-$backup")
     } catch (e: Exception) {
       note(root, "还原失败（包 $stamp）：${e.message}")
     }
+  }
+
+  private fun verifyPayload(payload: Path) {
+    val manifest = payload.resolve("manifest.json")
+    if (!Files.isRegularFile(manifest)) throw IllegalStateException("备份包缺少 manifest.json")
+    val node = runCatching { MAPPER.readTree(Files.readString(manifest)) }.getOrElse { throw IllegalStateException("manifest.json 无法解析") }
+    val entries = node.path("entries")
+    if (!entries.isArray || entries.size() == 0) throw IllegalStateException("manifest.json 缺少文件清单")
+    entries.forEach { entry ->
+      val rel = entry.path("path").asText("").trim()
+      if (rel.isEmpty()) throw IllegalStateException("manifest.json 条目缺少路径")
+      val file = payload.resolve(rel).normalize()
+      if (!file.startsWith(payload)) throw IllegalStateException("manifest.json 路径越界：$rel")
+      if (!Files.isRegularFile(file)) throw IllegalStateException("备份包缺少文件：$rel")
+      val expected = entry.path("sha256").asText("").trim()
+      if (expected.isEmpty()) throw IllegalStateException("manifest.json 条目缺少校验值：$rel")
+      if (!sha256(file).equals(expected, ignoreCase = true)) throw IllegalStateException("备份包文件校验失败：$rel")
+    }
+  }
+
+  private fun sha256(file: Path): String {
+    val digest = MessageDigest.getInstance("SHA-256")
+    Files.newInputStream(file).use { input ->
+      val buffer = ByteArray(64 * 1024)
+      while (true) {
+        val read = input.read(buffer)
+        if (read <= 0) break
+        digest.update(buffer, 0, read)
+      }
+    }
+    return digest.digest().joinToString("") { ((it.toInt() and 0xFF) + 0x100).toString(16).substring(1) }
   }
 
   private fun configDir(environment: ConfigurableEnvironment): Path {
@@ -91,15 +123,6 @@ class RestoreEnvironmentPostProcessor : EnvironmentPostProcessor, Ordered {
     }
   }
 
-  private fun copyConfigFiles(source: Path, target: Path) {
-    if (!Files.isDirectory(source)) return
-    Files.list(source).use { stream ->
-      stream
-        .filter { Files.isRegularFile(it) && YAML.matches(it.fileName.toString()) }
-        .forEach { Files.copy(it, target.resolve(it.fileName.toString()), StandardCopyOption.REPLACE_EXISTING) }
-    }
-  }
-
   private fun note(root: Path, message: String) {
     runCatching {
       Files.createDirectories(root)
@@ -113,10 +136,10 @@ class RestoreEnvironmentPostProcessor : EnvironmentPostProcessor, Ordered {
   }
 
   companion object {
+    private val MAPPER = com.fasterxml.jackson.databind.ObjectMapper()
     private const val PENDING_FILE = "restore.pending"
     private const val LOG_FILE = "restore.log"
     private val STAMP: Regex = Regex("\\d{8}-\\d{6}-\\d{3}")
     private val STAMP_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS")
-    private val YAML: Regex = Regex("application.*\\.ya?ml")
   }
 }

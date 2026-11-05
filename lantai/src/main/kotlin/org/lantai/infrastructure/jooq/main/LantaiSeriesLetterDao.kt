@@ -12,14 +12,22 @@ class LantaiSeriesLetterDao(
   dslRW: DSLContext,
   @Qualifier("dslContextRO") dslRO: DSLContext,
 ) : SplitDslDaoBase(dslRW, dslRO) {
+  private val s = Tables.SERIES
   private val d = Tables.SERIES_METADATA
 
-  fun idsByLetter(letter: String): List<String> {
+  fun idsByLetter(
+    letter: String,
+    libraryId: String? = null,
+  ): List<String> {
     val key = SeriesFirstLetter.normalizeLetter(letter)
+    var condition = d.FIRST_LETTER.eq(key).and(s.DELETED_DATE.isNull)
+    if (!libraryId.isNullOrBlank()) condition = condition.and(s.LIBRARY_ID.eq(libraryId))
     return dslRO
       .select(d.SERIES_ID)
       .from(d)
-      .where(d.FIRST_LETTER.eq(key))
+      .join(s)
+      .on(s.ID.eq(d.SERIES_ID))
+      .where(condition)
       .fetch(d.SERIES_ID)
   }
 

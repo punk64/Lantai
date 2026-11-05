@@ -1,7 +1,6 @@
 package org.lantai.application.tasks
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.lantai.application.query.UnpagedSorted
 import org.lantai.domain.model.Book
 import org.lantai.domain.model.BookMetadataPatchCapability
 import org.lantai.domain.model.BookPageNumbered
@@ -15,6 +14,7 @@ import org.lantai.domain.persistence.BookRepository
 import org.lantai.domain.service.BookConverter
 import org.lantai.infrastructure.search.LuceneEntity
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
@@ -30,7 +30,7 @@ class TaskEmitter(
   fun scanLibrary(
     libraryId: String,
     scanDeep: Boolean = false,
-    priority: Int = DEFAULT_PRIORITY,
+    priority: Int = HIGH_PRIORITY,
   ) {
     submitTask(Task.ScanLibrary(libraryId, scanDeep, priority))
   }
@@ -43,20 +43,28 @@ class TaskEmitter(
   }
 
   fun analyzeUnknownAndOutdatedBooks(library: Library) {
-    bookRepository
-      .findAll(
-        SearchCondition.AllOfBook(
-          SearchCondition.LibraryId(SearchOperator.Is(library.id)),
-          SearchCondition.AnyOfBook(
-            SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.UNKNOWN)),
-            SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.OUTDATED)),
-          ),
+    analyzeNextBook(library.id, LOW_PRIORITY)
+  }
+
+  fun analyzeNextBook(
+    libraryId: String,
+    priority: Int = LOW_PRIORITY,
+  ) {
+    if (libraryId.isBlank()) return
+    val condition =
+      SearchCondition.AllOfBook(
+        SearchCondition.LibraryId(SearchOperator.Is(libraryId)),
+        SearchCondition.AnyOfBook(
+          SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.UNKNOWN)),
+          SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.OUTDATED)),
         ),
-        SearchContext.empty(),
-        UnpagedSorted(Sort.by(Sort.Order.asc("seriesId"), Sort.Order.asc("number"))),
-      ).content
-      .map { Task.AnalyzeBook(it.id, groupId = it.seriesId) }
-      .let { submitTasks(it) }
+      )
+    val sort = Sort.by(Sort.Order.asc("seriesId"), Sort.Order.asc("number"))
+    bookRepository
+      .findAll(condition, SearchContext.empty(), PageRequest.of(0, 1, sort))
+      .content
+      .firstOrNull()
+      ?.let { submitTask(Task.AnalyzeBook(it.id, priority, it.seriesId, libraryId)) }
   }
 
   fun hashBooksWithoutHash(library: Library) {
@@ -146,7 +154,7 @@ class TaskEmitter(
     book: Book,
     priority: Int = DEFAULT_PRIORITY,
   ) {
-    submitTask(Task.AnalyzeBook(book.id, priority, book.seriesId))
+    submitTask(Task.AnalyzeBook(book.id, priority, book.seriesId, book.libraryId))
   }
 
   fun analyzeBook(
@@ -154,7 +162,7 @@ class TaskEmitter(
     priority: Int = DEFAULT_PRIORITY,
   ) {
     books
-      .map { Task.AnalyzeBook(it.id, priority, it.seriesId) }
+      .map { Task.AnalyzeBook(it.id, priority, it.seriesId, it.libraryId) }
       .let { submitTasks(it) }
   }
 

@@ -67,6 +67,17 @@ class LantaiTaskQueryDao(
 
   fun deleteById(id: String): Int = dslRW.deleteFrom(t).where(t.ID.eq(id)).execute()
 
+  fun updatePriority(
+    id: String,
+    priority: Int,
+  ): Int =
+    dslRW
+      .update(t)
+      .set(t.PRIORITY, priority)
+      .where(t.ID.eq(id))
+      .and(t.OWNER.isNull)
+      .execute()
+
   fun deleteQueued(): Int = dslRW.deleteFrom(t).where(t.OWNER.isNull).execute()
 
   private fun filters(

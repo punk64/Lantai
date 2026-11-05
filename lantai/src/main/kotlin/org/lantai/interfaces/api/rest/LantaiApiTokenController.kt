@@ -60,7 +60,7 @@ class LantaiApiTokenController(
         expiresDate = expiresDate,
       )
     apiTokenRepository.insert(token)
-    return apiTokenRepository.findByIdOrNull(token.id)?.toDto() ?: token.toDto()
+    return token.toDto(token.tokenValue)
   }
 
   @PatchMapping("{id}")
@@ -124,12 +124,15 @@ class LantaiApiTokenController(
     return parsed
   }
 
-  private fun ApiToken.toDto(): ApiTokenDto {
+  private fun maskValue(raw: String): String =
+    if (raw.length <= 12) "****" else raw.take(10) + "…" + raw.takeLast(4)
+
+  private fun ApiToken.toDto(plainValue: String? = null): ApiTokenDto {
     val owner = userRepository.findByIdOrNull(ownerId)
     return ApiTokenDto(
       id = id,
       name = name,
-      value = tokenValue,
+      value = plainValue ?: maskValue(tokenValue),
       scopes = scopes.map { it.label }.sorted(),
       enabled = enabled,
       expiresDate = expiresDate,

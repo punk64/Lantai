@@ -594,6 +594,7 @@ class SeriesController(
     @RequestParam(name = "read_status", required = false) readStatus: List<ReadStatus>? = null,
     @RequestParam(name = "tag", required = false) tags: List<String>? = null,
     @RequestParam(name = "deleted", required = false) deleted: Boolean? = null,
+    @RequestParam(name = "readerView", required = false) readerView: Boolean = false,
     @RequestParam(name = "unpaged", required = false) unpaged: Boolean = false,
     @Parameter(hidden = true) @Authors authors: List<Author>? = null,
     @Parameter(hidden = true) page: Pageable,
@@ -632,7 +633,7 @@ class SeriesController(
     return bookDtoRepository
       .findAll(
         search,
-        SearchContext(principal.user),
+        SearchContext(principal.user, readerView),
         pageRequest,
       ).map { it.restrictUrl(!principal.user.isAdmin) }
   }

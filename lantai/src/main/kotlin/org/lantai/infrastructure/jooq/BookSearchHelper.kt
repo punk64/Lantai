@@ -23,8 +23,16 @@ class BookSearchHelper(
   fun toCondition(searchCondition: SearchCondition.Book?): Pair<Condition, Set<RequiredJoin>> {
     val base = toCondition()
     val search = toConditionInternal(searchCondition)
-    return search.first.and(base.first) to (search.second + base.second)
+    val reader = readerCondition()
+    return search.first.and(base.first).and(reader.first) to (search.second + base.second + reader.second)
   }
+
+  private fun readerCondition(): Pair<Condition, Set<RequiredJoin>> =
+    if (!context.readerView) {
+      DSL.noCondition() to emptySet()
+    } else {
+      Tables.MEDIA.STATUS.`in`(Media.Status.READY.name, Media.Status.UNSUPPORTED.name) to setOf(RequiredJoin.Media)
+    }
 
   fun toCondition(): Pair<Condition, Set<RequiredJoin>> {
     val restrictions = ContentRestrictionsSearchHelper(context.restrictions).toCondition()

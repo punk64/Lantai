@@ -84,12 +84,23 @@ class TaskHandler(
               libraryContentLifecycle.emptyTrash(library)
             } ?: logger.warn { "Cannot execute task $task: Library does not exist" }
 
-          is Task.AnalyzeBook ->
-            bookRepository.findByIdOrNull(task.bookId)?.takeIf { ensureBookFile(it) }?.let { book ->
-              val actions = bookLifecycle.analyzeAndPersist(book)
-              if (actions.contains(BookAction.GENERATE_THUMBNAIL)) taskEmitter.generateBookThumbnail(book.id, priority = task.priority + 1)
-              if (actions.contains(BookAction.REFRESH_METADATA)) taskEmitter.refreshBookMetadata(book, priority = task.priority + 1)
-            } ?: logger.warn { "Cannot execute task $task: Book does not exist" }
+          is Task.AnalyzeBook -> {
+            val book = bookRepository.findByIdOrNull(task.bookId)?.takeIf { ensureBookFile(it) }
+            try {
+              if (book == null) {
+                logger.warn { "Cannot execute task $task: Book does not exist" }
+              } else {
+                val actions = bookLifecycle.analyzeAndPersist(book)
+                if (actions.contains(BookAction.GENERATE_THUMBNAIL)) taskEmitter.generateBookThumbnail(book.id, priority = task.priority + 1)
+                if (actions.contains(BookAction.REFRESH_METADATA)) taskEmitter.refreshBookMetadata(book, priority = task.priority + 1)
+              }
+            } catch (e: Exception) {
+              if (book != null) bookLifecycle.markAnalysisFailed(book)
+              throw e
+            } finally {
+              runCatching { taskEmitter.analyzeNextBook(book?.libraryId ?: task.libraryId, task.priority) }
+            }
+          }
 
           is Task.GenerateBookThumbnail ->
             bookRepository.findByIdOrNull(task.bookId)?.takeIf { ensureBookFile(it) }?.let { book ->

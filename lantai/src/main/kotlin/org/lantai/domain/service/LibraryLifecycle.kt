@@ -20,6 +20,7 @@ import java.io.FileNotFoundException
 import java.nio.file.Files
 
 private val logger = KotlinLogging.logger {}
+private const val DELETE_BATCH = 100
 
 @Service
 class LibraryLifecycle(
@@ -45,7 +46,7 @@ class LibraryLifecycle(
     checkLibraryValidity(library, existing)
 
     libraryRepository.insert(library)
-    taskEmitter.scanLibrary(library.id)
+    taskEmitter.scanLibrary(library.id, priority = HIGHEST_PRIORITY)
 
     eventPublisher.publishEvent(DomainEvent.LibraryAdded(library))
 
@@ -126,8 +127,10 @@ class LibraryLifecycle(
     logger.info { "Deleting library: $library" }
 
     val series = seriesRepository.findAllByLibraryId(library.id)
+    logger.info { "Deleting ${series.size} series in batches of $DELETE_BATCH" }
+    series.chunked(DELETE_BATCH).forEach { batch -> seriesLifecycle.deleteMany(batch) }
+
     transactionTemplate.executeWithoutResult {
-      seriesLifecycle.deleteMany(series)
       sidecarRepository.deleteByLibraryId(library.id)
 
       libraryRepository.delete(library.id)

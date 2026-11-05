@@ -104,6 +104,13 @@ class BookLifecycle(
     return if (media.status == Media.Status.READY) setOf(BookAction.GENERATE_THUMBNAIL, BookAction.REFRESH_METADATA) else emptySet()
   }
 
+  fun markAnalysisFailed(book: Book) {
+    runCatching {
+      mediaRepository.update(Media(status = Media.Status.ERROR, comment = "ERR_TASK_FAILED", bookId = book.id))
+      eventPublisher.publishEvent(DomainEvent.BookUpdated(book))
+    }.onFailure { logger.warn(it) { "Could not mark book as failed: $book" } }
+  }
+
   fun hashAndPersist(book: Book) {
     if (!libraryRepository.findById(book.libraryId).hashFiles)
       return logger.info { "File hashing is disabled for the library, it may have changed since the task was submitted, skipping" }

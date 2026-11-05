@@ -23,4 +23,4 @@ EXPOSE 25600
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
   CMD wget -q --spider http://127.0.0.1:25600/ || exit 1
 
-ENTRYPOINT ["java", "-Dspring.profiles.include=docker", "-jar", "/app/application.jar"]
+ENTRYPOINT ["java", "-XX:+ExplicitGCInvokesConcurrent", "-Dspring.profiles.include=docker", "-jar", "/app/application.jar"]

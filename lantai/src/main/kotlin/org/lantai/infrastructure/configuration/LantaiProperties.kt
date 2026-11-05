@@ -71,7 +71,7 @@ class LantaiProperties {
     var poolSize: Int? = null
 
     @get:Positive
-    var maxPoolSize: Int = 1
+    var maxPoolSize: Int = 6
 
     var journalMode: JournalMode? = JournalMode.WAL
 

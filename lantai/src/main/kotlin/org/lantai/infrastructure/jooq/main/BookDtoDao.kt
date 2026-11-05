@@ -256,8 +256,9 @@ class BookDtoDao(
     filterOnLibraryIds: Collection<String>?,
     pageable: Pageable,
     restrictions: ContentRestrictions,
+    readerView: Boolean,
   ): Page<BookDto> {
-    val (query, sortField, _) = bookCommonDao.getBooksOnDeckQuery(userId, restrictions, filterOnLibraryIds, onDeckFields)
+    val (query, sortField, _) = bookCommonDao.getBooksOnDeckQuery(userId, restrictions, filterOnLibraryIds, onDeckFields, readerView)
 
     val count = if (pageable.isUnpaged) null else dslRO.fetchCount(query)
 
@@ -271,6 +272,22 @@ class BookDtoDao(
           .fetchAndMap(dslRO)
 
     return buildPage(dtos, pageable, count ?: dtos.size, Sort.unsorted())
+  }
+
+  override fun findAllByIds(
+    ids: Collection<String>,
+    context: SearchContext,
+  ): List<BookDto> {
+    requireNotNull(context.userId) { "Missing userId in search context" }
+    if (ids.isEmpty()) return emptyList()
+    val (conditions, joins) = BookSearchHelper(context).toCondition(null)
+    return findAll(
+      conditions.and(b.ID.`in`(ids)),
+      context.userId,
+      Pageable.unpaged(),
+      null,
+      joins,
+    ).content
   }
 
   override fun findAllDuplicates(

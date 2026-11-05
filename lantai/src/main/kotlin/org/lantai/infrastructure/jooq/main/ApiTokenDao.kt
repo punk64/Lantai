@@ -10,8 +10,11 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
+import java.security.MessageDigest
 import java.time.LocalDateTime
 import java.time.ZoneId
+
+private const val HASH_PREFIX = "sha512:"
 
 @Component
 class ApiTokenDao(
@@ -28,7 +31,7 @@ class ApiTokenDao(
       .set(q.ID, token.id)
       .set(q.USER_ID, token.ownerId)
       .set(q.NAME, token.name)
-      .set(q.TOKEN_VALUE, token.tokenValue)
+      .set(q.TOKEN_VALUE, hash(token.tokenValue))
       .set(q.SCOPES, token.scopes.joinToString(",") { it.label })
       .set(q.ENABLED, token.enabled)
       .set(q.EXPIRES_DATE, token.expiresDate?.atZone(ZoneId.systemDefault())?.withZoneSameInstant(ZoneId.of("Z"))?.toLocalDateTime())
@@ -57,12 +60,30 @@ class ApiTokenDao(
       .fetchOne()
       ?.toDomain()
 
-  override fun findByTokenValueOrNull(tokenValue: String): ApiToken? =
+  override fun findByTokenValueOrNull(tokenValue: String): ApiToken? {
+    val hashed = hash(tokenValue)
     dslRO
       .selectFrom(q)
-      .where(q.TOKEN_VALUE.eq(tokenValue))
+      .where(q.TOKEN_VALUE.eq(hashed))
       .fetchOne()
       ?.toDomain()
+      ?.let { return it }
+    val legacy =
+      dslRO
+        .selectFrom(q)
+        .where(q.TOKEN_VALUE.eq(tokenValue))
+        .fetchOne()
+        ?.toDomain()
+        ?: return null
+    runCatching {
+      dslRW
+        .update(q)
+        .set(q.TOKEN_VALUE, hashed)
+        .where(q.ID.eq(legacy.id))
+        .execute()
+    }
+    return legacy
+  }
 
   override fun findAll(): List<ApiToken> =
     dslRO
@@ -102,6 +123,17 @@ class ApiTokenDao(
       .where(q.ID.eq(id))
       .execute()
   }
+
+  private fun hash(raw: String): String =
+    if (raw.startsWith(HASH_PREFIX)) {
+      raw
+    } else {
+      HASH_PREFIX +
+        MessageDigest
+          .getInstance("SHA-512")
+          .digest(raw.toByteArray(Charsets.UTF_8))
+          .joinToString("") { ((it.toInt() and 0xFF) + 0x100).toString(16).substring(1) }
+    }
 
   private fun ApiTokenRecord.toDomain() =
     ApiToken(

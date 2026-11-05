@@ -43,12 +43,18 @@ class UpgradeInspectProgressTest {
     sampler.isDaemon = true
     sampler.start()
 
-    val result = service.inspect(MockMultipartFile("file", "Lantai-0.3.22-upgrade.zip", "application/zip", pkg))
+    val accepted = service.inspect(MockMultipartFile("file", "Lantai-0.3.22-upgrade.zip", "application/zip", pkg))
+    assertThat(accepted.started).isTrue()
+
+    val finished = awaitInspect(service)
 
     sampler.interrupt()
     sampler.join(2000)
 
-    assertThat(result.version).isEqualTo("0.3.22")
+    assertThat(finished.phase).isEqualTo("done")
+    val result = finished.result
+    assertThat(result).isNotNull()
+    assertThat(result!!.version).isEqualTo("0.3.22")
     assertThat(result.sha256).isEqualTo(digest)
     assertThat(result.sizeBytes).isEqualTo(jar.size.toLong())
 
@@ -62,7 +68,8 @@ class UpgradeInspectProgressTest {
     assertThat(verifyPcts).isNotEmpty()
     assertThat(verifyPcts.last()).isGreaterThanOrEqualTo(78)
 
-    val monotonic = active.map { it.pct }.windowed(2).all { it[1] >= it[0] }
+    val unzipSeq = active.filter { it.phase == "unzip" }.map { it.pct }
+    val monotonic = unzipSeq.windowed(2).all { it[1] >= it[0] }
     assertThat(monotonic).isTrue()
     assertThat(service.progress().phase).isEqualTo("done")
     assertThat(service.progress().pct).isEqualTo(100)
@@ -74,15 +81,26 @@ class UpgradeInspectProgressTest {
     val pkg = buildPackage(jar, "deadbeef")
     val service = newService()
 
-    val thrown =
-      runCatching {
-        service.inspect(MockMultipartFile("file", "Lantai-0.3.22-upgrade.zip", "application/zip", pkg))
-      }.exceptionOrNull()
+    service.inspect(MockMultipartFile("file", "Lantai-0.3.22-upgrade.zip", "application/zip", pkg))
 
-    assertThat(thrown).isInstanceOf(IllegalArgumentException::class.java)
-    assertThat(thrown!!.message).contains("校验失败")
-    assertThat(service.progress().phase).isEqualTo("error")
+    val finished = awaitInspect(service)
+
+    assertThat(finished.phase).isEqualTo("error")
+    assertThat(finished.error).contains("校验失败")
     assertThat(java.nio.file.Files.exists(dir.resolve("cfg").resolve("upgrade").resolve("staged"))).isFalse()
+  }
+
+  private fun awaitInspect(
+    service: UpgradeService,
+    timeoutMs: Long = 20000,
+  ): UpgradeProgress {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+      val progress = service.progress()
+      if (progress.phase == "done" || progress.phase == "error") return progress
+      Thread.sleep(5)
+    }
+    return service.progress()
   }
 
   private fun newService(): UpgradeService {

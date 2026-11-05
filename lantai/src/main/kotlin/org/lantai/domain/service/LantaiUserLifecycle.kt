@@ -40,12 +40,13 @@ class LantaiUserLifecycle(
     user: LantaiUser,
     newPassword: String,
     expireSessions: Boolean,
+    keepSessionId: String? = null,
   ) {
     logger.info { "Changing password for user ${user.email}" }
     val updatedUser = user.copy(password = passwordEncoder.encode(newPassword))
     userRepository.update(updatedUser)
 
-    if (expireSessions) expireSessions(updatedUser)
+    if (expireSessions) expireSessions(updatedUser, keepSessionId)
 
     eventPublisher.publishEvent(DomainEvent.UserUpdated(updatedUser, expireSessions))
   }
@@ -126,10 +127,14 @@ class LantaiUserLifecycle(
     eventPublisher.publishEvent(DomainEvent.UserUpdated(user, true))
   }
 
-  fun expireSessions(user: LantaiUser) {
+  fun expireSessions(
+    user: LantaiUser,
+    keepSessionId: String? = null,
+  ) {
     logger.info { "Expiring all sessions for user: ${user.email}" }
     sessionRegistry
       .getAllSessions(LantaiPrincipal(user), false)
+      .filter { keepSessionId == null || it.sessionId != keepSessionId }
       .forEach {
         logger.info { "Expiring session: ${it.sessionId}" }
         it.expireNow()

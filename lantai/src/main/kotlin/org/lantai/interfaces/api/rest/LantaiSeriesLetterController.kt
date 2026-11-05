@@ -23,7 +23,8 @@ class LantaiSeriesLetterController(
   @Operation(summary = "Series ids whose computed first letter matches")
   fun letterIds(
     @RequestParam(name = "letter") letter: String,
-  ): List<String> = lantaiSeriesLetterDao.idsByLetter(letter)
+    @RequestParam(name = "libraryId", required = false) libraryId: String? = null,
+  ): List<String> = lantaiSeriesLetterDao.idsByLetter(letter, libraryId)
 
   @PostMapping("letter-rebuild")
   @PreAuthorize("hasRole('ADMIN')")

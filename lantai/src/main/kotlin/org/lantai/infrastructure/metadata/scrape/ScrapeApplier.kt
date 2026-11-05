@@ -22,14 +22,19 @@ import org.lantai.domain.service.MetadataAggregator
 import org.lantai.domain.service.SeriesLifecycle
 import org.lantai.infrastructure.image.ImageAnalyzer
 import org.lantai.infrastructure.mediacontainer.ContentDetector
+import org.lantai.infrastructure.net.OutboundUrlGuard
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
 import java.time.LocalDate
+
+private const val MAX_COVER_BYTES = 16 * 1024 * 1024
 
 private val logger = KotlinLogging.logger {}
 
@@ -480,6 +485,9 @@ class ScrapeApplier(
   }
 
   private fun download(url: String): ByteArray {
+    val uri =
+      runCatching { OutboundUrlGuard.parse(url) }
+        .getOrElse { throw ScrapeException("封面地址不可用：${it.message}") }
     val client =
       HttpClient
         .newBuilder()
@@ -488,14 +496,37 @@ class ScrapeApplier(
         .build()
     val request =
       HttpRequest
-        .newBuilder(URI.create(url))
+        .newBuilder(uri)
         .timeout(Duration.ofSeconds(20))
         .header("User-Agent", "Mozilla/5.0 (compatible; Lantai/0.3)")
         .GET()
         .build()
-    val response = client.send(request, HttpResponse.BodyHandlers.ofByteArray())
-    if (response.statusCode() !in 200..299) throw ScrapeException("Cover download failed with ${response.statusCode()}")
-    return response.body()
+    val response = client.send(request, HttpResponse.BodyHandlers.ofInputStream())
+    if (response.statusCode() !in 200..299) {
+      response.body().close()
+      throw ScrapeException("Cover download failed with ${response.statusCode()}")
+    }
+    val type = response.headers().firstValue("content-type").orElse("").lowercase()
+    if (type.isNotEmpty() && !type.startsWith("image/")) {
+      response.body().close()
+      throw ScrapeException("Cover download did not return an image")
+    }
+    return response.body().use { readLimited(it, MAX_COVER_BYTES) }
+  }
+
+  private fun readLimited(
+    input: InputStream,
+    limit: Int,
+  ): ByteArray {
+    val out = ByteArrayOutputStream()
+    val buf = ByteArray(16 * 1024)
+    while (true) {
+      val n = input.read(buf)
+      if (n <= 0) break
+      out.write(buf, 0, n)
+      if (out.size() > limit) throw ScrapeException("Cover exceeds ${limit / 1024 / 1024} MB")
+    }
+    return out.toByteArray()
   }
 
   private fun bookIds(seriesId: String): List<String> = bookRepository.findAllBySeriesId(seriesId).map { it.id }

@@ -16,6 +16,7 @@ import org.lantai.infrastructure.security.apikey.HeaderApiKeyAuthenticationConve
 import org.lantai.infrastructure.security.apikey.UriRegexApiKeyAuthenticationConverter
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.actuate.health.HealthEndpoint
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
@@ -43,6 +44,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher
+import org.springframework.session.web.http.DefaultCookieSerializer
 
 @Configuration
 @EnableWebSecurity
@@ -62,6 +64,7 @@ class SecurityConfiguration(
   private val tokenEncoder: TokenEncoder,
   private val hasher: Hasher,
   private val agentTokenProvider: AgentTokenProvider,
+  @param:Value("\${lantai.security.cookie-secure:false}") private val cookieSecure: Boolean,
   apiTokenRepository: ApiTokenRepository,
   lantaiUserRepository: LantaiUserRepository,
   apiTokenScopePolicy: ApiTokenScopePolicy,
@@ -71,6 +74,15 @@ class SecurityConfiguration(
 
   private val apiTokenAuthenticationFilter =
     ApiTokenAuthenticationFilter(apiTokenRepository, lantaiUserRepository, apiTokenScopePolicy)
+
+  @Bean
+  fun lantaiCookieSerializer(): DefaultCookieSerializer =
+    DefaultCookieSerializer().apply {
+      setCookieName(sessionCookieName)
+      setUseSecureCookie(cookieSecure)
+      setUseHttpOnlyCookie(true)
+      setSameSite("Lax")
+    }
 
   @Order(0)
   @Bean
@@ -207,6 +219,7 @@ class SecurityConfiguration(
             setTokenValiditySeconds(lantaiSettingsProvider.rememberMeDuration.inWholeSeconds.toInt())
             setAuthenticationDetailsSource(userAgentWebAuthenticationDetailsSource)
             setCookieName("lantai-remember-me")
+            setUseSecureCookie(cookieSecure)
           },
         )
       }

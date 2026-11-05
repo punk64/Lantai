@@ -117,6 +117,8 @@
     'up.phCopy': '正在替换程序文件',
     'up.phRestart': '已替换，正在重启',
     'up.phWorking': '正在处理',
+    'up.pollFail': '后端繁忙，进度查询失败，正在重试',
+    'up.pollTimeout': '长时间没有收到进度，后端可能已被其他任务占满；可稍后在任务页确认，或重启兰台后再试',
     'up.restartTitle': '正在升级',
     'up.restartMsg': '兰台正在替换程序并重启，页面会自动重新连接。请不要关闭或刷新本页。',
     'up.restartWait': '已等待 {n} 秒',

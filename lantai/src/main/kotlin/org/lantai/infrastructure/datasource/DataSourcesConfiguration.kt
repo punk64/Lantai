@@ -103,6 +103,9 @@ class DataSourcesConfiguration(
         this.dataSource = dataSource
         this.poolName = poolName
         this.maximumPoolSize = poolSize
+        this.connectionTimeout = CONNECTION_TIMEOUT_MS
+        this.validationTimeout = VALIDATION_TIMEOUT_MS
+        this.leakDetectionThreshold = LEAK_DETECTION_MS
       },
     )
   }
@@ -110,4 +113,10 @@ class DataSourcesConfiguration(
   fun LantaiProperties.Database.isMemory() = file.contains(":memory:") || file.contains("mode=memory")
 
   fun LantaiProperties.Database.shouldSeparateReadFromWrites(): Boolean = !isMemory() && journalMode == SQLiteConfig.JournalMode.WAL
+
+  private companion object {
+    const val CONNECTION_TIMEOUT_MS = 5_000L
+    const val VALIDATION_TIMEOUT_MS = 3_000L
+    const val LEAK_DETECTION_MS = 20_000L
+  }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
 import org.springframework.web.filter.OncePerRequestFilter
+import java.net.URI
 import java.time.LocalDateTime
 
 class ApiTokenAuthenticationFilter(
@@ -50,7 +51,7 @@ class ApiTokenAuthenticationFilter(
       reject(response, HttpServletResponse.SC_UNAUTHORIZED, "令牌归属账号不可用")
       return
     }
-    if (!scopePolicy.allows(token.scopes, request.method, request.requestURI)) {
+    if (!scopePolicy.allows(token.scopes, request.method, normalizedPath(request))) {
       reject(response, HttpServletResponse.SC_FORBIDDEN, "API 令牌无权访问该接口")
       return
     }
@@ -67,6 +68,15 @@ class ApiTokenAuthenticationFilter(
     request.setAttribute("__spring_security_session_mgmt_filter_applied", true)
     runCatching { apiTokenRepository.recordUsage(token.id, LocalDateTime.now(), clientIp(request)) }
     filterChain.doFilter(request, response)
+  }
+
+  private fun normalizedPath(request: HttpServletRequest): String {
+    val raw = request.requestURI
+    val decoded =
+      runCatching { java.net.URLDecoder.decode(raw, Charsets.UTF_8) }.getOrDefault(raw)
+    return runCatching { URI.create(decoded).normalize().path.ifEmpty { raw } }
+      .getOrDefault(raw)
+      .replace(Regex("/{2,}"), "/")
   }
 
   private fun readToken(request: HttpServletRequest): String? {

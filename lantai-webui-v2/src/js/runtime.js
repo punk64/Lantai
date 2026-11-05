@@ -132,20 +132,26 @@
     return request('api/v1/series/list?unpaged=true&sort=lastModified,desc', { method: 'POST', body: notDeleted(body) }).then(unwrap);
   }
 
-  function letterIds(letter) {
-    return request('api/lantai/v1/series/letter-ids?letter=' + encodeURIComponent(letter)).then(unwrap);
+  function letterIds(letter, libraryId) {
+    return request('api/lantai/v1/series/letter-ids?letter=' + encodeURIComponent(letter) + (libraryId ? '&libraryId=' + encodeURIComponent(libraryId) : '')).then(unwrap);
   }
 
-  function bookLetterIds(letter) {
-    return request('api/lantai/v1/books/letter-ids?letter=' + encodeURIComponent(letter)).then(unwrap);
+  function bookLetterIds(letter, libraryId) {
+    return request('api/lantai/v1/books/letter-ids?letter=' + encodeURIComponent(letter) + (libraryId ? '&libraryId=' + encodeURIComponent(libraryId) : '')).then(unwrap);
   }
 
-  function bookLetterGroups() {
-    return request('api/lantai/v1/books/letter-groups').then(function (r) { return Array.isArray(r) ? r : []; });
+  function bookLetterGroups(libraryId) {
+    return request('api/lantai/v1/books/letter-groups' + (libraryId ? '?libraryId=' + encodeURIComponent(libraryId) : '')).then(function (r) { return Array.isArray(r) ? r : []; });
+  }
+
+  function bookLetterBooks(letter, libraryId, page, size) {
+    return request('api/lantai/v1/books/letter-books?letter=' + encodeURIComponent(letter)
+      + (libraryId ? '&libraryId=' + encodeURIComponent(libraryId) : '')
+      + '&page=' + (page || 0) + '&size=' + (size || 50));
   }
 
   function searchBooks(body) {
-    return request('api/v1/books/list?unpaged=true&sort=lastModified,desc', { method: 'POST', body: notDeleted(body) }).then(unwrap);
+    return request('api/v1/books/list?unpaged=true&sort=lastModified,desc&readerView=true', { method: 'POST', body: notDeleted(body) }).then(unwrap);
   }
 
   function seriesGroups(body) {
@@ -305,9 +311,10 @@
       request('api/lantai/v1/tasks').catch(function () { return null; }),
       request('api/lantai/v1/devices').catch(function () { return null; }),
       request('api/lantai/v1/system').catch(function () { return null; }),
-      request('api/lantai/v1/runtimes').catch(function () { return null; })
+      request('api/lantai/v1/runtimes').catch(function () { return null; }),
+      request('api/lantai/v1/counts').catch(function () { return null; })
     ]).then(function (out) {
-      var libs = out[0], users = out[1], stats = out[2], tasks = out[3], devices = out[4], system = out[5], runtimes = out[6];
+      var libs = out[0], users = out[1], stats = out[2], tasks = out[3], devices = out[4], system = out[5], runtimes = out[6], counts = out[7];
 
       LIBS.length = 0; USERS.length = 0;
       if (typeof TASKS !== 'undefined') TASKS.length = 0;
@@ -383,6 +390,10 @@
         runtime.runtimes = map;
         live.runtimes = true;
       }
+      if (counts && typeof counts.books === 'number') {
+        runtime.navCounts = counts;
+        live.counts = true;
+      }
       if (typeof CFG !== 'undefined') {
         CFG.host = location.origin;
         CFG.port = Number(location.port) || (location.protocol === 'https:' ? 443 : 80);
@@ -414,7 +425,7 @@
   function catalogPage(kind) {
     var st = catalogState()[kind];
     if (st.done) return Promise.resolve(false);
-    var path = (kind === 'series' ? 'api/v1/series?sort=lastModified,desc' : 'api/v1/books?sort=lastModified,desc')
+    var path = (kind === 'series' ? 'api/v1/series?sort=lastModified,desc' : 'api/v1/books?sort=lastModified,desc&readerView=true')
       + '&deleted=false&size=' + CATALOG_PAGE + '&page=' + st.page;
     return request(path).then(function (p) {
       var content = (p && p.content) || [];
@@ -442,6 +453,7 @@
     if (force) {
       runtime.catalogLoaded = false;
       runtime.catalogLoading = null;
+      S._seriesLoaded = {};
     }
     runtime.catalog = null;
     runtime._more = null;
@@ -491,19 +503,37 @@
     };
   }
 
+  function catalogSetTotal(kind, total) {
+    var st = catalogState()[kind];
+    if (!st || typeof total !== 'number' || total < 0) return false;
+    if (st.total === total) return false;
+    st.total = total;
+    return true;
+  }
+
   function hydrate(force) {
     return hydrateShell().then(function () { return hydrateCatalog(false, force); }).then(paintRuntimeDot);
   }
 
   function fetchSeriesBooks(id) {
-    return request('api/v1/series/' + id + '/books?size=500').then(function (page) {
-      var content = (page && page.content) || [];
+    var all = [];
+    var cap = 20;
+    function page(n) {
+      return request('api/v1/series/' + id + '/books?size=500&page=' + n + '&readerView=true').then(function (p) {
+        var content = (p && p.content) || [];
+        for (var i = 0; i < content.length; i++) all.push(content[i]);
+        var totalPages = p && typeof p.totalPages === 'number' ? p.totalPages : 1;
+        if (content.length && n + 1 < totalPages && n + 1 < cap) return page(n + 1);
+        return null;
+      });
+    }
+    return page(0).then(function () {
       var ids = {};
-      content.forEach(function (b) { ids[b.id] = true; });
+      all.forEach(function (b) { ids[b.id] = true; });
       for (var i = BOOKS.length - 1; i >= 0; i--) {
         if (BOOKS[i].s === id && !ids[BOOKS[i].id]) BOOKS.splice(i, 1);
       }
-      mergeBooks(content);
+      mergeBooks(all);
     });
   }
 
@@ -572,10 +602,10 @@
     } catch (e) { return null; }
   }
 
-  function saveRemember(login, password) {
+  function saveRemember(login) {
     var box = document.querySelector('#bRemember');
     try {
-      if (box && box.checked) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ u: login, p: password }));
+      if (box && box.checked) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ u: login }));
       else localStorage.removeItem(REMEMBER_KEY);
     } catch (e) { }
   }
@@ -685,43 +715,86 @@
       return;
     }
     runtime.sse = es;
-    var timer = null, hits = 0, lastHit = 0, burst = false, queueSeen = false;
-    var refresh = function () {
+    var timer = null, hits = 0, lastHit = 0, burst = false, wantForce = false;
+    var applyPending = function () {
+      var path = parseHash().path;
+      var view0 = document.querySelector('#view');
+      var top = view0 ? view0.scrollTop : 0;
+      var force = wantForce;
+      wantForce = false;
+      hits = 0;
+      burst = false;
+      window.__lantaiKeepScroll = true;
+      hydrate(force).then(function () {
+        if (!/^\/read\//.test(path)) render();
+        var v = document.querySelector('#view');
+        if (v) v.scrollTop = top;
+      }).catch(function () {});
+    };
+    var refresh = function (force) {
+      if (force === true) wantForce = true;
       var now = Date.now();
       if (now - lastHit < 2000) hits++; else hits = Math.max(0, hits - 1);
       lastHit = now;
       if (hits >= 20) burst = true;
       clearTimeout(timer);
       timer = setTimeout(function () {
-        if (Date.now() - lastHit < 4000) { refresh(); return; }
-        var path = parseHash().path;
-        var view0 = document.querySelector('#view');
-        var top = view0 ? view0.scrollTop : 0;
-        hits = 0; burst = false;
-        window.__lantaiKeepScroll = true;
-        hydrate().then(function () {
-          if (!/^\/read\//.test(path)) render();
-          var v = document.querySelector('#view');
-          if (v) v.scrollTop = top;
-        }).catch(function () {});
+        if (Date.now() - lastHit < 4000) { refresh(false); return; }
+        applyPending();
       }, burst ? 6000 : 2500);
     };
-    ['BookAdded', 'BookChanged', 'BookDeleted', 'BookImported',
-      'SeriesAdded', 'SeriesChanged', 'SeriesDeleted',
-      'LibraryAdded', 'LibraryChanged', 'LibraryDeleted',
+    var thumbIds = function (e) {
+      var d = {};
+      try { d = JSON.parse((e && e.data) || '{}') || {}; } catch (err) { d = {}; }
+      return d || {};
+    };
+    var thumbBookPatch = function (e) {
+      var fn = window.lantaiThumbRefresh;
+      if (typeof fn !== 'function') return;
+      var d = thumbIds(e);
+      if (d.bookId) fn('book', d.bookId);
+      if (d.seriesId) fn('series', d.seriesId);
+    };
+    var thumbSeriesPatch = function (e) {
+      var fn = window.lantaiThumbRefresh;
+      if (typeof fn !== 'function') return;
+      var d = thumbIds(e);
+      if (d.seriesId) fn('series', d.seriesId);
+    };
+    ['BookAdded', 'BookDeleted', 'BookImported', 'SeriesAdded', 'SeriesDeleted',
+      'LibraryAdded', 'LibraryDeleted'].forEach(function (name) {
+      es.addEventListener(name, function () { refresh(true); });
+    });
+    ['BookChanged', 'SeriesChanged', 'LibraryChanged',
       'CollectionAdded', 'CollectionChanged', 'CollectionDeleted',
       'ReadListAdded', 'ReadListChanged', 'ReadListDeleted',
       'ReadProgressChanged', 'ReadProgressDeleted', 'ReadProgressSeriesChanged', 'ReadProgressSeriesDeleted',
-      'ThumbnailBookAdded', 'ThumbnailBookDeleted', 'ThumbnailSeriesAdded', 'ThumbnailSeriesDeleted',
       'ThumbnailSeriesCollectionAdded', 'ThumbnailSeriesCollectionDeleted',
       'ThumbnailReadListAdded', 'ThumbnailReadListDeleted'].forEach(function (name) {
-      es.addEventListener(name, refresh);
+      es.addEventListener(name, function () { refresh(false); });
     });
+    ['ThumbnailBookAdded', 'ThumbnailBookDeleted'].forEach(function (name) {
+      es.addEventListener(name, thumbBookPatch);
+    });
+    ['ThumbnailSeriesAdded', 'ThumbnailSeriesDeleted'].forEach(function (name) {
+      es.addEventListener(name, thumbSeriesPatch);
+    });
+    es.addEventListener('LibraryScanned', function () {
+      wantForce = true;
+      lastHit = 0;
+      clearTimeout(timer);
+      timer = setTimeout(applyPending, 1200);
+    });
+    var lastQueueCount = -1;
     es.addEventListener('TaskQueueStatus', function (e) {
-      var n = 0;
-      try { n = (JSON.parse(e.data || '{}').count) || 0; } catch (err) { n = 0; }
-      if (n > 0) { queueSeen = true; return; }
-      if (queueSeen) { queueSeen = false; refresh(); }
+      var d = {};
+      try { d = JSON.parse(e.data || '{}') || {}; } catch (err) { d = {}; }
+      var n = Number(d.count) || 0;
+      if (n === lastQueueCount) return;
+      lastQueueCount = n;
+      if (typeof window.lantaiTaskCountChanged === 'function') {
+        window.lantaiTaskCountChanged(n, d.byType || {});
+      }
     });
     es.addEventListener('SessionExpired', function () { location.reload(); });
     es.onerror = function () {
@@ -765,12 +838,16 @@
     me: null,
     sse: null,
     live: live,
+    navCounts: null,
     request: request,
     requestEtag: requestEtag,
     searchSeries: searchSeries,
     letterIds: letterIds,
     bookLetterIds: bookLetterIds,
     bookLetterGroups: bookLetterGroups,
+    bookLetterBooks: bookLetterBooks,
+    mergeBooks: mergeBooks,
+    fetchAll: fetchAll,
     searchBooks: searchBooks,
     seriesGroups: seriesGroups,
     refData: refData,
@@ -782,6 +859,7 @@
     catalogMore: catalogMore,
     catalogFull: catalogFull,
     catalogTotal: catalogTotal,
+    catalogSetTotal: catalogSetTotal,
     collectionSeries: collectionSeries,
     readlistBooks: readlistBooks,
     start: function () {
@@ -824,7 +902,7 @@
         return res.json();
       }).then(function (me) {
         runtime.me = me;
-        saveRemember(login, password);
+        saveRemember(login);
         return enter();
       }).catch(function (err) {
         btn.disabled = false;

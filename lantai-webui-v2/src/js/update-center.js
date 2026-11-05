@@ -111,7 +111,8 @@
   function load(force) {
     if (busy) return Promise.resolve();
     busy = 'load';
-    return Promise.all([loadStatus(), loadRemote(force)])
+    const head = loadStatus().then(() => { if (status) repaint(); });
+    return Promise.all([head, loadRemote(force)])
       .catch(() => { })
       .then(() => {
         busy = '';
@@ -171,7 +172,7 @@
       '<div class="upc-ver"><span class="mini">' + esc(L.t('up.current')) + '</span><b>' + esc(cur) + '</b></div>' +
       '<div class="upc-arrow">' + ico('right') + '</div>' +
       '<div class="upc-ver lat"><span class="mini">' + esc(L.t('up.latest')) + '</span><b>' + esc(lat || '—') + '</b></div>' +
-      '<div class="upc-act"><button class="btn pri" data-upc-check' + (busy ? ' disabled' : '') + '>' + ico('sync') + esc(busy === 'check' ? L.t('up.checking') : L.t('up.check')) + '</button></div>' +
+      '<div class="upc-act"><button class="btn pri" data-upc-check' + (busy ? ' disabled' : '') + '>' + ico('sync') + esc(busy === 'load' || busy === 'check' ? L.t('up.checking') : L.t('up.check')) + '</button></div>' +
       '</div>' +
       '<div class="upc-state"><span class="badge ' + tone + '">' + esc(title) + '</span>' +
       (rel && rel.publishedAt ? '<span class="mini">' + esc(L.t('up.published')) + ' ' + esc(String(rel.publishedAt).slice(0, 10)) + '</span>' : '') +
@@ -275,14 +276,19 @@
 
   function startRemotePoll() {
     stopRemotePoll();
+    let fails = 0;
     const tick = () => LantaiRuntime.request('api/lantai/v1/system/upgrade/remote/status')
       .then(p => {
+        fails = 0;
         if (!p || p.idle || p.phase === 'done' || p.phase === 'error') return;
-        setProg(prog ? prog.where : 'hero', p.phase, p.pct);
+        setProg(prog ? prog.where : 'hero', p.phase, p.pct, p.label || '');
       })
-      .catch(() => { });
+      .catch(() => {
+        fails++;
+        if (fails >= 3) setProg(prog ? prog.where : 'hero', 'download', 0, L.t('up.pollFail'));
+      });
     tick();
-    remotePoll = setInterval(tick, 400);
+    remotePoll = setInterval(tick, 1000);
   }
 
   function stopInspectPoll() {
@@ -291,15 +297,46 @@
 
   function startInspectPoll(where) {
     stopInspectPoll();
+    let fails = 0;
+    const startedAt = Date.now();
     const tick = () => LantaiRuntime.request('api/lantai/v1/system/upgrade/inspect/status')
       .then(p => {
+        fails = 0;
         if (!p || p.idle || !p.phase) return;
-        if (p.phase === 'done' || p.phase === 'error') return;
-        setProg(where, p.phase, p.pct);
+        if (p.phase === 'error') {
+          stopInspectPoll();
+          busy = '';
+          clearProg();
+          repaint();
+          toast(p.error || p.label || L.t('up.phVerify'), 'err', 9000);
+          return;
+        }
+        if (p.phase === 'done') {
+          stopInspectPoll();
+          busy = '';
+          clearProg();
+          if (p.result) {
+            fileInfo = p.result;
+            toast(L.t('up.ready') + ' · v' + p.result.version, 'ok');
+          }
+          repaint();
+          return;
+        }
+        setProg(where, p.phase, p.pct, p.label || '');
       })
-      .catch(() => { });
+      .catch(() => {
+        fails++;
+        if (fails >= 3) setProg(where, 'unzip', 0, L.t('up.pollFail'));
+        if (Date.now() - startedAt > 300000) {
+          stopInspectPoll();
+          busy = '';
+          clearProg();
+          repaint();
+          toast(L.t('up.pollTimeout'), 'err', 12000);
+        }
+      });
     tick();
-    inspectPoll = setInterval(tick, 350);
+    inspectPoll = setInterval(tick, 1000);
   }
 
   function stopRestartPoll() {
@@ -506,19 +543,10 @@
       startInspectPoll('import');
     };
     xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) return;
       stopInspectPoll();
       busy = '';
       clearProg();
-      let data = null;
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try { data = JSON.parse(xhr.responseText); } catch (_) { data = null; }
-      }
-      if (data) {
-        fileInfo = data;
-        toast(L.t('up.ready') + ' · v' + data.version, 'ok');
-        repaint();
-        return;
-      }
       repaint();
       toast(uploadErr(xhr), 'err', 9000);
     };

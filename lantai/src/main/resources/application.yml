@@ -29,6 +29,8 @@ lantai:
     pragmas:
       synchronous: NORMAL
   jdbc-session-enabled: false
+  tasks:
+    throttle-ms: 120
   read:
     default-window: 3
     max-window: 30
@@ -89,15 +91,15 @@ lantai:
 spring:
   servlet:
     multipart:
-      max-file-size: 512MB
-      max-request-size: 512MB
-      file-size-threshold: 0
+      max-file-size: 256MB
+      max-request-size: 256MB
+      file-size-threshold: 1MB
   session:
     jdbc:
       # top of every hour
       cleanup-cron: "0 0 * * * *"
       initialize-schema: never
-    timeout: 7d
+    timeout: 2d
   flyway:
     enabled: true
     locations: classpath:db/migration/{vendor}
@@ -160,7 +162,7 @@ management:
       roles: ADMIN
       show-details: when_authorized
     shutdown:
-      access: unrestricted
+      access: none
   info:
     java:
       enabled: true

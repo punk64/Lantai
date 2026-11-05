@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-private fun defaultTaskPoolSize(): Int = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, 8)
+private fun defaultTaskPoolSize(): Int = 2
 
 @Service
 class LantaiSettingsProvider(
@@ -44,7 +44,7 @@ class LantaiSettingsProvider(
   private fun getRandomRememberMeKey() = RandomStringUtils.secure().nextAlphanumeric(32)
 
   var rememberMeDuration: Duration =
-    (serverSettingsDao.getSettingByKey(Settings.REMEMBER_ME_DURATION.name, Int::class.java) ?: 365).days
+    (serverSettingsDao.getSettingByKey(Settings.REMEMBER_ME_DURATION.name, Int::class.java) ?: 30).days
     set(value) {
       serverSettingsDao.saveSetting(Settings.REMEMBER_ME_DURATION.name, value.inWholeDays.toInt())
       field = value
@@ -216,6 +216,27 @@ class LantaiSettingsProvider(
       }
       field = value
     }
+
+  var memoryReclaimEnabled: Boolean =
+    serverSettingsDao.getSettingByKey(Settings.MEMORY_RECLAIM_ENABLED.name, Boolean::class.java) ?: true
+    set(value) {
+      serverSettingsDao.saveSetting(Settings.MEMORY_RECLAIM_ENABLED.name, value)
+      field = value
+    }
+
+  var memoryIdleMinutes: Int =
+    serverSettingsDao.getSettingByKey(Settings.MEMORY_IDLE_MINUTES.name, Int::class.java) ?: 10
+    set(value) {
+      serverSettingsDao.saveSetting(Settings.MEMORY_IDLE_MINUTES.name, value)
+      field = value
+    }
+
+  var memoryGcEnabled: Boolean =
+    serverSettingsDao.getSettingByKey(Settings.MEMORY_GC_ENABLED.name, Boolean::class.java) ?: true
+    set(value) {
+      serverSettingsDao.saveSetting(Settings.MEMORY_GC_ENABLED.name, value)
+      field = value
+    }
 }
 
 private enum class Settings {
@@ -239,4 +260,7 @@ private enum class Settings {
   CALIBRE_ENABLED,
   SUWAYOMI_ENABLED,
   ONLINE_DISABLED_SOURCES,
+  MEMORY_RECLAIM_ENABLED,
+  MEMORY_IDLE_MINUTES,
+  MEMORY_GC_ENABLED,
 }

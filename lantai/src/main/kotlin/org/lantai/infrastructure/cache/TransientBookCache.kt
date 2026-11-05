@@ -23,4 +23,11 @@ class TransientBookCache : TransientBookRepository {
   override fun save(transientBooks: Collection<TransientBook>) {
     cache.putAll(transientBooks.associateBy { it.book.id })
   }
+
+  fun invalidateAll() {
+    cache.invalidateAll()
+    cache.cleanUp()
+  }
+
+  fun estimatedSize(): Long = cache.estimatedSize()
 }

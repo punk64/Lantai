@@ -2,6 +2,7 @@ package org.lantai.infrastructure.upgrade
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.lantai.infrastructure.net.OutboundUrlGuard
 import org.lantai.infrastructure.runtime.install.RuntimeEnvironment
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -20,6 +21,9 @@ import java.util.concurrent.atomic.AtomicReference
 
 private val remoteLogger = KotlinLogging.logger {}
 
+private val SAFE_ASSET_NAME = Regex("""^[0-9A-Za-z._-]{1,160}\.zip$""", RegexOption.IGNORE_CASE)
+private const val MAX_REDIRECTS = 5
+
 @Service
 class RemoteUpgradeService(
   private val runtimeEnvironment: RuntimeEnvironment,
@@ -27,16 +31,30 @@ class RemoteUpgradeService(
   private val upgradeService: UpgradeService,
   @param:Value("\${lantai.upgrade.feed:https://api.github.com/repos/punk64/Lantai/releases}") private val feed: String,
   @param:Value("\${lantai.upgrade.cache-hours:4}") private val cacheHours: Long,
+  @param:Value("\${lantai.upgrade.allowed-hosts:}") allowedHostsRaw: String,
+  @param:Value("\${lantai.upgrade.max-download-mb:2048}") private val maxDownloadMb: Long,
 ) {
   private val root: Path = runtimeEnvironment.configDir().resolve("upgrade")
   private val downloads: Path = root.resolve("downloads")
   private val cacheFile: Path = root.resolve("remote.json")
   private val progressRef = AtomicReference(RemoteProgress(idle = true))
+  private val allowedHosts: Set<String> =
+    (
+      allowedHostsRaw.split(',').map { it.trim().lowercase() }.filter { it.isNotEmpty() } +
+        listOf("github.com", "api.github.com", "objects.githubusercontent.com", "codeload.github.com", "*.githubusercontent.com", "*.github.com") +
+        runCatching { URI.create(feed).host?.lowercase() }.getOrNull().orEmpty().let { listOf(it) }
+    ).filter { it.isNotEmpty() }.toSet()
   private val client =
     HttpClient
       .newBuilder()
       .connectTimeout(Duration.ofSeconds(15))
       .followRedirects(HttpClient.Redirect.NORMAL)
+      .build()
+  private val downloadClient =
+    HttpClient
+      .newBuilder()
+      .connectTimeout(Duration.ofSeconds(15))
+      .followRedirects(HttpClient.Redirect.NEVER)
       .build()
 
   fun progress(): RemoteProgress = progressRef.get()
@@ -66,25 +84,25 @@ class RemoteUpgradeService(
     if (compareVersions(version, current) <= 0) throw IllegalStateException("版本 $version 不高于当前版本 $current")
 
     Files.createDirectories(downloads)
-    val name = (request.assetName?.trim()?.takeIf { it.isNotBlank() } ?: url.substringAfterLast('/')).ifBlank { "lantai-$version-upgrade.zip" }
-    if (!name.endsWith(".zip")) throw IllegalStateException("升级包名称不合法：$name")
-    val part = downloads.resolve("$name.part")
-    val target = downloads.resolve(name)
+    val name = resolveAssetName(request.assetName, url, version)
+    val part = downloads.resolve("$name.part").normalize()
+    val target = downloads.resolve(name).normalize()
+    if (target.parent != downloads.normalize()) throw IllegalStateException("升级包名称不合法：$name")
+    val limit = maxDownloadMb.coerceIn(64, 16384) * 1024 * 1024
 
     progressRef.set(RemoteProgress(idle = false, phase = "download", pct = 0, label = "0 B"))
     try {
-      val req =
-        HttpRequest
-          .newBuilder(URI.create(url))
-          .timeout(Duration.ofMinutes(20))
-          .header("User-Agent", "Lantai/${upgradeService.currentVersion}")
-          .header("Accept", "application/octet-stream")
-          .GET()
-          .build()
-      val res = client.send(req, HttpResponse.BodyHandlers.ofInputStream())
-      if (res.statusCode() !in 200..299) throw IllegalStateException("下载失败：HTTP ${res.statusCode()}")
+      val res = openDownload(requireAllowedUrl(url))
+      if (res.statusCode() !in 200..299) {
+        res.body().close()
+        throw IllegalStateException("下载失败：HTTP ${res.statusCode()}")
+      }
       val total = res.headers().firstValueAsLong("content-length").orElse(-1L)
-      res.body().use { input -> Files.newOutputStream(part).use { out -> pump(input, out, total) } }
+      if (total > limit) {
+        res.body().close()
+        throw IllegalStateException("升级包超过大小上限 ${limit / 1024 / 1024} MB")
+      }
+      res.body().use { input -> Files.newOutputStream(part).use { out -> pump(input, out, total, limit) } }
       Files.move(part, target, StandardCopyOption.REPLACE_EXISTING)
     } catch (e: Exception) {
       runCatching { Files.deleteIfExists(part) }
@@ -190,7 +208,7 @@ class RemoteUpgradeService(
     val req =
       HttpRequest
         .newBuilder(URI.create(feed))
-        .timeout(Duration.ofSeconds(25))
+        .timeout(Duration.ofSeconds(10))
         .header("User-Agent", "Lantai/${upgradeService.currentVersion}")
         .header("Accept", "application/vnd.github+json")
         .GET()
@@ -246,10 +264,54 @@ class RemoteUpgradeService(
     return exact ?: zip.firstOrNull()
   }
 
+  private fun resolveAssetName(
+    raw: String?,
+    url: String,
+    version: String,
+  ): String {
+    val candidate =
+      raw?.trim()?.takeIf { it.isNotBlank() }
+        ?: url.substringAfterLast('/').substringBefore('?').substringBefore('#')
+    val base =
+      runCatching { Path.of(candidate).fileName.toString() }
+        .getOrNull()
+        ?.trim()
+        .orEmpty()
+        .ifBlank { "lantai-$version-upgrade.zip" }
+    if (!SAFE_ASSET_NAME.matches(base)) throw IllegalStateException("升级包名称不合法：$base")
+    return base
+  }
+
+  private fun requireAllowedUrl(raw: String): URI =
+    runCatching { OutboundUrlGuard.requireAllowed(raw, allowedHosts) }
+      .getOrElse { throw IllegalStateException("升级包地址不可用：${it.message}") }
+
+  private fun openDownload(uri: URI): HttpResponse<InputStream> {
+    var current = uri
+    repeat(MAX_REDIRECTS) {
+      val req =
+        HttpRequest
+          .newBuilder(current)
+          .timeout(Duration.ofMinutes(20))
+          .header("User-Agent", "Lantai/${upgradeService.currentVersion}")
+          .header("Accept", "application/octet-stream")
+          .GET()
+          .build()
+      val res = downloadClient.send(req, HttpResponse.BodyHandlers.ofInputStream())
+      if (res.statusCode() !in 300..399) return res
+      val location = res.headers().firstValue("location").orElse(null)
+      res.body().close()
+      if (location.isNullOrBlank()) throw IllegalStateException("下载失败：HTTP ${res.statusCode()}")
+      current = requireAllowedUrl(current.resolve(location).toString())
+    }
+    throw IllegalStateException("下载失败：重定向次数过多")
+  }
+
   private fun pump(
     input: InputStream,
     output: OutputStream,
     total: Long,
+    limit: Long,
   ) {
     val buf = ByteArray(64 * 1024)
     var read = 0L
@@ -257,6 +319,8 @@ class RemoteUpgradeService(
     while (true) {
       val n = input.read(buf)
       if (n <= 0) break
+      read += n
+      if (read > limit) throw IllegalStateException("升级包超过大小上限 ${limit / 1024 / 1024} MB")
       output.write(buf, 0, n)
       read += n
       if (read - mark >= 2L * 1024 * 1024) {

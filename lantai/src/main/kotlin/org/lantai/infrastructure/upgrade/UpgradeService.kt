@@ -16,8 +16,10 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.ZipInputStream
 import kotlin.system.exitProcess
 
@@ -61,8 +63,12 @@ class UpgradeService(
   private val stagedDir: Path = root.resolve("staged")
   private val backupDir: Path = root.resolve("backup")
 
-  private val inspectGuard = ReentrantLock()
+  private val inspectGuard = Semaphore(1)
   private val inspectProgress = AtomicReference(UpgradeProgress(idle = true))
+  private val inspectExecutor: ExecutorService =
+    Executors.newSingleThreadExecutor { runnable ->
+      Thread(runnable, "lantai-upgrade-inspect").apply { isDaemon = true }
+    }
 
   val currentVersion: String
     get() = buildProperties.getIfAvailable()?.version ?: "unknown"
@@ -123,17 +129,37 @@ class UpgradeService(
     return compareVersions(version, currentVersion) > 0
   }
 
-  fun inspect(file: MultipartFile): UpgradeInspect {
+  fun inspect(file: MultipartFile): UpgradeAccepted {
     if (file.isEmpty) throw IllegalArgumentException("上传文件为空")
     val name = (file.originalFilename ?: "").lowercase()
     if (!name.endsWith(".zip") && !name.endsWith(".lup")) throw IllegalArgumentException("升级包必须是 .zip")
     if (file.size > 512L * 1024 * 1024) throw IllegalArgumentException("升级包超过 512MB")
-    if (!inspectGuard.tryLock()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
-    try {
-      return stage({ file.inputStream }, file.size)
-    } finally {
-      inspectGuard.unlock()
+    if (!inspectGuard.tryAcquire()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
+    val size = file.size
+    val upload =
+      try {
+        val incoming = root.resolve("incoming")
+        Files.createDirectories(incoming)
+        val target = incoming.resolve("upload-" + System.currentTimeMillis() + ".zip")
+        file.inputStream.use { input -> Files.newOutputStream(target).use { out -> input.copyTo(out, 64 * 1024) } }
+        target
+      } catch (e: Exception) {
+        inspectGuard.release()
+        report("error", 0, e.message ?: "上传失败", error = e.message ?: "上传失败")
+        throw e
+      }
+    report("unzip", 0, "正在解压 " + formatSize(size))
+    inspectExecutor.execute {
+      try {
+        stage({ Files.newInputStream(upload) }, size)
+      } catch (e: Exception) {
+        logger.warn(e) { "Upgrade inspection failed" }
+      } finally {
+        runCatching { Files.deleteIfExists(upload) }
+        inspectGuard.release()
+      }
     }
+    return UpgradeAccepted(started = true, fileName = upload.fileName.toString())
   }
 
   fun inspectFile(path: Path): UpgradeInspect {
@@ -142,11 +168,11 @@ class UpgradeService(
     if (!name.endsWith(".zip") && !name.endsWith(".lup")) throw IllegalArgumentException("升级包必须是 .zip")
     val size = Files.size(path)
     if (size > 512L * 1024 * 1024) throw IllegalArgumentException("升级包超过 512MB")
-    if (!inspectGuard.tryLock()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
+    if (!inspectGuard.tryAcquire()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
     try {
       return stage({ Files.newInputStream(path) }, size)
     } finally {
-      inspectGuard.unlock()
+      inspectGuard.release()
     }
   }
 
@@ -179,8 +205,11 @@ class UpgradeService(
 
       val jar = stagedJar()
       val jarSize = Files.size(jar).coerceAtLeast(1L)
-      report("verify", -1, "正在校验 SHA-256")
-      val digest = sha256(jar)
+      report("verify", 30, "正在校验 SHA-256")
+      val digest =
+        sha256(jar) { read ->
+          report("verify", (read * 100 / jarSize).toInt().coerceIn(30, 95), "正在校验 SHA-256")
+        }
       if (manifest.sha256 != null && manifest.sha256.isNotBlank()) {
         if (!digest.equals(manifest.sha256.trim(), ignoreCase = true)) throw IllegalArgumentException("jar 校验失败，包可能损坏")
       }
@@ -199,11 +228,11 @@ class UpgradeService(
           containerized = isContainerized(),
           restartMode = if (isContainerized()) "container" else "manual",
         )
-      report("done", 100, "校验通过")
+      report("done", 100, "校验通过", result = result)
       return result
     } catch (e: Exception) {
       runCatching { discard() }
-      report("error", 0, e.message ?: "校验失败")
+      report("error", 0, e.message ?: "校验失败", error = e.message ?: "校验失败")
       throw e
     }
   }
@@ -212,9 +241,11 @@ class UpgradeService(
     phase: String,
     pct: Int,
     label: String,
+    result: UpgradeInspect? = null,
+    error: String? = null,
   ) {
     val value = if (pct < 0) -1 else pct.coerceIn(0, 100)
-    inspectProgress.set(UpgradeProgress(idle = false, phase = phase, pct = value, label = label))
+    inspectProgress.set(UpgradeProgress(idle = false, phase = phase, pct = value, label = label, result = result, error = error))
   }
 
   private fun formatSize(bytes: Long): String =
@@ -234,11 +265,11 @@ class UpgradeService(
   }
 
   fun apply(): UpgradeApply {
-    if (!inspectGuard.tryLock()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
+    if (!inspectGuard.tryAcquire()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
     try {
       return applyLocked()
     } finally {
-      inspectGuard.unlock()
+      inspectGuard.release()
     }
   }
 
@@ -275,11 +306,11 @@ class UpgradeService(
   }
 
   fun rollback(): UpgradeApply {
-    if (!inspectGuard.tryLock()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
+    if (!inspectGuard.tryAcquire()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
     try {
       return rollbackLocked()
     } finally {
-      inspectGuard.unlock()
+      inspectGuard.release()
     }
   }
 
@@ -357,7 +388,11 @@ class UpgradeService(
   private fun stagedJar(): Path {
     if (!Files.isDirectory(stagedDir)) throw IllegalStateException("没有待安装的升级包")
     val manifest = readManifest()
-    val named = manifest.fileName?.takeIf { it.isNotBlank() }?.let { stagedDir.resolve(it) }
+    val named =
+      manifest.fileName
+        ?.takeIf { it.isNotBlank() }
+        ?.let { stagedDir.resolve(it).normalize() }
+        ?.takeIf { it.parent == stagedDir.normalize() && it.fileName.toString().endsWith(".jar") }
     if (named != null && Files.isRegularFile(named)) return named
     val jars =
       Files.list(stagedDir).use { s ->
@@ -542,4 +577,11 @@ data class UpgradeProgress(
   val phase: String = "",
   val pct: Int = 0,
   val label: String = "",
+  val result: UpgradeInspect? = null,
+  val error: String? = null,
+)
+
+data class UpgradeAccepted(
+  val started: Boolean,
+  val fileName: String,
 )

@@ -1,6 +1,7 @@
 package org.lantai.infrastructure.jooq.main
 
 import org.lantai.domain.model.ContentRestrictions
+import org.lantai.domain.model.Media
 import org.lantai.infrastructure.jooq.SplitDslDaoBase
 import org.lantai.infrastructure.jooq.toCondition
 import org.lantai.jooq.main.Tables
@@ -36,6 +37,7 @@ class BookCommonDao(
     restrictions: ContentRestrictions,
     filterOnLibraryIds: Collection<String>?,
     selectFields: Array<Field<*>>,
+    readerView: Boolean = false,
   ): Triple<SelectConditionStep<Record>, Field<LocalDateTime>, SelectJoinStep<Record1<LocalDateTime>>> {
     // On Deck books are the first unread book in a series that has at least one book read, but is not in progress
     // cteSeries will return On Deck series
@@ -73,7 +75,16 @@ class BookCommonDao(
             .where(r.COMPLETED.isNull)
             .and(
               b.SERIES_ID.`in`(select(cteSeries.field(s.ID)).from(cteSeries)),
-            ),
+            )
+            .apply {
+              if (readerView) {
+                and(
+                  b.ID.`in`(
+                    select(m.BOOK_ID).from(m).where(m.STATUS.`in`(Media.Status.READY.name, Media.Status.UNSUPPORTED.name)),
+                  ),
+                )
+              }
+            },
         )
 
     // finding the first unread book by number_sort is similar to finding the greatest-n-per-group

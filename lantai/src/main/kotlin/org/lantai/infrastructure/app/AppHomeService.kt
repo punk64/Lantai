@@ -2,6 +2,7 @@ package org.lantai.infrastructure.app
 
 import org.lantai.domain.model.BookSearch
 import org.lantai.domain.model.LantaiUser
+import org.lantai.domain.model.Media
 import org.lantai.domain.model.ReadStatus
 import org.lantai.domain.model.SearchCondition
 import org.lantai.domain.model.SearchContext
@@ -42,18 +43,38 @@ class AppHomeService(
     val authorized = user.getAuthorizedLibraryIds(null)
 
     val continueReading =
-      bookDtoRepository.findAllOnDeck(user.id, authorized, PageRequest.of(0, size), user.restrictions)
-    val added = bookDtoRepository.findAll(context, newest(size, "lastModifiedDate"))
+      bookDtoRepository.findAllOnDeck(user.id, authorized, PageRequest.of(0, size), user.restrictions, readerView = true)
+    val readerStatus =
+      SearchCondition.AnyOfBook(
+        SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.READY)),
+        SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.UNSUPPORTED)),
+      )
+    val added =
+      bookDtoRepository.findAll(
+        BookSearch(condition = readerStatus),
+        context,
+        newest(size, "lastModifiedDate"),
+      )
     val published =
       bookDtoRepository.findAll(
-        BookSearch(condition = SearchCondition.AllOfBook(SearchCondition.ReleaseDate(SearchOperator.IsNotNull))),
+        BookSearch(
+          condition =
+            SearchCondition.AllOfBook(
+              SearchCondition.ReleaseDate(SearchOperator.IsNotNull),
+              readerStatus,
+            ),
+        ),
         context,
         newest(size, "metadata.releaseDate"),
       )
     val recentRead =
       bookDtoRepository.findAll(
         BookSearch(
-          condition = SearchCondition.AllOfBook(SearchCondition.ReadStatus(SearchOperator.Is(ReadStatus.READ))),
+          condition =
+            SearchCondition.AllOfBook(
+              SearchCondition.ReadStatus(SearchOperator.Is(ReadStatus.READ)),
+              readerStatus,
+            ),
         ),
         context,
         newest(size, "readProgress.readDate"),

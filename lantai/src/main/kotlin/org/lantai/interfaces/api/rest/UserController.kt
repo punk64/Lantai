@@ -2,6 +2,7 @@ package org.lantai.interfaces.api.rest
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.lantai.application.query.UnpagedSorted
 import org.lantai.domain.model.AgeRestriction
@@ -73,10 +74,12 @@ class UserController(
     @AuthenticationPrincipal principal: LantaiPrincipal,
     @Valid @RequestBody
     newPasswordDto: PasswordUpdateDto,
+    request: HttpServletRequest,
   ) {
     if (demo) throw ResponseStatusException(HttpStatus.FORBIDDEN)
+    val keepSessionId = runCatching { request.getSession(false)?.id }.getOrNull()
     userRepository.findByIdOrNull(principal.user.id)?.let { user ->
-      userLifecycle.updatePassword(user, newPasswordDto.password, false)
+      userLifecycle.updatePassword(user, newPasswordDto.password, true, keepSessionId)
     } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
   }
 

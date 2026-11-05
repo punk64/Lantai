@@ -9,6 +9,7 @@ import org.lantai.infrastructure.jooq.tasks.TaskHistoryRow
 import org.lantai.infrastructure.jooq.tasks.TasksHistoryDao
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.task.ThreadPoolTaskExecutorBuilder
 import org.springframework.context.event.EventListener
@@ -29,12 +30,19 @@ class TaskProcessor(
   private val tasksHistoryDao: TasksHistoryDao,
   private val settingsProvider: LantaiSettingsProvider,
   taskExecutorBuilder: ThreadPoolTaskExecutorBuilder,
+  @param:Value("\${lantai.tasks.throttle-ms:120}") private val throttleMs: Long,
 ) : InitializingBean,
   DisposableBean {
   val executor: ThreadPoolTaskExecutor =
     taskExecutorBuilder
       .threadNamePrefix("taskProcessor-")
       .corePoolSize(settingsProvider.taskPoolSize)
+      .taskDecorator { runnable ->
+        Runnable {
+          runCatching { Thread.currentThread().priority = Thread.MIN_PRIORITY }
+          runnable.run()
+        }
+      }
       .build()
       .apply { initialize() }
 
@@ -119,6 +127,13 @@ class TaskProcessor(
       }
       logger.debug { "Task processed, remove it from the queue: $task" }
       tasksRepository.delete(task.uniqueId)
+      if (throttleMs > 0 && tasksRepository.hasAvailable()) {
+        try {
+          Thread.sleep(throttleMs)
+        } catch (_: InterruptedException) {
+          Thread.currentThread().interrupt()
+        }
+      }
       processAvailableTask()
     } else {
       logger.debug { "No available task found" }

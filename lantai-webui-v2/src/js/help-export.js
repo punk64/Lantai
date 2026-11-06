@@ -3,6 +3,7 @@
     ['title', 'Title', 'text', 'Series title', 'writable'],
     ['summary', 'Summary', 'text', 'Multi-line, use \\n for line breaks', 'writable'],
     ['publisher', 'Publisher', 'text', '', 'writable'],
+    ['region', 'Region', 'text', 'ISO 3166-1 alpha-2, e.g. JP, KR, CN, TW; leave empty when unknown', 'writable'],
     ['language', 'Language', 'text', 'BCP-47 such as zh-CN; zh and zh-CN are the same language', 'writable'],
     ['genres', 'Genres', 'array or delimited text', 'Fantasy、Adventure', 'writable'],
     ['authors', 'Authors', 'array or delimited text', 'Ryoko Kui', 'writable'],
@@ -51,14 +52,14 @@
       return [
         '# Scraping guide · How it works',
         '',
-        'Scraping fills in series metadata: title, summary, publisher, language, genres, authors, release date, ISBN, tags and cover.',
+        'Scraping fills in series metadata: title, summary, publisher, region, language, genres, authors, release date, ISBN, tags and cover.',
+        'Region records where the work comes from, as an ISO 3166-1 alpha-2 code (JP, KR, CN, TW and so on). Sources only report it when they actually know it; nothing is guessed from publisher names.',
         'The rule is: embedded metadata wins, only missing fields are filled, conflicts are never overwritten silently.',
         '',
         '## Where the queue comes from',
         mdTable(['Source', 'Notes'], [
           ['Single / multi select', 'Tick series in the library and choose Add to scrape queue; in per-book mode only the ticked books are registered'],
           ['Whole library', 'Start it from scrape settings or from the library page'],
-          ['Missing metadata', 'Automatically picks series with incomplete data, capped at 200'],
         ]),
         '',
         '## The four states',
@@ -77,14 +78,14 @@
       return [
         '# 刮削說明 · 功能',
         '',
-        '刮削是給系列補後設資料：標題、簡介、出版社、語言、分類、作者、出版日期、ISBN、標籤、封面。',
+        '刮削是給系列補後設資料：標題、簡介、出版社、地區、語言、分類、作者、出版日期、ISBN、標籤、封面。',
+        '地區記錄作品來源地，用兩位國家代碼表示（日本 JP、韓國 KR、中國大陸 CN、中國台灣 TW 等）。資料來源只在確有依據時給出，取不到就留空，不從出版社名稱猜測。',
         '蘭台的原則是內嵌資訊優先、只補缺失、衝突不自動覆蓋。',
         '',
         '## 名單從哪來',
         mdTable(['來源', '說明'], [
           ['單本 / 多選', '書庫頁勾選系列後點「加入刮削名單」；切到「按書籍」勾選具體冊時只登記選中的冊'],
           ['整庫', '刮削設定或書庫頁對某個庫整體發起'],
-          ['缺後設資料', '自動挑出資訊不全的系列，上限 200 條'],
         ]),
         '',
         '## 四種狀態',
@@ -102,14 +103,14 @@
     return [
       '# 刮削说明 · 功能',
       '',
-      '刮削是给系列补元数据：标题、简介、出版社、语言、分类、作者、出版日期、ISBN、标签、封面。',
+      '刮削是给系列补元数据：标题、简介、出版社、地区、语言、分类、作者、出版日期、ISBN、标签、封面。',
+      '地区记录作品来源地，用两位国家代码表示（日本 JP、韩国 KR、中国大陆 CN、中国台湾 TW 等）。数据源只在确有依据时给出，取不到就留空，不从出版社名称猜测。',
       '兰台的原则是**内嵌信息优先、只补缺失、冲突不自动覆盖**。',
       '',
       '## 名单从哪来',
       mdTable(['来源', '说明'], [
         ['单本 / 多选', '书库页勾选系列后点「加入刮削名单」；切到「按书籍」勾选具体册时只登记选中的册，同系列其它册不受影响'],
         ['整库', '刮削设置或书库页对某个库整体发起'],
-        ['缺元数据', '自动挑出信息不全的系列，上限 200 条'],
       ]),
       '',
       '## 四种状态',
@@ -147,6 +148,15 @@
         '2. Pull scrape/agent/queue to get entry ids, then fetch each entry detail.',
         '3. POST the result to scrape/agent/queue/{id}/result.',
         '4. See the API tab for details.',
+        '',
+        '## Option 4 · One book at a time, filled by AI',
+        '1. Open a series or a book and press Edit metadata; the prompt buttons are at the bottom left of the dialog.',
+        '2. Press Export prompt. It builds a Chinese prompt with the book parameters, the full metadata table (empty fields included), search keywords and a return template, then copies it to the clipboard.',
+        '3. Paste it into any AI chat and send. The AI answers with one JSON object.',
+        '4. Back in the dialog press Import result, paste the answer or choose the .txt file, then press Done to fill the form.',
+        '5. Review the values and press Save. Nothing is written before that.',
+        '',
+        '**Length limit**: one-click copy and a single import are both capped at 20000 characters (roughly 6-8k tokens). A prompt is usually far below that. When it exceeds the cap, Export prompt downloads `meta-*.txt` instead and you load it with Import result → Choose file. Import only fills the fields present in the form; links, notable entities and alternate titles appear in the prompt for the AI but are never written back.',
       ].join('\n');
     }
     if (g === 'zht') {
@@ -170,6 +180,15 @@
         '2. 腳本先拉 scrape/agent/queue 拿條目 id，再逐條取詳情',
         '3. 把結果 POST 到 scrape/agent/queue/{id}/result',
         '4. 詳見「API 介面」頁籤',
+        '',
+        '## 方式四 · 單本交給 AI 補全',
+        '1. 在系列或書籍詳情點「編輯中繼資料」，彈窗左下角有「匯出提示詞」',
+        '2. 點它會產生一段中文提示詞：書籍參數、完整中繼資料表格（空欄位也列出）、檢索關鍵詞、回傳範本，並自動複製到剪貼簿',
+        '3. 貼到任意 AI 對話框直接傳送，AI 按範本回傳完整 JSON',
+        '4. 回到彈窗點「匯入結果」，貼上或選檔案，點「完成」把值填進表單',
+        '5. 核對無誤再點「儲存」；不點儲存不會寫入任何東西',
+        '',
+        '**長度上限**：一鍵複製與單次匯入都以 20000 字元（約 6~8k token）為界。提示詞通常遠小於這個值；簡介極長等情況下會超出，此時「匯出提示詞」自動改為下載 `meta-*.txt`，用「匯入結果 → 選擇檔案」載回。匯入只填介面上有的欄位，連結、顯著實體、別名等僅出現在提示詞裡供 AI 參考，不會寫入。',
       ].join('\n');
     }
     return [
@@ -192,6 +211,15 @@
       '2. 脚本先拉 `scrape/agent/queue` 拿条目 id，再逐条取详情',
       '3. 把结果 `POST` 到 `scrape/agent/queue/{id}/result`',
       '4. 详见「API 接口」页签',
+      '',
+      '## 方式四 · 单本交给 AI 补全',
+      '1. 在系列或书籍详情点「编辑元数据」，弹窗左下角有「导出提示词」',
+      '2. 点它会生成一段中文提示词：书籍参数、完整元数据表格（空字段也列出）、检索关键词、返回模板，并自动复制到剪贴板',
+      '3. 粘贴到任意 AI 对话框直接发送，AI 按模板返回完整 JSON',
+      '4. 回到弹窗点「导入结果」，粘贴或选文件，点「完成」把值填进表单',
+      '5. 核对无误再点「保存」；不点保存不会写入任何东西',
+      '',
+      '**文本上限**：一键复制与单次导入都以 20000 字符（约 6~8k token）为界。提示词通常远小于这个值；简介极长等情况下会超出，此时「导出提示词」自动改为下载 `meta-*.txt`，用「导入结果 → 选择文件」载回。导入只填界面上有的字段，链接、显著实体、别名等仅出现在提示词里供 AI 参考，不会写入。',
     ].join('\n');
   }
 
@@ -218,6 +246,7 @@
         '        "title": "Delicious in Dungeon",',
         '        "summary": "A culinary adventure in a dungeon.",',
         '        "publisher": "Example Press",',
+        '        "region": "JP",',
         '        "language": "zh-CN",',
         '        "genres": ["Fantasy", "Adventure"],',
         '        "authors": ["Ryoko Kui"],',
@@ -236,7 +265,7 @@
         '## CSV columns',
         '```',
         csvHead,
-        '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,Delicious in Dungeon,QUEUED,Delicious in Dungeon,A culinary adventure.,Example Press,zh-CN,Fantasy、Adventure,Ryoko Kui,2015-01-01,9789863562305,Completed,',
+        '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,Delicious in Dungeon,QUEUED,Delicious in Dungeon,A culinary adventure.,Example Press,JP,zh-CN,Fantasy、Adventure,Ryoko Kui,2015-01-01,9789863562305,Completed,',
         '```',
         '',
         'The first row must be the header. Array fields accept 、, comma or pipe as separators. Quote cells containing commas with double quotes. Save as UTF-8.',
@@ -245,7 +274,7 @@
         mdTable(['Field', 'Name', 'Type', 'Notes', 'Write'], fieldRows('en')),
         '',
         '## Aliases',
-        'description → summary, categories → genres, author → authors, publishDate → releaseDate, cover → coverUrl, queueId → id.',
+        'description → summary, categories → genres, author → authors, publishDate → releaseDate, cover → coverUrl, country → region, queueId → id. Region is normalised to an uppercase two-letter code: send JP, not jp or Japan.',
         '',
         '## Three hard rules',
         mdTable(['Rule', 'Notes'], [
@@ -279,6 +308,7 @@
         '        "title": "迷宮飯",',
         '        "summary": "地下迷宮裡的美食冒險。",',
         '        "publisher": "青文",',
+        '        "region": "JP",',
         '        "language": "zh-CN",',
         '        "genres": ["奇幻", "冒險"],',
         '        "authors": ["九井諒子"],',
@@ -297,7 +327,7 @@
         '## CSV 欄位',
         '```',
         csvHead,
-        '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,迷宮飯,QUEUED,迷宮飯,地下迷宮裡的美食冒險。,青文,zh-CN,奇幻、冒險,九井諒子,2015-01-01,9789863562305,已完結,',
+        '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,迷宮飯,QUEUED,迷宮飯,地下迷宮裡的美食冒險。,青文,JP,zh-CN,奇幻、冒險,九井諒子,2015-01-01,9789863562305,已完結,',
         '```',
         '',
         '第一行必須是表頭。陣列欄位用頓號、逗號或豎線分隔都可以。含逗號的儲存格要用英文雙引號包起來。檔案存 UTF-8。',
@@ -306,7 +336,7 @@
         mdTable(['欄位', '中文', '類型', '說明', '寫入'], fieldRows('zht')),
         '',
         '## 別名',
-        'description → 簡介、categories → 分類、author → 作者、publishDate → 出版日期、cover → 封面位址、queueId → id。',
+        'description → 簡介、categories → 分類、author → 作者、publishDate → 出版日期、cover → 封面位址、country → 地區、queueId → id。地區一律歸一成大寫兩位代碼，請寫 JP，不要寫 jp 或 Japan。',
         '',
         '## 三條硬規則',
         mdTable(['規則', '說明'], [
@@ -339,6 +369,7 @@
       '        "title": "迷宫饭",',
       '        "summary": "地下迷宫里的美食冒险。",',
       '        "publisher": "青文",',
+      '        "region": "JP",',
       '        "language": "zh-CN",',
       '        "genres": ["奇幻", "冒险"],',
       '        "authors": ["九井谅子"],',
@@ -357,7 +388,7 @@
       '## CSV 列',
       '```',
       csvHead,
-      '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,迷宫饭,QUEUED,迷宫饭,地下迷宫里的美食冒险。,青文,zh-CN,奇幻、冒险,九井谅子,2015-01-01,9789863562305,已完结,',
+      '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,迷宫饭,QUEUED,迷宫饭,地下迷宫里的美食冒险。,青文,JP,zh-CN,奇幻、冒险,九井谅子,2015-01-01,9789863562305,已完结,',
       '```',
       '',
       '第一行必须是表头。数组字段用顿号、逗号或竖线分隔都可以。含逗号的单元格要用英文双引号包起来。文件存 UTF-8。',
@@ -366,7 +397,7 @@
       mdTable(['字段', '中文', '类型', '说明', '写入'], fieldRows('zh')),
       '',
       '## 别名',
-      '`description` → 简介，`categories` → 分类，`author` → 作者，`publishDate` → 出版日期，`cover` → 封面地址，`queueId` → id。',
+      '`description` → 简介，`categories` → 分类，`author` → 作者，`publishDate` → 出版日期，`cover` → 封面地址，`country` → 地区，`queueId` → id。地区一律归一成大写两位代码，请写 JP，不要写 jp 或 Japan。',
       '',
       '## 三条硬规则',
       mdTable(['规则', '说明'], [
@@ -381,7 +412,7 @@
   }
 
   function docApi(g) {
-    const base = 'http://127.0.0.1:25600/api/lantai/v1/';
+    const base = 'http(s)://xxx.xxx.xxx.xxx:xxxxx/api/lantai/v1/';
     if (g === 'en') {
       return [
         '# Scraping guide · API',
@@ -393,7 +424,7 @@
         '## Endpoints',
         mdTable(['Method', 'Path', 'Purpose', 'Scope'], [
           ['GET', 'scrape/agent/queue', 'One page of the queue: entry id, series id and title, state, attempts', 'scrape:read'],
-          ['GET', 'scrape/agent/queue/{id}', 'Entry detail: current values, embedded values, book list, last payload', 'scrape:read'],
+          ['GET', 'scrape/agent/queue/{id}', 'Entry detail: values already stored, book list, last payload', 'scrape:read'],
           ['POST', 'scrape/agent/queue/{id}/result', 'Submit a result; an entry id diffs, a seriesId overwrites', 'scrape:submit'],
           ['GET', 'scrape/agent/stats', 'Queue entry count and pending inbox count', 'scrape:read'],
         ]),
@@ -410,7 +441,7 @@
         'curl -H "X-API-Token: lt_xxxxxxxx" \\',
         '  "' + base + 'scrape/agent/queue/0K3M8Q1T7XGE5"',
         '```',
-        'Returns current values, embedded values, the `books` list (each with bookId, fileName, title, number, authors, releaseDate, isbn, tags, summary, publisher, genres, language and the titleLock / numberLock / authorsLock flags) and `external`, the last submitted payload or null.',
+        'Returns the current values (summary, publisher, region, authors, genres, hasCover), the `books` list (each with bookId, fileName, title, number, authors, releaseDate, isbn, tags, summary, publisher, genres, language and the titleLock / numberLock / authorsLock flags) and `external`, the last submitted payload or null. Only values already stored in the database are returned: the server never opens the book files here, so the call answers in milliseconds. Deciding what the file really contains is the caller\'s job.',
         '',
         '## Submit a result',
         '```bash',
@@ -418,7 +449,7 @@
         '  -d \'{"metadata":{"title":"Delicious in Dungeon","authors":["Ryoko Kui"],"genres":["Fantasy","Adventure"]}}\' \\',
         '  "' + base + 'scrape/agent/queue/0K3M8Q1T7XGE5/result"',
         '```',
-        'Fields can sit under `metadata` or at the top level. Arrays accept JSON arrays or delimited strings. Aliases work: description, categories, author, publishDate, cover.',
+        'Fields can sit under `metadata` or at the top level. Arrays accept JSON arrays or delimited strings. Aliases work: description, categories, author, publishDate, cover, country. Region is series level and must be an uppercase two-letter code.',
         '`status` is `DONE` when applied and removed from the queue, `REVIEW` when it needs a human. `appliedFields` lists what was written; `message` explains skips. Empty values never clear existing data.',
         '',
         '## Per-book writes',
@@ -451,7 +482,7 @@
         '## 介面一覽',
         mdTable(['方法', '路徑', '說明', '所需權限'], [
           ['GET', 'scrape/agent/queue', '拉一頁名單：條目 id、系列 id 與標題、狀態、嘗試次數', 'scrape:read'],
-          ['GET', 'scrape/agent/queue/{id}', '取單條詳情：現有值、內嵌值、冊清單、上次回填', 'scrape:read'],
+          ['GET', 'scrape/agent/queue/{id}', '取單條詳情：庫裡已存的現有值、冊清單、上次回填', 'scrape:read'],
           ['POST', 'scrape/agent/queue/{id}/result', '提交結果；id 給條目 id 走比對，給 seriesId 直接覆蓋', 'scrape:submit'],
           ['GET', 'scrape/agent/stats', '名單條目數與待處理回填數', 'scrape:read'],
         ]),
@@ -468,7 +499,7 @@
         'curl -H "X-API-Token: lt_xxxxxxxx" \\',
         '  "' + base + 'scrape/agent/queue/0K3M8Q1T7XGE5"',
         '```',
-        '回傳現有值、內嵌值、`books` 冊清單（每冊含 bookId、fileName、title、number、authors、releaseDate、isbn、tags、summary、publisher、genres、language 與三個鎖定標記 titleLock / numberLock / authorsLock），以及 `external`——上次回填的原始 payload，沒有則為 null。',
+        '回傳現有值（summary / publisher / region / authors / genres / hasCover）、`books` 冊清單（每冊含 bookId、fileName、title、number、authors、releaseDate、isbn、tags、summary、publisher、genres、language 與三個鎖定標記 titleLock / numberLock / authorsLock），以及 `external`——上次回填的原始 payload，沒有則為 null。這裡只回傳資料庫裡已經存下的參數，**不會打開書籍檔案解析內嵌中繼資料**，所以是毫秒級回傳；書裡到底寫了什麼，交給外部工具或人工判斷後再回傳。',
         '',
         '## 回傳結果',
         '```bash',
@@ -476,7 +507,7 @@
         '  -d \'{"metadata":{"title":"迷宮飯","authors":["九井諒子"],"genres":["奇幻","冒險"]}}\' \\',
         '  "' + base + 'scrape/agent/queue/0K3M8Q1T7XGE5/result"',
         '```',
-        'payload 可以套一層 `metadata`，也可以把欄位平鋪在頂層。陣列欄位用 JSON 陣列，或用頓號 / 逗號 / 豎線分隔的字串。別名照樣識別。',
+        'payload 可以套一層 `metadata`，也可以把欄位平鋪在頂層。陣列欄位用 JSON 陣列，或用頓號 / 逗號 / 豎線分隔的字串。別名照樣識別：description → 簡介、categories → 分類、author → 作者、publishDate → 出版日期、cover → 封面位址、country → 地區。地區屬系列級欄位，必須是歸一後的大寫兩位代碼。',
         '返回 `status`：`DONE` 已套用並移出名單，`REVIEW` 進入待核對；`appliedFields` 是真正寫入的欄位，`message` 說明跳過或失敗原因。空值不會被當成「清空」。',
         '',
         '## 按冊寫',
@@ -508,7 +539,7 @@
       '## 接口一览',
       mdTable(['方法', '路径', '说明', '所需权限'], [
         ['GET', 'scrape/agent/queue', '拉一页名单：条目 id、系列 id 与标题、状态、尝试次数', 'scrape:read'],
-        ['GET', 'scrape/agent/queue/{id}', '取单条详情：现有值、内嵌值、册清单、上次回填', 'scrape:read'],
+        ['GET', 'scrape/agent/queue/{id}', '取单条详情：库里已存的现有值、册清单、上次回填', 'scrape:read'],
         ['POST', 'scrape/agent/queue/{id}/result', '提交结果；id 给条目 id 走比对，给 seriesId 直接覆盖', 'scrape:submit'],
         ['GET', 'scrape/agent/stats', '名单条目数与待处理回填数', 'scrape:read'],
       ]),
@@ -525,7 +556,7 @@
       'curl -H "X-API-Token: lt_xxxxxxxx" \\',
       '  "' + base + 'scrape/agent/queue/0K3M8Q1T7XGE5"',
       '```',
-      '返回现有值（summary / publisher / authors / genres / hasCover）、内嵌值（embeddedAuthors / embeddedPublisher）、`books` 册清单（每册含 bookId、fileName、title、number、authors、releaseDate、isbn、tags、summary、publisher、genres、language 与三个锁定标记 titleLock / numberLock / authorsLock），以及 `external`——上次回填的原始 payload，没有则为 null。',
+      '返回现有值（summary / publisher / region / authors / genres / hasCover）、`books` 册清单（每册含 bookId、fileName、title、number、authors、releaseDate、isbn、tags、summary、publisher、genres、language 与三个锁定标记 titleLock / numberLock / authorsLock），以及 `external`——上次回填的原始 payload，没有则为 null。这里只返回数据库里已经存下的参数，**不会打开书籍文件解析内嵌元数据**，所以是毫秒级返回；书里到底写了什么，交给外部工具或人工判断后再回传。',
       '',
       '## 回传结果',
       '```bash',
@@ -533,7 +564,7 @@
       '  -d \'{"metadata":{"title":"迷宫饭","authors":["九井谅子"],"genres":["奇幻","冒险"]}}\' \\',
       '  "' + base + 'scrape/agent/queue/0K3M8Q1T7XGE5/result"',
       '```',
-      'payload 可以套一层 `metadata`，也可以把字段平铺在顶层。数组字段用 JSON 数组，或用顿号 / 逗号 / 竖线分隔的字符串。别名照样识别：description → 简介、categories → 分类、author → 作者、publishDate → 出版日期、cover → 封面地址。',
+      'payload 可以套一层 `metadata`，也可以把字段平铺在顶层。数组字段用 JSON 数组，或用顿号 / 逗号 / 竖线分隔的字符串。别名照样识别：description → 简介、categories → 分类、author → 作者、publishDate → 出版日期、cover → 封面地址、country → 地区。地区属系列级字段，必须是归一后的大写两位代码。',
       '返回 `status`：`DONE` 已应用并移出名单，`REVIEW` 进入待核对；`appliedFields` 是真正写入的字段，`message` 说明跳过或失败原因。空值不会被当成「清空」，只表示该字段保持一致。',
       '',
       '## 按册写',
@@ -566,7 +597,7 @@
   function scrapeHelpText(tab) {
     const g = langGroup();
     const set = DOCS[tab] || DOCS.feature;
-    return set[g]() + '\n';
+    return set[g](g) + '\n';
   }
 
   function scrapeHelpFileName(tab) {

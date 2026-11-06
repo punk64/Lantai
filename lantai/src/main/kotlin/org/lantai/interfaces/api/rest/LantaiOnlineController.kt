@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import com.fasterxml.jackson.databind.JsonNode
 import org.lantai.infrastructure.online.OnlineException
+import org.lantai.infrastructure.online.OnlineLibraryService
 import org.lantai.infrastructure.online.OnlineMangaInfo
 import org.lantai.infrastructure.online.OnlineSourceRegistry
 import org.lantai.infrastructure.online.SuwayomiClient
@@ -35,7 +36,18 @@ class LantaiOnlineController(
   private val registry: OnlineSourceRegistry,
   private val client: SuwayomiClient,
   private val syncService: OnlineSyncService,
+  private val libraryService: OnlineLibraryService,
 ) {
+  @PostMapping("library")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Create the managed online library when it has been removed")
+  fun ensureLibrary(): OnlineLibraryDto {
+    requireEnabled()
+    val existed = libraryService.findByType() != null
+    val library = libraryService.ensureLibrary()
+    return OnlineLibraryDto(library.id, library.name, library.root.toString(), library.type.name, existed)
+  }
+
   @GetMapping("sources")
   @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "List sources with their search/entry toggle state")
@@ -251,6 +263,14 @@ class LantaiOnlineController(
       throw ResponseStatusException(HttpStatus.BAD_GATEWAY, e.message, e)
     }
 }
+
+data class OnlineLibraryDto(
+  val id: String,
+  val name: String,
+  val root: String,
+  val type: String,
+  val existed: Boolean,
+)
 
 data class OnlineSourceDto(
   val id: String,

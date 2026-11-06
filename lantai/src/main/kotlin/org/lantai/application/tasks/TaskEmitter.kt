@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
 
+private const val PENDING_ANALYZE_PAGE_SIZE = 5000
+
 @Service
 class TaskEmitter(
   private val bookRepository: BookRepository,
@@ -43,12 +45,19 @@ class TaskEmitter(
   }
 
   fun analyzeUnknownAndOutdatedBooks(library: Library) {
-    analyzeNextBook(library.id, LOW_PRIORITY)
+    analyzePendingBooks(library.id, LOW_PRIORITY)
   }
 
   fun analyzeNextBook(
     libraryId: String,
     priority: Int = LOW_PRIORITY,
+  ) {
+    analyzePendingBooks(libraryId, priority)
+  }
+
+  private fun analyzePendingBooks(
+    libraryId: String,
+    priority: Int,
   ) {
     if (libraryId.isBlank()) return
     val condition =
@@ -60,11 +69,15 @@ class TaskEmitter(
         ),
       )
     val sort = Sort.by(Sort.Order.asc("seriesId"), Sort.Order.asc("number"))
-    bookRepository
-      .findAll(condition, SearchContext.empty(), PageRequest.of(0, 1, sort))
-      .content
-      .firstOrNull()
-      ?.let { submitTask(Task.AnalyzeBook(it.id, priority, it.seriesId, libraryId)) }
+    val tasks = mutableListOf<Task>()
+    var page = 0
+    while (true) {
+      val result = bookRepository.findAll(condition, SearchContext.empty(), PageRequest.of(page, PENDING_ANALYZE_PAGE_SIZE, sort))
+      result.content.mapTo(tasks) { Task.AnalyzeBook(it.id, priority, it.seriesId, libraryId) }
+      if (result.content.isEmpty() || tasks.size.toLong() >= result.totalElements) break
+      page++
+    }
+    if (tasks.isNotEmpty()) submitTasks(tasks)
   }
 
   fun hashBooksWithoutHash(library: Library) {
@@ -296,7 +309,7 @@ class TaskEmitter(
   }
 
   private fun submitTasks(tasks: Collection<Task>) {
-    logger.info { "Sending tasks: $tasks" }
+    logger.info { "Sending ${tasks.size} tasks: ${tasks.groupingBy { it.javaClass.simpleName }.eachCount()}" }
     tasksRepository.save(tasks)
     eventPublisher.publishEvent(TaskAddedEvent)
   }

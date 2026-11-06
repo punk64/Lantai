@@ -27,6 +27,7 @@ private val SEARCH_QUERY =
         coverImage { large }
         genres
         averageScore
+        countryOfOrigin
         siteUrl
         staff(perPage: 3) { nodes { name { full } } }
       }
@@ -119,6 +120,7 @@ class AniListScrapeSource(
       releaseDate = formatDate(node.path("startDate")),
       summary = stripHtml(node.path("description").asText()),
       coverUrl = node.path("coverImage").path("large").asText(),
+      region = node.path("countryOfOrigin").asText().trim().uppercase(),
       tags = node.path("genres").mapNotNull { it.asText().ifBlank { null } },
       rating = score?.let { it / 10.0 },
       url = node.path("siteUrl").asText(),

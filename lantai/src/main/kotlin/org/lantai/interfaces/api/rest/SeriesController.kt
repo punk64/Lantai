@@ -703,6 +703,8 @@ class SeriesController(
           readingDirectionLock = readingDirectionLock ?: existing.readingDirectionLock,
           publisher = publisher ?: existing.publisher,
           publisherLock = publisherLock ?: existing.publisherLock,
+          region = region?.trim()?.uppercase() ?: existing.region,
+          regionLock = regionLock ?: existing.regionLock,
           ageRating = if (isSet("ageRating")) ageRating else existing.ageRating,
           ageRatingLock = ageRatingLock ?: existing.ageRatingLock,
           genres =

@@ -106,6 +106,18 @@ class LantaiApiTokenController(
     apiTokenRepository.deleteById(id)
   }
 
+  @GetMapping("{id}/value")
+  @Operation(summary = "Read the plain value of an API token")
+  fun value(
+    @PathVariable id: String,
+  ): ApiTokenValueDto {
+    val token = apiTokenRepository.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    if (token.tokenValue.startsWith(HASH_LEGACY_PREFIX)) {
+      throw ResponseStatusException(HttpStatus.CONFLICT, "该令牌以旧版方式存储，明文无法恢复，请重新生成")
+    }
+    return ApiTokenValueDto(token.tokenValue)
+  }
+
   private fun requireName(raw: String): String {
     val name = raw.trim()
     if (name.isEmpty()) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "令牌名称不能为空")
@@ -132,7 +144,7 @@ class LantaiApiTokenController(
     return ApiTokenDto(
       id = id,
       name = name,
-      value = plainValue ?: maskValue(tokenValue),
+      value = plainValue ?: if (tokenValue.startsWith(HASH_LEGACY_PREFIX)) "****" else maskValue(tokenValue),
       scopes = scopes.map { it.label }.sorted(),
       enabled = enabled,
       expiresDate = expiresDate,
@@ -143,9 +155,18 @@ class LantaiApiTokenController(
       ownerId = ownerId,
       ownerUsername = owner?.username ?: ownerId,
       expired = isExpired(),
+      viewable = !tokenValue.startsWith(HASH_LEGACY_PREFIX),
     )
   }
+
+  private companion object {
+    private const val HASH_LEGACY_PREFIX = "sha512:"
+  }
 }
+
+data class ApiTokenValueDto(
+  val value: String,
+)
 
 data class ApiTokenDto(
   val id: String,
@@ -161,6 +182,7 @@ data class ApiTokenDto(
   val ownerId: String,
   val ownerUsername: String,
   val expired: Boolean,
+  val viewable: Boolean,
 )
 
 data class ApiTokenScopeDto(

@@ -10,6 +10,7 @@ class SeriesMetadata(
   summary: String = "",
   val readingDirection: ReadingDirection? = null,
   publisher: String = "",
+  region: String = "",
   val ageRating: Int? = null,
   language: String = "",
   genres: Set<String> = emptySet(),
@@ -24,6 +25,7 @@ class SeriesMetadata(
   val summaryLock: Boolean = false,
   val readingDirectionLock: Boolean = false,
   val publisherLock: Boolean = false,
+  val regionLock: Boolean = false,
   val ageRatingLock: Boolean = false,
   val languageLock: Boolean = false,
   val genresLock: Boolean = false,
@@ -40,6 +42,7 @@ class SeriesMetadata(
   val titleSort = titleSort.trim()
   val summary = summary.trim()
   val publisher = publisher.trim()
+  val region = region.trim()
   val language = BCP47TagValidator.normalize(language.trim())
   val tags = tags.lowerNotBlank().toSet()
   val genres = genres.lowerNotBlank().toSet()
@@ -52,6 +55,7 @@ class SeriesMetadata(
     summary: String = this.summary,
     readingDirection: ReadingDirection? = this.readingDirection,
     publisher: String = this.publisher,
+    region: String = this.region,
     ageRating: Int? = this.ageRating,
     language: String = this.language,
     genres: Set<String> = this.genres,
@@ -66,6 +70,7 @@ class SeriesMetadata(
     summaryLock: Boolean = this.summaryLock,
     readingDirectionLock: Boolean = this.readingDirectionLock,
     publisherLock: Boolean = this.publisherLock,
+    regionLock: Boolean = this.regionLock,
     ageRatingLock: Boolean = this.ageRatingLock,
     languageLock: Boolean = this.languageLock,
     genresLock: Boolean = this.genresLock,
@@ -84,6 +89,7 @@ class SeriesMetadata(
     summary = summary,
     readingDirection = readingDirection,
     publisher = publisher,
+    region = region,
     ageRating = ageRating,
     language = language,
     genres = genres,
@@ -98,6 +104,7 @@ class SeriesMetadata(
     summaryLock = summaryLock,
     readingDirectionLock = readingDirectionLock,
     publisherLock = publisherLock,
+    regionLock = regionLock,
     ageRatingLock = ageRatingLock,
     languageLock = languageLock,
     genresLock = genresLock,

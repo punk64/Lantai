@@ -133,6 +133,26 @@ class LantaiScrapeAgentController(
     apiTokenRepository.deleteById(id)
   }
 
+  @GetMapping("token/{id}/value")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Read the plain value of a scrape only API token")
+  fun tokenValue(
+    @PathVariable id: String,
+  ): ScrapeAgentTokenValueDto {
+    val token = apiTokenRepository.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    if (token.scopes.isEmpty() || !token.scopes.all { scope -> scope.isScrapeOnly }) {
+      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "只能查看刮削专用令牌")
+    }
+    if (token.tokenValue.startsWith(HASH_LEGACY_PREFIX)) {
+      throw ResponseStatusException(HttpStatus.CONFLICT, "该令牌以旧版方式存储，明文无法恢复，请重新生成")
+    }
+    return ScrapeAgentTokenValueDto(token.tokenValue)
+  }
+
+  private companion object {
+    private const val HASH_LEGACY_PREFIX = "sha512:"
+  }
+
   private fun maskValue(raw: String): String =
     if (raw.length <= 12) "****" else raw.take(10) + "…" + raw.takeLast(4)
 
@@ -140,15 +160,21 @@ class LantaiScrapeAgentController(
     ScrapeAgentTokenDto(
       id = id,
       name = name,
-      value = plainValue ?: maskValue(tokenValue),
+      value = plainValue ?: if (tokenValue.startsWith(HASH_LEGACY_PREFIX)) "****" else maskValue(tokenValue),
       enabled = enabled,
       expiresDate = expiresDate?.toString(),
       lastUsedDate = lastUsedDate?.toString(),
       useCount = useCount,
       createdDate = createdDate.toString(),
       scopes = scopes.map { it.label }.sorted(),
+      viewable = !tokenValue.startsWith(HASH_LEGACY_PREFIX),
     )
 }
+
+data class ScrapeAgentTokenValueDto(
+  val value: String,
+)
+
 
 data class ScrapeAgentTokenDto(
   val id: String,
@@ -160,6 +186,7 @@ data class ScrapeAgentTokenDto(
   val useCount: Int,
   val createdDate: String,
   val scopes: List<String>,
+  val viewable: Boolean,
 )
 
 data class ScrapeAgentTokenRequest(

@@ -7,6 +7,7 @@ data class SeriesMetadataPatch(
   val summary: String?,
   val readingDirection: SeriesMetadata.ReadingDirection?,
   val publisher: String?,
+  val region: String?,
   val ageRating: Int?,
   val language: String?,
   val genres: Set<String>?,

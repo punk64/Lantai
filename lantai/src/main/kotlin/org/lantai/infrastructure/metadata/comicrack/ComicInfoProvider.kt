@@ -160,6 +160,7 @@ class ComicInfoProvider(
         summary = null,
         readingDirection = readingDirection,
         publisher = comicInfo.publisher?.ifBlank { null },
+        region = null,
         ageRating = comicInfo.ageRating?.ageRating,
         language = if (comicInfo.languageISO != null && BCP47TagValidator.isValid(comicInfo.languageISO!!)) BCP47TagValidator.normalize(comicInfo.languageISO!!) else null,
         genres = if (!genres.isNullOrEmpty()) genres.toSet() else null,

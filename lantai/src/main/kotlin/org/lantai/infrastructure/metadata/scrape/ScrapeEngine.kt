@@ -259,6 +259,7 @@ class ScrapeEngine(
       title = metadata.title,
       summary = metadata.summary,
       publisher = metadata.publisher,
+      region = metadata.region,
       language = metadata.language,
       ageRating = metadata.ageRating,
       genres = metadata.genres.sorted(),
@@ -347,6 +348,7 @@ class ScrapeEngine(
       title = embedded.series.title.ifBlank { c?.title.orEmpty() },
       summary = embedded.series.summary.ifBlank { c?.summary.orEmpty() },
       publisher = embedded.series.publisher.ifBlank { c?.publisher.orEmpty() },
+      region = embedded.series.region.ifBlank { c?.region.orEmpty() },
       language = embedded.series.language,
       ageRating = null,
       genres = embedded.series.genres.ifEmpty { c?.tags.orEmpty() },
@@ -394,6 +396,7 @@ class ScrapeEngine(
     push("title", ScrapeTarget.SERIES, current.title, embedded.title, candidate?.title.orEmpty(), merged.title, metadata.titleLock)
     push("summary", ScrapeTarget.SERIES, current.summary, embedded.summary, candidate?.summary.orEmpty(), merged.summary, metadata.summaryLock)
     push("publisher", ScrapeTarget.SERIES, current.publisher, embedded.publisher, candidate?.publisher.orEmpty(), merged.publisher, metadata.publisherLock)
+    push("region", ScrapeTarget.SERIES, current.region, embedded.region, candidate?.region.orEmpty(), merged.region, metadata.regionLock)
     push("language", ScrapeTarget.SERIES, current.language, embedded.language, "", merged.language, metadata.languageLock)
     push("genres", ScrapeTarget.SERIES, current.genres.joinToString("、"), embedded.genres.joinToString("、"), candidate?.tags.orEmpty().joinToString("、"), merged.genres.joinToString("、"), metadata.genresLock)
     push("authors", ScrapeTarget.BOOK, current.authors.joinToString("、"), bookValues.authors.joinToString("、"), candidate?.authors.orEmpty().joinToString("、"), merged.authors.joinToString("、"), false)
@@ -429,6 +432,7 @@ class ScrapeEngine(
       title = value("title"),
       summary = value("summary"),
       publisher = value("publisher"),
+      region = value("region"),
       language = value("language"),
       genres = split(value("genres")),
       authors = split(value("authors")),

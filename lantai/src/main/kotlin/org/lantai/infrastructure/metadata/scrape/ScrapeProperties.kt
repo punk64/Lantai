@@ -14,6 +14,8 @@ class ScrapeProperties {
 
   class SourceProperties {
     var enabled: Boolean = false
+    var language: String = ""
+    var displayName: String = ""
     var baseUrl: String = ""
     var minIntervalMs: Long = 1500
     var dailyQuota: Int = 0

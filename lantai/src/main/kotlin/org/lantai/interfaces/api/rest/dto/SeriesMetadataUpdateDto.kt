@@ -35,6 +35,10 @@ class SeriesMetadataUpdateDto {
 
   var publisherLock: Boolean? = null
 
+  var region: String? = null
+
+  var regionLock: Boolean? = null
+
   var readingDirection: SeriesMetadata.ReadingDirection?
     by Delegates.observable(null) { prop, _, _ ->
       isSet[prop.name] = true

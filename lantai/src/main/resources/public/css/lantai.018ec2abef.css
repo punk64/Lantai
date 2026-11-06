@@ -67,12 +67,13 @@ svg.ic,svg:has(use[href^="#i-"]){width:16px;height:16px;flex:none;display:inline
 #app.collapsed{grid-template-columns:64px 1fr}
 .sidebar{background:linear-gradient(180deg,var(--bg-1),var(--bg));border-right:1px solid var(--line);
   display:flex;flex-direction:column;min-width:0;overflow:hidden}
-.brand{display:flex;align-items:center;gap:11px;padding:15px 16px 13px;border-bottom:1px solid var(--line);min-height:62px}
-.brand svg{width:34px;height:34px;flex:none;border-radius:8px;box-shadow:0 0 0 1px var(--acc-line),0 4px 12px rgba(0,0,0,.3)}
+.brand{display:flex;align-items:center;gap:12px;padding:16px 16px 14px;border-bottom:1px solid var(--line);min-height:74px}
+.brand svg{width:44px;height:44px;flex:none;border-radius:11px;box-shadow:0 0 0 1px var(--acc-line),0 4px 14px rgba(0,0,0,.32)}
 .brand-txt{min-width:0;overflow:hidden}
-.brand-txt b{display:block;font-family:var(--f-disp);font-size:19px;letter-spacing:4px;color:var(--acc-2);line-height:1.25;white-space:nowrap}
-.brand-txt span{display:block;font-size:10.5px;letter-spacing:2.4px;color:var(--tx-3);text-transform:uppercase;white-space:nowrap}
-#app.collapsed .brand{padding:15px 15px 13px}
+.brand-txt b{display:block;font-family:var(--f-disp);font-size:23px;letter-spacing:4.5px;color:var(--acc-2);line-height:1.22;white-space:nowrap}
+.brand-txt span{display:block;font-size:11.5px;letter-spacing:2.6px;color:var(--tx-3);text-transform:uppercase;white-space:nowrap}
+#app.collapsed .brand{padding:16px 10px 14px;justify-content:center}
+#app.collapsed .brand svg{width:40px;height:40px}
 #app.collapsed .brand-txt{opacity:0;width:0}
 .nav{flex:1;overflow-y:auto;padding:10px 10px 18px}
 .nav-grp{margin:14px 8px 7px;font-size:10.5px;letter-spacing:1.8px;text-transform:uppercase;color:var(--tx-4);white-space:nowrap}
@@ -619,6 +620,8 @@ html[data-theme=light] .pbar i:not(.done){background:linear-gradient(90deg,#6b4c
 .boot-lang .seg{margin-left:auto;transform:scale(.92);transform-origin:right center}
 .boot-lang select{margin-left:auto;max-width:190px;height:30px;font-size:11.5px;padding:0 8px}
 @media (max-width:1080px){#app{grid-template-columns:64px 1fr}#app .nav .lb,#app .nav .tag,#app .brand-txt,#app .side-foot span{display:none}
+  #app .brand{padding:16px 10px 14px;justify-content:center}
+  #app .brand svg{width:40px;height:40px}
   #app .nav a.on:before{left:-10px}}
 @media (max-width:720px){.page{padding:16px 13px 50px}.g-kpi,.row2,.row3{grid-template-columns:1fr}.shelf{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
   .topbar{padding:0 12px}.userchip .u-n,.userchip .u-r{display:none}.rd-col{--rdw:100%}}
@@ -752,9 +755,20 @@ html{-webkit-tap-highlight-color:transparent}
 #modal .modal-h,#modal .modal-f,#drawer .drawer-h,#palette .pal-list{user-select:none;-webkit-user-select:none}
 #app a,#app img,#app svg,#boot img{-webkit-user-drag:none}
 #app input,#app textarea,#app .inp,#boot input,#modal input,#modal textarea,
-#ebView,#app .api-dt-box,#app #logList,#app .ser-sum,#app pre,#app code,#modal .modal-b
+#drawer input,#drawer textarea,#drawer .inp,#drawer .drawer-b,
+#ebView,#app .api-dt-box,#app #logList,#app .ser-sum,#app pre,#app code,#modal .modal-b,#modal .tok-val
   {user-select:text;-webkit-user-select:text}
-#app input,#app textarea,#app .inp,#boot input,#modal input,#modal textarea{cursor:text}
+#app input,#app textarea,#app .inp,#boot input,#modal input,#modal textarea,#drawer input,#drawer textarea{cursor:text}
+
+.libgrid{align-items:start}
+.libcard{display:flex;flex-direction:column}
+.libstats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;text-align:center;margin:0 0 10px}
+.libstats b{display:block;font-family:var(--f-disp);font-size:17px;line-height:1.25}
+.libkv{display:flex;align-items:center;gap:8px;min-width:0;margin-top:4px}
+.libkv-l{flex:0 0 38px;font-size:11.5px;color:var(--tx-3);white-space:nowrap}
+.libkv-v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libfmt{gap:5px}
+.libacts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 
 .cm{position:fixed;inset:0;z-index:72;display:none;overflow:hidden;background:#0a0b0c;color:#e9e4d8;
   --cmt:0px;--cmb:0px;--cml:0px;--cmr:0px;--cmgap:8px;--cmz:1}

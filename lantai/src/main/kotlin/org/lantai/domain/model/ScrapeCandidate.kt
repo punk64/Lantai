@@ -7,6 +7,7 @@ data class ScrapeCandidate(
   val subtitle: String = "",
   val authors: List<String> = emptyList(),
   val publisher: String = "",
+  val region: String = "",
   val releaseDate: String = "",
   val summary: String = "",
   val coverUrl: String = "",

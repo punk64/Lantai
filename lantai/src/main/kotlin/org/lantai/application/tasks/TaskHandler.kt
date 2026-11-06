@@ -97,8 +97,6 @@ class TaskHandler(
             } catch (e: Exception) {
               if (book != null) bookLifecycle.markAnalysisFailed(book)
               throw e
-            } finally {
-              runCatching { taskEmitter.analyzeNextBook(book?.libraryId ?: task.libraryId, task.priority) }
             }
           }
 

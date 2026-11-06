@@ -449,6 +449,8 @@ class SeriesDtoDao(
     readingDirectionLock = readingDirectionLock,
     publisher = publisher,
     publisherLock = publisherLock,
+    region = region,
+    regionLock = regionLock,
     ageRating = ageRating,
     ageRatingLock = ageRatingLock,
     language = language,

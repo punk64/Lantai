@@ -20,6 +20,7 @@ data class ScrapeValues(
   val title: String = "",
   val summary: String = "",
   val publisher: String = "",
+  val region: String = "",
   val language: String = "",
   val ageRating: Int? = null,
   val genres: List<String> = emptyList(),

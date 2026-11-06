@@ -6,6 +6,7 @@ import org.lantai.domain.model.DirectoryNotFoundException
 import org.lantai.domain.model.ScanResult
 import org.lantai.domain.model.Series
 import org.lantai.domain.model.Sidecar
+import org.lantai.infrastructure.metadata.SeriesTitleCleaner
 import org.lantai.infrastructure.sidecar.SidecarBookConsumer
 import org.lantai.infrastructure.sidecar.SidecarSeriesConsumer
 import org.springframework.stereotype.Service
@@ -107,7 +108,7 @@ class FileSystemScanner(
 
             pathToSeries[dir] =
               Series(
-                name = dir.name.ifBlank { dir.pathString },
+                name = SeriesTitleCleaner.clean(dir.name) ?: dir.name.ifBlank { dir.pathString },
                 url = dir.toUri().toURL(),
                 fileLastModified = attrs.getUpdatedTime(),
               )
@@ -253,7 +254,7 @@ class FileSystemScanner(
     attrs: BasicFileAttributes,
   ): Book =
     Book(
-      name = path.nameWithoutExtension,
+      name = SeriesTitleCleaner.clean(path.nameWithoutExtension) ?: path.nameWithoutExtension,
       url = path.toUri().toURL(),
       fileLastModified = attrs.getUpdatedTime(),
       fileSize = attrs.size(),

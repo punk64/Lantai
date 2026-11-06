@@ -159,10 +159,17 @@ class LibraryContentLifecycle(
         } else {
           // if series already exists, update it
           logger.debug { "Scanned series already exists. Scanned: $newSeries, Existing: $existingSeries" }
-          val seriesChanged = newSeries.fileLastModified.notEquals(existingSeries.fileLastModified) || existingSeries.deletedDate != null || seriesUrlWithDeletedBooks.contains(newSeries.url)
+          val seriesRenamed = newSeries.name.isNotBlank() && newSeries.name != existingSeries.name
+          val seriesChanged = seriesRenamed || newSeries.fileLastModified.notEquals(existingSeries.fileLastModified) || existingSeries.deletedDate != null || seriesUrlWithDeletedBooks.contains(newSeries.url)
           if (seriesChanged) {
             logger.info { "Series changed on disk, updating: $existingSeries" }
-            seriesRepository.update(existingSeries.copy(fileLastModified = newSeries.fileLastModified, deletedDate = null))
+            seriesRepository.update(
+              existingSeries.copy(
+                name = if (seriesRenamed) newSeries.name else existingSeries.name,
+                fileLastModified = newSeries.fileLastModified,
+                deletedDate = null,
+              ),
+            )
           }
           if (scanDeep || seriesChanged) {
             // update list of books with existing entities if they exist
@@ -185,6 +192,7 @@ class LibraryContentLifecycle(
                     logger.info { "Book changed on disk, but still has the same hash, no need to reset media status: $existingBook" }
                     val updatedBook =
                       existingBook.copy(
+                        name = newBook.name.ifBlank { existingBook.name },
                         fileLastModified = newBook.fileLastModified,
                         fileSize = newBook.fileSize,
                         fileHash = hash,
@@ -194,6 +202,7 @@ class LibraryContentLifecycle(
                     logger.info { "Book changed on disk, update and reset media status: $existingBook" }
                     val updatedBook =
                       existingBook.copy(
+                        name = newBook.name.ifBlank { existingBook.name },
                         fileLastModified = newBook.fileLastModified,
                         fileSize = newBook.fileSize,
                         fileHash = hash ?: "",
@@ -206,6 +215,8 @@ class LibraryContentLifecycle(
                       bookRepository.update(updatedBook)
                     }
                   }
+                } else if (newBook.name.isNotBlank() && newBook.name != existingBook.name) {
+                  bookRepository.update(existingBook.copy(name = newBook.name))
                 }
               }
             }

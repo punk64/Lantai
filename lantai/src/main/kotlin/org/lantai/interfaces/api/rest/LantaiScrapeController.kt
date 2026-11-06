@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.lantai.domain.model.ScrapeCandidate
 import org.lantai.infrastructure.metadata.scrape.ScrapeException
+import org.lantai.infrastructure.metadata.scrape.ScrapeProperties
 import org.lantai.infrastructure.metadata.scrape.ScrapeQuotaExceededException
 import org.lantai.infrastructure.metadata.scrape.ScrapeRateLimiter
 import org.lantai.infrastructure.metadata.scrape.ScrapeSourceRegistry
@@ -25,6 +26,7 @@ private val logger = KotlinLogging.logger {}
 class LantaiScrapeController(
   private val registry: ScrapeSourceRegistry,
   private val rateLimiter: ScrapeRateLimiter,
+  private val properties: ScrapeProperties,
 ) {
   @GetMapping("sources")
   @PreAuthorize("hasRole('ADMIN')")
@@ -40,6 +42,7 @@ class LantaiScrapeController(
         kind = it.kind.name,
         builtin = it.builtin,
         baseUrl = it.baseUrl,
+        language = properties.source(it.id).language,
       )
     }
 
@@ -96,6 +99,7 @@ data class ScrapeSourceInfoDto(
   val kind: String = "BUILTIN",
   val builtin: Boolean = false,
   val baseUrl: String = "",
+  val language: String = "",
 )
 
 data class ScrapeCandidateDto(

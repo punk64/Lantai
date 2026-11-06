@@ -42,7 +42,7 @@
   };
 })();
 
-(function(){var D=window.LANTAI_I18N_DICT=window.LANTAI_I18N_DICT||{};D["zh-Hans"]={"brand.tagline":"个人书库 · 阅读与归档","boot.login":"登录","boot.userOrEmail":"用户名或邮箱","boot.password":"密码","boot.go":"进入兰台","boot.hint":"首次使用：管理员账号与初始密码已打印在启动日志（控制台窗口）中，登录后请立即修改密码","boot.language":"界面语言","boot.remember":"记住账号","boot.checking":"校验中…","boot.fillLogin":"请填写用户名与密码","boot.badCred":"用户名或密码不正确","boot.loginFail":"登录失败，请稍后再试","boot.needLogin":"请使用兰台账号登录","boot.serverDown":"服务端暂时不可用（状态码 {code}）","boot.cantConnect":"无法连接服务端，请确认兰台已启动","boot.loggedOut":"已退出登录","boot.signedIn":"已登录","nav.gOverview":"概览","nav.gLantai":"兰台增量","nav.gSystem":"系统","nav.home":"首页","nav.browse":"书库","nav.collections":"合集","nav.readlists":"阅读清单","nav.online":"在线源","nav.scrape":"刮削","nav.annotations":"批注","nav.stats":"阅读统计","nav.tasks":"任务中心","nav.settings":"设置中心","nav.extensions":"功能拓展","nav.users":"用户管理","nav.audit":"管理日志","nav.logs":"日志","nav.opds":"OPDS 目录","nav.kobo":"Kobo 设备","nav.devices":"阅读设备","nav.trash":"回收站","nav.inspect":"查重","nav.system":"系统信息","nav.protocol":"API 接口","top.search":"搜索系列、书籍、合集、在线源…","top.tasks":"任务队列","top.theme":"切换主题","top.nav":"导航","top.collapse":"收起导航","top.admin":"管理员","top.allLibs":"管理员 · 全部库","side.running":"运行中","side.onlineDown":"在线源服务未启动","side.onlineUp":"在线源服务运行中","set.title":"设置中心","set.sub":"书库、在线源、阅读与缓存设置","set.api":"API 接口","set.libraries":"库与扫描","set.online":"在线库配置","set.heartbeat":"计时与同步","set.appearance":"外观","set.cache":"派生缓存","set.backup":"备份","set.tokens":"API 令牌","set.system":"兰台全局","set.upgrade":"在线升级","set.language":"界面语言","set.languageNote":"切换后立即生效，仅影响界面文字，不改变书籍元数据。","set.languageScope":"当前覆盖登录页、导航、顶栏与设置页标题；具体业务页正文仍为中文。","common.save":"保存","common.cancel":"取消","common.delete":"删除","common.close":"关闭","common.confirm":"确认","common.search":"搜索","common.filter":"筛选","common.reset":"重置","common.loading":"加载中…","common.retry":"重试","common.empty":"暂无数据","common.all":"全部","ext.lang.all":"全部语言","ext.lang.more":"更多 {n} 种","ext.lang.pick":"选择语言","ext.lang.search":"搜索语言…","ext.lang.empty":"没有匹配的语言","ext.page.prev":"上一页","ext.page.next":"下一页","ext.page.detail":"共 {n} 条 · 第 {cur} / {pages} 页 · 本页 {m} 条","ext.searchPh":"搜索扩展…","ext.col.ext":"扩展","ext.col.lang":"语言","ext.col.ver":"版本","ext.col.state":"状态","ext.col.acts":"操作","nav.gMore":"更多","nav.about":"关于","nav.notify":"通知","api.title":"API 接口","api.sub":"全部对外接口 · {n} 个端点 · 基地址 {host}","api.needAdmin":"需要管理员权限","api.needAdminHint":"接口清单包含全部对外端点与鉴权方式，仅管理员账户可查看。","api.copyBase":"复制基地址","api.openapi":"OpenAPI JSON","api.users":"用户与角色","api.loading":"正在读取接口文档…","api.loadFail":"读取接口文档失败：{msg}","api.retry":"重新加载","api.authTitle":"调用说明","api.authHint":"鉴权与示例","api.expand":"展开","api.collapse":"收起","api.filterGroup":"功能","api.filterVer":"版本","api.all":"全部","api.count":"{n} 个端点","api.search":"搜索路径、说明或标签…","api.noResult":"没有匹配的端点","api.colMethod":"方法","api.colPath":"路径","api.colSummary":"说明","api.colVer":"版本","api.colTag":"标签","api.authBasic":"Basic Auth","api.authApiKey":"API Key","api.authAgent":"Agent 令牌","api.authSession":"会话","api.authBasicUse":"Authorization: Basic base64(邮箱:密码)","api.authApiKeyUse":"X-API-Key: 访问密钥","api.authAgentUse":"Authorization: Bearer 令牌（config-dir/agent-token.txt）","api.authSessionUse":"登录后返回 LANTAI-SESSION Cookie；加 X-Auth-Token 头可改用该头传会话","api.authLan":"所有接口基地址 {host}，局域网内其他设备需放行 25600 端口。","api.clients":"客户端适用内容","api.clientsClient":"客户端","api.clientsFits":"适合","api.clientsNot":"不支持","api.access":"接入方式","api.accessAddr":"地址","api.accessAccount":"账号","api.accessLan":"局域网访问需放行 25600 端口","api.accessSame":"客户端与电脑须在同一局域网","api.verLantai":"兰台","api.verV1":"v1","api.verV2":"v2","api.verOther":"—","api.grpLantai":"兰台自有","api.grpOther":"其他","api.detailParams":"参数","api.detailBody":"请求体","api.detailResp":"响应","api.detailNone":"没有需要说明的参数","api.detailRequired":"必填","api.detailName":"名称","api.detailType":"类型","api.detailDesc":"说明","api.detailClose":"收起详情","api.detailOpen":"查看详情","up.title":"在线更新","up.current":"当前版本","up.latest":"最新版本","up.uptodate":"已是最新版本","up.norelease":"更新源暂无可用版本","up.check":"检查更新","up.checking":"正在检查…","up.published":"发布时间","up.size":"大小","up.notes":"更新说明","up.download":"下载更新包","up.downloading":"正在下载","up.verifying":"正在校验","up.ready":"已下载并通过校验","up.install":"安装并重启","up.reverify":"重新校验","up.discard":"放弃这个包","up.autoCheck":"自动检查更新","up.autoCheckHint":"打开升级页时向更新源确认一次，最多每 4 小时一次","up.autoDownload":"发现新版本后自动下载","up.autoInstall":"下载校验通过后自动安装并重启","up.autoInstallHint":"仅容器部署可全自动；桌面形态安装后需手动重新启动","up.feed":"更新源","up.feedHint":"默认读取项目 Release，可换成返回同结构的镜像地址","up.unreachable":"更新源不可达","up.restartContainer":"兰台进程会退出，由容器自动拉起新版本；未配置重启策略时请手动启动容器","up.phUpload":"正在上传升级包","up.phDownload":"正在下载升级包","up.phUnzip":"正在解压升级包","up.phVerify":"正在校验升级包","up.phBackup":"正在备份当前版本","up.phCopy":"正在替换程序文件","up.phRestart":"已替换，正在重启","up.phWorking":"正在处理","up.pollFail":"后端繁忙，进度查询失败，正在重试","up.pollTimeout":"长时间没有收到进度，后端可能已被其他任务占满；可稍后在任务页确认，或重启兰台后再试","up.restartTitle":"正在升级","up.restartMsg":"兰台正在替换程序并重启，页面会自动重新连接。请不要关闭或刷新本页。","up.restartWait":"已等待 {n} 秒","up.restartReload":"立即刷新","up.restartPending":"升级已提交，正在等待服务重启","up.restartTimeout":"未检测到服务重启，请手动启动兰台后刷新本页","up.manualHint":"兰台会自行退出，请重新启动后再刷新本页","up.importTitle":"导入升级包","up.importHint":"升级包只包含应用 jar，不含镜像、JDK、配置与数据。上传后先校验，确认无误才替换文件。","up.verifyBtn":"校验","up.rollback":"回退","up.rollbackHint":"每次升级前会把当前 jar 备份到配置目录 upgrade/backup/，只保留一份。","up.backupNone":"无","up.jarPath":"运行文件","up.jarWritable":"写入权限","up.jarWritableYes":"可替换","up.jarWritableNo":"不可写，无法在线升级","up.deploy":"部署形态","up.deployContainer":"容器内","up.deployBare":"裸机 / 桌面","up.restartNote":"升级后","up.target":"目标版本","up.sha":"SHA-256","up.builtAt":"构建时间","up.applyNow":"立即升级并重启","up.discardShort":"放弃这个包","up.checkedAt":"最后检查 {t}","up.noNotes":"该版本未提供说明","up.dropTitle":"把升级包拖到这里，或点击选择文件","up.dropHint":"支持 .zip 格式，单个文件不超过 512 MB","up.foundNew":"发现新版本 v{v}","up.uptodateToast":"已是最新版本 v{v}","about.title":"关于兰台","about.version":"版本","about.build":"构建时间","about.runtime":"运行形态","about.repo":"项目地址","about.license":"许可证","about.upstream":"上游项目","about.check":"检查更新","notify.title":"通知","notify.empty":"暂无通知","notify.markAll":"全部标为已读","notify.newVer":"发现新版本 {v}","notify.view":"查看更新说明","help.copy":"复制","help.export":"导出 .md","help.copied":"已复制到剪贴板","help.copyFail":"复制失败，请手动选择","help.exported":"已导出 {name}","home.err":"首页数据加载失败，分组暂时为空。","home.libs":"{n} 个库","home.kpi.today":"今日阅读","home.kpi.todayD":"今日累计时长","home.kpi.week":"近 7 日","home.kpi.weekD":"近一周合计","home.kpi.heldVal":"册 / {s} 系列","home.unit.item":"条","home.kpi.subsUnit":"{n} 章","ago.today":"今天","ago.yesterday":"昨天","ago.days":"{n} 天前","home.kpi.held":"馆藏","home.kpi.heldD":"{l} 个本地库 · {o} 个在线库","home.kpi.subs":"在线订阅","home.kpi.subsD":"{n} 部已订阅","home.kpi.subsWait":"目录载入后统计","home.kpi.annot":"批注","home.kpi.annotD":"高亮 / 下划线 / 书签 / 笔记","home.kpi.annotWait":"打开批注页后载入","home.act.sections":"首页分组","home.act.scan":"扫描本地库","home.act.online":"在线源","home.cont.title":"继续阅读","home.cont.hint":"按最近阅读排序","home.cont.all":"全部书库","home.cont.empty":"还没有在读的书。随便打开一本，读几页就会出现在这里。","home.cont.page":"第 {n} {u}","home.unit.page":"页","home.unit.chapter":"章","home.chart.title":"近 14 日时长","home.chart.go":"统计页","home.pipe.title":"管线与格式","home.pipe.wait":"格式分布需要完整书目，进入书库后自动统计。","home.pipe.loading":"正在载入馆藏结构…","home.pipe.note":"TXT 与文字型 EPUB 按章节读取。","home.pipe.count":"{n} 册","home.byLib":"按库浏览","home.noLib":"还没有书库","home.online.title":"在线库概览","home.online.mgr":"管理订阅","home.online.empty":"还没有订阅，去在线源搜索一部漫画。","home.online.note":"在线书与本地书共用同一套书库与进度，两端阅读位置互通；章节按需下载。","home.run.title":"运行状态","home.run.uptime":"已运行","home.run.db":"数据库","home.run.proxy":"在线源服务","home.run.proxyOn":"运行中 · 端口 {p}","home.run.proxyOff":"未启动","home.run.cal":"Calibre","home.run.calOn":"已安装 {v}","home.run.calOff":"未安装 · MOBI/AZW3/FB2 暂只可下载","home.run.api":"API 接口","shelf.moreShort":"查看更多","shelf.more":"查看更多（剩余 {n}）","shelf.collapse":"收起","shelf.emptyBook":"暂无书籍。新入库的书解析完成后才会出现在这里。","shelf.emptySeries":"还没有系列，扫描书库后出现。","sec.ondeck.title":"导航 · 下一本","sec.ondeck.hint":"读完一本后自动推荐同系列的下一本","sec.ondeck.empty":"读完一本后，同系列的下一本会出现在这里。","sec.published.title":"最近发布","sec.published.hint":"按出版日期","sec.published.hint30":"按出版日期 · 近一个月","sec.published.empty":"还没有带出版日期的书籍。刮削元数据后即可按出版时间排列。","sec.added.title":"最近添加的书籍","sec.added.hint":"按入库时间","sec.recentRead.title":"最近阅读","sec.recentRead.hint":"按最近一次阅读时间","sec.recentRead.empty":"还没有阅读记录。打开任意一本书，进度会自动出现在这里。","sec.newSeries.title":"最近添加的系列","sec.updSeries.title":"最近更新的系列","sec.updSeries.hint":"按最后修改时间","fmt.DIVINA":"固定版式 · 页图","fmt.PDF":"固定版式 · 服务端渲染","fmt.EPUB":"可重排 · 文字版","fmt.TXT":"可重排 · 章节随机读","fmt.UNSUPPORTED":"需外部转换器","greet.s0.v0":"夜还长，书还热，兰台","greet.s0.v1":"这个点还没睡，不是书太好看，就是心事太多，兰台","greet.s0.v2":"世界都睡了，只剩翻书的声音，兰台","greet.s0.v3":"凌晨适合读点不着急的书，兰台","greet.s0.v4":"灯亮着，字也亮着，兰台","greet.s0.v5":"深夜的读者，不必向谁解释，兰台","greet.s0.v6":"读完这一章就睡，说好了，兰台","greet.s1.v0":"天光刚醒，先读三页再出门，兰台","greet.s1.v1":"早上好，今天第一件事是翻开书，兰台","greet.s1.v2":"清晨的字最清楚，兰台","greet.s1.v3":"鸟叫了，茶还烫，书正好，兰台","greet.s1.v4":"太阳刚上来，书签停在哪一页了？","greet.s1.v5":"早起的人，先读到好句子，兰台","greet.s1.v6":"一日之计，从一章开始，兰台","greet.s2.v0":"上午好，注意力最贵，读点硬的，兰台","greet.s2.v1":"一天里最清醒的两小时，交给书吧，兰台","greet.s2.v2":"光正好，适合把那本难啃的啃下来，兰台","greet.s2.v3":"上午好，进度条又往前走了一点，兰台","greet.s2.v4":"趁世界还没吵起来，多读几页，兰台","greet.s2.v5":"头脑清楚的时候，别都花在刷手机上，兰台","greet.s2.v6":"上午的安静是借来的，记得还给自己，兰台","greet.s3.v0":"午安，饭后两页比午睡更提神，兰台","greet.s3.v1":"中午了，吃好也读好，兰台","greet.s3.v2":"午休时间，一章刚刚好，兰台","greet.s3.v3":"太阳在头顶，书在手里，兰台","greet.s3.v4":"午安，别急着干活，先把这一节读完，兰台","greet.s3.v5":"一天的中间，停下来翻两页，兰台","greet.s3.v6":"饭在消化，让眼睛也吃点好的，兰台","greet.s4.v0":"下午好，茶配一章，正合适，兰台","greet.s4.v1":"阳光斜进来了，书页也跟着亮，兰台","greet.s4.v2":"下午容易困，好故事能救，兰台","greet.s4.v3":"一天过了三分之二，故事才到一半，兰台","greet.s4.v4":"下午好，慢慢读，不用赶，兰台","greet.s4.v5":"这个点的光，最适合看书，兰台","greet.s4.v6":"再读一章，就该收工了，兰台","greet.s5.v0":"晚上好，灯下见，兰台","greet.s5.v1":"一天收尾，把最后半小时留给书，兰台","greet.s5.v2":"晚饭后的一章，是一天里最稳的时刻，兰台","greet.s5.v3":"晚上好，外面很吵，书里很静，兰台","greet.s5.v4":"今天辛苦了，读点轻松的，兰台","greet.s5.v5":"夜色刚起，正好接上昨天的进度，兰台","greet.s5.v6":"灯开一盏就够，字自己会亮，兰台","greet.s6.v0":"夜深了，读完这章就睡，兰台","greet.s6.v1":"深夜好，书比人精神，兰台","greet.s6.v2":"这个点还在读，是喜欢，不是失眠，兰台","greet.s6.v3":"世界安静下来，故事才开始响，兰台","greet.s6.v4":"最后一章，看完就关灯，兰台","greet.s6.v5":"夜里的字比白天温柔，兰台","greet.s6.v6":"明天要早起的话，就少读一页，兰台"};})();
+(function(){var D=window.LANTAI_I18N_DICT=window.LANTAI_I18N_DICT||{};D["zh-Hans"]={"brand.tagline":"个人书库 · 阅读与归档","boot.login":"登录","boot.userOrEmail":"用户名或邮箱","boot.password":"密码","boot.go":"进入兰台","boot.hint":"首次使用：管理员账号与初始密码已打印在启动日志（控制台窗口）中，登录后请立即修改密码","boot.language":"界面语言","boot.remember":"保持登录状态","boot.checking":"校验中…","boot.fillLogin":"请填写用户名与密码","boot.badCred":"用户名或密码不正确","boot.loginFail":"登录失败，请稍后再试","boot.needLogin":"请使用兰台账号登录","boot.serverDown":"服务端暂时不可用（状态码 {code}）","boot.cantConnect":"无法连接服务端，请确认兰台已启动","boot.loggedOut":"已退出登录","boot.signedIn":"已登录","nav.gOverview":"概览","nav.gLantai":"兰台增量","nav.gSystem":"系统","nav.home":"首页","nav.browse":"书库","nav.collections":"合集","nav.readlists":"阅读清单","nav.online":"在线源","nav.scrape":"刮削","nav.annotations":"批注","nav.stats":"阅读统计","nav.tasks":"任务中心","nav.settings":"设置中心","nav.extensions":"功能拓展","nav.users":"用户管理","nav.audit":"管理日志","nav.logs":"日志","nav.opds":"OPDS 目录","nav.kobo":"Kobo 设备","nav.devices":"阅读设备","nav.trash":"回收站","nav.inspect":"查重","nav.system":"系统信息","nav.protocol":"API 接口","top.search":"搜索系列、书籍、合集、在线源…","top.tasks":"任务队列","top.theme":"切换主题","top.nav":"导航","top.collapse":"收起导航","top.admin":"管理员","top.allLibs":"管理员 · 全部库","side.running":"运行中","side.onlineDown":"在线源服务未启动","side.onlineUp":"在线源服务运行中","set.title":"设置中心","set.sub":"书库、在线源、阅读与缓存设置","set.api":"API 接口","set.libraries":"库与扫描","set.online":"在线库配置","set.heartbeat":"计时与同步","set.appearance":"外观","set.cache":"派生缓存","set.backup":"备份","set.tokens":"API 令牌","set.system":"兰台全局","set.upgrade":"在线升级","set.language":"界面语言","set.languageNote":"切换后立即生效，仅影响界面文字，不改变书籍元数据。","set.languageScope":"当前覆盖登录页、导航、顶栏与设置页标题；具体业务页正文仍为中文。","common.save":"保存","common.cancel":"取消","common.delete":"删除","common.close":"关闭","common.confirm":"确认","common.search":"搜索","common.filter":"筛选","common.reset":"重置","common.loading":"加载中…","common.retry":"重试","common.empty":"暂无数据","common.all":"全部","ext.lang.all":"全部语言","ext.lang.more":"更多 {n} 种","ext.lang.pick":"选择语言","ext.lang.search":"搜索语言…","ext.lang.empty":"没有匹配的语言","ext.page.prev":"上一页","ext.page.next":"下一页","ext.page.detail":"共 {n} 条 · 第 {cur} / {pages} 页 · 本页 {m} 条","ext.searchPh":"搜索扩展…","ext.col.ext":"扩展","ext.col.lang":"语言","ext.col.ver":"版本","ext.col.state":"状态","ext.col.acts":"操作","nav.gMore":"更多","nav.about":"关于","nav.notify":"通知","api.title":"API 接口","api.sub":"全部对外接口 · {n} 个端点 · 基地址 {host}","api.needAdmin":"需要管理员权限","api.needAdminHint":"接口清单包含全部对外端点与鉴权方式，仅管理员账户可查看。","api.copyBase":"复制基地址","api.openapi":"OpenAPI JSON","api.users":"用户与角色","api.loading":"正在读取接口文档…","api.loadFail":"读取接口文档失败：{msg}","api.retry":"重新加载","api.authTitle":"调用说明","api.authHint":"鉴权与示例","api.expand":"展开","api.collapse":"收起","api.filterGroup":"功能","api.filterVer":"版本","api.all":"全部","api.count":"{n} 个端点","api.search":"搜索路径、说明或标签…","api.noResult":"没有匹配的端点","api.colMethod":"方法","api.colPath":"路径","api.colSummary":"说明","api.colVer":"版本","api.colTag":"标签","api.authBasic":"Basic Auth","api.authApiKey":"API Key","api.authAgent":"Agent 令牌","api.authSession":"会话","api.authBasicUse":"Authorization: Basic base64(邮箱:密码)","api.authApiKeyUse":"X-API-Key: 访问密钥","api.authAgentUse":"Authorization: Bearer 令牌（config-dir/agent-token.txt）","api.authSessionUse":"登录后返回 LANTAI-SESSION Cookie；加 X-Auth-Token 头可改用该头传会话","api.authLan":"所有接口基地址 {host}，局域网内其他设备需放行 25600 端口。","api.clients":"客户端适用内容","api.clientsClient":"客户端","api.clientsFits":"适合","api.clientsNot":"不支持","api.access":"接入方式","api.accessAddr":"地址","api.accessAccount":"账号","api.accessLan":"局域网访问需放行 25600 端口","api.accessSame":"客户端与电脑须在同一局域网","api.verLantai":"兰台","api.verV1":"v1","api.verV2":"v2","api.verOther":"—","api.grpLantai":"兰台自有","api.grpOther":"其他","api.detailParams":"参数","api.detailBody":"请求体","api.detailResp":"响应","api.detailNone":"没有需要说明的参数","api.detailRequired":"必填","api.detailName":"名称","api.detailType":"类型","api.detailDesc":"说明","api.detailClose":"收起详情","api.detailOpen":"查看详情","up.title":"在线更新","up.current":"当前版本","up.latest":"最新版本","up.uptodate":"已是最新版本","up.norelease":"更新源暂无可用版本","up.check":"检查更新","up.checking":"正在检查…","up.published":"发布时间","up.size":"大小","up.notes":"更新说明","up.download":"下载更新包","up.downloading":"正在下载","up.verifying":"正在校验","up.ready":"已下载并通过校验","up.install":"安装并重启","up.reverify":"重新校验","up.discard":"放弃这个包","up.autoCheck":"自动检查更新","up.autoCheckHint":"打开升级页时向更新源确认一次，最多每 4 小时一次","up.autoDownload":"发现新版本后自动下载","up.autoInstall":"下载校验通过后自动安装并重启","up.autoInstallHint":"仅容器部署可全自动；桌面形态安装后需手动重新启动","up.feed":"更新源","up.feedHint":"默认读取项目 Release，可换成返回同结构的镜像地址","up.unreachable":"更新源不可达","up.restartContainer":"兰台进程会退出，由容器自动拉起新版本；未配置重启策略时请手动启动容器","up.phUpload":"正在上传升级包","up.phDownload":"正在下载升级包","up.phUnzip":"正在解压升级包","up.phVerify":"正在校验升级包","up.phBackup":"正在备份当前版本","up.phCopy":"正在替换程序文件","up.phRestart":"已替换，正在重启","up.phWorking":"正在处理","up.pollFail":"后端繁忙，进度查询失败，正在重试","up.pollTimeout":"长时间没有收到进度，后端可能已被其他任务占满；可稍后在任务页确认，或重启兰台后再试","up.restartTitle":"正在升级","up.restartMsg":"兰台正在替换程序并重启，页面会自动重新连接。请不要关闭或刷新本页。","up.restartWait":"已等待 {n} 秒","up.restartReload":"立即刷新","up.restartPending":"升级已提交，正在等待服务重启","up.restartTimeout":"未检测到服务重启，请手动启动兰台后刷新本页","up.manualHint":"兰台会自行退出，请重新启动后再刷新本页","up.importTitle":"导入升级包","up.importHint":"升级包只包含应用 jar，不含镜像、JDK、配置与数据。上传后先校验，确认无误才替换文件。","up.verifyBtn":"校验","up.rollback":"回退","up.rollbackHint":"每次升级前会把当前 jar 备份到配置目录 upgrade/backup/，只保留一份。","up.backupNone":"无","up.jarPath":"运行文件","up.jarWritable":"写入权限","up.jarWritableYes":"可替换","up.jarWritableNo":"不可写，无法在线升级","up.deploy":"部署形态","up.deployContainer":"容器内","up.deployBare":"裸机 / 桌面","up.restartNote":"升级后","up.target":"目标版本","up.sha":"SHA-256","up.builtAt":"构建时间","up.applyNow":"立即升级并重启","up.discardShort":"放弃这个包","up.checkedAt":"最后检查 {t}","up.noNotes":"该版本未提供说明","up.dropTitle":"把升级包拖到这里，或点击选择文件","up.dropHint":"支持 .zip 格式，单个文件不超过 512 MB","up.foundNew":"发现新版本 v{v}","up.uptodateToast":"已是最新版本 v{v}","about.title":"关于兰台","about.version":"版本","about.build":"构建时间","about.runtime":"运行形态","about.repo":"项目地址","about.license":"许可证","about.upstream":"上游项目","about.check":"检查更新","notify.title":"通知","notify.empty":"暂无通知","notify.markAll":"全部标为已读","notify.newVer":"发现新版本 {v}","notify.view":"查看更新说明","help.copy":"复制","help.export":"导出 .md","help.copied":"已复制到剪贴板","help.copyFail":"复制失败，请手动选择","help.exported":"已导出 {name}","home.err":"首页数据加载失败，分组暂时为空。","home.libs":"{n} 个库","home.kpi.today":"今日阅读","home.kpi.todayD":"今日累计时长","home.kpi.week":"近 7 日","home.kpi.weekD":"近一周合计","home.kpi.heldVal":"册 / {s} 系列","home.unit.item":"条","home.kpi.subsUnit":"{n} 章","ago.today":"今天","ago.yesterday":"昨天","ago.days":"{n} 天前","home.kpi.held":"馆藏","home.kpi.heldD":"{l} 个本地库 · {o} 个在线库","home.kpi.subs":"在线订阅","home.kpi.subsD":"{n} 部已订阅","home.kpi.subsWait":"目录载入后统计","home.kpi.annot":"批注","home.kpi.annotD":"高亮 / 下划线 / 书签 / 笔记","home.kpi.annotWait":"打开批注页后载入","home.act.sections":"首页分组","home.act.scan":"扫描本地库","home.act.online":"在线源","home.cont.title":"继续阅读","home.cont.hint":"按最近阅读排序","home.cont.all":"全部书库","home.cont.empty":"还没有在读的书。随便打开一本，读几页就会出现在这里。","home.cont.page":"第 {n} {u}","home.unit.page":"页","home.unit.chapter":"章","home.chart.title":"近 14 日时长","home.chart.go":"统计页","home.pipe.title":"管线与格式","home.pipe.wait":"格式分布需要完整书目，进入书库后自动统计。","home.pipe.loading":"正在载入馆藏结构…","home.pipe.note":"TXT 与文字型 EPUB 按章节读取。","home.pipe.count":"{n} 册","home.byLib":"按库浏览","home.noLib":"还没有书库","home.online.title":"在线库概览","home.online.mgr":"管理订阅","home.online.empty":"还没有订阅，去在线源搜索一部漫画。","home.online.note":"在线书与本地书共用同一套书库与进度，两端阅读位置互通；章节按需下载。","home.run.title":"运行状态","home.run.uptime":"已运行","home.run.db":"数据库","home.run.proxy":"在线源服务","home.run.proxyOn":"运行中 · 端口 {p}","home.run.proxyOff":"未启动","home.run.cal":"Calibre","home.run.calOn":"已安装 {v}","home.run.calOff":"未安装 · MOBI/AZW3/FB2 暂只可下载","home.run.api":"API 接口","shelf.moreShort":"查看更多","shelf.more":"查看更多（剩余 {n}）","shelf.collapse":"收起","shelf.emptyBook":"暂无书籍。新入库的书解析完成后才会出现在这里。","shelf.emptySeries":"还没有系列，扫描书库后出现。","sec.ondeck.title":"导航 · 下一本","sec.ondeck.hint":"读完一本后自动推荐同系列的下一本","sec.ondeck.empty":"读完一本后，同系列的下一本会出现在这里。","sec.published.title":"最近发布","sec.published.hint":"按出版日期","sec.published.hint30":"按出版日期 · 近一个月","sec.published.empty":"还没有带出版日期的书籍。刮削元数据后即可按出版时间排列。","sec.added.title":"最近添加的书籍","sec.added.hint":"按入库时间","sec.recentRead.title":"最近阅读","sec.recentRead.hint":"按最近一次阅读时间","sec.recentRead.empty":"还没有阅读记录。打开任意一本书，进度会自动出现在这里。","sec.newSeries.title":"最近添加的系列","sec.updSeries.title":"最近更新的系列","sec.updSeries.hint":"按最后修改时间","fmt.DIVINA":"固定版式 · 页图","fmt.PDF":"固定版式 · 服务端渲染","fmt.EPUB":"可重排 · 文字版","fmt.TXT":"可重排 · 章节随机读","fmt.UNSUPPORTED":"需外部转换器","meta.status":"连载状态","meta.dir":"阅读方向","meta.genres":"分类","meta.tags":"标签","meta.status.ongoing":"连载中","meta.status.ended":"已完结","meta.status.hiatus":"休刊","meta.status.abandoned":"弃坑","meta.dir.ltr":"从左往右","meta.dir.rtl":"从右往左","meta.dir.vertical":"纵向","meta.dir.webtoon":"条漫","mf.title":"标题","mf.titleSort":"排序标题","mf.summary":"简介","mf.number":"序号","mf.numberSort":"排序序号","mf.releaseDate":"出版日期","mf.authors":"作者","mf.notableEntities":"显著实体","mf.tags":"标签","mf.isbn":"ISBN","mf.links":"链接","mf.publisher":"出版社","mf.genres":"分类","mf.language":"语言","mf.status":"连载状态","mf.readingDirection":"阅读方向","mf.ageRating":"年龄分级","mf.region":"地区","mf.totalBookCount":"总册数","mf.sharingLabels":"共享标签","mf.alternateTitles":"别名","mp.intro":"你是图书元数据整理助手。请依据下面的线索检索权威资料，补全到最大可能，并按指定 JSON 返回。","mp.reqTitle":"要求：","mp.req1":"1. 只输出一个 JSON 对象，不要解释、不要前后缀；不要用 Markdown 代码块包裹。","mp.req2":"2. 下面列出的每个键都必须出现，取不到就给空字符串或空数组，不要省略键，不要写 null。","mp.req3":"3. 所有文本字段（title、titleSort、summary、genres、tags、alternateTitles、links 的 label 等）一律使用当前会话语言（{lang}），不要把来源的日文、英文、韩文原样混入，也不要在同一份回答里混用多种语言。检索时可以用原文书名与作者名，但返回内容必须全部是{lang}。人名、出版社、杂志名用{lang}的通行译名，没有通行译名时保留原文。language 字段填作品原文语言的 BCP-47 代码（zh-Hans / zh-Hant / ja / en / ko …），不受输出语言影响。","mp.req4":"4. 出版日期用 YYYY-MM-DD；ISBN 只保留数字。","mp.req5":"5. 作者只写姓名，不要带「（作者）」「（绘）」这类角色后缀；角色写进 role 字段。","mp.req6":"6. 分类（genres）与标签（tags）都使用当前会话语言（{lang}）：分类给 2~8 字的题材短词，最多 6 个；标签把来源的外文标签译成{lang}的短词，来源没有标签就留空数组。","mp.req7":"7. 简介用当前会话语言（{lang}）写 150~300 字（或等量篇幅），不含剧透。","mp.req8":"8. status 只能取四个值之一，必须原样大写英文，不要写中文，也不要写 COMPLETED、CANCELLED 等别名：ONGOING（{ongoing}）、ENDED（{ended}）、HIATUS（{hiatus}）、ABANDONED（{abandoned}）。无法确认时给 ONGOING。","mp.req9":"9. readingDirection 只能取 LEFT_TO_RIGHT（{ltr}）、RIGHT_TO_LEFT（{rtl}）、VERTICAL（{vertical}）、WEBTOON（{webtoon}）之一，无法确认时给 RIGHT_TO_LEFT。","mp.clues":"【书籍线索】","mp.series":"系列：","mp.bookName":"册名：","mp.file":"文件名：","mp.path":"相对路径：","mp.pages":"页数：","mp.fmt":"格式：","mp.size":"大小：","mp.books":"册数：","mp.firstRelease":"首册出版日期：","mp.id":"内部 ID：","mp.none":"（无）","mp.current":"【当前元数据（空表示尚未填写）】","mp.thKey":"键","mp.thField":"字段","mp.thValue":"当前值","mp.empty":"（空）","mp.locked":"已锁定字段（不会被写入，仅供你参考）：","mp.keywords":"【检索关键词】","mp.kwHint":"请优先用这组关键词检索，必要时自行补充作者原名、原题写法、出版社译名再检索；关键词保留原文只为检索准确，返回内容仍必须全部使用当前会话语言。","mp.template":"【返回模板】","mp.limit":"文本长度上限：本次提示词与你的回答都可能很长，网页端一键复制上限是 {max} 字符。超出时不要分段解释，直接给出完整 JSON；用户会用文件方式导入。","greet.s0.v0":"夜还长，书还热，兰台","greet.s0.v1":"这个点还没睡，不是书太好看，就是心事太多，兰台","greet.s0.v2":"世界都睡了，只剩翻书的声音，兰台","greet.s0.v3":"凌晨适合读点不着急的书，兰台","greet.s0.v4":"灯亮着，字也亮着，兰台","greet.s0.v5":"深夜的读者，不必向谁解释，兰台","greet.s0.v6":"读完这一章就睡，说好了，兰台","greet.s1.v0":"天光刚醒，先读三页再出门，兰台","greet.s1.v1":"早上好，今天第一件事是翻开书，兰台","greet.s1.v2":"清晨的字最清楚，兰台","greet.s1.v3":"鸟叫了，茶还烫，书正好，兰台","greet.s1.v4":"太阳刚上来，书签停在哪一页了？","greet.s1.v5":"早起的人，先读到好句子，兰台","greet.s1.v6":"一日之计，从一章开始，兰台","greet.s2.v0":"上午好，注意力最贵，读点硬的，兰台","greet.s2.v1":"一天里最清醒的两小时，交给书吧，兰台","greet.s2.v2":"光正好，适合把那本难啃的啃下来，兰台","greet.s2.v3":"上午好，进度条又往前走了一点，兰台","greet.s2.v4":"趁世界还没吵起来，多读几页，兰台","greet.s2.v5":"头脑清楚的时候，别都花在刷手机上，兰台","greet.s2.v6":"上午的安静是借来的，记得还给自己，兰台","greet.s3.v0":"午安，饭后两页比午睡更提神，兰台","greet.s3.v1":"中午了，吃好也读好，兰台","greet.s3.v2":"午休时间，一章刚刚好，兰台","greet.s3.v3":"太阳在头顶，书在手里，兰台","greet.s3.v4":"午安，别急着干活，先把这一节读完，兰台","greet.s3.v5":"一天的中间，停下来翻两页，兰台","greet.s3.v6":"饭在消化，让眼睛也吃点好的，兰台","greet.s4.v0":"下午好，茶配一章，正合适，兰台","greet.s4.v1":"阳光斜进来了，书页也跟着亮，兰台","greet.s4.v2":"下午容易困，好故事能救，兰台","greet.s4.v3":"一天过了三分之二，故事才到一半，兰台","greet.s4.v4":"下午好，慢慢读，不用赶，兰台","greet.s4.v5":"这个点的光，最适合看书，兰台","greet.s4.v6":"再读一章，就该收工了，兰台","greet.s5.v0":"晚上好，灯下见，兰台","greet.s5.v1":"一天收尾，把最后半小时留给书，兰台","greet.s5.v2":"晚饭后的一章，是一天里最稳的时刻，兰台","greet.s5.v3":"晚上好，外面很吵，书里很静，兰台","greet.s5.v4":"今天辛苦了，读点轻松的，兰台","greet.s5.v5":"夜色刚起，正好接上昨天的进度，兰台","greet.s5.v6":"灯开一盏就够，字自己会亮，兰台","greet.s6.v0":"夜深了，读完这章就睡，兰台","greet.s6.v1":"深夜好，书比人精神，兰台","greet.s6.v2":"这个点还在读，是喜欢，不是失眠，兰台","greet.s6.v3":"世界安静下来，故事才开始响，兰台","greet.s6.v4":"最后一章，看完就关灯，兰台","greet.s6.v5":"夜里的字比白天温柔，兰台","greet.s6.v6":"明天要早起的话，就少读一页，兰台"};})();
 (function () {
   var NAMES = [
     ['zh-Hans', '简体中文'], ['zh-Hant', '繁體中文'], ['en', 'English'],
@@ -516,12 +516,14 @@
     var bm = s.booksMetadata || {};
     var owner = LIBS.find(function (l) { return l.id === s.libraryId; });
     var online = !!(owner && owner.type === 'ONLINE');
-    var status = md.status === 'ENDED' ? 'COMPLETED' : md.status === 'ABANDONED' ? 'HIATUS' : (md.status || 'ONGOING');
+    var status = md.status || 'ONGOING';
     var releaseDate = bm.releaseDate || '';
     return {
       id: s.id,
       lib: s.libraryId,
       t: md.title || s.name,
+      raw: s.name || '',
+      url: s.url || '',
       author: (bm.authors || []).map(function (a) { return a.name; }).join('、'),
       status: status,
       oneShot: !!s.oneshot,
@@ -534,6 +536,7 @@
       note: md.summary || bm.summary || '',
       online: online,
       publisher: md.publisher || '',
+      region: md.region || '',
       source: '',
       published: releaseDate,
       year: releaseDate ? parseInt(String(releaseDate).slice(0, 4), 10) || 0 : 0,
@@ -560,6 +563,7 @@
       s: b.seriesId,
       num: b.number || 0,
       name: b.name,
+      url: b.url || '',
       mdTitle: md.title || '',
       mdNum: md.number || '',
       mdIsbn: md.isbn || '',
@@ -747,10 +751,26 @@
     return runtime.catalog;
   }
 
+  var readyState = { ids: null, count: 0, loading: null };
+
+  function loadReadyCatalog() {
+    if (readyState.loading) return readyState.loading;
+    readyState.loading = request('api/lantai/v1/catalog/ready').then(function (d) {
+      readyState.ids = (d && d.seriesIds) || [];
+      readyState.count = (d && d.bookCount) || 0;
+      readyState.loading = null;
+      return readyState;
+    }, function () {
+      readyState.loading = null;
+      return readyState;
+    });
+    return readyState.loading;
+  }
+
   function catalogPage(kind) {
     var st = catalogState()[kind];
     if (st.done) return Promise.resolve(false);
-    var path = (kind === 'series' ? 'api/v1/series?sort=lastModified,desc' : 'api/v1/books?sort=lastModified,desc&readerView=true')
+    var path = (kind === 'series' ? 'api/v1/series?sort=lastModified,desc' : 'api/v1/books?sort=lastModified,desc&readerView=true&media_status=READY')
       + '&deleted=false&size=' + CATALOG_PAGE + '&page=' + st.page;
     return request(path).then(function (p) {
       var content = (p && p.content) || [];
@@ -758,16 +778,20 @@
       st.page++;
       st.total = (p && typeof p.totalElements === 'number') ? p.totalElements : st.total + content.length;
       if (kind === 'series') {
-        if (first && !runtime.catalogLoaded) SERIES.length = 0;
-        mergeSeries(content);
-        live.series = true;
-        st.done = !content.length || SERIES.length >= st.total;
-      } else {
-        if (first && !runtime.catalogLoaded) BOOKS.length = 0;
-        mergeBooks(content);
-        live.books = true;
-        st.done = !content.length || BOOKS.length >= st.total;
+        return loadReadyCatalog().then(function (rs) {
+          var allow = rs.ids ? new Set(rs.ids) : null;
+          var rows = allow ? content.filter(function (s) { return allow.has(s.id); }) : content;
+          if (first && !runtime.catalogLoaded) SERIES.length = 0;
+          mergeSeries(rows);
+          live.series = true;
+          st.done = !content.length || st.page * CATALOG_PAGE >= st.total;
+          return !st.done;
+        });
       }
+      if (first && !runtime.catalogLoaded) BOOKS.length = 0;
+      mergeBooks(content);
+      live.books = true;
+      st.done = !content.length || st.page * CATALOG_PAGE >= st.total;
       return !st.done;
     });
   }
@@ -834,6 +858,26 @@
     if (st.total === total) return false;
     st.total = total;
     return true;
+  }
+
+  function seriesMetaKey(s) {
+    return [s.t, s.author, s.region, s.year, s.status, s.publisher, s.lang, (s.genres || []).join('/'), (s.tags || []).join('/')].join('|');
+  }
+
+  function refreshSeriesMeta() {
+    return request('api/v1/series?sort=lastModified,desc&deleted=false&size=60&page=0').then(function (p) {
+      var content = (p && p.content) || [];
+      var changed = false;
+      content.forEach(function (s) {
+        var idx = SERIES.findIndex(function (x) { return x.id === s.id; });
+        if (idx < 0) return;
+        var m = mapSeries(s);
+        if (seriesMetaKey(SERIES[idx]) === seriesMetaKey(m)) return;
+        SERIES[idx] = Object.assign({}, SERIES[idx], m);
+        changed = true;
+      });
+      return changed;
+    }, function () { return false; });
   }
 
   function hydrate(force) {
@@ -927,10 +971,9 @@
     } catch (e) { return null; }
   }
 
-  function saveRemember(login) {
-    var box = document.querySelector('#bRemember');
+  function saveRemember(login, keep) {
     try {
-      if (box && box.checked) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ u: login }));
+      if (keep) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ u: login, keep: true }));
       else localStorage.removeItem(REMEMBER_KEY);
     } catch (e) { }
   }
@@ -1184,7 +1227,10 @@
     catalogMore: catalogMore,
     catalogFull: catalogFull,
     catalogTotal: catalogTotal,
+    catalogReadyBooks: function () { return readyState.count; },
+    reloadReadyCatalog: loadReadyCatalog,
     catalogSetTotal: catalogSetTotal,
+    refreshSeriesMeta: refreshSeriesMeta,
     collectionSeries: collectionSeries,
     readlistBooks: readlistBooks,
     start: function () {
@@ -1216,9 +1262,11 @@
       if (!login || !password) return bootError(L.t('boot.fillLogin'));
       if (btn.disabled) return;
       btn.disabled = true;
+      var keepBox = document.querySelector('#bRemember');
+      var keep = keepBox ? !!keepBox.checked : true;
       var old = btn.textContent;
       btn.innerHTML = '<span class="spinner" style="margin-right:8px"></span>' + L.t('boot.checking');
-      fetch(base + 'api/v2/users/me?remember-me=true', {
+      fetch(base + 'api/v2/users/me' + (keep ? '?remember-me=true' : ''), {
         credentials: 'same-origin',
         headers: { Authorization: basic(login, password) }
       }).then(function (res) {
@@ -1227,7 +1275,8 @@
         return res.json();
       }).then(function (me) {
         runtime.me = me;
-        saveRemember(login);
+        saveRemember(login, keep);
+        if (!keep) fetch(base + 'api/lantai/v1/remember-me', { method: 'DELETE', credentials: 'same-origin' }).catch(function () { });
         return enter();
       }).catch(function (err) {
         btn.disabled = false;
@@ -1288,9 +1337,33 @@ const TYPE_CN = { LOCAL: '本地库', ONLINE: '在线库' };
 const INTERVAL_CN = { PT15M: '15 分钟', PT1H: '每小时', P1D: '每天', DISABLED: '关闭', HOURLY: '每小时', EVERY_6H: '每 6 小时', EVERY_12H: '每 12 小时', DAILY: '每天', WEEKLY: '每周' };
 const LIB_INTERVALS = ['DISABLED', 'HOURLY', 'EVERY_6H', 'EVERY_12H', 'DAILY', 'WEEKLY'];
 const STATUS_CN = { READY: '就绪', ERROR: '解析失败', UNSUPPORTED: '不支持' };
-const DIR_CN = { RIGHT_TO_LEFT: '从右往左', LEFT_TO_RIGHT: '从左往右' };
+const DIR_KEYS = { LEFT_TO_RIGHT: 'ltr', RIGHT_TO_LEFT: 'rtl', VERTICAL: 'vertical', WEBTOON: 'webtoon' };
+const STATUS_KEYS = { ONGOING: 'ongoing', ENDED: 'ended', COMPLETED: 'ended', HIATUS: 'hiatus', ABANDONED: 'abandoned' };
+const statusLabel = code => {
+  const k = STATUS_KEYS[String(code || '').toUpperCase()];
+  return k ? L.t('meta.status.' + k) : (code || '');
+};
+const dirLabel = code => {
+  const k = DIR_KEYS[String(code || '').toUpperCase()];
+  return k ? L.t('meta.dir.' + k) : (code || '');
+};
 const SCAN_CN = { cbx: 'CBZ/CBR', pdf: 'PDF', epub: 'EPUB/KEPUB', txt: 'TXT' };
-const SERIES_STATUS_CN = { ONGOING: '连载中', COMPLETED: '已完结', HIATUS: '休刊' };
+const REGION_CN = {
+  JP: '日本', KR: '韩国', CN: '中国大陆', TW: '中国台湾', HK: '中国香港', MO: '中国澳门',
+  US: '美国', GB: '英国', FR: '法国', DE: '德国', IT: '意大利', ES: '西班牙', CA: '加拿大',
+  AU: '澳大利亚', RU: '俄罗斯', PH: '菲律宾', MN: '蒙古', ID: '印度尼西亚', VN: '越南',
+  TH: '泰国', MY: '马来西亚', SG: '新加坡', TR: '土耳其', IL: '以色列', BR: '巴西',
+  MX: '墨西哥', AR: '阿根廷', PL: '波兰', NL: '荷兰', CH: '瑞士', SE: '瑞典', DK: '丹麦',
+  NO: '挪威', FI: '芬兰', CZ: '捷克', SK: '斯洛伐克', HU: '匈牙利', RO: '罗马尼亚', UA: '乌克兰'
+};
+const regionCn = code => REGION_CN[String(code || '').toUpperCase()] || code || '未知';
+const SCRAPE_STATE_CN = { done: '已刮削', none: '未刮削', bad: '未识别' };
+const scrapeStateOf = s => {
+  if (!s) return 'none';
+  if (BOOKS.some(b => b.s === s.id && b.status && b.status !== 'READY' && b.status !== 'OUTDATED')) return 'bad';
+  if (s.publisher || s.region || s.note || s.lang || (s.genres || []).length) return 'done';
+  return 'none';
+};
 const LANG_CN = { zh: '中文', en: '英文', ja: '日文', ko: '韩文', th: '泰文', es: '西班牙文', pt: '葡萄牙文', fr: '法文', de: '德文', ru: '俄文', id: '印尼文', vi: '越南文', ar: '阿拉伯文', it: '意大利文', tr: '土耳其文', pl: '波兰文', multi: '多语言', all: '全语言' };
 const PROFILE_CN = { DIVINA: '漫画页图', PDF: 'PDF 页图', EPUB: 'EPUB 电子书', TXT: 'TXT 小说', UNSUPPORTED: '需外部转换' };
 const fmtCn = x => x === 'cbz' ? 'CBZ 漫画' : x === 'pdf' ? 'PDF' : x === 'epub' ? 'EPUB 电子书' : x === 'txt' ? 'TXT 小说' : String(x).toUpperCase();
@@ -1371,6 +1444,17 @@ const ago = t => { const d = Date.now() - t; if (d < 0) return '刚刚'; return 
 const book = id => BOOKS.find(b => b.id === id);
 const series = id => SERIES.find(x => x.id === id);
 const lib = id => LIBS.find(l => l.id === id);
+function fileUrlPath(u) {
+  let p = String(u || '').replace(/^file:\/{2,}/i, '').replace(/^file:\//i, '');
+  try { p = decodeURIComponent(p); } catch (e) { }
+  return p.replace(/\\/g, '/');
+}
+function libRelPath(url, root) {
+  const p = fileUrlPath(url), r = fileUrlPath(root).replace(/\/+$/, '');
+  if (!p || !r) return '';
+  if (p.toLowerCase().indexOf(r.toLowerCase()) === 0) return p.slice(r.length).replace(/^\/+/, '');
+  return '';
+}
 const seriesOf = b => series(b.s) || { id: b.s || '', t: b.name || '未知系列', lib: '', online: false, genres: [], tags: [], chapters: 0, dirs: 0, status: 'ONGOING', readingDirection: 'RIGHT_TO_LEFT', year: 0, publisher: '', author: '' };
 const libOf = b => lib(seriesOf(b).lib);
 const booksOf = sid => BOOKS.filter(b => b.s === sid);
@@ -1456,6 +1540,10 @@ function navCount(key, fallback) {
   if (c && typeof c[key] === 'number') return c[key];
   return fallback;
 }
+function navBookCount() {
+  if (catalogReady()) return catalogTotal().books;
+  return navCount('books', 0);
+}
 function navTaskCount() {
   const rt = window.LantaiRuntime;
   const sum = rt && rt.taskSummary;
@@ -1465,7 +1553,7 @@ function navTaskCount() {
 const NAV = [
   { g: 'nav.gOverview' },
   { p: '/home', i: 'home', t: 'nav.home' },
-  { p: '/browse', i: 'library', t: 'nav.browse', n: () => navCount('books', catalogTotal().books) },
+  { p: '/browse', i: 'library', t: 'nav.browse', n: () => navBookCount() },
   { p: '/collections', i: 'collection', t: 'nav.collections', n: () => navCount('collections', COLLECTIONS.length) },
   { p: '/readlists', i: 'readlist', t: 'nav.readlists', n: () => navCount('readlists', READLISTS.length) },
   { g: 'nav.gLantai' },
@@ -1551,6 +1639,15 @@ function catalogReady() {
 function catalogTotal() {
   if (window.LantaiRuntime && LantaiRuntime.catalogTotal) return LantaiRuntime.catalogTotal();
   return { series: SERIES.length, books: BOOKS.length, seriesDone: true, booksDone: true };
+}
+function catalogBooksBytes() {
+  const T = catalogTotal();
+  if (!(T.books > 0) || BOOKS.length < T.books) return null;
+  return BOOKS.reduce((a, b) => a + b.size, 0);
+}
+function catalogBooksSizeHtml() {
+  const n = catalogBooksBytes();
+  return n == null ? '' : ' · ' + bytes(n);
 }
 function ensureCatalog(kind, view) {
   const T = catalogTotal();
@@ -1726,7 +1823,11 @@ function closeDrawer() {
   $('#drawer').classList.remove('on');
   if (!$('#modal').classList.contains('on')) $('#veil').classList.remove('on');
 }
-$('#veil').onclick = () => { closeModal(); closeDrawer(); };
+$('#veil').onclick = () => {
+  if ($('#drawer').classList.contains('on') && $('#modal').classList.contains('on')) { closeDrawer(); return; }
+  closeModal();
+  closeDrawer();
+};
 
 /* ---- 主题 ---- */
 function setTheme(t) {
@@ -1926,7 +2027,7 @@ function openTasks() {
 }
 
 /* ============================ 首页 / 浏览 / 详情 ============================ */
-S.browse = { mode: 'series', bsrc: 'all', fmt: 'all', state: 'all', sort: 'updated', view: 'grid', q: '', libFilter: 'all', srcQ: '', srcSub: 'all', sstate: 'all', year: 'all', genre: 'all', letter: '', sel: {}, src: 'all', pg: 1, size: 50, pick: false };
+S.browse = { mode: 'series', bsrc: 'all', fmt: 'all', state: 'all', sort: 'updated', view: 'grid', q: '', libFilter: 'all', srcQ: '', srcSub: 'all', sstate: 'all', year: 'all', genre: 'all', region: 'all', scrape: 'all', letter: '', sel: {}, src: 'all', pg: 1, size: 50, pick: false };
 const PAGE_SIZES = [20, 50, 100, 200];
 
 function statOf(sid) {
@@ -1944,7 +2045,7 @@ function seriesCard(sid) {
       badge: s.online ? '<span class="badge gold">在线</span>' : s.status === 'HIATUS' ? '<span class="badge warn">休更</span>' : ''
     }) +
     '<div class="ov"><button class="btn pri sm" data-read="' + sid + '">' + ico('play') + (p ? '继续' : '阅读') + '</button></div>' +
-    '<div class="cv-meta"><div class="t">' + esc(s.t) + '</div><div class="s"><span>' + esc(s.author || '—') + '</span><span style="margin-left:auto">' +
+    '<div class="cv-meta"><div class="t">' + esc(s.t) + '</div><div class="s"><span>' + esc(s.author || '—') + (s.region ? ' · ' + esc(regionCn(s.region)) : '') + '</span><span style="margin-left:auto">' +
     (s.online ? num(s.chapters) + ' 章' : st.count + ' 册') + '</span></div>' +
     (p ? '<div class="pbar"><i style="width:' + p.pct + '%"></i></div>' : '') + '</div></div>';
 }
@@ -2360,11 +2461,12 @@ Routes.browse = (v, seg, qs) => {
   if (qs && qs.src !== undefined) B.src = qs.src;
   if (B.mode === 'books') return renderBooksPage(v, l);
   if (ensureCatalog('series', v)) return;
-  if (B.fmt !== 'all' && ensureCatalog('books', v)) return;
+  if ((B.fmt !== 'all' || B.scrape !== 'all') && ensureCatalog('books', v)) return;
   runBrowseSearch(B, l.id);
   const RC = browseCache;
   const remoteIds = RC.key === browseKey(B, l.id) && RC.ids ? new Set(RC.ids) : null;
   const list = SERIES.filter(s => s.lib === l.id);
+  sanitizeBrowse(B, list, list.flatMap(s => booksOf(s.id)));
   const srcNames = [...new Set(list.filter(s => s.online).map(s => s.publisher).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh'));
   if (B.src !== 'all' && srcNames.indexOf(B.src) < 0) B.src = 'all';
   let f = list.slice();
@@ -2415,7 +2517,7 @@ Routes.browse = (v, seg, qs) => {
   else {
     const ck = chunkList(f, s => { const st = statOf(s.id); return '<tr class="click" data-series="' + s.id + '"><td><div class="thumb" style="background:' + gradOf(s.t) + '">' + thumbImg('series', s.id) + '</div></td>' +
       '<td><div style="font-size:13.5px">' + esc(s.t) + '</div><div class="mini">' + esc(s.author) + ' · ' + (s.genres || []).join(' / ') + '</div></td>' +
-      '<td>' + (s.online ? '<span class="badge gold">在线 ' + num(s.chapters) + ' 章</span>' : '<span class="badge">' + (SERIES_STATUS_CN[s.status] || s.status) + '</span>') + '</td>' +
+      '<td>' + (s.online ? '<span class="badge gold">在线 ' + num(s.chapters) + ' 章</span>' : '<span class="badge">' + statusLabel(s.status) + '</span>') + '</td>' +
       '<td>' + (s.online ? '<span class="mini mono">存档 ' + s.downloaded + '</span>' : '<span class="mini mono">' + (st.count - st.unread) + '/' + st.count + ' 已读</span>') + '</td>' +
       '<td class="num mini">' + esc(s.last.slice(5)) + '</td><td style="text-align:right"><span class="mini">打开 →</span></td></tr>'; });
     v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>系列</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody data-chunk>' + ck.head + '</tbody></table></div>');
@@ -3159,6 +3261,28 @@ function libRefValues(mode) {
 function fchip(attr, key, val, label, B) {
   return '<span class="chip' + ((B[key] || 'all') === val ? ' on' : '') + '" data-' + attr + '="' + esc(val) + '">' + esc(label) + '</span>';
 }
+function sanitizeBrowse(B, seriesPool, bookPool) {
+  const regions = new Set(['__none']);
+  const genres = new Set();
+  const years = new Set();
+  const states = new Set();
+  const scrapes = new Set();
+  (seriesPool || []).forEach(s => {
+    if (s.region) regions.add(String(s.region).toUpperCase());
+    (s.genres || []).forEach(g => genres.add(g));
+    if (s.year) years.add(String(s.year));
+    if (s.status) states.add(s.status);
+    scrapes.add(scrapeStateOf(s));
+  });
+  (bookPool || []).forEach(b => { if (b.pub) years.add(String(b.pub).slice(0, 4)); });
+  if (B.region !== 'all' && !regions.has(B.region)) B.region = 'all';
+  if (B.genre !== 'all' && !genres.has(B.genre)) B.genre = 'all';
+  if (B.year !== 'all' && !years.has(B.year)) B.year = 'all';
+  if (B.sstate !== 'all' && !states.has(B.sstate)) B.sstate = 'all';
+  if (B.scrape !== 'all' && !scrapes.has(B.scrape)) B.scrape = 'all';
+  const letters = (B.mode === 'books' ? (bookGroupCache.list || []) : (groupCache.list || [])).filter(g => g && g.count > 0).map(g => g.group);
+  if (B.letter && letters.length && letters.indexOf(B.letter) < 0) B.letter = '';
+}
 function libLetterBarHtml(B, mode) {
   const raw = mode === 'books' ? (bookGroupCache.list || []) : (groupCache.list || []);
   const groups = raw.filter(g => g && g.group && g.group !== '#' && g.count > 0);
@@ -3174,15 +3298,20 @@ function libFilterHtml(B, mode) {
   const ref = libRefValues(mode), srcNames = libSourceNames();
   const row = (label, chips) => '<div class="frow"><span class="lbl" style="margin:0">' + label + '</span><div class="chips">' + chips + '</div></div>';
   const fmt = fchip('bfmt', 'fmt', 'all', '全部', B) + ['cbx', 'epub', 'pdf', 'txt'].map(x => fchip('bfmt', 'fmt', x, SCAN_CN[x], B)).join('');
-  const state = fchip('bstate', 'sstate', 'all', '全部', B) + ['ONGOING', 'COMPLETED', 'HIATUS'].map(x => fchip('bstate', 'sstate', x, SERIES_STATUS_CN[x], B)).join('');
+  const state = fchip('bstate', 'sstate', 'all', '全部', B) + ['ONGOING', 'ENDED', 'HIATUS', 'ABANDONED'].map(x => fchip('bstate', 'sstate', x, statusLabel(x), B)).join('');
+  const regionCodes = [...new Set(SERIES.map(s => String(s.region || '').toUpperCase()).filter(Boolean))].sort((a, b) => regionCn(a).localeCompare(regionCn(b), 'zh'));
+  const regionRow = row('地区', fchip('bregion', 'region', 'all', '全部', B) + regionCodes.map(c => fchip('bregion', 'region', c, regionCn(c), B)).join('') + fchip('bregion', 'region', '__none', '未知', B));
+  const scrapeRow = row('刮削', ['all', 'done', 'none', 'bad'].map(k => fchip('bscrape', 'scrape', k, k === 'all' ? '全部' : SCRAPE_STATE_CN[k], B)).join(''));
   return (srcNames.length
     ? row('图源',
       '<span class="chip' + (B.src === 'all' ? ' on' : '') + '" data-libsrc="all">全部（' + srcNames.length + '）</span>' +
       srcNames.map(x => '<span class="chip' + (B.src === x ? ' on' : '') + '" data-libsrc="' + esc(x) + '">' + esc(x) + '</span>').join(''))
     : '') +
     '<div class="frow"><span class="lbl" style="margin:0">格式</span><div class="chips">' + fmt + '</div><span class="sep"></span><span class="lbl" style="margin:0">连载</span><div class="chips">' + state + '</div></div>' +
+    regionRow +
+    scrapeRow +
     row('年份', fchip('byear', 'year', 'all', '全部', B) + (ref.years.length ? ref.years.map(y => fchip('byear', 'year', String(y), String(y), B)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>')) +
-    row('风格', fchip('bgenre', 'genre', 'all', '全部', B) + (ref.genres.length ? ref.genres.slice(0, 12).map(g => fchip('bgenre', 'genre', g, g, B)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>'));
+    row(L.t('meta.genres'), fchip('bgenre', 'genre', 'all', '全部', B) + (ref.genres.length ? ref.genres.slice(0, 12).map(g => fchip('bgenre', 'genre', g, g, B)).join('') : '<span class="mini" style="align-self:center">刮削后可用</span>'));
 }
 function libFilterPanelHtml(B, mode, extra) {
   return '<div class="filters fpanel">' + modeBarHtml(B) + libLetterBarHtml(B, mode) + libFilterHtml(B, mode) + libSortBarHtml(B, mode, extra) + '</div>';
@@ -3204,6 +3333,8 @@ function wireLibFilters(v, B) {
   v.querySelectorAll('[data-bstate]').forEach(el => el.onclick = () => { B.sstate = el.dataset.bstate; B.pg = 1; render(); });
   v.querySelectorAll('[data-byear]').forEach(el => el.onclick = () => { B.year = el.dataset.byear; B.pg = 1; render(); });
   v.querySelectorAll('[data-bgenre]').forEach(el => el.onclick = () => { B.genre = el.dataset.bgenre; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bregion]').forEach(el => el.onclick = () => { B.region = el.dataset.bregion; B.pg = 1; render(); });
+  v.querySelectorAll('[data-bscrape]').forEach(el => el.onclick = () => { B.scrape = el.dataset.bscrape; B.pg = 1; render(); });
   v.querySelectorAll('[data-bletter]').forEach(el => el.onclick = () => {
     B.letter = el.dataset.bletter || '';
     B.pg = 1;
@@ -3281,11 +3412,14 @@ function renderBooksPage(v, l) {
       if (B.bsrc === 'online') return isOnlineBook(b);
       return true;
     });
+  sanitizeBrowse(B, l ? SERIES.filter(s => s.lib === l.id) : SERIES.slice(), list);
   if (B.src !== 'all') list = list.filter(b => (seriesOf(b).publisher || '') === B.src);
   if (B.fmt !== 'all') list = list.filter(b => FMT_GROUP(b.profile) === B.fmt);
   if (B.sstate !== 'all') list = list.filter(b => seriesOf(b).status === B.sstate);
   if (B.year !== 'all') list = list.filter(b => (String(b.pub || '').slice(0, 4) || String(seriesOf(b).year || '')) === B.year);
   if (B.genre !== 'all') list = list.filter(b => (seriesOf(b).genres || []).indexOf(B.genre) >= 0);
+  if (B.region !== 'all') list = list.filter(b => { const s = seriesOf(b); return B.region === '__none' ? !s.region : String(s.region || '').toUpperCase() === B.region; });
+  if (B.scrape !== 'all') list = list.filter(b => scrapeStateOf(seriesOf(b)) === B.scrape);
   if (B.q) list = list.filter(b => bookTitle(b).indexOf(B.q) >= 0 || b.name.indexOf(B.q) >= 0 || seriesOf(b).t.indexOf(B.q) >= 0);
   if (letterIds) { const set = new Set(letterIds); list = list.filter(b => set.has(b.id)); }
   const sk = b => String(b.last || b.added || '');
@@ -3308,7 +3442,7 @@ function renderBooksPage(v, l) {
         ? '<span class="badge warn">' + ico('shield') + ' 受管库 · 扫描入口已隐藏</span><button class="btn" data-go="/online">' + ico('globe') + '在线源入口</button>'
         : '<button class="btn" data-act="scanlib" data-id="' + l.id + '">' + ico('sync') + '扫描库</button><button class="btn" data-editlib="' + l.id + '">' + ico('edit') + '编辑</button>') +
       '<button class="btn pri" data-act="addbook">' + ico('plus') + '导入书籍</button></div></div>'
-    : '<div class="ph"><div><h1>书库 ' + letterNote + gapBooks + gapSeries + '</h1><div class="sub">全部 ' + num(CT2.series) + ' 系列 · ' + num(CT2.books) + ' 册 · ' + bytes(sizeAll) + '</div></div>' +
+    : '<div class="ph"><div><h1>书库 ' + letterNote + gapBooks + gapSeries + '</h1><div class="sub">全部 ' + num(CT2.series) + ' 系列 · ' + num(CT2.books) + ' 册' + catalogBooksSizeHtml() + '</div></div>' +
       '<div class="acts"><button class="btn pri" data-go="/scrape">' + ico('wand') + '刮削与元数据</button><button class="btn" data-go="/libraries">' + ico('settings') + '书库设置</button></div></div>';
 
   const sel = B.sel || (B.sel = {});
@@ -3369,6 +3503,7 @@ function renderAllSeries(v) {
   let list = SERIES.slice();
   if (B.bsrc === 'local') list = list.filter(s => !s.online);
   if (B.bsrc === 'online') list = list.filter(s => s.online);
+  sanitizeBrowse(B, list, null);
   const srcNames = [...new Set(SERIES.filter(s => s.online).map(s => s.publisher).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh'));
   if (B.src !== 'all' && srcNames.indexOf(B.src) < 0) B.src = 'all';
   if (B.src !== 'all') list = list.filter(s => (s.publisher || '') === B.src);
@@ -3380,6 +3515,8 @@ function renderAllSeries(v) {
   if (B.sstate !== 'all') list = list.filter(s => s.status === B.sstate);
   if (B.year !== 'all') list = list.filter(s => String(s.year || '') === B.year);
   if (B.genre !== 'all') list = list.filter(s => (s.genres || []).indexOf(B.genre) >= 0);
+  if (B.region !== 'all') list = list.filter(s => B.region === '__none' ? !s.region : String(s.region || '').toUpperCase() === B.region);
+  if (B.scrape !== 'all') list = list.filter(s => scrapeStateOf(s) === B.scrape);
   list.sort((a, b) => B.sort === 'title' ? a.t.localeCompare(b.t, 'zh') : B.sort === 'count' ? (b.chapters || booksOf(b.id).length) - (a.chapters || booksOf(a.id).length) : String(b.last).localeCompare(String(a.last)));
 
   const pgAll = B.size === 0;
@@ -3398,7 +3535,7 @@ function renderAllSeries(v) {
     : '';
 
   v.innerHTML =
-    '<div class="ph"><div><h1>书库 ' + searchState + gapSeries + gapBooks + '</h1><div class="sub">全部 ' + CT2.series + ' 系列 · ' + CT2.books + ' 册' + (CT2.booksDone ? ' · ' + bytes(BOOKS.reduce((a, b) => a + b.size, 0)) : ' · 统计随加载更新') + '</div></div>' +
+    '<div class="ph"><div><h1>书库 ' + searchState + gapSeries + gapBooks + '</h1><div class="sub">全部 ' + CT2.series + ' 系列 · ' + CT2.books + ' 册' + catalogBooksSizeHtml() + '</div></div>' +
     '<div class="acts">' +
     '<button class="btn pri" data-go="/scrape">' + ico('wand') + '刮削与元数据</button>' +
     '<button class="btn" data-go="/libraries">' + ico('settings') + '书库设置</button>' +
@@ -3407,7 +3544,7 @@ function renderAllSeries(v) {
 
   v.setAttribute('data-total', String(list.length));
   if (!pageList.length) {
-    v.insertAdjacentHTML('beforeend', '<div class="empty">' + '<svg><use href="#i-library"/></svg><h4>没有符合条件的系列</h4><p>调整筛选，或先回填元数据（年份与风格依赖刮削数据）。</p></div>');
+    v.insertAdjacentHTML('beforeend', '<div class="empty">' + '<svg><use href="#i-library"/></svg><h4>没有符合条件的系列</h4><p>调整筛选，或先回填元数据（年份与分类依赖刮削数据）。</p></div>');
   } else if (B.view === 'grid') {
     const ck = chunkList(pageList, s => (B.pick ? seriesPickCard(s.id, !!sel[s.id]) : seriesCard(s.id)));
     v.insertAdjacentHTML('beforeend', '<div class="shelf" data-chunk>' + ck.head + '</div>');
@@ -3418,8 +3555,8 @@ function renderAllSeries(v) {
       return '<tr class="click" data-series="' + s.id + '">' +
         (B.pick ? '<td><span class="pkbox' + (sel[s.id] ? ' on' : '') + '" data-pick-s="' + s.id + '">' + (sel[s.id] ? '✓' : '') + '</span></td>' : '') +
         '<td><div class="thumb" style="background:' + gradOf(s.t) + '">' + thumbImg('series', s.id) + '</div></td>' +
-        '<td><div style="font-size:13.5px">' + esc(s.t) + '</div><div class="mini">' + esc(s.author || '') + (s.genres && s.genres.length ? ' · ' + esc(s.genres.slice(0, 3).join(' / ')) : '') + '</div></td>' +
-        '<td><span class="badge">' + esc(SERIES_STATUS_CN[s.status] || s.status || '—') + '</span></td>' +
+        '<td><div style="font-size:13.5px">' + esc(s.t) + '</div><div class="mini">' + esc(s.author || '') + (s.region ? ' · ' + esc(regionCn(s.region)) : '') + (s.genres && s.genres.length ? ' · ' + esc(s.genres.slice(0, 3).join(' / ')) : '') + '</div></td>' +
+        '<td><span class="badge">' + esc(statusLabel(s.status) || '—') + '</span></td>' +
         '<td class="num mono">' + (s.chapters || 0) + '</td>' +
         '<td class="num mono">' + (s.year || '—') + '</td>' +
         '<td class="mini">' + esc(owner ? owner.name : '—') + '</td></tr>';
@@ -3514,39 +3651,34 @@ function renderBulkDiff(res, dryRun) {
 function renderLibs(v) {
   const B = S.browse, F = B.libFilter || 'all';
   const showLocal = F !== 'online', showOnline = F !== 'local';
-  const openMap = S.libOpen || (S.libOpen = {});
   const libCard = l => {
     const ss = SERIES.filter(s => s.lib === l.id);
     const bs = BOOKS.filter(b => { const s = series(b.s); return !!s && s.lib === l.id; });
-    const open = !!openMap[l.id];
+    const online = l.type === 'ONLINE';
     const stats = [
       ['系列', ss.length],
-      [l.type === 'ONLINE' ? '章' : '册', l.type === 'ONLINE' ? num(ss.reduce((a, s) => a + (s.chapters || 0), 0)) : bs.length],
+      [online ? '章' : '册', online ? num(ss.reduce((a, s) => a + (s.chapters || 0), 0)) : bs.length],
       ['体积', bytes(bs.reduce((a, b) => a + b.size, 0))]
     ];
-    return '<div class="card' + (open ? '' : ' hover') + '" data-libcard="' + l.id + '" style="cursor:pointer">' +
-      '<div class="card-h"><h3>' + esc(l.name) + '</h3><span class="badge ' + (l.type === 'ONLINE' ? 'gold' : 'moss') + '">' + (TYPE_CN[l.type] || l.type) + '</span>' +
-      '<div class="r"><span class="mini">' + esc(MEDIA_CN[l.mediaType] || l.mediaType || '') + '</span>' +
-      '<svg class="ic" style="margin-left:9px;transform:rotate(' + (open ? 90 : 0) + 'deg);transition:transform .2s var(--ease)"><use href="#i-right"/></svg></div></div>' +
-      '<div class="grid" style="grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin-bottom:12px">' +
-      stats.map(x => '<div><b style="font-family:var(--f-disp);font-size:19px">' + x[1] + '</b><div class="mini">' + x[0] + '</div></div>').join('') + '</div>' +
-      '<div class="chips">' + Object.keys(l.scan).filter(k => l.scan[k]).map(k => '<span class="chip on" style="cursor:default">' + (SCAN_CN[k] || k) + '</span>').join('') + '</div>' +
-      (open
-        ? '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">' +
-          '<div class="mini">根目录</div><div class="mono mini" style="word-break:break-all;margin:4px 0 12px">' + esc(l.root) + '</div>' +
-          '<div class="mini">扫描间隔</div><div style="margin:4px 0 12px">' + esc(INTERVAL_CN[l.interval] || l.interval || '—') + '</div>' +
-          '<div class="mini">扫描格式</div><div class="chips" style="margin:6px 0 12px">' +
-          Object.keys(l.scan).map(k => '<span class="chip' + (l.scan[k] ? ' on' : '') + '" style="cursor:default">' + (SCAN_CN[k] || k) + '</span>').join('') + '</div>' +
-          (l.type === 'ONLINE' ? '<div class="note red" style="font-size:11.5px;margin-bottom:12px">' + ico('shield') + ' 在线库不支持扫描与文件整理</div>' : '') +
-          '<div style="display:flex;gap:7px;flex-wrap:wrap">' +
-          (l.type === 'ONLINE'
-            ? '<button class="btn sm" data-go="/online">' + ico('globe') + '订阅管理</button>'
-            : '<button class="btn sm" data-act="scanlib" data-id="' + l.id + '">' + ico('sync') + '扫描</button><button class="btn sm" data-editlib="' + l.id + '">' + ico('edit') + '编辑</button>') +
-          '<button class="btn sm" data-go="/browse/' + l.id + '">浏览此库 →</button>' +
-          (l.type === 'ONLINE' ? '' : '<button class="btn sm" data-emptytb="' + l.id + '">' + ico('trash') + '清空库回收站</button>') +
-          (isAdmin() ? '<button class="btn sm danger" data-dellib="' + l.id + '">' + ico('trash') + '删除书库</button>' : '') + '</div></div>'
-        : '') +
-      '</div>';
+    return '<div class="card libcard">' +
+      '<div class="card-h"><h3>' + esc(l.name) + '</h3><span class="badge ' + (online ? 'gold' : 'moss') + '">' + (TYPE_CN[l.type] || l.type) + '</span>' +
+      '<div class="r"><span class="mini">' + esc(MEDIA_CN[l.mediaType] || l.mediaType || '') + '</span></div></div>' +
+      '<div class="libstats">' + stats.map(x => '<div><b>' + x[1] + '</b><span class="mini">' + x[0] + '</span></div>').join('') + '</div>' +
+      '<div class="libkv"><span class="libkv-l">根目录</span><span class="libkv-v mono mini" title="' + esc(l.root || '') + '">' + esc(l.root || '—') + '</span></div>' +
+      '<div class="libkv"><span class="libkv-l">扫描</span><span class="libkv-v mini">' + esc(INTERVAL_CN[l.interval] || l.interval || '—') + '</span></div>' +
+      '<div class="libkv"><span class="libkv-l">格式</span><div class="chips libfmt">' +
+      Object.keys(l.scan).map(k => '<span class="chip' + (l.scan[k] ? ' on' : '') + '" style="padding:2px 8px;font-size:11px;cursor:default">' + (SCAN_CN[k] || k) + '</span>').join('') + '</div></div>' +
+      (online ? '<div class="note red" style="font-size:11.5px;margin-top:8px">' + ico('shield') + ' 在线库不支持扫描与文件整理</div>' : '') +
+      '<div class="libacts">' +
+      (online
+        ? '<button class="btn sm" data-go="/online">' + ico('globe') + '订阅管理</button>'
+        : '<button class="btn sm" data-act="scanlib" data-id="' + l.id + '">' + ico('sync') + '扫描</button>' +
+          '<button class="btn sm" data-act="scrapelib" data-id="' + l.id + '">' + ico('wand') + '刮削</button>' +
+          '<button class="btn sm" data-editlib="' + l.id + '">' + ico('edit') + '编辑</button>') +
+      '<button class="btn sm" data-go="/browse/' + l.id + '">浏览此库 →</button>' +
+      (online ? '' : '<button class="btn sm" data-emptytb="' + l.id + '">' + ico('trash') + '清空回收站</button>') +
+      (isAdmin() ? '<button class="btn sm danger" data-dellib="' + l.id + '">' + ico('trash') + '删除书库</button>' : '') +
+      '</div></div>';
   };
   const srcCardLib = x => {
     return '<div class="card hover" data-go="/online?src=' + x.id + '" style="cursor:pointer">' +
@@ -3567,14 +3699,8 @@ function renderLibs(v) {
     [['all', '全部'], ['local', '本地库'], ['online', '在线源']].map(x =>
       '<button class="' + (F === x[0] ? 'on' : '') + '" data-libfilter="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
     '<span class="mini" style="margin-left:auto">' + LIBS.filter(l => l.type !== 'ONLINE').length + ' 本地库 · ' + SOURCES.length + ' 个在线源</span></div>' +
-    '<div class="grid g-3">' + cards.join('') + '</div>';
+    '<div class="grid g-3 libgrid">' + cards.join('') + '</div>';
   v.querySelectorAll('[data-libfilter]').forEach(el => el.onclick = () => { B.libFilter = el.dataset.libfilter; render(); });
-  v.querySelectorAll('[data-libcard]').forEach(el => el.onclick = e => {
-    if (e.target.closest('button,a,[data-act],[data-editlib],[data-go]')) return;
-    const id = el.dataset.libcard;
-    if (openMap[id]) delete openMap[id]; else openMap[id] = 1;
-    render();
-  });
   wire(v);
 }
 
@@ -3592,13 +3718,22 @@ const mSelect = (label, id, opts, cur) =>
 const mVal = id => { const el = $('#' + id); return el ? el.value.trim() : ''; };
 const mList = v => String(v || '').split(/[,，]/).map(x => x.trim()).filter(Boolean);
 
-function openMetaModal(title, fields, onSubmit) {
+function openMetaModal(title, fields, onSubmit, opts) {
+  const o = opts || {};
+  const withTools = o.kind === 'series' || o.kind === 'book';
   openModal({
     title: title, width: 660,
-    body: '<div class="note">留空的字段不会被修改，填了才写入。</div><div style="margin-top:12px">' + fields + '</div>',
-    foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>保存</button>',
+    body: '<div class="note">留空的字段不会被修改，填了才写入。需要 AI 补全时用左下角的「导出提示词」。</div><div style="margin-top:12px">' + fields + '</div>',
+    foot: (withTools
+      ? '<div style="margin-right:auto;display:flex;gap:8px"><button class="btn ghost" data-mprompt>' + ico('copy') + '导出提示词</button><button class="btn ghost" data-mimport>' + ico('upload') + '导入结果</button></div>'
+      : '') +
+      '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>保存</button>',
     after() {
       $('#modal [data-x]').onclick = closeModal;
+      if (withTools) {
+        $('#modal [data-mprompt]').onclick = () => openPromptDrawer(o);
+        $('#modal [data-mimport]').onclick = () => openImportDrawer(o);
+      }
       const ok = $('#modal [data-ok]');
       ok.onclick = () => {
         ok.disabled = true;
@@ -3608,19 +3743,412 @@ function openMetaModal(title, fields, onSubmit) {
   });
 }
 
+const META_PROMPT_MAX = 20000;
+
+const META_FIELD_LABELS = {
+  title: '标题', titleSort: '排序标题', summary: '简介', number: '序号', numberSort: '排序序号',
+  releaseDate: '出版日期', authors: '作者', notableEntities: '显著实体', tags: '标签', isbn: 'ISBN',
+  links: '链接', publisher: '出版社', genres: '分类', language: '语言', status: '连载状态',
+  readingDirection: '阅读方向', ageRating: '年龄分级', region: '地区', totalBookCount: '总册数',
+  sharingLabels: '共享标签', alternateTitles: '别名'
+};
+
+const META_FIELD_ORDER = {
+  book: ['title', 'number', 'numberSort', 'releaseDate', 'isbn', 'summary', 'authors', 'publisher', 'language', 'genres', 'tags', 'links', 'notableEntities'],
+  series: ['title', 'titleSort', 'summary', 'publisher', 'language', 'status', 'readingDirection', 'ageRating', 'region', 'genres', 'tags', 'totalBookCount', 'alternateTitles', 'links', 'sharingLabels']
+};
+
+function metaFieldLabel(key) {
+  const v = L.t('mf.' + key);
+  return v === 'mf.' + key ? (META_FIELD_LABELS[key] || key) : v;
+}
+
+const META_FIELD_INPUT = {
+  book: { title: 'bmTitle', number: 'bmNumber', releaseDate: 'bmDate', isbn: 'bmIsbn', summary: 'bmSummary', authors: 'bmAuthors', publisher: 'bmPublisher', language: 'bmLanguage', genres: 'bmGenres', tags: 'bmTags' },
+  series: { title: 'smTitle', titleSort: 'smSort', summary: 'smSummary', publisher: 'smPublisher', language: 'smLang', status: 'smStatus', readingDirection: 'smDir', ageRating: 'smAge', region: 'smRegion', genres: 'smGenres', tags: 'smTags' }
+};
+
+function metaFieldValue(kind, key, md) {
+  const id = META_FIELD_INPUT[kind][key];
+  if (id) {
+    const el = $('#' + id);
+    if (el) return String(el.value == null ? '' : el.value).trim();
+  }
+  const v = md ? md[key] : null;
+  if (v == null) return '';
+  if (Array.isArray(v)) {
+    return v.map(x => typeof x === 'string' ? x : (x && (x.name || x.title || x.label || x.url || x.kind) || '')).filter(Boolean).join(', ');
+  }
+  return String(v);
+}
+
+function metaKeywords(kind, ctx) {
+  const md = ctx.md || {};
+  const out = [];
+  const push = v => String(v || '').split(/[,，、|]/).forEach(x => { const t = x.trim(); if (t && out.indexOf(t) < 0) out.push(t); });
+  push(ctx.seriesTitle);
+  push(kind === 'book' ? ctx.bookTitle : '');
+  push(ctx.fileName);
+  push((md.authors || []).map(a => a && a.name).join(','));
+  push(md.publisher);
+  push(md.isbn);
+  push(Array.from(md.genres || []).join(','));
+  const bracket = String(ctx.rawName || '').match(/\[([^\[\]]+)\]/g);
+  if (bracket) bracket.forEach(seg => push(seg.replace(/^\[|\]$/g, '')));
+  return out.filter(t => t.length > 1 && !/^(vol\.?\s*\d+|\d+(-\d+)?|第?\d+[卷册话話])$/i.test(t)).slice(0, 14).join(' ');
+}
+
+function metaPromptText(opts) {
+  const kind = opts.kind, id = opts.id, raw = opts.raw || {};
+  const md = raw.metadata || {};
+  const books = raw.booksMetadata || {};
+  const ctx = {
+    md: md,
+    seriesTitle: kind === 'book' ? (raw.seriesTitle || '') : (md.title || raw.name || ''),
+    bookTitle: kind === 'book' ? (md.title || raw.name || '') : '',
+    fileName: kind === 'book' ? (raw.name || '') : '',
+    rawName: raw.name || '',
+    id: id
+  };
+  const libId = raw.libraryId;
+  const lib = LIBS.filter(l => l.id === libId)[0];
+  const rel = raw.url && lib && lib.root ? libRelPath(raw.url, lib.root) : (raw.url || '');
+
+  const ui = L.lang();
+  const T = (k, v) => L.t('mp.' + k, v);
+  const none = T('none');
+  const lines = [];
+  lines.push(T('intro'));
+  lines.push('');
+  lines.push(T('reqTitle'));
+  lines.push(T('req1'));
+  lines.push(T('req2'));
+  lines.push(T('req3', { lang: L.name(ui) }));
+  lines.push(T('req4'));
+  lines.push(T('req5'));
+  lines.push(T('req6', { lang: L.name(ui) }));
+  lines.push(T('req7', { lang: L.name(ui) }));
+  lines.push(T('req8', {
+    ongoing: L.t('meta.status.ongoing'), ended: L.t('meta.status.ended'),
+    hiatus: L.t('meta.status.hiatus'), abandoned: L.t('meta.status.abandoned')
+  }));
+  lines.push(T('req9', {
+    ltr: L.t('meta.dir.ltr'), rtl: L.t('meta.dir.rtl'),
+    vertical: L.t('meta.dir.vertical'), webtoon: L.t('meta.dir.webtoon')
+  }));
+  lines.push('');
+  lines.push(T('clues'));
+  if (kind === 'book') {
+    lines.push(T('series') + (ctx.seriesTitle || none));
+    lines.push(T('bookName') + (ctx.bookTitle || none));
+    lines.push(T('file') + (raw.name || none));
+    lines.push(T('path') + (rel || none));
+    if (raw.media && raw.media.pagesCount) lines.push(T('pages') + raw.media.pagesCount);
+    if (raw.media && raw.media.mediaType) lines.push(T('fmt') + raw.media.mediaType);
+    if (raw.size) lines.push(T('size') + raw.size);
+  } else {
+    lines.push(T('series') + (raw.name || none));
+    lines.push(T('path') + (rel || none));
+    if (raw.booksCount) lines.push(T('books') + raw.booksCount);
+    if (books && books.releaseDate) lines.push(T('firstRelease') + books.releaseDate);
+  }
+  if (ctx.id) lines.push(T('id') + ctx.id);
+  lines.push('');
+  lines.push(T('current'));
+  lines.push('| ' + T('thKey') + ' | ' + T('thField') + ' | ' + T('thValue') + ' |');
+  lines.push('|---|---|---|');
+  META_FIELD_ORDER[kind].forEach(key => {
+    const v = metaFieldValue(kind, key, md);
+    lines.push('| ' + key + ' | ' + metaFieldLabel(key) + ' | ' + (v || T('empty')) + ' |');
+  });
+  const locked = META_FIELD_ORDER[kind].filter(k => md[k + 'Lock']).map(k => metaFieldLabel(k));
+  if (locked.length) lines.push(T('locked') + locked.join(', '));
+  lines.push('');
+  lines.push(T('keywords'));
+  lines.push(metaKeywords(kind, ctx) || none);
+  lines.push(T('kwHint'));
+  lines.push('');
+  lines.push(T('template'));
+  const tplStatus = META_STATUS_SET.indexOf(String(md.status || '').toUpperCase()) >= 0 ? String(md.status).toUpperCase() : 'ONGOING';
+  const tplDir = META_DIR_SET.indexOf(String(md.readingDirection || '').toUpperCase()) >= 0 ? String(md.readingDirection).toUpperCase() : 'RIGHT_TO_LEFT';
+  lines.push(kind === 'book'
+    ? '{"title":"","number":"","numberSort":0,"releaseDate":"","isbn":"","summary":"","authors":[{"name":"","role":"writer"}],"publisher":"","language":"","genres":[],"tags":[],"links":[{"label":"","url":""}],"notableEntities":[{"kind":"","name":""}]}'
+    : '{"title":"","titleSort":"","summary":"","publisher":"","language":"","status":"' + tplStatus + '","readingDirection":"' + tplDir + '","ageRating":0,"region":"","genres":[],"tags":[],"totalBookCount":0,"alternateTitles":[{"title":""}],"links":[{"label":"","url":""}],"sharingLabels":[]}');
+  lines.push('');
+  lines.push(T('limit', { max: META_PROMPT_MAX }));
+  return lines.join('\n');
+}
+
+function legacyCopy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+function copyText(text) {
+  const done = () => toast('已复制 ' + text.length + ' 字符，粘贴到 AI 对话框即可', 'ok', 3600);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).then(done).catch(() => { if (legacyCopy(text)) done(); else toast('复制失败，请在文本框里手动全选复制', 'err'); });
+  }
+  if (legacyCopy(text)) done(); else toast('复制失败，请在文本框里手动全选复制', 'err');
+}
+
+function downloadText(name, text) {
+  try {
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    return true;
+  } catch (e) {
+    toast('生成文件失败：' + e.message, 'err');
+    return false;
+  }
+}
+
+function metaKeyOf(name) {
+  const t = String(name || '').trim().replace(/^["'`]|["'`]$/g, '');
+  if (!t) return '';
+  if (META_FIELD_LABELS[t]) return t;
+  const hit = Object.keys(META_FIELD_LABELS).filter(k => META_FIELD_LABELS[k] === t)[0];
+  if (hit) return hit;
+  const lower = t.toLowerCase();
+  const lowerHit = Object.keys(META_FIELD_LABELS).filter(k => k.toLowerCase() === lower)[0];
+  if (lowerHit) return lowerHit;
+  return Object.keys(META_FIELD_LABELS).filter(k => {
+    const v = L.t('mf.' + k);
+    return !!v && v !== 'mf.' + k && (v === t || v.toLowerCase() === lower);
+  })[0] || '';
+}
+
+function metaEmptyMark(v) {
+  const s = String(v || '').trim();
+  if (!s) return true;
+  return s === L.t('mp.empty') || /^[（(]\s*(空|なし|없음|empty|none)\s*[)）]$/i.test(s) || s === '—';
+}
+
+function parseMetaText(text, kind) {
+  let raw = String(text || '').trim();
+  const fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) raw = fence[1].trim();
+  const tryJson = s => { try { const v = JSON.parse(s); return v && typeof v === 'object' ? v : null; } catch (e) { return null; } };
+  let obj = tryJson(raw);
+  if (!obj) {
+    const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+    if (a >= 0 && b > a) obj = tryJson(raw.slice(a, b + 1));
+  }
+  if (Array.isArray(obj)) obj = obj[0] || null;
+  if (obj && obj.metadata && typeof obj.metadata === 'object' && !Array.isArray(obj.metadata)) obj = obj.metadata;
+  if (obj && obj.data && typeof obj.data === 'object' && !Array.isArray(obj.data)) obj = obj.data;
+  if (obj) return obj;
+  const out = {};
+  raw.split(/\r?\n/).forEach(line => {
+    const t = line.trim();
+    if (!t || /^[-|:\s]+$/.test(t)) return;
+    if (t.charAt(0) === '|') {
+      const cells = t.split('|').map(x => x.trim());
+      while (cells.length && cells[0] === '') cells.shift();
+      while (cells.length && cells[cells.length - 1] === '') cells.pop();
+      if (cells.length < 2) return;
+      const key = metaKeyOf(cells[0]);
+      if (!key) return;
+      const val = cells[cells.length - 1];
+      if (val && !metaEmptyMark(val)) out[key] = val;
+      return;
+    }
+    const m = t.match(/^[-*\s]*([A-Za-z_]+|[\u4e00-\u9fa5]{1,8})\s*[:：]\s*(.+)$/);
+    if (!m) return;
+    const key = metaKeyOf(m[1]);
+    const val = m[2].trim();
+    if (key && val && !metaEmptyMark(val)) out[key] = val;
+  });
+  return Object.keys(out).length ? out : null;
+}
+
+const META_STATUS_SET = ['ONGOING', 'ENDED', 'HIATUS', 'ABANDONED'];
+
+const META_DIR_SET = ['LEFT_TO_RIGHT', 'RIGHT_TO_LEFT', 'VERTICAL', 'WEBTOON'];
+
+const META_STATUS_ALIAS = {
+  '连载中': 'ONGOING', '連載中': 'ONGOING', '連载中': 'ONGOING', '连载': 'ONGOING', '連載': 'ONGOING', '연재 중': 'ONGOING', '연재중': 'ONGOING',
+  'ongoing': 'ONGOING', 'serialized': 'ONGOING', 'publishing': 'ONGOING', 'serializing': 'ONGOING',
+  '已完结': 'ENDED', '已完結': 'ENDED', '完结': 'ENDED', '完結': 'ENDED', '완결': 'ENDED',
+  'ended': 'ENDED', 'completed': 'ENDED', 'complete': 'ENDED', 'finished': 'ENDED', 'concluded': 'ENDED',
+  '休刊': 'HIATUS', '休載': 'HIATUS', '휴재': 'HIATUS', 'hiatus': 'HIATUS',
+  'on hold': 'HIATUS', 'onhold': 'HIATUS', 'paused': 'HIATUS', 'suspended': 'HIATUS',
+  '已弃坑': 'ABANDONED', '弃坑': 'ABANDONED', '棄坑': 'ABANDONED', '打ち切り': 'ABANDONED', '중단': 'ABANDONED',
+  'abandoned': 'ABANDONED', 'cancelled': 'ABANDONED', 'canceled': 'ABANDONED', 'axed': 'ABANDONED', 'dropped': 'ABANDONED', 'discontinued': 'ABANDONED'
+};
+
+const META_DIR_ALIAS = {
+  '从左往右': 'LEFT_TO_RIGHT', '從左往右': 'LEFT_TO_RIGHT', '左から右': 'LEFT_TO_RIGHT', '왼쪽에서 오른쪽': 'LEFT_TO_RIGHT',
+  'left to right': 'LEFT_TO_RIGHT', 'left-to-right': 'LEFT_TO_RIGHT', 'ltr': 'LEFT_TO_RIGHT',
+  '从右往左': 'RIGHT_TO_LEFT', '從右往左': 'RIGHT_TO_LEFT', '右から左': 'RIGHT_TO_LEFT', '오른쪽에서 왼쪽': 'RIGHT_TO_LEFT',
+  'right to left': 'RIGHT_TO_LEFT', 'right-to-left': 'RIGHT_TO_LEFT', 'rtl': 'RIGHT_TO_LEFT',
+  '纵向': 'VERTICAL', '縱向': 'VERTICAL', '縦書き': 'VERTICAL', '세로쓰기': 'VERTICAL', 'vertical': 'VERTICAL',
+  '条漫': 'WEBTOON', '條漫': 'WEBTOON', 'webtoon': 'WEBTOON', 'webtoons': 'WEBTOON'
+};
+
+function metaEnumValue(key, s) {
+  const v = String(s || '').trim();
+  if (!v) return '';
+  const norm = v.toUpperCase().replace(/[\s-]+/g, '_');
+  if (key === 'status') {
+    const hit = META_STATUS_ALIAS[v] || META_STATUS_ALIAS[v.toLowerCase()] || norm;
+    return META_STATUS_SET.indexOf(hit) >= 0 ? hit : '';
+  }
+  if (key === 'readingDirection') {
+    const hit = META_DIR_ALIAS[v] || META_DIR_ALIAS[v.toLowerCase()] || norm;
+    return META_DIR_SET.indexOf(hit) >= 0 ? hit : '';
+  }
+  if (key === 'region') {
+    const up = v.toUpperCase();
+    if (/^[A-Z]{2}$/.test(up)) return up;
+    return Object.keys(REGION_CN).filter(k => REGION_CN[k] === v)[0] || '';
+  }
+  return v;
+}
+
+function applyMetaObject(kind, obj) {
+  const map = META_FIELD_INPUT[kind] || {};
+  const dropped = [];
+  let n = 0;
+  Object.keys(obj).forEach(rawKey => {
+    const key = META_FIELD_LABELS[rawKey] ? rawKey : metaKeyOf(rawKey);
+    if (!key || !map[key]) return;
+    const el = $('#' + map[key]);
+    if (!el) return;
+    let s = Array.isArray(obj[rawKey])
+      ? obj[rawKey].map(x => typeof x === 'string' ? x : ((x && (x.name || x.title || x.kind)) || '')).filter(Boolean).join(', ')
+      : String(obj[rawKey] == null ? '' : obj[rawKey]);
+    s = s.trim();
+    if (!s) return;
+    if (key === 'releaseDate') s = s.slice(0, 10);
+    if (key === 'status' || key === 'readingDirection' || key === 'region') {
+      const ev = metaEnumValue(key, s);
+      if (!ev) { dropped.push(s); return; }
+      s = ev;
+    }
+    el.value = s;
+    n++;
+  });
+  return { n: n, dropped: dropped };
+}
+
+function openPromptDrawer(o) {
+  let text = '';
+  try {
+    text = metaPromptText(o);
+  } catch (e) {
+    return toast('生成失败：' + e.message, 'err');
+  }
+  const over = text.length > META_PROMPT_MAX;
+  const fileName = 'meta-' + o.kind + '-' + o.id + '.txt';
+  openDrawer({
+    title: '导出提示词', width: 640,
+    body: '<div class="note' + (over ? ' gold' : '') + '">' +
+      (over
+        ? '文本 ' + text.length + ' 字符，超过一键复制上限 ' + META_PROMPT_MAX + '，已改为下载 .txt；粘贴到 AI 后用「导入结果 → 选择文件」载回。'
+        : '文本 ' + text.length + ' 字符，已自动复制，直接粘贴给 AI 即可。') +
+      '</div>' +
+      '<div class="mini" style="margin:10px 0 6px">一键复制上限 ' + META_PROMPT_MAX + ' 字符；超出时自动下载 .txt，再用「导入结果」载入。</div>' +
+      '<textarea class="inp" id="mpText" style="height:320px" spellcheck="false" readonly></textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:10px"><button class="btn sm" data-mpcopy>' + ico('copy') + '再次复制</button>' +
+      '<button class="btn sm" data-mpdl>' + ico('dl') + '下载 txt</button>' +
+      '<button class="btn sm ghost" data-mpimp>' + ico('upload') + '去导入</button></div>',
+    after() {
+      const ta = $('#mpText');
+      if (ta) ta.value = text;
+      const cp = $('#drawer [data-mpcopy]');
+      if (cp) cp.onclick = () => copyText(text);
+      const dl = $('#drawer [data-mpdl]');
+      if (dl) dl.onclick = () => downloadText(fileName, text);
+      const im = $('#drawer [data-mpimp]');
+      if (im) im.onclick = () => { closeDrawer(); openImportDrawer(o); };
+      if (over) downloadText(fileName, text); else copyText(text);
+    }
+  });
+}
+
+function openImportDrawer(o) {
+  openDrawer({
+    title: '导入 AI 结果', width: 640,
+    body: '<div class="note">把 AI 返回的内容整段粘贴进来，也可以选 .txt / .json 文件。解析后只填入表单，不会直接保存。</div>' +
+      '<textarea class="inp" id="mpIn" style="height:280px;margin-top:10px" spellcheck="false" placeholder="{&quot;title&quot;:&quot;迷宫饭&quot;,…} 或每行「字段: 值」"></textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;align-items:center">' +
+      '<button class="btn sm" data-mpfile>' + ico('file') + '选择文件</button>' +
+      '<input type="file" id="mpFile" accept=".txt,.json,text/plain,application/json" style="display:none">' +
+      '<span class="mini" id="mpLen">0 字符</span><span style="flex:1"></span>' +
+      '<button class="btn pri" data-mpdo>完成，填入表单</button></div>' +
+      '<div class="mini" style="margin-top:10px">文本上限：建议单次不超过 ' + META_PROMPT_MAX + ' 字符（约 6~8k token）。超长时「导出提示词」会自动改下载 .txt，用上面的「选择文件」直接载入；粘贴超长文本浏览器可能卡顿。' +
+      '只填界面上有的字段，链接、显著实体、别名等不在表单里的内容会被忽略，不会写入。</div>',
+    after() {
+      const ta = $('#mpIn');
+      const len = $('#mpLen');
+      const sync = () => { if (len) len.textContent = String((ta && ta.value || '').length) + ' 字符'; };
+      if (ta) { ta.oninput = sync; sync(); ta.focus(); }
+      const file = $('#mpFile');
+      const pick = $('#drawer [data-mpfile]');
+      if (pick) pick.onclick = () => file && file.click();
+      if (file) file.onchange = () => {
+        const f = file.files && file.files[0];
+        if (!f) return;
+        const fr = new FileReader();
+        fr.onload = () => { if (ta) { ta.value = String(fr.result || ''); sync(); toast('已载入 ' + f.name, 'ok'); } };
+        fr.onerror = () => toast('文件读取失败', 'err');
+        fr.readAsText(f, 'utf-8');
+      };
+      const go = $('#drawer [data-mpdo]');
+      if (go) go.onclick = () => {
+        const text = ta ? ta.value.trim() : '';
+        if (!text) return toast('先粘贴内容或选择文件', 'err');
+        const obj = parseMetaText(text, o.kind);
+        if (!obj) return toast('没解析出字段，确认是 JSON 或「字段: 值」格式', 'err', 5000);
+        const res = applyMetaObject(o.kind, obj);
+        closeDrawer();
+        if (!res.n) return toast('没有可填入的字段，检查键名', 'warn', 4000);
+        const skip = res.dropped.length ? '；' + res.dropped.join('、') + ' 不在预设内，已忽略' : '';
+        toast('已填入 ' + res.n + ' 项' + skip + '，核对后点「保存」', res.dropped.length ? 'warn' : 'ok', 5000);
+      };
+    }
+  });
+}
+
 function editSeriesMeta(sid) {
   if (!window.LantaiRuntime) return toast('后端不可用', 'err');
   LantaiRuntime.request('api/v1/series/' + sid).then(raw => {
     const md = raw.metadata || {};
+    const regionCur = String(md.region || '').toUpperCase();
+    const regionOpts = [['', '未设置']].concat(Object.keys(REGION_CN).map(k => [k, REGION_CN[k]]));
+    if (regionCur && REGION_CN[regionCur] === undefined) regionOpts.push([regionCur, regionCur]);
     openMetaModal('编辑系列元数据',
       '<div class="grid g-2" style="gap:0 14px">' + mField('标题', 'smTitle', md.title || raw.name) + mField('排序标题', 'smSort', md.titleSort) + '</div>' +
       mArea('简介', 'smSummary', md.summary) +
       '<div class="grid g-2" style="gap:0 14px">' + mField('出版社', 'smPublisher', md.publisher) + mField('语言', 'smLang', md.language, '如 zh-Hans') + '</div>' +
       '<div class="grid g-2" style="gap:0 14px">' +
-      mSelect('连载状态', 'smStatus', [['ONGOING', '连载中'], ['ENDED', '已完结'], ['HIATUS', '休刊'], ['ABANDONED', '已弃坑']], md.status) +
-      mSelect('阅读方向', 'smDir', [['LEFT_TO_RIGHT', '从左往右'], ['RIGHT_TO_LEFT', '从右往左'], ['VERTICAL', '纵向'], ['WEBTOON', '条漫']], md.readingDirection) +
+      mSelect(L.t('meta.status'), 'smStatus', META_STATUS_SET.map(v => [v, statusLabel(v)]), md.status) +
+      mSelect(L.t('meta.dir'), 'smDir', META_DIR_SET.map(v => [v, dirLabel(v)]), md.readingDirection) +
       '</div>' +
-      '<div class="grid g-2" style="gap:0 14px">' + mField('年龄分级', 'smAge', md.ageRating, '数字') + mField('分类', 'smGenres', (md.genres || []).join(', '), '逗号分隔') + '</div>' +
+      '<div class="grid g-2" style="gap:0 14px">' +
+      mField('年龄分级', 'smAge', md.ageRating, '数字') +
+      mSelect('地区', 'smRegion', [['', '未设置']].concat(Object.keys(REGION_CN).map(k => [k, REGION_CN[k]])), String(md.region || '').toUpperCase()) +
+      '</div>' +
+      mField('分类', 'smGenres', (md.genres || []).join(', '), '逗号分隔') +
       mField('标签', 'smTags', Array.from(md.tags || []).join(', '), '逗号分隔'),
       () => {
         const body = { status: mVal('smStatus'), readingDirection: mVal('smDir') };
@@ -3630,6 +4158,7 @@ function editSeriesMeta(sid) {
         put('summary', mVal('smSummary'));
         put('publisher', mVal('smPublisher'));
         put('language', mVal('smLang'));
+        body.region = mVal('smRegion');
         const age = mVal('smAge');
         if (age !== '' && !isNaN(+age)) body.ageRating = +age;
         const g = mList(mVal('smGenres'));
@@ -3640,7 +4169,7 @@ function editSeriesMeta(sid) {
           .then(() => { closeModal(); toast('系列元数据已保存', 'ok'); return LantaiRuntime.hydrate(); })
           .then(() => render())
           .catch(e => toast('保存失败：' + onlineErrText(e), 'err'));
-      });
+      }, { kind: 'series', id: sid, raw: raw });
   }).catch(e => toast('读取失败：' + onlineErrText(e), 'err'));
 }
 
@@ -3677,7 +4206,7 @@ function editBookMeta(bid) {
           .then(() => { closeModal(); toast('书籍元数据已保存', 'ok'); return LantaiRuntime.hydrate(); })
           .then(() => render())
           .catch(e => toast('保存失败：' + onlineErrText(e), 'err'));
-      });
+      }, { kind: 'book', id: bid, raw: raw });
   }).catch(e => toast('读取失败：' + onlineErrText(e), 'err'));
 }
 
@@ -3808,7 +4337,7 @@ Routes.series = (v, seg) => {
     '<div style="width:150px;flex:none;cursor:pointer" data-cov="series:' + s.id + '" data-cov-title="' + esc(s.t) + '" title="点击查看大图">' + coverArt(s.t + 'x', s.t, { id: s.id, kind: 'series' }) + '</div>' +
     '<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
     '<h1 style="font-family:var(--f-disp);font-size:26px;letter-spacing:1.5px">' + esc(s.t) + '</h1>' +
-    (online ? '<span class="badge gold">在线 · ' + esc(s.publisher || '在线源') + '</span>' : '<span class="badge">' + (SERIES_STATUS_CN[s.status] || s.status) + '</span>') +
+    (online ? '<span class="badge gold">在线 · ' + esc(s.publisher || '在线源') + '</span>' : '<span class="badge">' + statusLabel(s.status) + '</span>') +
     (s.oneShot ? '<span class="badge">单册</span>' : '') + '</div>' +
     '<div class="mini" style="margin:6px 0 ' + (s.note ? '8px' : '12px') + '">' +
     ([esc(s.author || ''), (s.genres || []).map(esc).join(' / '), (s.tags || []).map(t => '#' + esc(t)).join(' ')].filter(Boolean).join(' · ') || '作者与分类未标注') + '</div>' +
@@ -3832,8 +4361,12 @@ Routes.series = (v, seg) => {
     '<div class="grid g-2" style="gap:10px 22px">' +
     kvLine('章节 / 册', online ? num(s.chapters) + ' 章' + (och && och.rows ? '（已存档 ' + och.rows.filter(r => r.downloaded).length + '）' : '') : st.count + ' 册') +
     kvLine('体积', bytes(st.size)) +
-    kvLine('最后更新', s.last) + kvLine('阅读方向', DIR_CN[online ? 'RIGHT_TO_LEFT' : (s.lang === 'zh' ? 'RIGHT_TO_LEFT' : 'LEFT_TO_RIGHT')]) +
+    kvLine('最后更新', s.last) + kvLine(metaFieldLabel('readingDirection'), dirLabel(online ? 'RIGHT_TO_LEFT' : (s.lang === 'zh' ? 'RIGHT_TO_LEFT' : 'LEFT_TO_RIGHT'))) +
     (online ? kvLine('远端 ID', osub ? osub.remoteMangaId : '—') + kvLine('上次同步', osub ? fmtSync(osub.lastSyncAt) : '—') : '') +
+    kvLine('地区', s.region ? regionCn(s.region) : '—') +
+    (online ? '' :
+      '<div class="kv span2"><span class="k">路径</span><span class="v mono-sm" style="word-break:break-all">' + esc(libRelPath(s.url, L.root) || (s.raw || s.t)) + '</span></div>' +
+      '<div class="kv span2"><span class="k">完整名称</span><span class="v mono-sm" style="word-break:break-all">' + esc(s.raw || s.t) + '</span></div>') +
     kvLine('扫描', L.type === 'ONLINE' ? '不支持' : INTERVAL_CN[L.interval]) +
     '</div></div>' +
     (p ? '<div style="width:120px;flex:none;text-align:center"><div class="ring" style="--v:' + (p.pct) + ';margin:0 auto"><b>' + p.pct + '%</b></div>' +
@@ -3879,7 +4412,9 @@ Routes.book = (v, seg) => {
   const online = isOnlineBook(b);
   const pc = p && p.pages ? (p.page / p.pages * 100) : 0;
   const kvSpan = (k, val, cls) => '<div class="kv' + (cls ? ' ' + cls : '') + '"><span class="k">' + esc(k) + '</span><span class="v">' + esc(val) + '</span></div>';
-  const pathText = (s.online ? '在线库/…/' : L.root.replace(/^.*library\//, '') + '/') + b.name;
+  const pathText = online
+    ? '在线库/…/' + (b.name || '')
+    : (libRelPath(b.url, L.root) || ((s.t ? s.t + '/' : '') + (b.name || '')));
   v.innerHTML =
     '<div class="crumb"><a data-go="/browse">书库</a><i>/</i>' +
     (s.t === bookTitle(b) ? '' : '<a data-go="/series/' + s.id + '">' + esc(s.t) + '</a><i>/</i>') +
@@ -3907,7 +4442,7 @@ Routes.book = (v, seg) => {
       '<button class="btn" data-markread="' + b.id + '">' + ico('check') + (p && p.completed ? '标记为未读' : '标记为已读') + '</button>') +
     '</div>' +
     '<div class="bk-mini-acts">' +
-    '<button class="btn sm ghost" data-bmeta="' + b.id + '">' + ico('edit') + '元数据</button>' +
+    '<button class="btn sm ghost" data-bmeta="' + b.id + '">' + ico('edit') + '编辑元数据</button>' +
     '<button class="btn sm ghost" data-bcover="' + b.id + '">' + ico('layers') + '封面</button>' +
     '<button class="btn sm ghost" data-bref="' + b.id + '">' + ico('sync') + '刷新</button>' +
     '<button class="btn sm ghost" data-bana="' + b.id + '">' + ico('cpu') + '重新分析</button>' +
@@ -3996,8 +4531,10 @@ function paintBookMeta(b, raw) {
   const val = v => (v === undefined || v === null || String(v).trim() === '') ? '—' : String(v);
   const row = (k, v, cls) => '<div class="kv' + (cls ? ' ' + cls : '') + '"><span class="k">' + esc(k) + '</span><span class="v">' + esc(v) + '</span></div>';
   const authors = (md.authors || []).map(a => {
-    const role = META_ROLE_CN[String(a.role || '').toLowerCase()] || a.role;
-    return role ? a.name + '（' + role + '）' : a.name;
+    const key = String(a.role || '').toLowerCase();
+    const role = META_ROLE_CN[key] || a.role;
+    const plain = key === 'writer' || key === 'author';
+    return (role && !plain) ? a.name + '（' + role + '）' : a.name;
   }).join('、');
   const notable = (md.notableEntities || []).map(e => (e.kind ? e.kind + '：' : '') + e.name).join('、');
   const tags = Array.from(new Set([].concat(Array.from(md.tags || []), Array.from(s.tags || []))));
@@ -4016,7 +4553,7 @@ function paintBookMeta(b, raw) {
     row('作者', val(authors), 'span2') +
     row('出版社', val(md.publisher || s.publisher)) +
     row('语言', val(md.language || s.lang)) +
-    row('丛书状态', val(SERIES_STATUS_CN[s.status] || s.status)) +
+    row('丛书状态', val(statusLabel(s.status))) +
     row('分类', val(genres.join(' / ')), 'span2') +
     row('标签', val(tags.join('、')), 'span2') +
     row('显著实体', val(notable), 'span2') +
@@ -5009,7 +5546,7 @@ function paintOnlineResults(q) {
       '<div style="width:74px;flex:none">' + onlineCover(m, 74) + '</div>' +
       '<div style="flex:1;min-width:0"><div style="font-size:14.5px;font-weight:600">' + hlq(m.t, q) + '</div>' +
       '<div class="mini" style="margin:3px 0 8px">' + esc(m.author || '作者未知') + (m.genres.length ? ' · ' + esc(m.genres.join('/')) : '') + '</div>' +
-      '<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge ' + st + '">' + (SERIES_STATUS_CN[m.status] || m.status || '状态未知') + '</span>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge ' + st + '">' + (statusLabel(m.status) || '状态未知') + '</span>' +
       '<span class="badge moss">' + esc(m.source) + '</span></div></div></div>' +
       '<div class="mini" style="margin:11px 0 10px;line-height:1.5;max-height:38px;overflow:hidden">' + esc(m.desc || '源站未提供简介') + '</div>' +
       '<div style="display:flex;gap:8px">' + (sub ? '<span class="badge ok" style="height:29px">' + ico('check') + ' 已订阅</span><button class="btn sm" data-go="/series/' + sub.seriesId + '">打开</button>'
@@ -5047,7 +5584,7 @@ function onlineMangaPage(v, sourceId, mangaId) {
   const err = cached && cached.err ? cached.err : '';
   const sub = (onlineSubs || []).find(x => String(x.remoteMangaId) === id);
   const srcName = (m && m.source) || sourceName(sourceId) || '在线源';
-  const status = m ? (SERIES_STATUS_CN[m.status] || m.status || '状态未知') : '';
+  const status = m ? (statusLabel(m.status) || '状态未知') : '';
   v.innerHTML =
     '<div class="crumb"><a data-go="/online">在线源</a><i>/</i><a data-go="/online?src=' + encodeURIComponent(sourceId) + '">' + esc(srcName) + '</a><i>/</i><b>' + esc(m ? m.t : '详情') + '</b></div>' +
     (err ? '<div class="note red">' + ico('alert') + ' 读取详情失败：' + esc(err) + '</div><div class="rowflex" style="margin-top:12px"><button class="btn" data-go="/online?src=' + encodeURIComponent(sourceId) + '">' + ico('left') + '返回该源</button></div>' : '') +
@@ -5087,7 +5624,7 @@ function subscribe(m) {
     body: '<div style="display:flex;gap:14px;margin-bottom:14px">' + onlineCover(m, 76) +
       '<div style="flex:1;min-width:0"><div class="mini">' + esc(m.author || '作者未知') + ' · ' + esc(m.source) + '</div>' +
       '<div class="mini" style="margin-top:6px">' + esc((m.genres || []).join(' / ') || '未标注分类') + '</div>' +
-      '<div class="mini" style="margin-top:6px">' + esc(SERIES_STATUS_CN[m.status] || m.status || '状态未知') + '</div></div></div>' +
+      '<div class="mini" style="margin-top:6px">' + esc(statusLabel(m.status) || '状态未知') + '</div></div></div>' +
       '<div class="note gold">' + ico('shield') + ' 订阅会按远端章节创建系列与占位章节，之后可逐章下载存档。</div>',
     foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>确认订阅</button>',
     after() {
@@ -5119,7 +5656,7 @@ function onlineSubsHtml() {
     const s = series(x.seriesId) || {};
     const st = x.status || s.status || '';
     return '<div class="card"><div class="card-h"><h3>' + esc(x.title || s.t || x.seriesId) + '</h3>' +
-      '<span class="badge ' + (st === 'COMPLETED' ? 'ok' : st === 'HIATUS' ? 'warn' : 'gold') + '">' + esc(SERIES_STATUS_CN[st] || st || '未知') + '</span>' +
+      '<span class="badge ' + ((st === 'COMPLETED' || st === 'ENDED') ? 'ok' : st === 'HIATUS' ? 'warn' : 'gold') + '">' + esc(statusLabel(st) || '未知') + '</span>' +
       '<div class="r"><span class="mini">' + esc(fmtSync(x.lastSyncAt)) + '</span></div></div>' +
       '<div class="grid" style="grid-template-columns:repeat(3,1fr);gap:9px;text-align:center;margin-bottom:13px">' +
       '<div><div class="mini">章节</div><b class="mono">' + num(s.chapters || 0) + '</b></div>' +
@@ -5923,7 +6460,11 @@ function paintScSettings() {
     html += '<div class="note">刮削令牌只能读取名单与回传刮削结果，权限写死，访问不了书库其他接口。</div>' +
       (list.length
         ? '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>名称</th><th>令牌</th><th style="width:70px">调用</th><th style="width:118px">创建</th><th style="width:118px">到期</th><th style="width:118px"></th></tr></thead><tbody>' +
-          list.map(t => '<tr><td>' + esc(t.name) + '</td><td class="mono mini">' + esc(t.value) + '</td><td class="mini">' + (t.useCount || 0) + '</td>' +
+          list.map(t => '<tr><td>' + esc(t.name) + '</td><td class="mono mini" style="min-width:200px">' + esc(t.value) +
+            (t.viewable
+              ? '<div class="rowflex" style="gap:6px;margin-top:6px"><button class="btn xs" data-sc-tokview="' + esc(t.id) + '">查看</button><button class="btn xs" data-sc-tokcopy="' + esc(t.id) + '">复制</button></div>'
+              : '<div class="mini" style="margin-top:6px;color:var(--tx-4)">旧版令牌不可查看</div>') +
+            '</td><td class="mini">' + (t.useCount || 0) + '</td>' +
             '<td class="mini mono">' + esc(t.createdDate ? String(t.createdDate).slice(0, 16).replace('T', ' ') : '—') + '</td>' +
             '<td class="mini mono">' + (t.expiresDate ? esc(String(t.expiresDate).slice(0, 16).replace('T', ' ')) : '<span style="color:var(--tx-3)">不限期</span>') + '</td>' +
             '<td style="text-align:right"><button class="btn xs danger" data-sc-tokdel="' + esc(t.id) + '">吊销</button></td></tr>').join('') + '</tbody></table></div>'
@@ -5951,6 +6492,11 @@ function paintScSettings() {
       .then(v => { scSettings = v; toast('设置已保存', 'ok'); paintScSettings(); loadScrape(); })
       .catch(e => toast('保存失败：' + onlineErrText(e), 'err'));
   };
+  $$('#scCfg [data-sc-tokview]').forEach(el => el.onclick = () => {
+    const t = (scTokens || []).find(x => x.id === el.dataset.scTokview);
+    revealTokenModal(el.dataset.scTokview, 'api/lantai/v1/scrape/agent/token/', t && t.name);
+  });
+  $$('#scCfg [data-sc-tokcopy]').forEach(el => el.onclick = () => copyTokenById(el.dataset.scTokcopy, 'api/lantai/v1/scrape/agent/token/'));
   $$('#scCfg [data-sc-tokdel]').forEach(el => el.onclick = () => {
     LantaiRuntime.request('api/lantai/v1/scrape/agent/token/' + el.dataset.scTokdel, { method: 'DELETE' })
       .then(() => { toast('已吊销', 'ok'); return loadScrape(); })
@@ -6013,7 +6559,8 @@ function scSourceListHtml() {
     '<div class="r"><button class="btn xs" data-src-add>' + ico('plus') + '添加数据源</button></div></div>' +
     (list.length ? list.map(s => '<div class="list-i" style="align-items:flex-start"><span class="gi">' + ico('globe') + '</span>' +
       '<div style="flex:1"><div class="gt">' + esc(s.displayName) + ' <span class="mini mono">' + esc(s.id) + '</span>' +
-      ' <span class="badge">' + esc(SRC_KIND[s.kind] || s.kind) + '</span>' + (s.builtin ? ' <span class="badge">内置</span>' : '') + '</div>' +
+      ' <span class="badge">' + esc(SRC_KIND[s.kind] || s.kind) + '</span>' + (s.builtin ? ' <span class="badge">内置</span>' : '') +
+      (s.language ? ' <span class="badge gold">' + esc(SRC_LANG_CN[s.language] || s.language) + '</span>' : '') + '</div>' +
       '<div class="gs">今日 ' + (s.usageToday || 0) + ' / ' + (s.dailyQuota || 0) + ' 次 · 搜索与匹配共用额度' + (s.baseUrl ? ' · ' + esc(s.baseUrl) : '') + '</div></div>' +
       '<div class="gr">' +
       '<label class="sw"><input type="checkbox" data-src-toggle="' + esc(s.id) + '"' + (s.enabled ? ' checked' : '') + '><i></i></label>' +
@@ -6047,6 +6594,37 @@ function resetScrapeSource(id) {
     .then(() => { toast('已重置 ' + id + ' 的熔断与退避', 'ok'); scSources = null; loadScSources(); })
     .catch(e => toast('重置失败：' + onlineErrText(e), 'err', 3600));
 }
+function scrapeOne(sid) {
+  if (!window.LantaiRuntime) return toast('后端不可用', 'err');
+  const s = series(sid);
+  const name = s ? s.t : sid;
+  LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: { seriesIds: [sid], run: false } })
+    .then(r => {
+      const added = r.added > 0;
+      openModal({
+        title: added ? '已加入刮削名单' : '已在刮削名单中',
+        width: 460,
+        body: '<div class="note">' + esc(name) + (added ? ' 已加入刮削名单，还没有请求任何数据源。' : ' 原本就在名单里，本次没有新增。') + '</div>' +
+          '<div class="note gold" style="margin-top:12px">现在开始才会消耗数据源配额，并逐条检索、比对差异。</div>',
+        foot: '<button class="btn" data-x>稍后开始</button><button class="btn pri" data-ok>开始刮削</button>',
+        after() {
+          $('#modal [data-x]').onclick = () => {
+            closeModal();
+            toast('已加入名单，可在「刮削与元数据」统一开始', 'ok', 3200);
+          };
+          $('#modal [data-ok]').onclick = () => {
+            const btn = $('#modal [data-ok]');
+            btn.disabled = true;
+            LantaiRuntime.request('api/lantai/v1/scrape/queue/start', { method: 'POST' })
+              .then(() => { closeModal(); scPage = null; toast('已开始刮削', 'ok'); go('/scrape'); })
+              .catch(e => { btn.disabled = false; toast('启动失败：' + onlineErrText(e), 'err'); });
+          };
+        }
+      });
+    })
+    .catch(e => toast('加入失败：' + onlineErrText(e), 'err'));
+}
+
 function scrapeLibrary(libId) {
   const l = lib(libId);
   openModal({
@@ -6077,17 +6655,12 @@ Routes.scrape = (v, seg, qs) => {
   wire(v);
   if (qs && qs.series && scAutoSeries !== qs.series) {
     scAutoSeries = qs.series;
-    LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: { seriesIds: [qs.series], run: true } })
-      .then(r => {
-        toast(r.added ? '已加入名单并开始刮削' : '该系列已在名单中', r.added ? 'ok' : 'info');
-        scOffset = 0;
-        loadScrape();
-      })
-      .catch(e => toast('加入失败：' + onlineErrText(e), 'err'));
+    scrapeOne(qs.series);
   }
 };
 
 const SRC_KIND = { BUILTIN: '内置', JSON: 'JSON', GRAPHQL: 'GraphQL', HTML: 'HTML' };
+const SRC_LANG_CN = { 'zh-CN': '中文', 'zh-Hans': '中文', ja: '日文', ko: '韩文', en: '英文', mul: '多语言' };
 const SRC_FIELD_HINT = {
   JSON: 'title=title\nauthors=authors[]\ncoverUrl=cover.large\nurl=link',
   GRAPHQL: 'title=title.romaji\nauthors=staff.nodes[].name.full\ncoverUrl=coverImage.large\nurl=siteUrl',
@@ -8128,7 +8701,7 @@ function syncCounts() {
   const q = '&deleted=false&size=1&page=0';
   return Promise.all([
     rt.request('api/v1/series?sort=lastModified,desc' + q).catch(() => null),
-    rt.request('api/v1/books?sort=lastModified,desc' + q).catch(() => null)
+    rt.request('api/v1/books?sort=lastModified,desc&deleted=false&size=1&page=0&readerView=true&media_status=READY').catch(() => null)
   ]).then(list => {
     countBusy = false;
     let changed = false;
@@ -8187,6 +8760,32 @@ function pageFingerprint() {
   const tq = String(S.route || '') === '/tasks' ? taskQKey() : '';
   return [libs, TASKS.length, TASKS.filter(t => t.state === 'run').length, SERIES.length, BOOKS.length, swy, rtd, cnt, libStatKey(), tq].join('|');
 }
+let readyBookSeen = -1, readyRefreshedAt = 0;
+function refreshReadyCatalog() {
+  if (!window.LantaiRuntime || !LantaiRuntime.reloadReadyCatalog) return Promise.resolve();
+  return LantaiRuntime.reloadReadyCatalog().then(() => {
+    const n = LantaiRuntime.catalogReadyBooks();
+    if (readyBookSeen < 0) { readyBookSeen = n; return; }
+    if (n === readyBookSeen) return;
+    const now = Date.now();
+    if (now - readyRefreshedAt < 15000) return;
+    readyRefreshedAt = now;
+    readyBookSeen = n;
+    return LantaiRuntime.hydrateCatalog(false, true);
+  }).catch(() => {});
+}
+let browseMetaAt = 0;
+function refreshBrowseMeta() {
+  if (!window.LantaiRuntime || !LantaiRuntime.refreshSeriesMeta) return Promise.resolve();
+  const now = Date.now();
+  if (now - browseMetaAt < 10000) return Promise.resolve();
+  browseMetaAt = now;
+  return LantaiRuntime.refreshSeriesMeta().then(changed => {
+    if (!changed) return;
+    window.__lantaiKeepScroll = true;
+    render();
+  }).catch(() => { });
+}
 let pageTick = null, pageTickCount = 0;
 function pollCurrentPage() {
   if (!window.LantaiRuntime || document.hidden) return Promise.resolve();
@@ -8209,6 +8808,8 @@ function pollCurrentPage() {
     if (S.settingsTab === 'online') jobs.push(loadSwy(true));
   }
   if (p === '/tasks') jobs.push(taskQueueTick());
+  if (p === '/browse' || p.indexOf('/browse/') === 0 || p === '/search') jobs.push(refreshReadyCatalog());
+  if (p === '/browse' || p.indexOf('/browse/') === 0) jobs.push(refreshBrowseMeta());
   if (p === '/online') jobs.push(loadSwy(true));
   if (!jobs.length) return Promise.resolve();
   const before = pageFingerprint();
@@ -9442,7 +10043,11 @@ function stTokens() {
       : list.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>名称</th><th style="width:190px">令牌</th><th>权限范围</th><th style="width:150px">有效期</th><th style="width:76px">状态</th><th style="width:120px">最近使用</th><th style="width:236px"></th></tr></thead><tbody>' +
         list.map(k => '<tr>' +
           '<td><div>' + esc(k.name) + '</div><div class="mini mono">' + esc(k.ownerUsername || '') + '</div></td>' +
-          '<td class="mono mini" style="word-break:break-all">' + esc(String(k.value)) + '</td>' +
+          '<td class="mono mini" style="word-break:break-all">' + esc(String(k.value)) +
+          (k.viewable
+            ? '<div class="rowflex" style="gap:6px;margin-top:6px"><button class="btn xs" data-tkview="' + esc(k.id) + '">查看</button><button class="btn xs" data-tkcopy="' + esc(k.id) + '">复制</button></div>'
+            : '<div class="mini" style="margin-top:6px;color:var(--tx-4)">旧版令牌不可查看</div>') +
+          '</td>' +
           '<td class="mini">' + esc(tokenScopeText(k.scopes)) + '</td>' +
           '<td class="mini">' + esc(tokenExpiryText(k)) + '</td>' +
           '<td><span class="badge ' + (!k.enabled ? 'bad' : k.expired ? 'warn' : 'ok') + '">' + (!k.enabled ? '停用' : k.expired ? '过期' : '启用') + '</span></td>' +
@@ -9453,7 +10058,7 @@ function stTokens() {
           '<button class="btn xs danger" data-tkdel="' + esc(k.id) + '">删除</button></td></tr>').join('') +
         '</tbody></table></div>'
       : '<div class="empty" style="padding:26px"><h4>还没有 API 令牌</h4><p>创建后可指定权限范围与有效期，用于脚本或第三方客户端。</p><button class="btn pri" data-tknew>新建令牌</button></div>') +
-    '<div class="note" style="margin-top:12px">调用方式：请求头 <span class="mono">X-API-Token: &lt;令牌&gt;</span> 或 <span class="mono">Authorization: Bearer &lt;令牌&gt;</span>。令牌以 <span class="mono">lt_</span> 开头，数据库中仅保存不可逆摘要，明文只在创建时显示一次，请及时保存。</div>' +
+    '<div class="note" style="margin-top:12px">调用方式：请求头 <span class="mono">X-API-Token: &lt;令牌&gt;</span> 或 <span class="mono">Authorization: Bearer &lt;令牌&gt;</span>。令牌以 <span class="mono">lt_</span> 开头，在本机以 AES-GCM 加密保存，管理员可随时在列表里查看与复制。</div>' +
     '</div>';
 }
 function wireTokens(B) {
@@ -9470,6 +10075,11 @@ function wireTokens(B) {
     const k = (apiTokens || []).find(x => x.id === el.dataset.tkdel);
     if (k) deleteToken(k);
   });
+  B.querySelectorAll('[data-tkview]').forEach(el => el.onclick = () => {
+    const k = (apiTokens || []).find(x => x.id === el.dataset.tkview);
+    if (k) revealTokenModal(k.id, 'api/lantai/v1/api-tokens/', k.name);
+  });
+  B.querySelectorAll('[data-tkcopy]').forEach(el => el.onclick = () => copyTokenById(el.dataset.tkcopy, 'api/lantai/v1/api-tokens/'));
 }
 function copyToken(t) {
   const fallback = () => {
@@ -9481,6 +10091,28 @@ function copyToken(t) {
   };
   if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t).then(() => toast('令牌已复制', 'ok'), fallback);
   return fallback();
+}
+function tokenValueRequest(id, path) {
+  return LantaiRuntime.request(path + id + '/value').then(v => (v && v.value) || '');
+}
+function copyTokenById(id, path) {
+  tokenValueRequest(id, path)
+    .then(v => copyToken(v))
+    .catch(e => toast('复制失败：' + onlineErrText(e), 'err', 3600));
+}
+function revealTokenModal(id, path, name) {
+  tokenValueRequest(id, path).then(v => {
+    openModal({
+      title: '令牌明文', width: 560,
+      body: '<div class="note gold">' + (name ? esc(name) + ' · ' : '') + '明文保存在本地数据库，仅管理员可查看。</div>' +
+        '<div class="mono tok-val" style="margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:8px;word-break:break-all;font-size:12.5px">' + esc(v) + '</div>',
+      foot: '<button class="btn pri" data-copy>复制令牌</button><button class="btn" data-x>关闭</button>',
+      after() {
+        $('#modal [data-copy]').onclick = () => copyToken(v);
+        $('#modal [data-x]').onclick = closeModal;
+      }
+    });
+  }).catch(e => toast('无法查看：' + onlineErrText(e), 'err', 3600));
 }
 function tokenScopeRows(selected) {
   const scopes = apiTokenScopes || TOKEN_SCOPES_DEFAULT;
@@ -9863,41 +10495,74 @@ function queueScan(l) {
   toast('正在提交扫描任务：' + l.name);
   return libOp(l.id, 'scan', '扫描');
 }
+function libModalBody(l, type) {
+  const online = type === 'ONLINE';
+  if (online && !l) {
+    return '<div class="note">在线库由兰台托管，名称与根目录取服务端配置（online.library-name / online.root-dir）。</div>' +
+      '<div class="note">扫描间隔与入库格式固定关闭，内容通过订阅在线源产生；若服务端已存在在线库，创建会直接返回现有库。</div>';
+  }
+  return '<div class="field"><label>名称</label><input class="inp" id="lmName" value="' + esc(l ? l.name : '') + '" placeholder="漫画库"></div>' +
+    '<div class="field"><label>根目录（一个库对应一个目录）</label><div class="rowflex" style="gap:6px"><input class="inp mono" id="lmRoot" style="font-size:11.5px;flex:1" value="' + esc(l ? l.root : '') + '"' + (online ? ' disabled' : '') + '>' +
+    (online ? '' : '<button class="btn sm" data-fsbrowse="lmFs" data-fsinput="lmRoot">' + ico('folder') + '浏览</button>') +
+    '</div><div id="lmFs"></div></div>' +
+    '<div class="field"><label>扫描间隔</label><select class="inp" id="lmInt"' + (online ? ' disabled' : '') + '>' +
+    LIB_INTERVALS.map(m => '<option value="' + m + '"' + (l && l.interval === m ? ' selected' : '') + '>' + (INTERVAL_CN[m] || m) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>入库格式</label>' + ['cbx', 'pdf', 'epub', 'txt'].map(k =>
+      '<label class="sw" style="width:100%;justify-content:space-between;margin-bottom:8px"><span>' + SCAN_CN[k] + '</span>' +
+      '<input type="checkbox" data-lm="' + k + '"' + (l && l.scan[k] ? ' checked' : '') + (online ? ' disabled' : '') + '><i></i></label>').join('') + '</div>' +
+    (online ? '<div class="note red">在线库的格式开关与扫描间隔由兰台管理，不可编辑。</div>'
+      : '<div class="note">开关决定扫描时收录哪些格式，关闭后该格式的文件不再入库。</div>') +
+    (online ? '' :
+      '<div class="field"><label>哈希与扫描行为</label>' +
+      [['hashFiles', '计算文件哈希', 'hashFiles'], ['hashPages', '计算页面哈希', 'hashPages'], ['hashKoreader', '计算 Kobo 哈希', 'hashKoreader'],
+        ['analyzeDimensions', '分析图片尺寸', 'analyzeDimensions'], ['scanForceModifiedTime', '忽略修改时间全量重扫', 'forceModified'],
+        ['scanOnStartup', '启动时扫描', 'onStartup'], ['repairExtensions', '修正错误扩展名', 'repairExt'], ['convertToCbz', '自动转 CBZ', 'convertCbz']].map(x =>
+        '<label class="sw" style="width:100%;justify-content:space-between;margin-bottom:8px"><span>' + x[1] + '</span>' +
+        '<input type="checkbox" data-lma="' + x[0] + '"' + (l && l[x[2]] ? ' checked' : '') + '><i></i></label>').join('') +
+      '<div class="mini" style="margin-top:2px">页面哈希与 Kobo 哈希按册派生任务，库大时先把任务中心并发调高。</div></div>' +
+      '<div class="field"><label>单册目录（相对根目录，留空不启用）</label>' +
+      '<input class="inp mono" id="lmOne" style="font-size:11.5px" value="' + esc(l ? (l.oneshots || '') : '') + '" placeholder="单册"></div>' +
+      '<div class="field"><label>排除目录（每行一个，相对根目录）</label>' +
+      '<textarea class="inp mono" id="lmExc" style="font-size:11.5px;min-height:64px" placeholder="临时&#10;回收">' + esc(l ? (l.exclusions || '') : '') + '</textarea></div>');
+}
 function libModal(l) {
   const isNew = !l;
+  let type = isNew ? 'LOCAL' : l.type;
+  const headHtml = () => isNew
+    ? '<span class="chip' + (type === 'LOCAL' ? ' on' : '') + '" data-libtype="LOCAL">本地库</span><span class="chip' + (type === 'ONLINE' ? ' on' : '') + '" data-libtype="ONLINE">在线库</span>'
+    : '<span class="badge ' + (type === 'ONLINE' ? 'gold' : 'moss') + '">' + (TYPE_CN[type] || type) + '</span>';
+  const wireBody = () => {
+    $$('#modal [data-fsbrowse]').forEach(el => el.onclick = () => {
+      const box = $('#modal #' + el.dataset.fsbrowse), inp = $('#modal #' + el.dataset.fsinput);
+      if (!box || !inp) return;
+      fsBrowse(box, inp.value.trim(), p => { inp.value = p; });
+    });
+    $$('#modal [data-libtype]').forEach(el => el.onclick = () => {
+      if (el.dataset.libtype === type) return;
+      type = el.dataset.libtype;
+      $('#mHead').innerHTML = headHtml();
+      $('#mBody').innerHTML = libModalBody(null, type);
+      wireBody();
+    });
+  };
   openModal({
     title: isNew ? '新建库' : '编辑库 · ' + l.name, width: 520,
-    head: '<span class="badge ' + (isNew ? '' : l.type === 'ONLINE' ? 'gold' : 'moss') + '">' + (isNew ? '本地库' : (TYPE_CN[l.type] || l.type)) + '</span>',
-    body: '<div class="field"><label>名称</label><input class="inp" id="lmName" value="' + esc(l ? l.name : '') + '" placeholder="漫画库"></div>' +
-      '<div class="field"><label>根目录（一个库对应一个目录）</label><div class="rowflex" style="gap:6px"><input class="inp mono" id="lmRoot" style="font-size:11.5px;flex:1" value="' + esc(l ? l.root : '') + '"><button class="btn sm" data-fsbrowse="lmFs" data-fsinput="lmRoot">' + ico('folder') + '浏览</button></div><div id="lmFs"></div></div>' +
-      '<div class="field"><label>扫描间隔</label><select class="inp" id="lmInt"' + (l && l.type === 'ONLINE' ? ' disabled' : '') + '>' +
-      LIB_INTERVALS.map(m => '<option value="' + m + '"' + (l && l.interval === m ? ' selected' : '') + '>' + (INTERVAL_CN[m] || m) + '</option>').join('') + '</select></div>' +
-      '<div class="field"><label>入库格式</label>' + ['cbx', 'pdf', 'epub', 'txt'].map(k =>
-        '<label class="sw" style="width:100%;justify-content:space-between;margin-bottom:8px"><span>' + SCAN_CN[k] + '</span>' +
-        '<input type="checkbox" data-lm="' + k + '"' + (l && l.scan[k] ? ' checked' : '') + (l && l.type === 'ONLINE' ? ' disabled' : '') + '><i></i></label>').join('') + '</div>' +
-      (l && l.type === 'ONLINE' ? '<div class="note red">在线库的格式开关与扫描间隔由兰台管理，不可编辑。</div>'
-        : '<div class="note">开关决定扫描时收录哪些格式，关闭后该格式的文件不再入库。</div>') +
-      (l && l.type === 'ONLINE' ? '' :
-        '<div class="field"><label>哈希与扫描行为</label>' +
-        [['hashFiles', '计算文件哈希', 'hashFiles'], ['hashPages', '计算页面哈希', 'hashPages'], ['hashKoreader', '计算 Kobo 哈希', 'hashKoreader'],
-          ['analyzeDimensions', '分析图片尺寸', 'analyzeDimensions'], ['scanForceModifiedTime', '忽略修改时间全量重扫', 'forceModified'],
-          ['scanOnStartup', '启动时扫描', 'onStartup'], ['repairExtensions', '修正错误扩展名', 'repairExt'], ['convertToCbz', '自动转 CBZ', 'convertCbz']].map(x =>
-          '<label class="sw" style="width:100%;justify-content:space-between;margin-bottom:8px"><span>' + x[1] + '</span>' +
-          '<input type="checkbox" data-lma="' + x[0] + '"' + (l && l[x[2]] ? ' checked' : '') + '><i></i></label>').join('') +
-        '<div class="mini" style="margin-top:2px">页面哈希与 Kobo 哈希按册派生任务，库大时先把任务中心并发调高。</div></div>' +
-        '<div class="field"><label>单册目录（相对根目录，留空不启用）</label>' +
-        '<input class="inp mono" id="lmOne" style="font-size:11.5px" value="' + esc(l ? (l.oneshots || '') : '') + '" placeholder="单册"></div>' +
-        '<div class="field"><label>排除目录（每行一个，相对根目录）</label>' +
-        '<textarea class="inp mono" id="lmExc" style="font-size:11.5px;min-height:64px" placeholder="临时&#10;回收">' + esc(l ? (l.exclusions || '') : '') + '</textarea></div>'),
+    head: headHtml(),
+    body: libModalBody(l, type),
     foot: '<button class="btn" data-x>取消</button><button class="btn pri" data-ok>' + (isNew ? '创建' : '保存') + '</button>',
     after() {
       $('#modal [data-x]').onclick = closeModal;
-      $$('#modal [data-fsbrowse]').forEach(el => el.onclick = () => {
-        const box = $('#modal #' + el.dataset.fsbrowse), inp = $('#modal #' + el.dataset.fsinput);
-        if (!box || !inp) return;
-        fsBrowse(box, inp.value.trim(), p => { inp.value = p; });
-      });
+      wireBody();
       $('#modal [data-ok]').onclick = () => {
+        const btn = $('#modal [data-ok]');
+        if (isNew && type === 'ONLINE') {
+          btn.disabled = true;
+          LantaiRuntime.request('api/lantai/v1/online/library', { method: 'POST' })
+            .then(d => { closeModal(); return libReload((d.existed ? '在线库已存在：' : '已创建在线库 ') + d.name, true); })
+            .catch(e => toast('创建失败：' + onlineErrText(e), 'err'))
+            .then(() => { btn.disabled = false; });
+          return;
+        }
         const name = $('#lmName').value.trim(), root = $('#lmRoot').value.trim();
         if (!name) return toast('名称不能为空', 'err');
         if (isNew && !root) return toast('根目录不能为空', 'err');
@@ -9909,7 +10574,7 @@ function libModal(l) {
         if (one) body.oneshotsDirectory = one.value.trim();
         const exc = $('#modal #lmExc');
         if (exc) body.scanDirectoryExclusions = exc.value.split('\n').map(s => s.trim()).filter(Boolean);
-        const btn = $('#modal [data-ok]'); btn.disabled = true;
+        btn.disabled = true;
         const req = isNew
           ? LantaiRuntime.request('api/v1/libraries', { method: 'POST', body })
           : LantaiRuntime.request('api/v1/libraries/' + l.id, { method: 'PATCH', body });
@@ -9934,7 +10599,7 @@ function wire(root) {
   root.querySelectorAll('[data-lib]').forEach(el => el.onclick = e => { if (!guard(e)) go('/browse/' + el.dataset.lib); });
   root.querySelectorAll('[data-coll]').forEach(el => el.onclick = () => go('/collections/' + el.dataset.coll));
   root.querySelectorAll('[data-list]').forEach(el => el.onclick = () => go('/readlists/' + el.dataset.list));
-  root.querySelectorAll('[data-scrape]').forEach(el => el.onclick = () => go('/scrape?series=' + el.dataset.scrape));
+  root.querySelectorAll('[data-scrape]').forEach(el => el.onclick = () => scrapeOne(el.dataset.scrape));
   root.querySelectorAll('[data-homecfg]').forEach(el => el.onclick = () => homeSectionModal());
   root.querySelectorAll('[data-home-retry]').forEach(el => el.onclick = () => {
     homeApp.err = '';
@@ -10042,10 +10707,12 @@ function importModal() {
 }
 var L = window.LantaiI18n || { t: function (k) { return k; }, lang: function () { return 'zh-Hans'; }, langs: function () { return []; }, name: function (c) { return c; }, apply: function () { } };
 function bootHtml() {
+  const rem = window.LantaiRuntime && LantaiRuntime.remember ? LantaiRuntime.remember() : null;
+  const keep = rem ? rem.keep !== false : true;
   $('#bootBody').innerHTML = '<div class="fld">' +
     '<div class="field"><label>' + L.t('boot.userOrEmail') + '</label><input class="inp" id="bIn1" placeholder="' + L.t('boot.userOrEmail') + '" autocomplete="username" spellcheck="false"></div>' +
     '<div class="field"><label>' + L.t('boot.password') + '</label><input class="inp mono" id="bIn2" type="password" style="font-size:11.5px" value="" autocomplete="current-password"></div>' +
-    '<label id="bRemWrap" style="display:flex;align-items:center;gap:7px;margin:-2px 0 10px;cursor:pointer;font-size:12px;color:var(--tx-3)"><input type="checkbox" id="bRemember" style="width:14px;height:14px;margin:0;accent-color:var(--acc)">' + L.t('boot.remember') + '</label>' +
+    '<label id="bRemWrap" style="display:flex;align-items:center;gap:7px;margin:-2px 0 10px;cursor:pointer;font-size:12px;color:var(--tx-3)"><input type="checkbox" id="bRemember"' + (keep ? ' checked' : '') + ' style="width:14px;height:14px;margin:0;accent-color:var(--acc)">' + L.t('boot.remember') + '</label>' +
     '<button class="btn pri blk" id="bGo" style="margin-top:6px;height:38px">' + L.t('boot.go') + '</button>' +
     '<div class="mini" style="margin-top:12px;line-height:1.7;color:var(--tx-4)">' + L.t('boot.hint') + '</div>' +
     '<div class="boot-lang"><span>' + L.t('boot.language') + '</span><select class="inp" id="bLang">' +
@@ -10061,12 +10728,7 @@ function bootHtml() {
   });
   const ls = $('#bLang');
   if (ls) ls.onchange = () => applyLang(ls.value);
-  const rem = window.LantaiRuntime && LantaiRuntime.remember ? LantaiRuntime.remember() : null;
-  if (rem && rem.u) {
-    $('#bIn1').value = rem.u;
-    const rb = $('#bRemember');
-    if (rb) rb.checked = true;
-  }
+  if (rem && rem.u) $('#bIn1').value = rem.u;
   setTimeout(() => { const el = $('#bIn1').value ? $('#bGo') : $('#bIn1'); if (el) el.focus(); }, 40);
 }
 function applyLang(code) {

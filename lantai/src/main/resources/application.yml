@@ -73,13 +73,66 @@ lantai:
     sources:
       douban:
         enabled: true
+        language: zh-CN
+        display-name: 豆瓣读书
         base-url: https://book.douban.com
         min-interval-ms: 2000
         daily-quota: 100
       anilist:
         enabled: true
+        language: ja
+        display-name: AniList
         base-url: https://graphql.anilist.co
         min-interval-ms: 1000
+        daily-quota: 0
+      wikidata:
+        enabled: true
+        language: mul
+        display-name: Wikidata
+        base-url: https://www.wikidata.org
+        min-interval-ms: 1000
+        daily-quota: 0
+      kitsu:
+        enabled: true
+        language: en
+        display-name: Kitsu
+        base-url: https://kitsu.io
+        min-interval-ms: 1500
+        daily-quota: 0
+      mangaupdates:
+        enabled: true
+        language: en
+        display-name: MangaUpdates
+        base-url: https://api.mangaupdates.com
+        min-interval-ms: 1500
+        daily-quota: 0
+      mangadex:
+        enabled: false
+        language: mul
+        display-name: MangaDex（预留）
+        base-url: https://api.mangadex.org
+        min-interval-ms: 1000
+        daily-quota: 0
+      bangumi:
+        enabled: false
+        language: zh-CN
+        display-name: Bangumi（预留）
+        base-url: https://api.bgm.tv
+        min-interval-ms: 1500
+        daily-quota: 0
+      jikan:
+        enabled: false
+        language: en
+        display-name: MyAnimeList/Jikan（预留）
+        base-url: https://api.jikan.moe
+        min-interval-ms: 1000
+        daily-quota: 0
+      googlebooks:
+        enabled: false
+        language: mul
+        display-name: Google Books（预留）
+        base-url: https://www.googleapis.com
+        min-interval-ms: 1500
         daily-quota: 0
   reading:
     rollup-enabled: true

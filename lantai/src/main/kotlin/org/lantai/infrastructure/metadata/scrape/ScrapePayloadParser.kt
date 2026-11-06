@@ -12,6 +12,7 @@ object ScrapePayloadParser {
       title = text(node, "title"),
       summary = text(node, "summary").ifBlank { text(node, "description") },
       publisher = text(node, "publisher"),
+      region = text(node, "region").ifBlank { text(node, "country") }.uppercase(),
       language = text(node, "language"),
       ageRating = text(node, "ageRating").toIntOrNull(),
       genres = list(node, "genres").ifEmpty { list(node, "categories") },

@@ -92,6 +92,7 @@ class SeriesMetadataDao(
       .set(d.SUMMARY, metadata.summary)
       .set(d.READING_DIRECTION, metadata.readingDirection?.toString())
       .set(d.PUBLISHER, metadata.publisher)
+      .set(d.REGION, metadata.region)
       .set(d.AGE_RATING, metadata.ageRating)
       .set(d.LANGUAGE, metadata.language)
       .set(d.STATUS_LOCK, metadata.statusLock)
@@ -100,6 +101,7 @@ class SeriesMetadataDao(
       .set(d.SUMMARY_LOCK, metadata.summaryLock)
       .set(d.READING_DIRECTION_LOCK, metadata.readingDirectionLock)
       .set(d.PUBLISHER_LOCK, metadata.publisherLock)
+      .set(d.REGION_LOCK, metadata.regionLock)
       .set(d.AGE_RATING_LOCK, metadata.ageRatingLock)
       .set(d.LANGUAGE_LOCK, metadata.languageLock)
       .set(d.GENRES_LOCK, metadata.genresLock)
@@ -129,6 +131,7 @@ class SeriesMetadataDao(
       .set(d.SUMMARY, metadata.summary)
       .set(d.READING_DIRECTION, metadata.readingDirection?.toString())
       .set(d.PUBLISHER, metadata.publisher)
+      .set(d.REGION, metadata.region)
       .set(d.AGE_RATING, metadata.ageRating)
       .set(d.LANGUAGE, metadata.language)
       .set(d.STATUS_LOCK, metadata.statusLock)
@@ -137,6 +140,7 @@ class SeriesMetadataDao(
       .set(d.SUMMARY_LOCK, metadata.summaryLock)
       .set(d.READING_DIRECTION_LOCK, metadata.readingDirectionLock)
       .set(d.PUBLISHER_LOCK, metadata.publisherLock)
+      .set(d.REGION_LOCK, metadata.regionLock)
       .set(d.AGE_RATING_LOCK, metadata.ageRatingLock)
       .set(d.LANGUAGE_LOCK, metadata.languageLock)
       .set(d.GENRES_LOCK, metadata.genresLock)
@@ -307,6 +311,7 @@ class SeriesMetadataDao(
         SeriesMetadata.ReadingDirection.valueOf(readingDirection)
       },
     publisher = publisher,
+    region = region,
     ageRating = ageRating,
     language = language,
     genres = genres,
@@ -321,6 +326,7 @@ class SeriesMetadataDao(
     summaryLock = summaryLock,
     readingDirectionLock = readingDirectionLock,
     publisherLock = publisherLock,
+    regionLock = regionLock,
     ageRatingLock = ageRatingLock,
     languageLock = languageLock,
     genresLock = genresLock,

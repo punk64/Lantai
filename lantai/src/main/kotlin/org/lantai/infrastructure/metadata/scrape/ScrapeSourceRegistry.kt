@@ -40,6 +40,25 @@ class ScrapeSourceRegistry(
         logger.info { "Seeded scrape source ${bean.id}" }
       }.onFailure { logger.warn(it) { "Failed to seed scrape source ${bean.id}" } }
     }
+    properties.sources.forEach { (id, defaults) ->
+      if (builtins.any { it.id == id }) return@forEach
+      if (repository.findByIdOrNull(id) != null) return@forEach
+      runCatching {
+        repository.insert(
+          ScrapeSourceConfig(
+            id = id,
+            displayName = defaults.displayName.ifBlank { id },
+            kind = ScrapeSourceConfig.Kind.BUILTIN,
+            baseUrl = defaults.baseUrl,
+            dailyQuota = defaults.dailyQuota,
+            minIntervalMs = defaults.minIntervalMs,
+            enabled = false,
+            builtin = true,
+          ),
+        )
+        logger.info { "Seeded reserved scrape source $id" }
+      }.onFailure { logger.warn(it) { "Failed to seed reserved source $id" } }
+    }
   }
 
   fun list(): List<ScrapeSourceConfig> = repository.findAll()

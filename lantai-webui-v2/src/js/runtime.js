@@ -191,12 +191,14 @@
     var bm = s.booksMetadata || {};
     var owner = LIBS.find(function (l) { return l.id === s.libraryId; });
     var online = !!(owner && owner.type === 'ONLINE');
-    var status = md.status === 'ENDED' ? 'COMPLETED' : md.status === 'ABANDONED' ? 'HIATUS' : (md.status || 'ONGOING');
+    var status = md.status || 'ONGOING';
     var releaseDate = bm.releaseDate || '';
     return {
       id: s.id,
       lib: s.libraryId,
       t: md.title || s.name,
+      raw: s.name || '',
+      url: s.url || '',
       author: (bm.authors || []).map(function (a) { return a.name; }).join('、'),
       status: status,
       oneShot: !!s.oneshot,
@@ -209,6 +211,7 @@
       note: md.summary || bm.summary || '',
       online: online,
       publisher: md.publisher || '',
+      region: md.region || '',
       source: '',
       published: releaseDate,
       year: releaseDate ? parseInt(String(releaseDate).slice(0, 4), 10) || 0 : 0,
@@ -235,6 +238,7 @@
       s: b.seriesId,
       num: b.number || 0,
       name: b.name,
+      url: b.url || '',
       mdTitle: md.title || '',
       mdNum: md.number || '',
       mdIsbn: md.isbn || '',
@@ -422,10 +426,26 @@
     return runtime.catalog;
   }
 
+  var readyState = { ids: null, count: 0, loading: null };
+
+  function loadReadyCatalog() {
+    if (readyState.loading) return readyState.loading;
+    readyState.loading = request('api/lantai/v1/catalog/ready').then(function (d) {
+      readyState.ids = (d && d.seriesIds) || [];
+      readyState.count = (d && d.bookCount) || 0;
+      readyState.loading = null;
+      return readyState;
+    }, function () {
+      readyState.loading = null;
+      return readyState;
+    });
+    return readyState.loading;
+  }
+
   function catalogPage(kind) {
     var st = catalogState()[kind];
     if (st.done) return Promise.resolve(false);
-    var path = (kind === 'series' ? 'api/v1/series?sort=lastModified,desc' : 'api/v1/books?sort=lastModified,desc&readerView=true')
+    var path = (kind === 'series' ? 'api/v1/series?sort=lastModified,desc' : 'api/v1/books?sort=lastModified,desc&readerView=true&media_status=READY')
       + '&deleted=false&size=' + CATALOG_PAGE + '&page=' + st.page;
     return request(path).then(function (p) {
       var content = (p && p.content) || [];
@@ -433,16 +453,20 @@
       st.page++;
       st.total = (p && typeof p.totalElements === 'number') ? p.totalElements : st.total + content.length;
       if (kind === 'series') {
-        if (first && !runtime.catalogLoaded) SERIES.length = 0;
-        mergeSeries(content);
-        live.series = true;
-        st.done = !content.length || SERIES.length >= st.total;
-      } else {
-        if (first && !runtime.catalogLoaded) BOOKS.length = 0;
-        mergeBooks(content);
-        live.books = true;
-        st.done = !content.length || BOOKS.length >= st.total;
+        return loadReadyCatalog().then(function (rs) {
+          var allow = rs.ids ? new Set(rs.ids) : null;
+          var rows = allow ? content.filter(function (s) { return allow.has(s.id); }) : content;
+          if (first && !runtime.catalogLoaded) SERIES.length = 0;
+          mergeSeries(rows);
+          live.series = true;
+          st.done = !content.length || st.page * CATALOG_PAGE >= st.total;
+          return !st.done;
+        });
       }
+      if (first && !runtime.catalogLoaded) BOOKS.length = 0;
+      mergeBooks(content);
+      live.books = true;
+      st.done = !content.length || st.page * CATALOG_PAGE >= st.total;
       return !st.done;
     });
   }
@@ -509,6 +533,26 @@
     if (st.total === total) return false;
     st.total = total;
     return true;
+  }
+
+  function seriesMetaKey(s) {
+    return [s.t, s.author, s.region, s.year, s.status, s.publisher, s.lang, (s.genres || []).join('/'), (s.tags || []).join('/')].join('|');
+  }
+
+  function refreshSeriesMeta() {
+    return request('api/v1/series?sort=lastModified,desc&deleted=false&size=60&page=0').then(function (p) {
+      var content = (p && p.content) || [];
+      var changed = false;
+      content.forEach(function (s) {
+        var idx = SERIES.findIndex(function (x) { return x.id === s.id; });
+        if (idx < 0) return;
+        var m = mapSeries(s);
+        if (seriesMetaKey(SERIES[idx]) === seriesMetaKey(m)) return;
+        SERIES[idx] = Object.assign({}, SERIES[idx], m);
+        changed = true;
+      });
+      return changed;
+    }, function () { return false; });
   }
 
   function hydrate(force) {
@@ -602,10 +646,9 @@
     } catch (e) { return null; }
   }
 
-  function saveRemember(login) {
-    var box = document.querySelector('#bRemember');
+  function saveRemember(login, keep) {
     try {
-      if (box && box.checked) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ u: login }));
+      if (keep) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ u: login, keep: true }));
       else localStorage.removeItem(REMEMBER_KEY);
     } catch (e) { }
   }
@@ -859,7 +902,10 @@
     catalogMore: catalogMore,
     catalogFull: catalogFull,
     catalogTotal: catalogTotal,
+    catalogReadyBooks: function () { return readyState.count; },
+    reloadReadyCatalog: loadReadyCatalog,
     catalogSetTotal: catalogSetTotal,
+    refreshSeriesMeta: refreshSeriesMeta,
     collectionSeries: collectionSeries,
     readlistBooks: readlistBooks,
     start: function () {
@@ -891,9 +937,11 @@
       if (!login || !password) return bootError(L.t('boot.fillLogin'));
       if (btn.disabled) return;
       btn.disabled = true;
+      var keepBox = document.querySelector('#bRemember');
+      var keep = keepBox ? !!keepBox.checked : true;
       var old = btn.textContent;
       btn.innerHTML = '<span class="spinner" style="margin-right:8px"></span>' + L.t('boot.checking');
-      fetch(base + 'api/v2/users/me?remember-me=true', {
+      fetch(base + 'api/v2/users/me' + (keep ? '?remember-me=true' : ''), {
         credentials: 'same-origin',
         headers: { Authorization: basic(login, password) }
       }).then(function (res) {
@@ -902,7 +950,8 @@
         return res.json();
       }).then(function (me) {
         runtime.me = me;
-        saveRemember(login);
+        saveRemember(login, keep);
+        if (!keep) fetch(base + 'api/lantai/v1/remember-me', { method: 'DELETE', credentials: 'same-origin' }).catch(function () { });
         return enter();
       }).catch(function (err) {
         btn.disabled = false;

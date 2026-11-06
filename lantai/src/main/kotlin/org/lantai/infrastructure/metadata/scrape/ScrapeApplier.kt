@@ -20,6 +20,7 @@ import org.lantai.domain.persistence.SeriesRepository
 import org.lantai.domain.persistence.ThumbnailSeriesRepository
 import org.lantai.domain.service.MetadataAggregator
 import org.lantai.domain.service.SeriesLifecycle
+import org.lantai.infrastructure.metadata.AuthorNameCleaner
 import org.lantai.infrastructure.image.ImageAnalyzer
 import org.lantai.infrastructure.mediacontainer.ContentDetector
 import org.lantai.infrastructure.net.OutboundUrlGuard
@@ -92,6 +93,10 @@ class ScrapeApplier(
       if (metadata.publisherLock) skipped += "publisher" else applied += "publisher"
       if (!metadata.publisherLock && candidate.publisher.isNotBlank()) updated = updated.copy(publisher = candidate.publisher)
     }
+    if ("region" in requested) {
+      if (metadata.regionLock) skipped += "region" else applied += "region"
+      if (!metadata.regionLock && candidate.region.isNotBlank()) updated = updated.copy(region = candidate.region)
+    }
     if ("genres" in requested) {
       if (metadata.genresLock) skipped += "genres" else applied += "genres"
       if (!metadata.genresLock && candidate.tags.isNotEmpty()) updated = updated.copy(genres = candidate.tags.toSet())
@@ -128,6 +133,8 @@ class ScrapeApplier(
     val metadata = seriesMetadataRepository.findById(seriesId)
     val ids = bookIds(seriesId)
     val targets = if (scope.isEmpty()) ids else ids.filter { it in scope }
+    val authors = AuthorNameCleaner.cleanAll(values.authors)
+    val region = values.region.ifBlank { AuthorNameCleaner.regionOfAuthors(values.authors) }
     val bookSnapshots =
       bookMetadataRepository.findAllByIds(ids).map {
         BookSnapshot(
@@ -171,11 +178,12 @@ class ScrapeApplier(
     }
 
     if (bookScoped) {
-      listOf("title", "summary", "publisher", "language", "genres", "ageRating").forEach { if (it in fields) skipped += it }
+      listOf("title", "summary", "publisher", "region", "language", "genres", "ageRating").forEach { if (it in fields) skipped += it }
     } else {
       writeSeries("title", metadata.titleLock) { it.copy(title = values.title, titleSort = values.title) }
       writeSeries("summary", metadata.summaryLock) { it.copy(summary = values.summary) }
       writeSeries("publisher", metadata.publisherLock) { it.copy(publisher = values.publisher) }
+      writeSeries("region", metadata.regionLock) { it.copy(region = region) }
       writeSeries("language", metadata.languageLock) { it.copy(language = values.language) }
       writeSeries("genres", metadata.genresLock) { it.copy(genres = values.genres.toSet()) }
       if ("ageRating" in fields && values.ageRating != null) {
@@ -198,8 +206,8 @@ class ScrapeApplier(
       targets.forEach { bookId ->
         val current = bookMetadataRepository.findByIdOrNull(bookId) ?: return@forEach
         var next = current
-        if ("authors" in bookFields && values.authors.isNotEmpty() && !current.authorsLock) {
-          if (current.authors.isEmpty() || overwriteConflicts) next = next.copy(authors = values.authors.map { Author(it, "writer") })
+        if ("authors" in bookFields && authors.isNotEmpty() && !current.authorsLock) {
+          if (current.authors.isEmpty() || overwriteConflicts) next = next.copy(authors = authors.map { Author(it, "writer") })
         }
         if ("releaseDate" in bookFields && values.releaseDate != null && !current.releaseDateLock) {
           if (current.releaseDate == null || overwriteConflicts) next = next.copy(releaseDate = values.releaseDate)
@@ -257,7 +265,7 @@ class ScrapeApplier(
             sourceId = seriesId,
             title = values.title,
             subtitle = "",
-            authors = values.authors,
+            authors = authors,
             publisher = values.publisher,
             releaseDate = values.releaseDate?.toString().orEmpty(),
             summary = values.summary,
@@ -337,7 +345,8 @@ class ScrapeApplier(
       write("language", current.languageLock) { if (choice.language.isNotBlank()) next = next.copy(language = choice.language.trim()) }
       write("genres", current.genresLock) { if (choice.genres.isNotEmpty()) next = next.copy(genres = choice.genres.toSet()) }
       write("authors", current.authorsLock) {
-        if (choice.authors.isNotEmpty()) next = next.copy(authors = choice.authors.map { Author(it, "writer") })
+        val names = AuthorNameCleaner.cleanAll(choice.authors)
+        if (names.isNotEmpty()) next = next.copy(authors = names.map { Author(it, "writer") })
       }
       write("isbn", current.isbnLock) { if (choice.isbn.isNotBlank()) next = next.copy(isbn = choice.isbn.trim()) }
       write("tags", current.tagsLock) {

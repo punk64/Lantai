@@ -3,6 +3,7 @@ package org.lantai.infrastructure.jooq.main
 import org.lantai.domain.model.ApiToken
 import org.lantai.domain.persistence.ApiTokenRepository
 import org.lantai.infrastructure.jooq.SplitDslDaoBase
+import org.lantai.infrastructure.security.apitoken.TokenCipher
 import org.lantai.jooq.main.Tables
 import org.lantai.jooq.main.tables.records.ApiTokenRecord
 import org.lantai.language.toCurrentTimeZone
@@ -20,6 +21,7 @@ private const val HASH_PREFIX = "sha512:"
 class ApiTokenDao(
   dslRW: DSLContext,
   @Qualifier("dslContextRO") dslRO: DSLContext,
+  private val tokenCipher: TokenCipher,
 ) : SplitDslDaoBase(dslRW, dslRO),
   ApiTokenRepository {
   private val q = Tables.API_TOKEN
@@ -31,7 +33,8 @@ class ApiTokenDao(
       .set(q.ID, token.id)
       .set(q.USER_ID, token.ownerId)
       .set(q.NAME, token.name)
-      .set(q.TOKEN_VALUE, hash(token.tokenValue))
+      .set(q.TOKEN_VALUE, tokenCipher.encrypt(token.tokenValue))
+      .set(q.TOKEN_HASH, hash(token.tokenValue))
       .set(q.SCOPES, token.scopes.joinToString(",") { it.label })
       .set(q.ENABLED, token.enabled)
       .set(q.EXPIRES_DATE, token.expiresDate?.atZone(ZoneId.systemDefault())?.withZoneSameInstant(ZoneId.of("Z"))?.toLocalDateTime())
@@ -64,10 +67,26 @@ class ApiTokenDao(
     val hashed = hash(tokenValue)
     dslRO
       .selectFrom(q)
-      .where(q.TOKEN_VALUE.eq(hashed))
+      .where(q.TOKEN_HASH.eq(hashed))
       .fetchOne()
       ?.toDomain()
       ?.let { return it }
+    dslRO
+      .selectFrom(q)
+      .where(q.TOKEN_VALUE.eq(hashed))
+      .fetchOne()
+      ?.toDomain()
+      ?.let { stored ->
+        runCatching {
+          dslRW
+            .update(q)
+            .set(q.TOKEN_VALUE, tokenCipher.encrypt(tokenValue))
+            .set(q.TOKEN_HASH, hashed)
+            .where(q.ID.eq(stored.id))
+            .execute()
+        }
+        return stored.copy(tokenValue = tokenValue)
+      }
     val legacy =
       dslRO
         .selectFrom(q)
@@ -78,11 +97,12 @@ class ApiTokenDao(
     runCatching {
       dslRW
         .update(q)
-        .set(q.TOKEN_VALUE, hashed)
+        .set(q.TOKEN_VALUE, tokenCipher.encrypt(tokenValue))
+        .set(q.TOKEN_HASH, hashed)
         .where(q.ID.eq(legacy.id))
         .execute()
     }
-    return legacy
+    return legacy.copy(tokenValue = tokenValue)
   }
 
   override fun findAll(): List<ApiToken> =
@@ -139,7 +159,7 @@ class ApiTokenDao(
     ApiToken(
       name = name,
       ownerId = userId,
-      tokenValue = tokenValue,
+      tokenValue = tokenCipher.decrypt(tokenValue) ?: tokenValue,
       scopes = ApiToken.Scope.fromStored(scopes),
       enabled = enabled,
       expiresDate = expiresDate?.toCurrentTimeZone(),

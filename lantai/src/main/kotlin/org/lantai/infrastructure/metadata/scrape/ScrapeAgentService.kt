@@ -40,8 +40,6 @@ data class ScrapeAgentDetail(
   val authors: List<String>,
   val genres: List<String>,
   val hasCover: Boolean,
-  val embeddedAuthors: List<String>,
-  val embeddedPublisher: String,
   val books: List<ScrapeBookDto> = emptyList(),
   val external: JsonNode?,
 )
@@ -67,7 +65,6 @@ class ScrapeAgentService(
   private val inboxRepository: ScrapeInboxRepository,
   private val seriesRepository: SeriesRepository,
   private val seriesMetadataRepository: SeriesMetadataRepository,
-  private val embeddedReader: ScrapeEmbeddedReader,
   private val engine: ScrapeEngine,
   private val applier: ScrapeApplier,
   private val bookCatalog: ScrapeBookCatalog,
@@ -101,10 +98,9 @@ class ScrapeAgentService(
 
   fun detail(id: String): ScrapeAgentDetail {
     val item = queueRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Queue item $id does not exist")
-    val series = seriesRepository.findByIdOrNull(item.seriesId) ?: throw NoSuchElementException("Series ${item.seriesId} does not exist")
+    seriesRepository.findByIdOrNull(item.seriesId) ?: throw NoSuchElementException("Series ${item.seriesId} does not exist")
     val metadata = seriesMetadataRepository.findByIdOrNull(item.seriesId)
     val aggregation = runCatching { aggregationRepository.findByIdOrNull(item.seriesId) }.getOrNull()
-    val embedded = runCatching { embeddedReader.read(series) }.getOrNull() ?: EmbeddedRead()
     val external =
       inboxRepository.findLatestByQueueId(id)?.payload?.let { runCatching { objectMapper.readTree(it) }.getOrNull() }
     return ScrapeAgentDetail(
@@ -119,8 +115,6 @@ class ScrapeAgentService(
       authors = aggregation?.authors?.map { it.name }.orEmpty(),
       genres = metadata?.genres?.sorted().orEmpty(),
       hasCover = runCatching { thumbnailsSeriesRepository.findSelectedBySeriesIdOrNull(item.seriesId) != null }.getOrDefault(false),
-      embeddedAuthors = embedded.firstBookValues().authors,
-      embeddedPublisher = embedded.series.publisher,
       books =
         runCatching {
           val all = bookCatalog.list(item.seriesId)

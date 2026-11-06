@@ -14,6 +14,7 @@ import org.lantai.domain.persistence.MediaRepository
 import org.lantai.domain.persistence.SeriesMetadataRepository
 import org.lantai.infrastructure.metadata.SeriesMetadataFromBookProvider
 import org.lantai.infrastructure.metadata.SeriesMetadataProvider
+import org.lantai.infrastructure.metadata.SeriesTitleCleaner
 import org.lantai.language.mostFrequent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -97,6 +98,22 @@ class SeriesMetadataLifecycle(
     }
 
     if (changed) eventPublisher.publishEvent(DomainEvent.SeriesUpdated(series))
+
+    cleanDirtyTitle(series)
+  }
+
+  private fun cleanDirtyTitle(series: Series) {
+    val metadata = seriesMetadataRepository.findById(series.id)
+    if (metadata.titleLock) return
+    val authors =
+      bookMetadataRepository
+        .findAllByIds(bookRepository.findAllIdsBySeriesId(series.id))
+        .flatMap { it.authors }
+        .map { it.name }
+        .toSet()
+    val cleaned = SeriesTitleCleaner.clean(metadata.title, authors) ?: return
+    logger.info { "Clean dirty series title: ${metadata.title} -> $cleaned" }
+    seriesMetadataRepository.update(metadata.copy(title = cleaned, titleSort = cleaned))
   }
 
   private fun handlePatchForSeriesMetadata(
@@ -119,6 +136,7 @@ class SeriesMetadataLifecycle(
         readingDirection = patches.mostFrequent { it.readingDirection },
         ageRating = patches.mapNotNull { it.ageRating }.maxOrNull(),
         publisher = patches.mostFrequent { it.publisher },
+        region = patches.mostFrequent { it.region },
         totalBookCount = patches.mapNotNull { it.totalBookCount }.maxOrNull(),
         collections = emptySet(),
       )

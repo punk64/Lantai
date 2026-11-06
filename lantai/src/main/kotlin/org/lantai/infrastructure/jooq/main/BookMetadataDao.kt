@@ -7,6 +7,7 @@ import org.lantai.domain.model.WebLink
 import org.lantai.domain.persistence.BookMetadataRepository
 import org.lantai.infrastructure.jooq.SplitDslDaoBase
 import org.lantai.infrastructure.jooq.TempTable.Companion.withTempTable
+import org.lantai.infrastructure.metadata.AuthorNameCleaner
 import org.lantai.jooq.main.Tables
 import org.lantai.jooq.main.tables.records.BookMetadataRecord
 import org.lantai.language.toCurrentTimeZone
@@ -262,7 +263,7 @@ class BookMetadataDao(
               .values(null as String?, null, null),
           ).also { step ->
             chunk.forEach { metadata ->
-              metadata.authors.forEach {
+              AuthorNameCleaner.cleanAuthors(metadata.authors).forEach {
                 step.bind(metadata.bookId, it.name, it.role)
               }
             }

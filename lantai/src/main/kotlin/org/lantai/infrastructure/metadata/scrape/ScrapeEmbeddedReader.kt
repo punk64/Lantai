@@ -7,6 +7,7 @@ import org.lantai.domain.model.Series
 import org.lantai.domain.persistence.BookRepository
 import org.lantai.domain.persistence.LibraryRepository
 import org.lantai.domain.persistence.MediaRepository
+import org.lantai.infrastructure.metadata.AuthorNameCleaner
 import org.lantai.infrastructure.metadata.BookMetadataProvider
 import org.lantai.infrastructure.metadata.SeriesMetadataFromBookProvider
 import org.springframework.stereotype.Service
@@ -51,7 +52,14 @@ class ScrapeEmbeddedReader(
         }
       }
 
-    return EmbeddedRead(series = seriesValues, books = bookValues)
+    val seriesRegion =
+      if (seriesValues.region.isNotBlank()) {
+        seriesValues.region
+      } else {
+        bookValues.firstNotNullOfOrNull { it.values.region.takeIf { region -> region.isNotBlank() } }.orEmpty()
+      }
+
+    return EmbeddedRead(series = seriesValues.copy(region = seriesRegion), books = bookValues)
   }
 
   private fun readSeriesValues(
@@ -99,6 +107,7 @@ class ScrapeEmbeddedReader(
     var isbn = ""
     val authors = linkedSetOf<String>()
     val tags = linkedSetOf<String>()
+    var region = ""
 
     bookMetadataProviders.forEach { provider ->
       if (!provider.shouldLibraryHandlePatch(library, MetadataPatchTarget.BOOK)) return@forEach
@@ -110,7 +119,11 @@ class ScrapeEmbeddedReader(
       if (summary.isBlank()) summary = patch.summary?.takeIf { it.isNotBlank() }.orEmpty()
       if (releaseDate == null) releaseDate = patch.releaseDate
       if (isbn.isBlank()) isbn = patch.isbn?.takeIf { it.isNotBlank() }.orEmpty()
-      patch.authors?.map { it.name }?.filter { it.isNotBlank() }?.forEach { authors += it }
+      patch.authors?.filter { it.name.isNotBlank() }?.forEach {
+        if (region.isBlank()) region = AuthorNameCleaner.regionOf(it.name)
+        val name = AuthorNameCleaner.clean(it.name)
+        if (name.isNotBlank()) authors += name
+      }
       patch.tags?.filter { it.isNotBlank() }?.forEach { tags += it }
     }
 
@@ -118,6 +131,7 @@ class ScrapeEmbeddedReader(
       summary = summary,
       releaseDate = releaseDate,
       isbn = isbn,
+      region = region,
       authors = authors.toList(),
       tags = tags.toList(),
     )

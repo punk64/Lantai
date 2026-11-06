@@ -1526,18 +1526,27 @@
 
   function fillVoices() {
     var sel = $('ebVoice'); if (!sel) return;
-    var list = ttsVoices();
-    sel.innerHTML = '<option value="">系统默认</option>' + list.map(function (v) {
-      return '<option value="' + esc(v.name) + '"' + (PRE.ttsVoice === v.name ? ' selected' : '') + '>' + esc(v.name + ' · ' + v.lang) + '</option>';
-    }).join('');
+    var groups = { zh: [], en: [], other: [] };
+    ttsVoices().forEach(function (v) {
+      var tag = String(v.lang || '').toLowerCase(), name = String(v.name || '');
+      if (/^zh|^cmn/.test(tag) || /Chinese|中文|普通话/i.test(name)) groups.zh.push(v);
+      else if (/^en/.test(tag) || /English|英语/i.test(name)) groups.en.push(v);
+      else groups.other.push(v);
+    });
+    var optgroup = function (label, list) {
+      if (!list.length) return '';
+      return '<optgroup label="' + label + '">' + list.map(function (v) {
+        return '<option value="' + esc(v.name) + '"' + (PRE.ttsVoice === v.name ? ' selected' : '') + '>' + esc(v.name + ' · ' + v.lang) + '</option>';
+      }).join('') + '</optgroup>';
+    };
+    sel.innerHTML = '<option value="">系统默认</option>' +
+      optgroup('中文', groups.zh) + optgroup('英语', groups.en) + optgroup('其他', groups.other);
     sel.onchange = function () { PRE.ttsVoice = sel.value; savePrefs(); };
   }
 
   function ttsVoices() {
     if (!window.speechSynthesis) return [];
-    var all = window.speechSynthesis.getVoices() || [];
-    var zh = all.filter(function (v) { return /^zh|^cmn|Chinese|中文|普通话/i.test(v.lang + ' ' + v.name); });
-    return zh.length ? zh : all;
+    return window.speechSynthesis.getVoices() || [];
   }
 
   function annFiltered() {

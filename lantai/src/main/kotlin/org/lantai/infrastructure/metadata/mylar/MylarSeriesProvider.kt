@@ -55,6 +55,7 @@ class MylarSeriesProvider(
         summary = metadata.descriptionFormatted ?: metadata.descriptionText,
         readingDirection = null,
         publisher = metadata.publisher,
+        region = null,
         ageRating = metadata.ageRating?.ageRating,
         language = null,
         genres = null,

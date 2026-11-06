@@ -12,6 +12,7 @@ import org.lantai.domain.model.MetadataPatchTarget
 import org.lantai.domain.model.SeriesMetadata
 import org.lantai.domain.model.SeriesMetadataPatch
 import org.lantai.infrastructure.mediacontainer.epub.getPackageFileContent
+import org.lantai.infrastructure.metadata.AuthorNameCleaner
 import org.lantai.infrastructure.metadata.BookMetadataProvider
 import org.lantai.infrastructure.metadata.SeriesMetadataFromBookProvider
 import org.jsoup.Jsoup
@@ -126,6 +127,13 @@ class EpubMetadataProvider(
           .toSet()
           .ifEmpty { null }
 
+      val authorRegion =
+        opf
+          .select("*|metadata > *|creator")
+          .map { it.text().trim() }
+          .let { AuthorNameCleaner.regionOfAuthors(it) }
+          .ifBlank { null }
+
       val direction =
         opf.selectFirst("*|spine")?.attr("page-progression-direction")?.let {
           when (it) {
@@ -141,6 +149,7 @@ class EpubMetadataProvider(
         status = null,
         readingDirection = direction,
         publisher = publisher,
+        region = authorRegion,
         ageRating = null,
         summary = null,
         language = if (language != null && BCP47TagValidator.isValid(language)) BCP47TagValidator.normalize(language) else null,

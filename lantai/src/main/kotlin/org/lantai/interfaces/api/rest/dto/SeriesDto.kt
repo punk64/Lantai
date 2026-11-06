@@ -40,6 +40,8 @@ data class SeriesMetadataDto(
   val readingDirectionLock: Boolean,
   val publisher: String,
   val publisherLock: Boolean,
+  val region: String,
+  val regionLock: Boolean,
   val ageRating: Int?,
   val ageRatingLock: Boolean,
   val language: String,

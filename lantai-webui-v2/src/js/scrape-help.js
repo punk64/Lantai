@@ -2,6 +2,7 @@ const SC_META_FIELDS = [
   ['title', '标题', '文本', '系列标题', '可写'],
   ['summary', '简介', '文本', '可多行，换行用 \\n', '可写'],
   ['publisher', '出版社', '文本', '', '可写'],
+  ['region', '地区', '文本', '两位国家代码，如 JP、KR、CN、TW，取不到留空', '可写'],
   ['language', '语言', '文本', 'BCP-47，如 zh-CN；zh 与 zh-CN 视为同一语言', '可写'],
   ['genres', '分类', '数组或分隔文本', '奇幻、冒险', '可写'],
   ['authors', '作者', '数组或分隔文本', '九井谅子', '可写'],
@@ -12,7 +13,7 @@ const SC_META_FIELDS = [
   ['ageRating', '年龄分级', '数字', '当前版本不写入', '忽略'],
 ];
 
-const SC_CSV_HEAD = ['id', 'seriesId', 'seriesTitle', 'status', 'title', 'summary', 'publisher', 'language', 'genres', 'authors', 'releaseDate', 'isbn', 'tags', 'coverUrl'];
+const SC_CSV_HEAD = ['id', 'seriesId', 'seriesTitle', 'status', 'title', 'summary', 'publisher', 'region', 'language', 'genres', 'authors', 'releaseDate', 'isbn', 'tags', 'coverUrl'];
 
 function scText(v) {
   return v == null ? '' : String(v).trim();
@@ -26,7 +27,7 @@ function scSplitList(v) {
 
 function scEmptyMetadata() {
   return {
-    title: '', summary: '', publisher: '', language: '',
+    title: '', summary: '', publisher: '', region: '', language: '',
     genres: [], authors: [], releaseDate: '', isbn: '', tags: [], coverUrl: '',
   };
 }
@@ -42,7 +43,7 @@ function scCsvText(items) {
     const m = x.metadata || {};
     lines.push([
       x.id, x.seriesId, x.seriesTitle, x.status,
-      m.title, m.summary, m.publisher, m.language,
+      m.title, m.summary, m.publisher, m.region, m.language,
       Array.isArray(m.genres) ? m.genres.join('、') : m.genres,
       Array.isArray(m.authors) ? m.authors.join('、') : m.authors,
       m.releaseDate, m.isbn,
@@ -105,6 +106,7 @@ function scNormalizeEntry(raw) {
     title: scText(source.title),
     summary: scText(source.summary || source.description),
     publisher: scText(source.publisher),
+    region: scText(source.region || source.country).toUpperCase(),
     language: scText(source.language),
     genres: scSplitList(source.genres != null ? source.genres : source.categories),
     authors: scSplitList(source.authors != null ? source.authors : source.author),
@@ -115,7 +117,7 @@ function scNormalizeEntry(raw) {
   };
   const age = source.ageRating;
   if (age != null && age !== '') metadata.ageRating = Number(age) || null;
-  const filled = metadata.title || metadata.summary || metadata.publisher || metadata.language ||
+  const filled = metadata.title || metadata.summary || metadata.publisher || metadata.region || metadata.language ||
     metadata.genres.length || metadata.authors.length || metadata.releaseDate ||
     metadata.isbn || metadata.tags.length || metadata.coverUrl;
   if (!filled) return { ok: false, reason: '所有字段均为空' };
@@ -154,7 +156,7 @@ function scImportCsv(text) {
     const one = scNormalizeEntry({
       id: obj.id, seriesId: obj.seriesId, seriesTitle: obj.seriesTitle, status: obj.status,
       metadata: {
-        title: obj.title, summary: obj.summary, publisher: obj.publisher, language: obj.language,
+        title: obj.title, summary: obj.summary, publisher: obj.publisher, region: obj.region, language: obj.language,
         genres: obj.genres, authors: obj.authors, releaseDate: obj.releaseDate,
         isbn: obj.isbn, tags: obj.tags, coverUrl: obj.coverUrl, ageRating: obj.ageRating,
       },
@@ -179,12 +181,11 @@ function scFieldTable() {
 }
 
 function scHelpFeature() {
-  return '<div class="note">刮削是给系列补元数据：标题、简介、出版社、语言、分类、作者、出版日期、ISBN、标签、封面。兰台的原则是<b>内嵌信息优先、只补缺失、冲突不自动覆盖</b>。</div>' +
+  return '<div class="note">刮削是给系列补元数据：标题、简介、出版社、地区、语言、分类、作者、出版日期、ISBN、标签、封面。地区记录作品来源地，用两位国家代码表示（如日本 JP、韩国 KR、中国大陆 CN），各地数据源只在确有依据时给出，取不到就留空，不做猜测性映射。兰台的原则是<b>内嵌信息优先、只补缺失、冲突不自动覆盖</b>。</div>' +
     '<h4 style="margin:16px 0 8px">名单从哪来</h4>' +
     '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:130px">来源</th><th>说明</th></tr></thead><tbody>' +
     '<tr><td>单本 / 多选</td><td class="mini">书库页勾选系列后点「加入刮削名单」；切到「按书籍」勾选具体册时只登记选中的册，同系列其它册不受影响</td></tr>' +
     '<tr><td>整库</td><td class="mini">刮削设置或书库页对某个库整体发起</td></tr>' +
-    '<tr><td>缺元数据</td><td class="mini">自动挑出信息不全的系列，上限 200 条</td></tr>' +
     '</tbody></table></div>' +
     '<h4 style="margin:16px 0 8px">四种状态</h4>' +
     '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:110px">状态</th><th>含义</th><th style="width:170px">下一步</th></tr></thead><tbody>' +
@@ -217,26 +218,35 @@ function scHelpUsage() {
     '<li>脚本先拉 <span class="mono">scrape/agent/queue</span> 拿条目 id，再逐条取详情</li>' +
     '<li>把结果 <span class="mono">POST</span> 到 <span class="mono">scrape/agent/queue/{id}/result</span></li>' +
     '<li>详见「API 接口」页签</li>' +
-    '</ol></div>';
+    '</ol></div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-h"><h3>方式四 · 单本交给 AI 补全</h3></div>' +
+    '<ol class="mini" style="margin:0;padding-left:20px;line-height:2">' +
+    '<li>在系列或书籍详情点「编辑元数据」，弹窗左下角有「导出提示词」</li>' +
+    '<li>点它会生成一段中文提示词：书籍参数、完整元数据表格（空字段也列出）、检索关键词、返回模板，并自动复制到剪贴板</li>' +
+    '<li>粘贴到任意 AI 对话框直接发送，AI 按模板返回完整 JSON</li>' +
+    '<li>回到弹窗点「导入结果」，粘贴或选文件，点「完成」把值填进表单</li>' +
+    '<li>核对无误再点「保存」；不点保存不会写入任何东西</li>' +
+    '</ol>' +
+    '<div class="note" style="margin-top:10px">文本上限：一键复制与单次导入都以 <b>20000 字符</b>（约 6~8k token）为界。提示词通常远小于这个值；简介极长等情况下会超出，此时「导出提示词」自动改为下载 <span class="mono">meta-*.txt</span>，「导入结果 → 选择文件」可直接载回，不需要手动复制。导入只填界面上有的字段，链接、显著实体、别名等仅出现在提示词里供 AI 参考，不会写入。</div></div>';
 }
 
 function scHelpFormat() {
   return '<div class="note">两种格式内容等价，任选一种。JSON 字段是嵌套的 <span class="mono">metadata</span> 对象，CSV 是平铺的一行。</div>' +
     '<h4 style="margin:16px 0 8px">JSON 结构</h4>' +
     '<pre class="mono" style="font-size:11.5px;line-height:1.75;background:var(--bg-2);padding:14px;border-radius:8px;overflow:auto">' +
-    '{\n  "version": 1,\n  "count": 2,\n  "items": [\n    {\n      "id": "0K3M8Q1T7XGE5",\n      "seriesId": "0K3M8Q1T7XGE5",\n      "seriesTitle": "迷宫饭",\n      "status": "QUEUED",\n      "metadata": {\n        "title": "迷宫饭",\n        "summary": "地下迷宫里的美食冒险。",\n        "publisher": "青文",\n        "language": "zh-CN",\n        "genres": ["奇幻", "冒险"],\n        "authors": ["九井谅子"],\n        "releaseDate": "2015-01-01",\n        "isbn": "9789863562305",\n        "tags": ["已完结"],\n        "coverUrl": ""\n      }\n    }\n  ]\n}' +
+    '{\n  "version": 1,\n  "count": 2,\n  "items": [\n    {\n      "id": "0K3M8Q1T7XGE5",\n      "seriesId": "0K3M8Q1T7XGE5",\n      "seriesTitle": "迷宫饭",\n      "status": "QUEUED",\n      "metadata": {\n        "title": "迷宫饭",\n        "summary": "地下迷宫里的美食冒险。",\n        "publisher": "青文",\n        "region": "JP",\n        "language": "zh-CN",\n        "genres": ["奇幻", "冒险"],\n        "authors": ["九井谅子"],\n        "releaseDate": "2015-01-01",\n        "isbn": "9789863562305",\n        "tags": ["已完结"],\n        "coverUrl": ""\n      }\n    }\n  ]\n}' +
     '</pre>' +
     '<div class="mini" style="margin-top:8px;color:var(--tx-3)">直接传单个对象、或直接传数组也可以，解析时会自动兼容。</div>' +
     '<h4 style="margin:16px 0 8px">CSV 列</h4>' +
     '<pre class="mono" style="font-size:11.5px;line-height:1.75;background:var(--bg-2);padding:14px;border-radius:8px;overflow:auto">' +
     SC_CSV_HEAD.join(',') + '\n' +
-    '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,迷宫饭,QUEUED,迷宫饭,地下迷宫里的美食冒险。,青文,zh-CN,奇幻、冒险,九井谅子,2015-01-01,9789863562305,已完结,' +
+    '0K3M8Q1T7XGE5,0K3M8Q1T7XGE5,迷宫饭,QUEUED,迷宫饭,地下迷宫里的美食冒险。,青文,JP,zh-CN,奇幻、冒险,九井谅子,2015-01-01,9789863562305,已完结,' +
     '</pre>' +
     '<div class="mini" style="margin-top:8px;color:var(--tx-3)">第一行必须是表头。数组字段用顿号、逗号或竖线分隔都可以。含逗号的单元格要用英文双引号包起来。文件存 UTF-8。</div>' +
     '<h4 style="margin:16px 0 8px">字段说明</h4>' +
     scFieldTable() +
     '<h4 style="margin:16px 0 8px">别名</h4>' +
-    '<div class="note">填写时下面这些写法都能识别：<span class="mono">description</span> → 简介，<span class="mono">categories</span> → 分类，<span class="mono">author</span> → 作者，<span class="mono">publishDate</span> → 出版日期，<span class="mono">cover</span> → 封面地址，<span class="mono">queueId</span> → id。</div>' +
+    '<div class="note">填写时下面这些写法都能识别：<span class="mono">description</span> → 简介，<span class="mono">categories</span> → 分类，<span class="mono">author</span> → 作者，<span class="mono">publishDate</span> → 出版日期，<span class="mono">cover</span> → 封面地址，<span class="mono">country</span> → 地区，<span class="mono">queueId</span> → id。地区一律归一成大写两位代码，如 <span class="mono">jp</span>、<span class="mono">Japan</span> 需自行写成 <span class="mono">JP</span>。</div>' +
     '<h4 style="margin:16px 0 8px">三条硬规则</h4>' +
     '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:150px">规则</th><th>说明</th></tr></thead><tbody>' +
     '<tr><td>留空不覆盖</td><td class="mini">字段为空或空数组时，该字段视为「保持一致」，不会清空现有值。想清空只能到书库里手动改。</td></tr>' +
@@ -250,31 +260,32 @@ function scHelpFormat() {
 function scHelpApi() {
   const rows = [
     ['GET', 'scrape/agent/queue', '拉一页名单：条目 id、系列 id 与标题、状态、尝试次数', 'scrape:read'],
-    ['GET', 'scrape/agent/queue/{id}', '取单条详情：现有值、内嵌值、册清单、上次回填', 'scrape:read'],
+    ['GET', 'scrape/agent/queue/{id}', '取单条详情：库里已存的现有值、册清单、上次回填', 'scrape:read'],
     ['POST', 'scrape/agent/queue/{id}/result', '提交结果；id 给条目 id 走比对，给 seriesId 直接覆盖', 'scrape:submit'],
     ['GET', 'scrape/agent/stats', '名单条目数与待处理回填数', 'scrape:read'],
   ];
   const box = s => '<pre class="mono" style="font-size:11.5px;line-height:1.75;background:var(--bg-2);padding:14px;border-radius:8px;overflow:auto">' + s + '</pre>';
-  return '<div class="note">基地址 <span class="mono">http://127.0.0.1:25600/api/lantai/v1/</span>。对外只开放下面四个接口，令牌在「刮削设置 → 刮削令牌」生成，权限写死为 <span class="mono">scrape:read</span> 与 <span class="mono">scrape:submit</span>，读不到书库其它接口。</div>' +
+  return '<div class="note">基地址 <span class="mono">http(s)://xxx.xxx.xxx.xxx:xxxxx/api/lantai/v1/</span>，把 <span class="mono">xxx</span> 换成实际的主机与端口。对外只开放下面四个接口，令牌在「刮削设置 → 刮削令牌」生成，权限写死为 <span class="mono">scrape:read</span> 与 <span class="mono">scrape:submit</span>，读不到书库其它接口。</div>' +
     '<div class="note" style="margin-top:8px">外部程序用请求头传令牌，二选一：<span class="mono">X-API-Token: lt_xxx</span> 或 <span class="mono">Authorization: Bearer lt_xxx</span>。浏览器登录态的 <span class="mono">LANTAI-SESSION</span> Cookie 也能通，但脚本不要依赖它。</div>' +
     '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th style="width:64px">方法</th><th style="width:290px">路径</th><th>说明</th><th style="width:110px">所需权限</th></tr></thead><tbody>' +
     rows.map(r => '<tr><td><span class="badge">' + r[0] + '</span></td><td class="mono mini">' + r[1] + '</td><td class="mini">' + r[2] + '</td><td class="mini mono">' + r[3] + '</td></tr>').join('') +
     '</tbody></table></div>' +
     '<h4 style="margin:16px 0 8px">拉名单</h4>' +
-    box('curl -H "X-API-Token: lt_xxxxxxxx" \\\n  "http://127.0.0.1:25600/api/lantai/v1/scrape/agent/queue?offset=0&amp;limit=50"') +
+    box('curl -H "X-API-Token: lt_xxxxxxxx" \\\n  "http(s)://xxx.xxx.xxx.xxx:xxxxx/api/lantai/v1/scrape/agent/queue?offset=0&amp;limit=50"') +
     '<div class="mini" style="margin-top:8px;color:var(--tx-3)"><span class="mono">offset</span> 默认 0，<span class="mono">limit</span> 默认 20、最大 200。返回的 <span class="mono">total</span> 与 <span class="mono">counts</span>（queued / running / review / failed）都是<b>名单条目数</b>——一个系列一行，不是册数；<span class="mono">items</span> 每条含 <span class="mono">id</span>、<span class="mono">seriesId</span>、<span class="mono">seriesTitle</span>、<span class="mono">status</span>、<span class="mono">attempt</span>、<span class="mono">createdDate</span>、<span class="mono">lastError</span>，以及 <span class="mono">bookIds</span>——空数组表示整系列，非空表示只刮这几册，长度即册数。</div>' +
     '<h4 style="margin:16px 0 8px">取单条详情</h4>' +
-    box('curl -H "X-API-Token: lt_xxxxxxxx" \\\n  "http://127.0.0.1:25600/api/lantai/v1/scrape/agent/queue/0K3M8Q1T7XGE5"') +
-    '<div class="mini" style="margin-top:8px;color:var(--tx-3)">返回现有值（<span class="mono">summary</span> / <span class="mono">publisher</span> / <span class="mono">authors</span> / <span class="mono">genres</span> / <span class="mono">hasCover</span>）、内嵌值（<span class="mono">embeddedAuthors</span> / <span class="mono">embeddedPublisher</span>）、<span class="mono">books</span> 册清单（每册含 <span class="mono">bookId</span>、<span class="mono">fileName</span>、<span class="mono">title</span>、<span class="mono">number</span>、<span class="mono">authors</span>、<span class="mono">releaseDate</span>、<span class="mono">isbn</span>、<span class="mono">tags</span>、<span class="mono">summary</span>、<span class="mono">publisher</span>、<span class="mono">genres</span>、<span class="mono">language</span> 与三个锁定标记 <span class="mono">titleLock</span> / <span class="mono">numberLock</span> / <span class="mono">authorsLock</span>），以及 <span class="mono">external</span>——上次回填的原始 payload，没有则为 null。</div>' +
+    box('curl -H "X-API-Token: lt_xxxxxxxx" \\\n  "http(s)://xxx.xxx.xxx.xxx:xxxxx/api/lantai/v1/scrape/agent/queue/0K3M8Q1T7XGE5"') +
+    '<div class="mini" style="margin-top:8px;color:var(--tx-3)">返回现有值（<span class="mono">summary</span> / <span class="mono">publisher</span> / <span class="mono">region</span> / <span class="mono">authors</span> / <span class="mono">genres</span> / <span class="mono">hasCover</span>）、<span class="mono">books</span> 册清单（每册含 <span class="mono">bookId</span>、<span class="mono">fileName</span>、<span class="mono">title</span>、<span class="mono">number</span>、<span class="mono">authors</span>、<span class="mono">releaseDate</span>、<span class="mono">isbn</span>、<span class="mono">tags</span>、<span class="mono">summary</span>、<span class="mono">publisher</span>、<span class="mono">genres</span>、<span class="mono">language</span> 与三个锁定标记 <span class="mono">titleLock</span> / <span class="mono">numberLock</span> / <span class="mono">authorsLock</span>），以及 <span class="mono">external</span>——上次回填的原始 payload，没有则为 null。</div>' +
+    '<div class="mini" style="margin-top:6px;color:var(--tx-3)">详情只读数据库里已经存下的参数，<b>不会打开书籍文件解析内嵌元数据</b>，所以是毫秒级返回；书里到底写了什么，交给外部工具或人工判断后再回传。</div>' +
     '<h4 style="margin:16px 0 8px">回传结果</h4>' +
-    box('curl -X POST -H "X-API-Token: lt_xxxxxxxx" -H "Content-Type: application/json" \\\n  -d \'{"metadata":{"title":"迷宫饭","authors":["九井谅子"],"genres":["奇幻","冒险"]}}\' \\\n  "http://127.0.0.1:25600/api/lantai/v1/scrape/agent/queue/0K3M8Q1T7XGE5/result"') +
+    box('curl -X POST -H "X-API-Token: lt_xxxxxxxx" -H "Content-Type: application/json" \\\n  -d \'{"metadata":{"title":"迷宫饭","authors":["九井谅子"],"genres":["奇幻","冒险"]}}\' \\\n  "http(s)://xxx.xxx.xxx.xxx:xxxxx/api/lantai/v1/scrape/agent/queue/0K3M8Q1T7XGE5/result"') +
     '<div class="mini" style="margin-top:8px;color:var(--tx-3)">payload 可以套一层 <span class="mono">metadata</span>，也可以把字段平铺在顶层。数组字段用 JSON 数组，或用顿号 / 逗号 / 竖线分隔的字符串。别名照样识别：<span class="mono">description</span> → 简介、<span class="mono">categories</span> → 分类、<span class="mono">author</span> → 作者、<span class="mono">publishDate</span> → 出版日期、<span class="mono">cover</span> → 封面地址。</div>' +
     '<div class="mini" style="margin-top:6px;color:var(--tx-3)">返回 <span class="mono">status</span>：<span class="mono">DONE</span> 已应用并移出名单，<span class="mono">REVIEW</span> 进入待核对；<span class="mono">appliedFields</span> 是真正写入的字段，<span class="mono">message</span> 说明跳过或失败原因。空值不会被当成「清空」，只表示该字段保持一致。</div>' +
     '<h4 style="margin:16px 0 8px">按册写</h4>' +
     box('{\n  "metadata": { "publisher": "青文" },\n  "books": [\n    { "bookId": "0K3M8Q1T7XGE5", "fields": ["title", "authors", "isbn"], "title": "迷宫饭 1", "authors": ["九井谅子"], "isbn": "9789863562305" }\n  ]\n}') +
     '<div class="mini" style="margin-top:8px;color:var(--tx-3)">带 <span class="mono">books</span> 时只写列出的册；<span class="mono">fields</span> 省略则默认写 <span class="mono">title</span>、<span class="mono">number</span>、<span class="mono">authors</span>、<span class="mono">releaseDate</span>、<span class="mono">isbn</span>、<span class="mono">tags</span>、<span class="mono">summary</span>、<span class="mono">publisher</span>、<span class="mono">genres</span>、<span class="mono">language</span>。队列条目本身带册范围时，范围外的 <span class="mono">bookId</span> 会被忽略；已锁定的字段跳过。</div>' +
     '<h4 style="margin:16px 0 8px">查统计</h4>' +
-    box('curl -H "X-API-Token: lt_xxxxxxxx" "http://127.0.0.1:25600/api/lantai/v1/scrape/agent/stats"\n\n{"total":2,"queued":1,"review":1,"failed":0,"inboxReceived":1}') +
+    box('curl -H "X-API-Token: lt_xxxxxxxx" "http(s)://xxx.xxx.xxx.xxx:xxxxx/api/lantai/v1/scrape/agent/stats"\n\n{"total":2,"queued":1,"review":1,"failed":0,"inboxReceived":1}') +
     '<div class="mini" style="margin-top:8px;color:var(--tx-3)">同样按条目数统计；没有 running 一项，正在跑的条目这四个数字都不计。<span class="mono">inboxReceived</span> 是已收到但还没处理完的回填数量。</div>';
 }
 

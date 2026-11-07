@@ -26,7 +26,7 @@ const BUILTIN = 'zh-Hans';
 const langBlock = code =>
   '(function(){var D=window.LANTAI_I18N_DICT=window.LANTAI_I18N_DICT||{};D[' + JSON.stringify(code) + ']=' + JSON.stringify(DICT[code]) + ';})();';
 
-const MAIN_SRC = ['i18n.js', 'ext-lang.js', 'runtime.js', 'app.js'];
+const MAIN_SRC = ['i18n.js', 'ext-lang.js', 'runtime.js', 'paged.js', 'app.js'];
 const js = [read(path.join(src, 'js', 'i18n.locales.js')), langBlock(BUILTIN)]
   .concat(MAIN_SRC.map(f => read(path.join(src, 'js', f))))
   .join('\n');

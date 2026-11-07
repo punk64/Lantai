@@ -248,7 +248,7 @@
       '<div class="dz-s">' + esc(L.t('up.dropHint')) + '</div>' +
       (uploadName ? '<div class="dz-file">' + ico('check') + esc(uploadName) + '</div>' : '') +
       '</div>' +
-      '<div class="note" style="margin-top:12px">' + esc(L.t('up.importHint')) + '</div>' +
+      '<div class="note" style="margin-top:8px">' + esc(L.t('up.importHint')) + '</div>' +
       '<div id="upcProg">' + (prog && prog.where === 'import' ? progBlock(prog) : '') + '</div>' +
       '</div>';
   }
@@ -442,10 +442,28 @@
       .catch(e => { busy = ''; clearProg(); repaint(); toast(onlineErrText(e), 'err', 8000); });
   }
 
+  function confirmAction(title, body, onOk) {
+    openModal({
+      title: esc(title), width: 460,
+      body: '<div class="note gold">' + esc(body) + '</div>',
+      foot: '<button class="btn" data-x>' + esc(L.t('common.cancel')) + '</button>' +
+        '<button class="btn pri" data-ok>' + esc(L.t('common.confirm')) + '</button>',
+      after() {
+        const x = document.querySelector('#modal [data-x]');
+        if (x) x.onclick = closeModal;
+        const ok = document.querySelector('#modal [data-ok]');
+        if (ok) ok.onclick = () => { closeModal(); onOk(); };
+      }
+    });
+  }
+
   function doApply() {
     const staged = fileInfo || (remote && remote.cached) || null;
     const target = (staged && staged.version) || (status && status.stagedVersion) || '?';
-    if (!window.confirm(L.t('up.applyNow') + ' ' + target + ' ?')) return;
+    confirmAction(L.t('up.applyNow'), '即将升级到 v' + target + '，完成后服务会自动重启。', doApplyConfirmed);
+  }
+
+  function doApplyConfirmed() {
     busy = 'apply';
     setProg('hero', 'backup', 0);
     repaint();
@@ -485,7 +503,11 @@
 
   function doRollback() {
     const v = status && status.backupVersion;
-    if (!v || !window.confirm(L.t('up.rollback') + ' ' + v + ' ?')) return;
+    if (!v) return;
+    confirmAction(L.t('up.rollback'), '即将回退到 v' + v + '，完成后服务会自动重启。', doRollbackConfirmed);
+  }
+
+  function doRollbackConfirmed() {
     busy = 'rollback';
     setProg('hero', 'copy', 0);
     repaint();

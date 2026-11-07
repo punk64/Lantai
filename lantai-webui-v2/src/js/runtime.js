@@ -154,6 +154,69 @@
     return request('api/v1/books/list?unpaged=true&sort=lastModified,desc&readerView=true', { method: 'POST', body: notDeleted(body) }).then(unwrap);
   }
 
+  function pageQuery(page, size, sort) {
+    var zeroBased = Math.max(0, (Number(page) || 1) - 1);
+    return 'page=' + zeroBased + '&size=' + (size || 50) + '&sort=' + encodeURIComponent(sort || 'lastModified,desc');
+  }
+
+  function toPage(res) {
+    if (Array.isArray(res)) return { rows: res, total: res.length };
+    if (!res || typeof res !== 'object') throw new Error('列表接口返回了非 JSON 响应（' + typeof res + '）');
+    var rows = Array.isArray(res.content) ? res.content : [];
+    var total =
+      typeof res.totalElements === 'number'
+        ? res.totalElements
+        : (res.page && typeof res.page.totalElements === 'number' ? res.page.totalElements : rows.length);
+    return { rows: rows, total: total };
+  }
+
+  function seriesPage(body, page, size, sort) {
+    return request('api/v1/series/list?' + pageQuery(page, size, sort), { method: 'POST', body: notDeleted(body) }).then(function (res) {
+      var p = toPage(res);
+      return { rows: p.rows.map(mapSeries), total: p.total };
+    });
+  }
+
+  function booksPage(body, page, size, sort) {
+    return request('api/v1/books/list?' + pageQuery(page, size, sort) + '&readerView=true', { method: 'POST', body: notDeleted(body) }).then(function (res) {
+      var p = toPage(res);
+      applyReadProgress(p.rows);
+      return { rows: p.rows.map(mapBook), total: p.total };
+    });
+  }
+
+  function seriesAll(body, sort) {
+    return request('api/v1/series/list?unpaged=true&sort=' + encodeURIComponent(sort || 'lastModified,desc'), { method: 'POST', body: notDeleted(body) }).then(function (res) {
+      var p = toPage(res);
+      return { rows: p.rows.map(mapSeries), total: p.rows.length };
+    });
+  }
+
+  function booksAll(body, sort) {
+    return request('api/v1/books/list?unpaged=true&sort=' + encodeURIComponent(sort || 'lastModified,desc') + '&readerView=true', { method: 'POST', body: notDeleted(body) }).then(function (res) {
+      var p = toPage(res);
+      applyReadProgress(p.rows);
+      return { rows: p.rows.map(mapBook), total: p.rows.length };
+    });
+  }
+
+  function facets(libraryId) {
+    return request('api/lantai/v1/catalog/facets' + (libraryId ? '?libraryId=' + encodeURIComponent(libraryId) : '')).then(function (r) {
+      return (r && typeof r === 'object' && !Array.isArray(r)) ? r : {};
+    });
+  }
+
+  function fetchSeries(id) {
+    return request('api/v1/series/' + encodeURIComponent(id)).then(mapSeries);
+  }
+
+  function fetchBook(id) {
+    return request('api/v1/books/' + encodeURIComponent(id)).then(function (b) {
+      applyReadProgress([b]);
+      return mapBook(b);
+    });
+  }
+
   function seriesGroups(body) {
     return request('api/v1/series/list/alphabetical-groups', { method: 'POST', body: body || {} }).then(function (r) { return Array.isArray(r) ? r : []; });
   }
@@ -217,7 +280,13 @@
       published: releaseDate,
       year: releaseDate ? parseInt(String(releaseDate).slice(0, 4), 10) || 0 : 0,
       chapters: s.booksCount || 0,
-      downloaded: 0
+      downloaded: 0,
+      st: {
+        count: s.booksCount || 0,
+        unread: s.booksUnreadCount || 0,
+        done: s.booksReadCount || 0,
+        progress: s.booksInProgressCount || 0
+      }
     };
   }
 
@@ -237,6 +306,7 @@
     return {
       id: b.id,
       s: b.seriesId,
+      seriesTitle: b.seriesTitle || '',
       num: b.number || 0,
       vol: b.volume || '',
       name: b.name,
@@ -498,27 +568,6 @@
     return runtime.catalogLoading;
   }
 
-  function catalogMore(kind) {
-    if (!runtime._more) runtime._more = {};
-    if (runtime._more[kind]) return runtime._more[kind];
-    var p = catalogPage(kind).then(function (hasMore) {
-      runtime._more[kind] = null;
-      return hasMore;
-    }, function () {
-      runtime._more[kind] = null;
-      return false;
-    });
-    runtime._more[kind] = p;
-    return p;
-  }
-
-  function catalogFull(kind) {
-    if (catalogState()[kind].done) return Promise.resolve(true);
-    return catalogMore(kind).then(function (hasMore) {
-      return hasMore ? catalogFull(kind) : true;
-    });
-  }
-
   function catalogTotal() {
     var st = catalogState();
     return {
@@ -599,13 +648,13 @@
     });
   }
 
-  function fetchSeries(id) {
+  function loadSeriesIntoCache(id) {
     return request('api/v1/series/' + id).then(function (s) { mergeSeries([s]); });
   }
 
   function ensureSeries(id) {
     if (!SERIES.some(function (s) { return s.id === id; })) {
-      var p = fetchSeries(id);
+      var p = loadSeriesIntoCache(id);
       return p.then(function () { return fetchSeriesBooks(id); });
     }
     return fetchSeriesBooks(id);
@@ -926,6 +975,15 @@
     mergeBooks: mergeBooks,
     fetchAll: fetchAll,
     searchBooks: searchBooks,
+    seriesPage: seriesPage,
+    booksPage: booksPage,
+    seriesAll: seriesAll,
+    booksAll: booksAll,
+    facets: facets,
+    fetchSeries: fetchSeries,
+    fetchSeriesBooks: fetchSeriesBooks,
+    fetchBook: fetchBook,
+    mergeSeries: mergeSeries,
     seriesGroups: seriesGroups,
     refData: refData,
     remember: readRemember,
@@ -933,8 +991,6 @@
     hydrateShell: hydrateShell,
     hydrateCatalog: hydrateCatalog,
     catalogReady: function () { return !!runtime.catalogLoaded; },
-    catalogMore: catalogMore,
-    catalogFull: catalogFull,
     catalogTotal: catalogTotal,
     catalogReadyBooks: function () { return readyState.count; },
     reloadReadyCatalog: loadReadyCatalog,

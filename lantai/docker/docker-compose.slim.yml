@@ -2,12 +2,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.4.21}-alpine
+    image: lantai:${LANTAI_VERSION:-0.6.0}-alpine
     build:
       context: ..
       dockerfile: docker/Dockerfile.alpine
       args:
-        VERSION: ${LANTAI_VERSION:-0.4.21}
+        VERSION: ${LANTAI_VERSION:-0.6.0}
     container_name: lantai
     ports:
       - "${LANTAI_PORT:-25600}:25600"

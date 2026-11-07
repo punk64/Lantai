@@ -224,12 +224,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.5.0}-ubuntu
+    image: lantai:${LANTAI_VERSION:-0.6.0}-ubuntu
     build:
       context: ..
       dockerfile: docker/Dockerfile.lantai
       args:
-        VERSION: ${LANTAI_VERSION:-0.5.0}
+        VERSION: ${LANTAI_VERSION:-0.6.0}
         WITH_KEPUBIFY: "true"
     container_name: lantai
     network_mode: host
@@ -268,12 +268,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.5.0}-alpine
+    image: lantai:${LANTAI_VERSION:-0.6.0}-alpine
     build:
       context: ..
       dockerfile: docker/Dockerfile.alpine
       args:
-        VERSION: ${LANTAI_VERSION:-0.5.0}
+        VERSION: ${LANTAI_VERSION:-0.6.0}
     container_name: lantai
     ports:
       - "${LANTAI_PORT:-25600}:25600"

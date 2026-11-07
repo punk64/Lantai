@@ -2,12 +2,12 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.4.21}-ubuntu
+    image: lantai:${LANTAI_VERSION:-0.6.0}-ubuntu
     build:
       context: ..
       dockerfile: docker/Dockerfile.lantai
       args:
-        VERSION: ${LANTAI_VERSION:-0.4.21}
+        VERSION: ${LANTAI_VERSION:-0.6.0}
         WITH_KEPUBIFY: "true"
     container_name: lantai
     network_mode: host

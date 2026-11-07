@@ -42,7 +42,7 @@
   };
 })();
 
-(function(){var D=window.LANTAI_I18N_DICT=window.LANTAI_I18N_DICT||{};D["zh-Hans"]={"brand.tagline":"个人书库 · 阅读与归档","boot.login":"登录","boot.userOrEmail":"用户名或邮箱","boot.password":"密码","boot.go":"进入兰台","boot.hint":"首次使用：管理员账号与初始密码已打印在启动日志（控制台窗口）中，登录后请立即修改密码","boot.language":"界面语言","boot.remember":"保持登录状态","boot.checking":"校验中…","boot.fillLogin":"请填写用户名与密码","boot.badCred":"用户名或密码不正确","boot.loginFail":"登录失败，请稍后再试","boot.needLogin":"请使用兰台账号登录","boot.serverDown":"服务端暂时不可用（状态码 {code}）","boot.cantConnect":"无法连接服务端，请确认兰台已启动","boot.loggedOut":"已退出登录","boot.signedIn":"已登录","nav.gOverview":"概览","nav.gLantai":"兰台增量","nav.gSystem":"系统","nav.home":"首页","nav.browse":"书库","nav.collections":"合集","nav.readlists":"阅读清单","nav.online":"在线源","nav.scrape":"刮削","nav.annotations":"批注","nav.stats":"阅读统计","nav.tasks":"任务中心","nav.settings":"设置中心","nav.extensions":"功能拓展","nav.users":"用户管理","nav.audit":"管理日志","nav.logs":"日志","nav.opds":"OPDS 目录","nav.kobo":"Kobo 设备","nav.devices":"阅读设备","nav.trash":"回收站","nav.inspect":"查重","nav.system":"系统信息","nav.protocol":"API 接口","top.search":"搜索系列、书籍、合集、在线源…","top.tasks":"任务队列","top.theme":"切换主题","top.nav":"导航","top.collapse":"收起导航","top.admin":"管理员","top.allLibs":"管理员 · 全部库","side.running":"运行中","side.onlineDown":"在线源服务未启动","side.onlineUp":"在线源服务运行中","set.title":"设置中心","set.sub":"书库、在线源、阅读与缓存设置","set.api":"API 接口","set.libraries":"库与扫描","set.online":"在线库配置","set.heartbeat":"计时与同步","set.appearance":"外观","set.cache":"派生缓存","set.backup":"备份","set.tokens":"API 令牌","set.system":"兰台全局","set.upgrade":"在线升级","set.language":"界面语言","set.languageNote":"切换后立即生效，仅影响界面文字，不改变书籍元数据。","set.languageScope":"当前覆盖登录页、导航、顶栏与设置页标题；具体业务页正文仍为中文。","common.save":"保存","common.cancel":"取消","common.delete":"删除","common.close":"关闭","common.confirm":"确认","common.search":"搜索","common.filter":"筛选","common.reset":"重置","common.loading":"加载中…","common.retry":"重试","common.empty":"暂无数据","common.all":"全部","ext.lang.all":"全部语言","ext.lang.more":"更多 {n} 种","ext.lang.pick":"选择语言","ext.lang.search":"搜索语言…","ext.lang.empty":"没有匹配的语言","ext.page.prev":"上一页","ext.page.next":"下一页","ext.page.detail":"共 {n} 条 · 第 {cur} / {pages} 页 · 本页 {m} 条","ext.searchPh":"搜索扩展…","ext.col.ext":"扩展","ext.col.lang":"语言","ext.col.ver":"版本","ext.col.state":"状态","ext.col.acts":"操作","nav.gMore":"更多","nav.about":"关于","nav.notify":"通知","api.title":"API 接口","api.sub":"全部对外接口 · {n} 个端点 · 基地址 {host}","api.needAdmin":"需要管理员权限","api.needAdminHint":"接口清单包含全部对外端点与鉴权方式，仅管理员账户可查看。","api.copyBase":"复制基地址","api.openapi":"OpenAPI JSON","api.users":"用户与角色","api.loading":"正在读取接口文档…","api.loadFail":"读取接口文档失败：{msg}","api.retry":"重新加载","api.authTitle":"调用说明","api.authHint":"鉴权与示例","api.expand":"展开","api.collapse":"收起","api.filterGroup":"功能","api.filterVer":"版本","api.all":"全部","api.count":"{n} 个端点","api.search":"搜索路径、说明或标签…","api.noResult":"没有匹配的端点","api.colMethod":"方法","api.colPath":"路径","api.colSummary":"说明","api.colVer":"版本","api.colTag":"标签","api.authBasic":"Basic Auth","api.authApiKey":"API Key","api.authAgent":"Agent 令牌","api.authSession":"会话","api.authBasicUse":"Authorization: Basic base64(邮箱:密码)","api.authApiKeyUse":"X-API-Key: 访问密钥","api.authAgentUse":"Authorization: Bearer 令牌（config-dir/agent-token.txt）","api.authSessionUse":"登录后返回 LANTAI-SESSION Cookie；加 X-Auth-Token 头可改用该头传会话","api.authLan":"所有接口基地址 {host}，局域网内其他设备需放行 25600 端口。","api.clients":"客户端适用内容","api.clientsClient":"客户端","api.clientsFits":"适合","api.clientsNot":"不支持","api.access":"接入方式","api.accessAddr":"地址","api.accessAccount":"账号","api.accessLan":"局域网访问需放行 25600 端口","api.accessSame":"客户端与电脑须在同一局域网","api.verLantai":"兰台","api.verV1":"v1","api.verV2":"v2","api.verOther":"—","api.grpLantai":"兰台自有","api.grpOther":"其他","api.detailParams":"参数","api.detailBody":"请求体","api.detailResp":"响应","api.detailNone":"没有需要说明的参数","api.detailRequired":"必填","api.detailName":"名称","api.detailType":"类型","api.detailDesc":"说明","api.detailClose":"收起详情","api.detailOpen":"查看详情","up.title":"在线更新","up.current":"当前版本","up.latest":"最新版本","up.uptodate":"已是最新版本","up.norelease":"更新源暂无可用版本","up.check":"检查更新","up.checking":"正在检查…","up.published":"发布时间","up.size":"大小","up.notes":"更新说明","up.download":"下载更新包","up.downloading":"正在下载","up.verifying":"正在校验","up.ready":"已下载并通过校验","up.install":"安装并重启","up.reverify":"重新校验","up.discard":"放弃这个包","up.autoCheck":"自动检查更新","up.autoCheckHint":"打开升级页时向更新源确认一次，最多每 4 小时一次","up.autoDownload":"发现新版本后自动下载","up.autoInstall":"下载校验通过后自动安装并重启","up.autoInstallHint":"仅容器部署可全自动；桌面形态安装后需手动重新启动","up.feed":"更新源","up.feedHint":"默认读取项目 Release，可换成返回同结构的镜像地址","up.unreachable":"更新源不可达","up.restartContainer":"兰台进程会退出，由容器自动拉起新版本；未配置重启策略时请手动启动容器","up.phUpload":"正在上传升级包","up.phDownload":"正在下载升级包","up.phUnzip":"正在解压升级包","up.phVerify":"正在校验升级包","up.phBackup":"正在备份当前版本","up.phCopy":"正在替换程序文件","up.phRestart":"已替换，正在重启","up.phWorking":"正在处理","up.pollFail":"后端繁忙，进度查询失败，正在重试","up.pollTimeout":"长时间没有收到进度，后端可能已被其他任务占满；可稍后在任务页确认，或重启兰台后再试","up.restartTitle":"正在升级","up.restartMsg":"兰台正在替换程序并重启，页面会自动重新连接。请不要关闭或刷新本页。","up.restartWait":"已等待 {n} 秒","up.restartReload":"立即刷新","up.restartPending":"升级已提交，正在等待服务重启","up.restartTimeout":"未检测到服务重启，请手动启动兰台后刷新本页","up.manualHint":"兰台会自行退出，请重新启动后再刷新本页","up.importTitle":"导入升级包","up.importHint":"升级包只包含应用 jar，不含镜像、JDK、配置与数据。上传后先校验，确认无误才替换文件。","up.verifyBtn":"校验","up.rollback":"回退","up.rollbackHint":"每次升级前会把当前 jar 备份到配置目录 upgrade/backup/，只保留一份。","up.backupNone":"无","up.jarPath":"运行文件","up.jarWritable":"写入权限","up.jarWritableYes":"可替换","up.jarWritableNo":"不可写，无法在线升级","up.deploy":"部署形态","up.deployContainer":"容器内","up.deployBare":"裸机 / 桌面","up.restartNote":"升级后","up.target":"目标版本","up.sha":"SHA-256","up.builtAt":"构建时间","up.applyNow":"立即升级并重启","up.discardShort":"放弃这个包","up.checkedAt":"最后检查 {t}","up.noNotes":"该版本未提供说明","up.dropTitle":"把升级包拖到这里，或点击选择文件","up.dropHint":"支持 .zip 格式，单个文件不超过 512 MB","up.foundNew":"发现新版本 v{v}","up.uptodateToast":"已是最新版本 v{v}","about.title":"关于兰台","about.version":"版本","about.build":"构建时间","about.runtime":"运行形态","about.repo":"项目地址","about.license":"许可证","about.upstream":"上游项目","about.check":"检查更新","notify.title":"通知","notify.empty":"暂无通知","notify.markAll":"全部标为已读","notify.newVer":"发现新版本 {v}","notify.view":"查看更新说明","help.copy":"复制","help.export":"导出 .md","help.copied":"已复制到剪贴板","help.copyFail":"复制失败，请手动选择","help.exported":"已导出 {name}","home.err":"首页数据加载失败，分组暂时为空。","home.libs":"{n} 个库","home.kpi.today":"今日阅读","home.kpi.todayD":"今日累计时长","home.kpi.week":"近 7 日","home.kpi.weekD":"近一周合计","home.kpi.heldVal":"册 / {s} 系列","home.unit.item":"条","home.kpi.subsUnit":"{n} 章","ago.today":"今天","ago.yesterday":"昨天","ago.days":"{n} 天前","home.kpi.held":"馆藏","home.kpi.heldD":"{l} 个本地库 · {o} 个在线库","home.kpi.subs":"在线订阅","home.kpi.subsD":"{n} 部已订阅","home.kpi.subsWait":"目录载入后统计","home.kpi.annot":"批注","home.kpi.annotD":"高亮 / 下划线 / 书签 / 笔记","home.kpi.annotWait":"打开批注页后载入","home.act.sections":"首页分组","home.act.scan":"扫描本地库","home.act.online":"在线源","home.cont.title":"继续阅读","home.cont.hint":"按最近阅读排序","home.cont.all":"全部书库","home.cont.empty":"还没有在读的书。随便打开一本，读几页就会出现在这里。","home.cont.page":"第 {n} {u}","home.unit.page":"页","home.unit.chapter":"章","home.chart.title":"近 14 日时长","home.chart.go":"统计页","home.pipe.title":"管线与格式","home.pipe.wait":"格式分布需要完整书目，进入书库后自动统计。","home.pipe.loading":"正在载入馆藏结构…","home.pipe.note":"TXT 与文字型 EPUB 按章节读取。","home.pipe.count":"{n} 册","home.byLib":"按库浏览","home.noLib":"还没有书库","home.online.title":"在线库概览","home.online.mgr":"管理订阅","home.online.empty":"还没有订阅，去在线源搜索一部漫画。","home.online.note":"在线书与本地书共用同一套书库与进度，两端阅读位置互通；章节按需下载。","home.run.title":"运行状态","home.run.uptime":"已运行","home.run.db":"数据库","home.run.proxy":"在线源服务","home.run.proxyOn":"运行中 · 端口 {p}","home.run.proxyOff":"未启动","home.run.cal":"Calibre","home.run.calOn":"已安装 {v}","home.run.calOff":"未安装 · MOBI/AZW3/FB2 暂只可下载","home.run.api":"API 接口","shelf.moreShort":"查看更多","shelf.more":"查看更多（剩余 {n}）","shelf.collapse":"收起","shelf.emptyBook":"暂无书籍。新入库的书解析完成后才会出现在这里。","shelf.emptySeries":"还没有系列，扫描书库后出现。","sec.ondeck.title":"导航 · 下一本","sec.ondeck.hint":"读完一本后自动推荐同系列的下一本","sec.ondeck.empty":"读完一本后，同系列的下一本会出现在这里。","sec.published.title":"最近发布","sec.published.hint":"按出版日期","sec.published.hint30":"按出版日期 · 近一个月","sec.published.empty":"还没有带出版日期的书籍。刮削元数据后即可按出版时间排列。","sec.added.title":"最近添加的书籍","sec.added.hint":"按入库时间","sec.recentRead.title":"最近阅读","sec.recentRead.hint":"按最近一次阅读时间","sec.recentRead.empty":"还没有阅读记录。打开任意一本书，进度会自动出现在这里。","sec.newSeries.title":"最近添加的系列","sec.updSeries.title":"最近更新的系列","sec.updSeries.hint":"按最后修改时间","fmt.DIVINA":"固定版式 · 页图","fmt.PDF":"固定版式 · 服务端渲染","fmt.EPUB":"可重排 · 文字版","fmt.TXT":"可重排 · 章节随机读","fmt.UNSUPPORTED":"需外部转换器","meta.status":"连载状态","meta.dir":"阅读方向","meta.genres":"分类","meta.tags":"标签","meta.status.ongoing":"连载中","meta.status.ended":"已完结","meta.status.hiatus":"休刊","meta.status.abandoned":"弃坑","meta.dir.ltr":"从左往右","meta.dir.rtl":"从右往左","meta.dir.vertical":"纵向","meta.dir.webtoon":"条漫","mf.title":"标题","mf.titleSort":"排序标题","mf.summary":"简介","mf.number":"序号","mf.numberSort":"排序序号","mf.releaseDate":"出版日期","mf.authors":"作者","mf.notableEntities":"显著实体","mf.tags":"标签","mf.isbn":"ISBN","mf.links":"链接","mf.publisher":"出版社","mf.genres":"分类","mf.language":"语言","mf.status":"连载状态","mf.readingDirection":"阅读方向","mf.ageRating":"年龄分级","mf.region":"地区","mf.totalBookCount":"总册数","mf.sharingLabels":"共享标签","mf.alternateTitles":"别名","mp.intro":"你是图书元数据整理助手。请依据下面的线索检索权威资料，补全到最大可能，并按指定 JSON 返回。","mp.reqTitle":"要求：","mp.req1":"1. 只输出一个 JSON 对象，不要解释、不要前后缀；不要用 Markdown 代码块包裹。","mp.req2":"2. 下面列出的每个键都必须出现，取不到就给空字符串或空数组，不要省略键，不要写 null。","mp.req3":"3. 所有文本字段（title、titleSort、summary、genres、tags、alternateTitles、links 的 label 等）一律使用当前会话语言（{lang}），不要把来源的日文、英文、韩文原样混入，也不要在同一份回答里混用多种语言。检索时可以用原文书名与作者名，但返回内容必须全部是{lang}。人名、出版社、杂志名用{lang}的通行译名，没有通行译名时保留原文。language 字段填作品原文语言的 BCP-47 代码（zh-Hans / zh-Hant / ja / en / ko …），不受输出语言影响。","mp.req4":"4. 出版日期用 YYYY-MM-DD；ISBN 只保留数字。","mp.req5":"5. 作者只写姓名，不要带「（作者）」「（绘）」这类角色后缀；角色写进 role 字段。","mp.req6":"6. 分类（genres）与标签（tags）都使用当前会话语言（{lang}）：分类给 2~8 字的题材短词，最多 6 个；标签把来源的外文标签译成{lang}的短词，来源没有标签就留空数组。","mp.req7":"7. 简介用当前会话语言（{lang}）写 150~300 字（或等量篇幅），不含剧透。","mp.req8":"8. status 只能取四个值之一，必须原样大写英文，不要写中文，也不要写 COMPLETED、CANCELLED 等别名：ONGOING（{ongoing}）、ENDED（{ended}）、HIATUS（{hiatus}）、ABANDONED（{abandoned}）。无法确认时给 ONGOING。","mp.req9":"9. readingDirection 只能取 LEFT_TO_RIGHT（{ltr}）、RIGHT_TO_LEFT（{rtl}）、VERTICAL（{vertical}）、WEBTOON（{webtoon}）之一，无法确认时给 RIGHT_TO_LEFT。","mp.clues":"【书籍线索】","mp.series":"系列：","mp.bookName":"册名：","mp.file":"文件名：","mp.path":"相对路径：","mp.pages":"页数：","mp.fmt":"格式：","mp.size":"大小：","mp.books":"册数：","mp.firstRelease":"首册出版日期：","mp.id":"内部 ID：","mp.none":"（无）","mp.current":"【当前元数据（空表示尚未填写）】","mp.thKey":"键","mp.thField":"字段","mp.thValue":"当前值","mp.empty":"（空）","mp.locked":"已锁定字段（不会被写入，仅供你参考）：","mp.keywords":"【检索关键词】","mp.kwHint":"请优先用这组关键词检索，必要时自行补充作者原名、原题写法、出版社译名再检索；关键词保留原文只为检索准确，返回内容仍必须全部使用当前会话语言。","mp.template":"【返回模板】","mp.limit":"文本长度上限：本次提示词与你的回答都可能很长，网页端一键复制上限是 {max} 字符。超出时不要分段解释，直接给出完整 JSON；用户会用文件方式导入。","greet.s0.v0":"夜还长，书还热，兰台","greet.s0.v1":"这个点还没睡，不是书太好看，就是心事太多，兰台","greet.s0.v2":"世界都睡了，只剩翻书的声音，兰台","greet.s0.v3":"凌晨适合读点不着急的书，兰台","greet.s0.v4":"灯亮着，字也亮着，兰台","greet.s0.v5":"深夜的读者，不必向谁解释，兰台","greet.s0.v6":"读完这一章就睡，说好了，兰台","greet.s1.v0":"天光刚醒，先读三页再出门，兰台","greet.s1.v1":"早上好，今天第一件事是翻开书，兰台","greet.s1.v2":"清晨的字最清楚，兰台","greet.s1.v3":"鸟叫了，茶还烫，书正好，兰台","greet.s1.v4":"太阳刚上来，书签停在哪一页了？","greet.s1.v5":"早起的人，先读到好句子，兰台","greet.s1.v6":"一日之计，从一章开始，兰台","greet.s2.v0":"上午好，注意力最贵，读点硬的，兰台","greet.s2.v1":"一天里最清醒的两小时，交给书吧，兰台","greet.s2.v2":"光正好，适合把那本难啃的啃下来，兰台","greet.s2.v3":"上午好，进度条又往前走了一点，兰台","greet.s2.v4":"趁世界还没吵起来，多读几页，兰台","greet.s2.v5":"头脑清楚的时候，别都花在刷手机上，兰台","greet.s2.v6":"上午的安静是借来的，记得还给自己，兰台","greet.s3.v0":"午安，饭后两页比午睡更提神，兰台","greet.s3.v1":"中午了，吃好也读好，兰台","greet.s3.v2":"午休时间，一章刚刚好，兰台","greet.s3.v3":"太阳在头顶，书在手里，兰台","greet.s3.v4":"午安，别急着干活，先把这一节读完，兰台","greet.s3.v5":"一天的中间，停下来翻两页，兰台","greet.s3.v6":"饭在消化，让眼睛也吃点好的，兰台","greet.s4.v0":"下午好，茶配一章，正合适，兰台","greet.s4.v1":"阳光斜进来了，书页也跟着亮，兰台","greet.s4.v2":"下午容易困，好故事能救，兰台","greet.s4.v3":"一天过了三分之二，故事才到一半，兰台","greet.s4.v4":"下午好，慢慢读，不用赶，兰台","greet.s4.v5":"这个点的光，最适合看书，兰台","greet.s4.v6":"再读一章，就该收工了，兰台","greet.s5.v0":"晚上好，灯下见，兰台","greet.s5.v1":"一天收尾，把最后半小时留给书，兰台","greet.s5.v2":"晚饭后的一章，是一天里最稳的时刻，兰台","greet.s5.v3":"晚上好，外面很吵，书里很静，兰台","greet.s5.v4":"今天辛苦了，读点轻松的，兰台","greet.s5.v5":"夜色刚起，正好接上昨天的进度，兰台","greet.s5.v6":"灯开一盏就够，字自己会亮，兰台","greet.s6.v0":"夜深了，读完这章就睡，兰台","greet.s6.v1":"深夜好，书比人精神，兰台","greet.s6.v2":"这个点还在读，是喜欢，不是失眠，兰台","greet.s6.v3":"世界安静下来，故事才开始响，兰台","greet.s6.v4":"最后一章，看完就关灯，兰台","greet.s6.v5":"夜里的字比白天温柔，兰台","greet.s6.v6":"明天要早起的话，就少读一页，兰台"};})();
+(function(){var D=window.LANTAI_I18N_DICT=window.LANTAI_I18N_DICT||{};D["zh-Hans"]={"brand.tagline":"个人书库 · 阅读与归档","boot.login":"登录","boot.userOrEmail":"用户名或邮箱","boot.password":"密码","boot.go":"进入兰台","boot.hint":"首次使用：管理员账号与初始密码已打印在启动日志（控制台窗口）中，登录后请立即修改密码","boot.language":"界面语言","boot.remember":"保持登录状态","boot.checking":"校验中…","boot.fillLogin":"请填写用户名与密码","boot.badCred":"用户名或密码不正确","boot.loginFail":"登录失败，请稍后再试","boot.needLogin":"请使用兰台账号登录","boot.serverDown":"服务端暂时不可用（状态码 {code}）","boot.cantConnect":"无法连接服务端，请确认兰台已启动","boot.loggedOut":"已退出登录","boot.signedIn":"已登录","nav.gOverview":"概览","nav.gLantai":"兰台增量","nav.gSystem":"系统","nav.home":"首页","nav.browse":"书库","nav.collections":"合集","nav.readlists":"阅读清单","nav.online":"在线源","nav.scrape":"刮削","nav.annotations":"批注","nav.stats":"阅读统计","nav.tasks":"任务中心","nav.settings":"设置中心","nav.extensions":"功能拓展","nav.users":"用户管理","nav.audit":"管理日志","nav.logs":"日志","nav.opds":"OPDS 目录","nav.kobo":"Kobo 设备","nav.devices":"阅读设备","nav.trash":"回收站","nav.inspect":"查重","nav.system":"系统信息","nav.protocol":"API 接口","top.search":"搜索系列、书籍、合集、在线源…","top.tasks":"任务队列","top.theme":"切换主题","top.nav":"导航","top.collapse":"收起导航","top.admin":"管理员","top.allLibs":"管理员 · 全部库","side.running":"运行中","side.onlineDown":"在线源服务未启动","side.onlineUp":"在线源服务运行中","set.title":"设置中心","set.sub":"书库、在线源、阅读与缓存设置","set.api":"API 接口","set.libraries":"库与扫描","set.online":"在线库配置","set.heartbeat":"计时与同步","set.appearance":"外观","set.cache":"派生缓存","set.backup":"备份","set.tokens":"API 令牌","set.system":"兰台全局","set.upgrade":"在线升级","set.language":"界面语言","set.languageNote":"切换后立即生效，仅影响界面文字，不改变书籍元数据。","set.languageScope":"当前覆盖登录页、导航、顶栏与设置页标题；具体业务页正文仍为中文。","common.save":"保存","common.cancel":"取消","common.delete":"删除","common.close":"关闭","common.confirm":"确认","common.search":"搜索","common.filter":"筛选","common.reset":"重置","common.loading":"加载中…","common.retry":"重试","common.empty":"暂无数据","common.all":"全部","ext.lang.all":"全部语言","ext.lang.more":"更多 {n} 种","ext.lang.pick":"选择语言","ext.lang.search":"搜索语言…","ext.lang.empty":"没有匹配的语言","ext.page.prev":"上一页","ext.page.next":"下一页","ext.page.detail":"共 {n} 条 · 第 {cur} / {pages} 页 · 本页 {m} 条","ext.searchPh":"搜索扩展…","ext.col.ext":"扩展","ext.col.lang":"语言","ext.col.ver":"版本","ext.col.state":"状态","ext.col.acts":"操作","nav.gMore":"更多","nav.about":"关于","nav.notify":"通知","api.title":"API 接口","api.sub":"全部对外接口 · {n} 个端点 · 基地址 {host}","api.needAdmin":"需要管理员权限","api.needAdminHint":"接口清单包含全部对外端点与鉴权方式，仅管理员账户可查看。","api.copyBase":"复制基地址","api.openapi":"OpenAPI JSON","api.users":"用户与角色","api.loading":"正在读取接口文档…","api.loadFail":"读取接口文档失败：{msg}","api.retry":"重新加载","api.authTitle":"调用说明","api.authHint":"鉴权与示例","api.expand":"展开","api.collapse":"收起","api.filterGroup":"功能","api.filterVer":"版本","api.all":"全部","api.count":"{n} 个端点","api.search":"搜索路径、说明或标签…","api.noResult":"没有匹配的端点","api.colMethod":"方法","api.colPath":"路径","api.colSummary":"说明","api.colVer":"版本","api.colTag":"标签","api.authBasic":"Basic Auth","api.authApiKey":"API Key","api.authAgent":"Agent 令牌","api.authSession":"会话","api.authBasicUse":"Authorization: Basic base64(邮箱:密码)","api.authApiKeyUse":"X-API-Key: 访问密钥","api.authAgentUse":"Authorization: Bearer 令牌（config-dir/agent-token.txt）","api.authSessionUse":"登录后返回 LANTAI-SESSION Cookie；加 X-Auth-Token 头可改用该头传会话","api.authLan":"所有接口基地址 {host}，局域网内其他设备需放行 25600 端口。","api.clients":"客户端适用内容","api.clientsClient":"客户端","api.clientsFits":"适合","api.clientsNot":"不支持","api.access":"接入方式","api.accessAddr":"地址","api.accessAccount":"账号","api.accessLan":"局域网访问需放行 25600 端口","api.accessSame":"客户端与电脑须在同一局域网","api.verLantai":"兰台","api.verV1":"v1","api.verV2":"v2","api.verOther":"—","api.grpLantai":"兰台自有","api.grpOther":"其他","api.detailParams":"参数","api.detailBody":"请求体","api.detailResp":"响应","api.detailNone":"没有需要说明的参数","api.detailRequired":"必填","api.detailName":"名称","api.detailType":"类型","api.detailDesc":"说明","api.detailClose":"收起详情","api.detailOpen":"查看详情","up.title":"在线更新","up.current":"当前版本","up.latest":"最新版本","up.uptodate":"已是最新版本","up.norelease":"更新源暂无可用版本","up.check":"检查更新","up.checking":"正在检查…","up.published":"发布时间","up.size":"大小","up.notes":"更新说明","up.download":"下载更新包","up.downloading":"正在下载","up.verifying":"正在校验","up.ready":"已下载并通过校验","up.install":"安装并重启","up.reverify":"重新校验","up.discard":"放弃这个包","up.autoCheck":"自动检查更新","up.autoCheckHint":"打开升级页时向更新源确认一次，最多每 4 小时一次","up.autoDownload":"发现新版本后自动下载","up.autoInstall":"下载校验通过后自动安装并重启","up.autoInstallHint":"仅容器部署可全自动；桌面形态安装后需手动重新启动","up.feed":"更新源","up.feedHint":"默认读取项目 Release，可换成返回同结构的镜像地址","up.unreachable":"更新源不可达","up.restartContainer":"兰台进程会退出，由容器自动拉起新版本；未配置重启策略时请手动启动容器","up.phUpload":"正在上传升级包","up.receiving":"服务端正在接收升级包","up.pausedAfter":"重启后任务队列保持暂停，可在「任务」页点「恢复」继续。","up.phDownload":"正在下载升级包","up.phUnzip":"正在解压升级包","up.phVerify":"正在校验升级包","up.phBackup":"正在备份当前版本","up.phCopy":"正在替换程序文件","up.phRestart":"已替换，正在重启","up.phWorking":"正在处理","up.pollFail":"后端繁忙，进度查询失败，正在重试","up.pollTimeout":"长时间没有收到进度，后端可能已被其他任务占满；可稍后在任务页确认，或重启兰台后再试","up.restartTitle":"正在升级","up.restartMsg":"兰台正在替换程序并重启，页面会自动重新连接。请不要关闭或刷新本页。","up.restartWait":"已等待 {n} 秒","up.restartReload":"立即刷新","up.restartPending":"升级已提交，正在等待服务重启","up.restartTimeout":"未检测到服务重启，请手动启动兰台后刷新本页","up.manualHint":"兰台会自行退出，请重新启动后再刷新本页","up.importTitle":"导入升级包","up.importHint":"升级包只包含应用 jar，不含镜像、JDK、配置与数据。上传后先校验，确认无误才替换文件。","up.verifyBtn":"校验","up.rollback":"回退","up.rollbackHint":"每次升级前会把当前 jar 备份到配置目录 upgrade/backup/，只保留一份。","up.backupNone":"无","up.jarPath":"运行文件","up.jarWritable":"写入权限","up.jarWritableYes":"可替换","up.jarWritableNo":"不可写，无法在线升级","up.deploy":"部署形态","up.deployContainer":"容器内","up.deployBare":"裸机 / 桌面","up.restartNote":"升级后","up.target":"目标版本","up.sha":"SHA-256","up.builtAt":"构建时间","up.applyNow":"立即升级并重启","up.discardShort":"放弃这个包","up.checkedAt":"最后检查 {t}","up.noNotes":"该版本未提供说明","up.dropTitle":"把升级包拖到这里，或点击选择文件","up.dropHint":"支持 .zip 格式，单个文件不超过 512 MB","up.foundNew":"发现新版本 v{v}","up.uptodateToast":"已是最新版本 v{v}","about.title":"关于兰台","about.version":"版本","about.build":"构建时间","about.runtime":"运行形态","about.repo":"项目地址","about.license":"许可证","about.upstream":"上游项目","about.check":"检查更新","notify.title":"通知","notify.empty":"暂无通知","notify.markAll":"全部标为已读","notify.newVer":"发现新版本 {v}","notify.view":"查看更新说明","help.copy":"复制","help.export":"导出 .md","help.copied":"已复制到剪贴板","help.copyFail":"复制失败，请手动选择","help.exported":"已导出 {name}","home.err":"首页数据加载失败，分组暂时为空。","home.libs":"{n} 个库","home.kpi.today":"今日阅读","home.kpi.todayD":"今日累计时长","home.kpi.week":"近 7 日","home.kpi.weekD":"近一周合计","home.kpi.heldVal":"册 / {s} 系列","home.unit.item":"条","home.kpi.subsUnit":"{n} 章","ago.today":"今天","ago.yesterday":"昨天","ago.days":"{n} 天前","home.kpi.held":"馆藏","home.kpi.heldD":"{l} 个本地库 · {o} 个在线库","home.kpi.subs":"在线订阅","home.kpi.subsD":"{n} 部已订阅","home.kpi.subsWait":"目录载入后统计","home.kpi.annot":"批注","home.kpi.annotD":"高亮 / 下划线 / 书签 / 笔记","home.kpi.annotWait":"打开批注页后载入","home.act.sections":"首页分组","home.act.scan":"扫描本地库","home.act.online":"在线源","home.cont.title":"继续阅读","home.cont.hint":"按最近阅读排序","home.cont.all":"全部书库","home.cont.empty":"还没有在读的书。随便打开一本，读几页就会出现在这里。","home.cont.page":"第 {n} {u}","home.unit.page":"页","home.unit.chapter":"章","home.chart.title":"近 14 日时长","home.chart.go":"统计页","home.pipe.title":"管线与格式","home.pipe.wait":"格式分布需要完整书目，进入书库后自动统计。","home.pipe.loading":"正在载入馆藏结构…","home.pipe.note":"TXT 与文字型 EPUB 按章节读取。","home.pipe.count":"{n} 册","home.byLib":"按库浏览","home.noLib":"还没有书库","home.online.title":"在线库概览","home.online.mgr":"管理订阅","home.online.empty":"还没有订阅，去在线源搜索一部漫画。","home.online.note":"在线书与本地书共用同一套书库与进度，两端阅读位置互通；章节按需下载。","home.run.title":"运行状态","home.run.uptime":"已运行","home.run.db":"数据库","home.run.proxy":"在线源服务","home.run.proxyOn":"运行中 · 端口 {p}","home.run.proxyOff":"未启动","home.run.cal":"Calibre","home.run.calOn":"已安装 {v}","home.run.calOff":"未安装 · MOBI/AZW3/FB2 暂只可下载","home.run.api":"API 接口","shelf.moreShort":"查看更多","shelf.more":"查看更多（剩余 {n}）","shelf.collapse":"收起","shelf.emptyBook":"暂无书籍。新入库的书解析完成后才会出现在这里。","shelf.emptySeries":"还没有系列，扫描书库后出现。","sec.ondeck.title":"导航 · 下一本","sec.ondeck.hint":"读完一本后自动推荐同系列的下一本","sec.ondeck.empty":"读完一本后，同系列的下一本会出现在这里。","sec.published.title":"最近发布","sec.published.hint":"按出版日期","sec.published.hint30":"按出版日期 · 近一个月","sec.published.empty":"还没有带出版日期的书籍。刮削元数据后即可按出版时间排列。","sec.added.title":"最近添加的书籍","sec.added.hint":"按入库时间","sec.recentRead.title":"最近阅读","sec.recentRead.hint":"按最近一次阅读时间","sec.recentRead.empty":"还没有阅读记录。打开任意一本书，进度会自动出现在这里。","sec.newSeries.title":"最近添加的系列","sec.updSeries.title":"最近更新的系列","sec.updSeries.hint":"按最后修改时间","fmt.DIVINA":"固定版式 · 页图","fmt.PDF":"固定版式 · 服务端渲染","fmt.EPUB":"可重排 · 文字版","fmt.TXT":"可重排 · 章节随机读","fmt.UNSUPPORTED":"需外部转换器","meta.status":"连载状态","meta.dir":"阅读方向","meta.genres":"分类","meta.tags":"标签","meta.status.ongoing":"连载中","meta.status.ended":"已完结","meta.status.hiatus":"休刊","meta.status.abandoned":"弃坑","meta.dir.ltr":"从左往右","meta.dir.rtl":"从右往左","meta.dir.vertical":"纵向","meta.dir.webtoon":"条漫","mf.title":"标题","mf.titleSort":"排序标题","mf.summary":"简介","mf.number":"序号","mf.numberSort":"排序序号","mf.releaseDate":"出版日期","mf.authors":"作者","mf.notableEntities":"显著实体","mf.tags":"标签","mf.isbn":"ISBN","mf.links":"链接","mf.publisher":"出版社","mf.genres":"分类","mf.language":"语言","mf.status":"连载状态","mf.readingDirection":"阅读方向","mf.ageRating":"年龄分级","mf.region":"地区","mf.totalBookCount":"总册数","mf.sharingLabels":"共享标签","mf.alternateTitles":"别名","mp.intro":"你是图书元数据整理助手。请依据下面的线索检索权威资料，补全到最大可能，并按指定 JSON 返回。","mp.reqTitle":"要求：","mp.req1":"1. 只输出一个 JSON 对象，不要解释、不要前后缀；不要用 Markdown 代码块包裹。","mp.req2":"2. 下面列出的每个键都必须出现，取不到就给空字符串或空数组，不要省略键，不要写 null。","mp.req3":"3. 所有文本字段（title、titleSort、summary、genres、tags、alternateTitles、links 的 label 等）一律使用当前会话语言（{lang}），不要把来源的日文、英文、韩文原样混入，也不要在同一份回答里混用多种语言。检索时可以用原文书名与作者名，但返回内容必须全部是{lang}。人名、出版社、杂志名用{lang}的通行译名，没有通行译名时保留原文。language 字段填作品原文语言的 BCP-47 代码（zh-Hans / zh-Hant / ja / en / ko …），不受输出语言影响。","mp.req4":"4. 出版日期用 YYYY-MM-DD；ISBN 只保留数字。","mp.req5":"5. 作者只写姓名，不要带「（作者）」「（绘）」这类角色后缀；角色写进 role 字段。","mp.req6":"6. 分类（genres）与标签（tags）都使用当前会话语言（{lang}）：分类给 2~8 字的题材短词，最多 6 个；标签把来源的外文标签译成{lang}的短词，来源没有标签就留空数组。","mp.req7":"7. 简介用当前会话语言（{lang}）写 150~300 字（或等量篇幅），不含剧透。","mp.req8":"8. status 只能取四个值之一，必须原样大写英文，不要写中文，也不要写 COMPLETED、CANCELLED 等别名：ONGOING（{ongoing}）、ENDED（{ended}）、HIATUS（{hiatus}）、ABANDONED（{abandoned}）。无法确认时给 ONGOING。","mp.req9":"9. readingDirection 只能取 LEFT_TO_RIGHT（{ltr}）、RIGHT_TO_LEFT（{rtl}）、VERTICAL（{vertical}）、WEBTOON（{webtoon}）之一，无法确认时给 RIGHT_TO_LEFT。","mp.clues":"【书籍线索】","mp.series":"系列：","mp.bookName":"册名：","mp.file":"文件名：","mp.path":"相对路径：","mp.pages":"页数：","mp.fmt":"格式：","mp.size":"大小：","mp.books":"册数：","mp.firstRelease":"首册出版日期：","mp.id":"内部 ID：","mp.none":"（无）","mp.current":"【当前元数据（空表示尚未填写）】","mp.thKey":"键","mp.thField":"字段","mp.thValue":"当前值","mp.empty":"（空）","mp.locked":"已锁定字段（不会被写入，仅供你参考）：","mp.keywords":"【检索关键词】","mp.kwHint":"请优先用这组关键词检索，必要时自行补充作者原名、原题写法、出版社译名再检索；关键词保留原文只为检索准确，返回内容仍必须全部使用当前会话语言。","mp.template":"【返回模板】","mp.limit":"文本长度上限：本次提示词与你的回答都可能很长，网页端一键复制上限是 {max} 字符。超出时不要分段解释，直接给出完整 JSON；用户会用文件方式导入。","rd.comic":"漫画","rd.pagesN":"{n} 页","rd.pageN":"第 {n} 页","rd.exit":"返回书架","rd.imm":"隐身","rd.readingTitle":"兰台阅读","rd.loading":"正在读取这本书","rd.retry":"重试","rd.offline":"网络已断开","rd.offlineNote":"已载入的页面仍可继续阅读","rd.restN":"剩 {n} 页","rd.tool.mode":"阅读模式","rd.tool.thumbs":"缩略图条","rd.tool.anns":"书签与标注","rd.tool.bm":"加书签","rd.tool.rect":"框选标注","rd.tool.brush":"自由画笔","rd.tool.set":"阅读设置","rd.tool.full":"全屏","rd.tool.q":"画质","rd.tool.export":"导出","rd.tool.dir":"阅读方向","rd.mode.single":"单页","rd.mode.dual":"双页","rd.mode.webtoon":"长条","rd.mode.paged":"分页","rd.dir.ltr":"从左往右","rd.dir.rtl":"从右往左","rd.fit.contain":"适应","rd.fit.width":"满宽","rd.fit.height":"满高","rd.fit.orig":"原始","rd.q.orig":"原图","rd.q.hd":"高清","rd.q.lite":"省流","rd.mp.none":"无","rd.mp.narrow":"窄","rd.mp.std":"标准","rd.mp.wide":"宽","rd.set.title":"阅读设置","rd.set.mode":"阅读模式","rd.set.fit":"页面适应","rd.set.dir":"阅读方向","rd.set.dirScrollNote":"当前是滚动模式，左右方向不生效；点方向会切回单页","rd.set.dirNote":"方向镜像翻页热区与键盘左右键","rd.set.q":"画质","rd.set.qNote":"原图零转码最快；高清 / 省流由服务端按宽度降采样，省流量","rd.set.margin":"边距","rd.set.marginT":"上","rd.set.marginB":"下","rd.set.marginL":"左","rd.set.marginR":"右","rd.set.gap":"长条页间距","rd.set.pre":"预加载","rd.set.preNote":"提前取相邻页的图片，翻页时直接出图","rd.set.preOff":"关闭","rd.set.preN":"{n} 页","rd.set.bg":"背景光晕","rd.set.bgAuto":"跟随页面","rd.set.bgBlack":"纯黑","rd.set.imm":"隐身阅读","rd.set.off":"关闭","rd.set.on":"开启","rd.set.immNote":"开启后服务端不写阅读会话与进度，翻到哪页只存本标签页；标注照常保存","rd.set.keys":"快捷键","rd.set.help":"操作指引","rd.set.helpNote":"重新查看按钮说明、翻页方式与触控区域","rd.key.prevNext":"上一页 / 下一页","rd.key.next":"下一页","rd.key.thumbs":"缩略图条","rd.key.anns":"标注列表","rd.key.bm":"加书签","rd.key.rect":"框选标注","rd.key.full":"全屏","rd.key.zoom":"缩放","rd.ann.title":"书签与标注","rd.ann.tabAll":"全部 {n}","rd.ann.tabBm":"书签 {n}","rd.ann.tabMark":"标注 {n}","rd.ann.searchQ":"搜索页码或备注","rd.ann.addPage":"给第 {n} 页加书签","rd.ann.empty":"没有匹配的条目","rd.ann.none":"还没有书签和标注。按 R 框选区域标注；按 B 给当前页加书签。","rd.ann.item":"第 {n} 页 · {desc}","rd.ann.note":"备注","rd.ann.brushTag":"画笔","rd.ann.rectTag":"框选","rd.ann.countN":"{n} 处","rd.common.cancel":"取消","rd.common.save":"保存","rd.marker.highlight":"高亮","rd.marker.underline":"下划线","rd.marker.bookmark":"书签","rd.marker.comment":"标注","rd.exp.title":"导出","rd.exp.cur":"当前页","rd.exp.curBtn":"下载第 {n} 页（原图）","rd.exp.curNote":"直接取服务端原图，不经画布重编码，保留原始格式与画质","rd.exp.range":"页区间","rd.exp.to":"至","rd.exp.total":"共 {n} 页","rd.exp.zip":"打包下载 ZIP","rd.exp.zipNote":"服务端按原图打包，单次最多 {n} 页","rd.exp.all":"整本","rd.exp.allBtn":"整本打包（分批）","rd.exp.allNote":"按 {n} 页一批连续下载，浏览器可能提示允许多文件下载","rd.exp.tooMany":"一次最多 {n} 页，请缩小范围","rd.exp.start":"开始下载第 {n} 页","rd.exp.packing":"正在打包第 {a}–{b} 页","rd.err.request":"请求失败","rd.err.noPerm":"没有这个书库的阅读权限","rd.err.notFound":"书籍或页面不存在","rd.err.noImage":"这一页没有图片","rd.err.backend":"后端不可用","rd.err.notInLib":"这本书不在书库里","rd.err.unsupported":"这本书需要先转成 CBZ 才能阅读","rd.err.openFail":"这本书打不开","rd.err.pageFail":"第 {n} 页载入失败","rd.err.annSave":"标注保存失败：{e}","rd.err.bmSave":"书签保存失败：{e}","rd.err.del":"删除失败：{e}","rd.err.update":"更新失败：{e}","rd.err.export":"导出失败：{e}","rd.err.fullscreen":"浏览器拒绝了全屏请求","rd.err.waitImg":"等图片载入完成再框选","rd.err.wake":"当前环境不支持屏幕常亮（HTTPS 或 localhost 才可用）","rd.toast.imm":"隐身阅读 · 本次不留记录","rd.toast.immOn":"隐身阅读已开启，本次不留记录","rd.toast.immResume":"已恢复记录进度","rd.toast.closed":"已读 {dur} · 停在第 {page} 页","rd.toast.dir":"阅读方向：{v}","rd.toast.q":"画质：{v}","rd.toast.single":"已切到单页，方向生效","rd.toast.annSaved":"标注已保存 · 第 {n} 页","rd.toast.annUpdated":"已更新标注","rd.toast.annDeleted":"标注已删除","rd.toast.bmAdded":"已在第 {n} 页加书签","rd.hint.basics":"左右点击翻页 · 中间呼出工具栏 · 长按拖动也能翻","rd.hint.brush":"自由画笔：在页面上拖动画线，松手后选颜色保存","rd.hint.rect":"框选：在页面上拖出矩形，松手后选颜色保存","rd.guide.stepN":"第 {i} / {n} 步","rd.guide.keysTitle":"键盘 · 焦点在阅读器内即生效","rd.guide.pinch":"焦点在阅读器内即生效。双指捏合或 Ctrl + 滚轮缩放，放大后拖动画面移动；双击在 1 倍与 2 倍之间切换。","rd.guide.skipped":"指引已跳过 · 可在设置里重看","rd.guide.done":"开始阅读 · 可在设置里重看指引","rd.key.home":"跳到首页 / 末页","rd.key.brush":"自由画笔","rd.key.set":"阅读设置","rd.key.esc":"逐层关闭","rd.guide.title":"操作指引","rd.guide.skip":"跳过","rd.guide.next":"下一步","rd.guide.prev":"上一步","rd.guide.start":"开始阅读","rd.guide.p1":"认识按钮","rd.guide.p2":"翻页与触控","rd.guide.p3":"手势与快捷键","rd.guide.topRow":"顶部按钮","rd.guide.botRow":"底部按钮","rd.guide.d1":"返回书架，退出阅读","rd.guide.d2":"书签与标注入口：书签与标注列表、加书签、框选标注、自由画笔，点击展开选择","rd.guide.d3":"阅读设置：页面适应、边距、预加载、背景光晕、隐身阅读","rd.guide.d4":"全屏切换","rd.guide.progress":"页码与进度","rd.guide.d5":"页码与进度条，拖动可快速定位，悬停显示缩略预览","rd.guide.d6":"阅读模式：单页 / 双页 / 长条 / 分页，点击展开选择，同一菜单可切换阅读方向","rd.guide.d7":"画质档位，点击展开选择原图 / 高清 / 省流","rd.guide.d8":"导出下载当前页、页区间或整本","rd.guide.d9":"缩略图条，横向滚动挑选任意页","rd.guide.zoneTitle":"触控有效区域（单页 / 双页模式）","rd.guide.zoneL":"左侧 22%","rd.guide.zoneLNote":"点击上一页","rd.guide.zoneC":"中间 56%","rd.guide.zoneCNote":"呼出或收起工具栏","rd.guide.zoneR":"右侧 22%","rd.guide.zoneRNote":"点击下一页","rd.guide.zoneNote":"长条与分页模式没有左右热区，点击任意位置呼出工具栏，上下滚动翻页。","rd.guide.pageTitle":"翻页方式","rd.guide.pg1":"键盘 ← → 或滚轮翻一页，空格下一页、Shift + 空格上一页","rd.guide.pg2":"按住画面拖动超过屏幕宽度的 18% 松手即翻页","rd.guide.pg3":"拖动或点击进度条可直接跳到任意页","rd.guide.pg4":"Home / End 跳到首页或末页","rd.guide.gesTitle":"手势与缩放","rd.guide.ges1":"双指捏合缩放，最大 4 倍","rd.guide.ges2":"双击画面在 1 倍与 2 倍之间切换","rd.guide.ges3":"放大后拖动画面平移，Ctrl + 滚轮缩放","rd.guide.ges4":"Esc 逐层关闭面板，最后退出阅读","greet.s0.v0":"夜还长，书还热，兰台","greet.s0.v1":"这个点还没睡，不是书太好看，就是心事太多，兰台","greet.s0.v2":"世界都睡了，只剩翻书的声音，兰台","greet.s0.v3":"凌晨适合读点不着急的书，兰台","greet.s0.v4":"灯亮着，字也亮着，兰台","greet.s0.v5":"深夜的读者，不必向谁解释，兰台","greet.s0.v6":"读完这一章就睡，说好了，兰台","greet.s1.v0":"天光刚醒，先读三页再出门，兰台","greet.s1.v1":"早上好，今天第一件事是翻开书，兰台","greet.s1.v2":"清晨的字最清楚，兰台","greet.s1.v3":"鸟叫了，茶还烫，书正好，兰台","greet.s1.v4":"太阳刚上来，书签停在哪一页了？","greet.s1.v5":"早起的人，先读到好句子，兰台","greet.s1.v6":"一日之计，从一章开始，兰台","greet.s2.v0":"上午好，注意力最贵，读点硬的，兰台","greet.s2.v1":"一天里最清醒的两小时，交给书吧，兰台","greet.s2.v2":"光正好，适合把那本难啃的啃下来，兰台","greet.s2.v3":"上午好，进度条又往前走了一点，兰台","greet.s2.v4":"趁世界还没吵起来，多读几页，兰台","greet.s2.v5":"头脑清楚的时候，别都花在刷手机上，兰台","greet.s2.v6":"上午的安静是借来的，记得还给自己，兰台","greet.s3.v0":"午安，饭后两页比午睡更提神，兰台","greet.s3.v1":"中午了，吃好也读好，兰台","greet.s3.v2":"午休时间，一章刚刚好，兰台","greet.s3.v3":"太阳在头顶，书在手里，兰台","greet.s3.v4":"午安，别急着干活，先把这一节读完，兰台","greet.s3.v5":"一天的中间，停下来翻两页，兰台","greet.s3.v6":"饭在消化，让眼睛也吃点好的，兰台","greet.s4.v0":"下午好，茶配一章，正合适，兰台","greet.s4.v1":"阳光斜进来了，书页也跟着亮，兰台","greet.s4.v2":"下午容易困，好故事能救，兰台","greet.s4.v3":"一天过了三分之二，故事才到一半，兰台","greet.s4.v4":"下午好，慢慢读，不用赶，兰台","greet.s4.v5":"这个点的光，最适合看书，兰台","greet.s4.v6":"再读一章，就该收工了，兰台","greet.s5.v0":"晚上好，灯下见，兰台","greet.s5.v1":"一天收尾，把最后半小时留给书，兰台","greet.s5.v2":"晚饭后的一章，是一天里最稳的时刻，兰台","greet.s5.v3":"晚上好，外面很吵，书里很静，兰台","greet.s5.v4":"今天辛苦了，读点轻松的，兰台","greet.s5.v5":"夜色刚起，正好接上昨天的进度，兰台","greet.s5.v6":"灯开一盏就够，字自己会亮，兰台","greet.s6.v0":"夜深了，读完这章就睡，兰台","greet.s6.v1":"深夜好，书比人精神，兰台","greet.s6.v2":"这个点还在读，是喜欢，不是失眠，兰台","greet.s6.v3":"世界安静下来，故事才开始响，兰台","greet.s6.v4":"最后一章，看完就关灯，兰台","greet.s6.v5":"夜里的字比白天温柔，兰台","greet.s6.v6":"明天要早起的话，就少读一页，兰台"};})();
 (function () {
   var NAMES = [
     ['zh-Hans', '简体中文'], ['zh-Hant', '繁體中文'], ['en', 'English'],
@@ -505,6 +505,7 @@
       repairExt: !!l.repairExtensions,
       convertCbz: !!l.convertToCbz,
       oneshots: l.oneshotsDirectory || '',
+      volumeGrouping: !!l.volumeGrouping,
       exclusions: Array.isArray(l.scanDirectoryExclusions) ? l.scanDirectoryExclusions.join('\n') : '',
       unavailable: !!l.unavailable,
       updated: ''
@@ -562,6 +563,7 @@
       id: b.id,
       s: b.seriesId,
       num: b.number || 0,
+      vol: b.volume || '',
       name: b.name,
       url: b.url || '',
       mdTitle: md.title || '',
@@ -1063,6 +1065,37 @@
     });
   }
 
+  function paintUserChip(bust) {
+    var me = runtime.me;
+    if (!me) return;
+    var nameEl = document.querySelector('#uName');
+    var roleEl = document.querySelector('#uRole');
+    var avaEl = document.querySelector('#uAvatar');
+    var name = String(me.username || '').trim() || (me.email ? String(me.email).split('@')[0] : '') || '?';
+    var roles = Array.from(me.roles || []);
+    var isAdmin = roles.indexOf('ADMIN') >= 0;
+    if (nameEl) nameEl.textContent = name;
+    if (roleEl) {
+      var libs = (me.sharedLibrariesIds || []).length;
+      roleEl.textContent =
+        isAdmin && me.sharedAllLibraries
+          ? L.t('top.allLibs')
+          : (isAdmin ? L.t('top.admin') : (roles.length ? roles[0] : '')) + (me.sharedAllLibraries ? '' : ' · ' + libs);
+    }
+    if (!avaEl) return;
+    avaEl.textContent = name.slice(0, 1).toUpperCase();
+    avaEl.style.backgroundImage = '';
+    if (typeof Image === 'undefined') return;
+    var probe = new Image();
+    probe.onload = function () {
+      avaEl.textContent = '';
+      avaEl.style.backgroundImage = 'url("' + probe.src + '")';
+      avaEl.style.backgroundPosition = 'center';
+      avaEl.style.backgroundSize = 'cover';
+    };
+    probe.src = base + 'api/lantai/v1/user-profile/' + encodeURIComponent(me.id) + '/avatar' + (bust ? '?v=' + Date.now() : '');
+  }
+
   function showApp() {
     var boot = document.querySelector('#boot');
     var app = document.querySelector('#app');
@@ -1071,6 +1104,7 @@
     render();
     paintRuntime();
     paintBell();
+    paintUserChip();
     connectSse();
   }
 
@@ -1293,6 +1327,7 @@
       });
     },
     showBoot: showBoot,
+    paintUserChip: paintUserChip,
     bootError: bootError
   };
 
@@ -1458,6 +1493,15 @@ function libRelPath(url, root) {
 const seriesOf = b => series(b.s) || { id: b.s || '', t: b.name || '未知系列', lib: '', online: false, genres: [], tags: [], chapters: 0, dirs: 0, status: 'ONGOING', readingDirection: 'RIGHT_TO_LEFT', year: 0, publisher: '', author: '' };
 const libOf = b => lib(seriesOf(b).lib);
 const booksOf = sid => BOOKS.filter(b => b.s === sid);
+const volGroups = list => {
+  const out = [], idx = {};
+  (list || []).slice().sort((a, b) => (a.num || 0) - (b.num || 0)).forEach(b => {
+    const key = b.vol || '';
+    if (!idx[key]) { idx[key] = { name: key, books: [] }; out.push(idx[key]); }
+    idx[key].books.push(b);
+  });
+  return out;
+};
 const prog = id => PROGRESS[id] || null;
 const isOnlineBook = b => { const s = series(b.s); return s && s.online; };
 function sysVersion() {
@@ -2961,7 +3005,8 @@ function bulkScrape(ids, run, bookIds) {
           .then(r => {
             closeModal();
             toast('已登记 ' + r.added + ' 个系列' + (byBook ? '、' + bookIds.length + ' 册' : '') +
-              (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
+              (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') +
+              (r.notReady ? '，' + r.notReady + ' 个未解析完成已跳过' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
             S.browse.sel = {};
             render();
             loadScrape();
@@ -3596,19 +3641,132 @@ function renderAllSeries(v) {
 }
 
 function bulkFill() {
+  let zipFile = null;
   openDrawer({
     title: '回填元数据', width: 760,
-    body: '<div class="note">把填写好的文本粘贴进来，先预览再写入。留空的字段不会覆盖，已锁定的字段会跳过。</div>' +
+    body: '<div class="seg" style="margin-bottom:14px">' +
+      '<button class="on" data-bulk-mode="text">粘贴文本</button>' +
+      '<button data-bulk-mode="zip">zip 包</button></div>' +
+      '<div id="bulkPaneText">' +
+      '<div class="note">把填写好的文本粘贴进来，先预览再写入。留空的字段不会覆盖，已锁定的字段会跳过。</div>' +
       '<textarea class="inp" id="bulkIn" style="height:300px;margin-top:10px" spellcheck="false" placeholder="[1] 0S3C2Q5E6XGE5&#10;标题: 迷宫饭&#10;状态: 完结&#10;出版社: 青文&#10;年份: 2015&#10;风格: 奇幻, 冒险, 美食"></textarea>' +
-      '<div style="display:flex;gap:8px;margin-top:10px"><button class="btn pri" data-preview>预览变更</button><button class="btn ghost" data-paste>从剪贴板</button></div>' +
-      '<div id="bulkDiff" style="margin-top:16px"></div>',
+      '<div class="rowflex" style="gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn pri" data-preview>预览变更</button><button class="btn ghost" data-paste>从剪贴板</button></div>' +
+      '<div id="bulkDiff" style="margin-top:16px"></div></div>' +
+      '<div id="bulkPaneZip" style="display:none">' +
+      '<div class="note">压缩包里放 <span class="mono">metadata.txt</span> 与 <span class="mono">covers/</span>，封面按系列ID或序号命名，写入后替换当前封面。先预览再确认，预览不会改动数据。</div>' +
+      '<div class="rowflex" style="gap:8px;margin-top:12px;flex-wrap:wrap">' +
+      '<button class="btn sm" data-tpl>' + ico('dl') + '下载模板</button>' +
+      '<label class="btn sm ghost" style="cursor:pointer">' + ico('upload') + '选择 zip<input type="file" accept=".zip" id="bulkZip" hidden></label>' +
+      '<span class="mini mono" id="bulkZipName">未选择文件</span></div>' +
+      '<div class="rowflex" style="gap:8px;margin-top:12px;flex-wrap:wrap">' +
+      '<button class="btn pri" data-zip-preview disabled>预览压缩包</button>' +
+      '<button class="btn" data-zip-commit disabled>确认写入</button></div>' +
+      '<div id="bulkZipOut" style="margin-top:16px"></div></div>',
     after: () => {
       const pv = $('#drawer [data-preview]');
       if (pv) pv.onclick = () => bulkSubmit(true);
       const ps = $('#drawer [data-paste]');
       if (ps) ps.onclick = () => navigator.clipboard.readText().then(t => { $('#bulkIn').value = t; toast('已粘贴 ' + t.length + ' 字符', 'ok'); }).catch(() => toast('浏览器不允许读取剪贴板，请手动粘贴', 'err'));
+      $$('#drawer [data-bulk-mode]').forEach(el => el.onclick = () => {
+        $$('#drawer [data-bulk-mode]').forEach(b => b.classList.toggle('on', b === el));
+        const zip = el.dataset.bulkMode === 'zip';
+        $('#bulkPaneText').style.display = zip ? 'none' : '';
+        $('#bulkPaneZip').style.display = zip ? '' : 'none';
+      });
+      const tpl = $('#drawer [data-tpl]');
+      if (tpl) tpl.onclick = () => bulkTemplate(tpl);
+      const file = $('#bulkZip');
+      if (file) file.onchange = () => {
+        zipFile = (file.files && file.files[0]) || null;
+        $('#bulkZipName').textContent = zipFile ? zipFile.name + ' · ' + bytes(zipFile.size) : '未选择文件';
+        const on = !!zipFile;
+        $('#drawer [data-zip-preview]').disabled = !on;
+        $('#drawer [data-zip-commit]').disabled = !on;
+        $('#bulkZipOut').innerHTML = '';
+      };
+      const zp = $('#drawer [data-zip-preview]');
+      if (zp) zp.onclick = () => bulkZipSubmit(zipFile, true);
+      const zc = $('#drawer [data-zip-commit]');
+      if (zc) zc.onclick = () => {
+        if (zc.dataset.armed !== '1') {
+          zc.dataset.armed = '1';
+          zc.textContent = '再点一次确认';
+          setTimeout(() => { if (zc.isConnected) { zc.dataset.armed = ''; zc.textContent = '确认写入'; } }, 4000);
+          return;
+        }
+        zc.dataset.armed = '';
+        zc.textContent = '确认写入';
+        bulkZipSubmit(zipFile, false);
+      };
     }
   });
+}
+
+function bulkTemplate(btn) {
+  if (btn) btn.disabled = true;
+  fetch('api/lantai/v1/series/metadata/package/template', { credentials: 'same-origin' })
+    .then(r => r.ok ? r.blob() : r.text().then(t => Promise.reject(new Error(t || 'HTTP ' + r.status))))
+    .then(b => {
+      const url = URL.createObjectURL(b);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lantai-metadata-template.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      toast('模板已下载', 'ok');
+    })
+    .catch(e => toast('下载失败：' + e.message, 'err'))
+    .then(() => { if (btn) btn.disabled = false; });
+}
+
+function bulkZipSubmit(file, dryRun) {
+  if (!file) return toast('先选一个 zip 包', 'err');
+  const out = $('#bulkZipOut');
+  const pv = $('#drawer [data-zip-preview]');
+  const cm = $('#drawer [data-zip-commit]');
+  if (out) out.innerHTML = '<div class="note">正在' + (dryRun ? '预览' : '写入') + '…</div>';
+  if (pv) pv.disabled = true;
+  if (cm) cm.disabled = true;
+  const fd = new FormData();
+  fd.append('file', file);
+  fetch('api/lantai/v1/series/metadata/package?dryRun=' + (dryRun ? 'true' : 'false'), {
+    method: 'POST', credentials: 'same-origin', body: fd
+  })
+    .then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(t || 'HTTP ' + r.status))))
+    .then(res => {
+      renderBulkPackage(res, dryRun, () => bulkZipSubmit(file, false));
+      if (!dryRun) {
+        toast('已写入 ' + ((res.metadata && res.metadata.applied) || 0) + ' 项 · 封面 ' + (res.covers || []).filter(c => c.applied).length + ' 张', 'ok');
+        LantaiRuntime.hydrate().then(() => render()).catch(() => { });
+      }
+    })
+    .catch(e => { if (out) out.innerHTML = '<div class="note red">' + esc(e.message) + '</div>'; })
+    .then(() => {
+      if (pv) pv.disabled = false;
+      if (cm) cm.disabled = false;
+    });
+}
+
+function renderBulkPackage(res, dryRun, onCommit) {
+  const el = $('#bulkZipOut');
+  if (!el) return;
+  const md = res.metadata || {};
+  const covers = res.covers || [];
+  const ignored = res.ignored || [];
+  el.innerHTML =
+    '<div class="note ' + (dryRun ? 'gold' : '') + '">' + esc(res.packageFile || '') + ' · ' + (dryRun ? '预览' : '已写入') +
+    '：元数据 ' + num(md.total || 0) + ' 项 · 写入 ' + num(md.applied || 0) + ' 项 · 跳过 ' + num(md.skipped || 0) + ' 项' +
+    (md.failed ? ' · 失败 ' + num(md.failed) : '') + '；封面 ' + num(covers.length) + ' 张</div>' +
+    (covers.length ? '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>系列</th><th>封面文件</th><th class="num">大小</th><th>结果</th></tr></thead><tbody>' +
+      covers.map(c => '<tr><td>' + esc(c.seriesTitle || c.seriesId) + '</td><td class="mini mono">' + esc(c.fileName) + '</td>' +
+        '<td class="num mono">' + bytes(c.sizeBytes || 0) + '</td>' +
+        '<td>' + (c.applied ? '<span class="badge ok">' + (dryRun ? '待写入' : '已应用') + '</span>' : '<span class="badge">' + esc(c.note || '跳过') + '</span>') + '</td></tr>').join('') +
+      '</tbody></table></div>' : '') +
+    (ignored.length ? '<div class="note gold" style="margin-top:12px">未匹配到系列的封面：' + ignored.map(esc).join('、') + '</div>' : '') +
+    '<div id="bulkZipDiff" style="margin-top:14px"></div>';
+  renderBulkDiff(md, dryRun, '#bulkZipDiff', onCommit);
 }
 
 function bulkSubmit(dryRun) {
@@ -3626,8 +3784,8 @@ function bulkSubmit(dryRun) {
     .catch(e => toast('提交失败：' + e.message, 'err'));
 }
 
-function renderBulkDiff(res, dryRun) {
-  const el = $('#bulkDiff');
+function renderBulkDiff(res, dryRun, sel, onCommit) {
+  const el = $(sel || '#bulkDiff');
   if (!el) return;
   if (!res.items || !res.items.length) {
     el.innerHTML = '<div class="note red">没有解析到条目，检查 [序号] 系列ID 行是否保留。</div>';
@@ -3645,7 +3803,7 @@ function renderBulkDiff(res, dryRun) {
       '</div>').join('') +
     (dryRun && res.applied ? '<button class="btn pri" style="margin-top:12px" data-commit>确认写入 ' + res.applied + ' 项</button>' : '');
   const commit = el.querySelector('[data-commit]');
-  if (commit) commit.onclick = () => bulkSubmit(false);
+  if (commit) commit.onclick = onCommit || (() => bulkSubmit(false));
 }
 
 function renderLibs(v) {
@@ -4273,24 +4431,94 @@ function coverLightbox(kind, id, title) {
   if (!window.LantaiRuntime || !id) return toast('后端不可用', 'err');
   const seg = kind === 'series' ? 'series' : 'books';
   const path = 'api/v1/' + seg + '/' + id;
-  const src = path + '/thumbnail?t=' + Date.now();
+  const stamp = Date.now();
+  const thumb = path + '/thumbnail?t=' + stamp;
+  const full = path + '/thumbnail/original?t=' + stamp;
   openModal({
     title: title || '封面',
-    width: 760,
+    width: 1120,
     body:
-      '<div style="background:var(--bg-2);border-radius:8px;padding:12px;text-align:center">' +
-      '<img src="' + src + '" alt="" style="max-width:100%;max-height:68vh;object-fit:contain;border-radius:4px">' +
+      '<div id="covStage" style="position:relative;background:var(--bg-2);border-radius:8px;height:74vh;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none">' +
+      '<img id="covImg" src="' + thumb + '" alt="" style="max-width:100%;max-height:100%;object-fit:contain;transform-origin:center center;user-select:none;-webkit-user-drag:none">' +
+      '<div class="mini" style="position:absolute;right:10px;bottom:8px;color:var(--tx-3);pointer-events:none">滚轮缩放 · 拖动平移 · 双击复位</div>' +
+      '<div class="mini" id="covLoad" style="position:absolute;left:10px;bottom:8px;color:var(--tx-3);pointer-events:none">正在载入原图…</div>' +
       '</div>' +
-      '<div class="note" style="margin-top:10px">替换封面只写库内缩略图（USER_UPLOADED），不改动原始文件；自动封面会随扫描重建。</div>',
+      '<div class="note" style="margin-top:10px">先显示缩略图，原图就位后自动替换成原始分辨率。替换封面只写库内封面（USER_UPLOADED），不改动原始文件；自动封面会随扫描重建。</div>',
     foot: '<button class="btn" data-x>关闭</button>' +
       '<button class="btn" data-save>' + ico('dl') + '保存原图</button>' +
       '<button class="btn" data-rep>' + ico('upload') + '替换封面</button>' +
       '<button class="btn ghost" data-manage>' + ico('layers') + '封面管理</button>',
     after() {
+      const stage = $('#covStage');
+      const img = $('#covImg');
+      const tip = $('#covLoad');
+      let zoom = 1, panX = 0, panY = 0, dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+      const apply = () => {
+        img.style.transform = 'translate(' + panX + 'px,' + panY + 'px) scale(' + zoom + ')';
+      };
+      const reset = () => {
+        zoom = 1;
+        panX = 0;
+        panY = 0;
+        apply();
+      };
+      if (typeof Image !== 'undefined') {
+        const probe = new Image();
+        probe.onload = () => {
+          img.src = probe.src;
+          if (tip) tip.textContent = '原图';
+        };
+        probe.onerror = () => {
+          if (tip) tip.textContent = '原始文件不可用，显示缩略图';
+        };
+        probe.src = full;
+      }
+      if (stage) {
+        stage.onwheel = e => {
+          e.preventDefault();
+          const next = Math.min(8, Math.max(1, zoom * (e.deltaY < 0 ? 1.18 : 0.85)));
+          if (next === zoom) return;
+          zoom = next;
+          if (zoom === 1) {
+            panX = 0;
+            panY = 0;
+          }
+          apply();
+        };
+        stage.onmousedown = e => {
+          if (zoom <= 1) return;
+          dragging = true;
+          sx = e.clientX;
+          sy = e.clientY;
+          ox = panX;
+          oy = panY;
+          stage.style.cursor = 'grabbing';
+        };
+        stage.onmousemove = e => {
+          if (!dragging) return;
+          panX = ox + (e.clientX - sx);
+          panY = oy + (e.clientY - sy);
+          apply();
+        };
+        const stop = () => {
+          dragging = false;
+          stage.style.cursor = zoom > 1 ? 'grab' : 'default';
+        };
+        stage.onmouseup = stop;
+        stage.onmouseleave = stop;
+        stage.ondblclick = () => {
+          if (zoom > 1) {
+            reset();
+          } else {
+            zoom = 2;
+            apply();
+          }
+        };
+      }
       $('#modal [data-x]').onclick = closeModal;
       $('#modal [data-save]').onclick = () => {
         const a = document.createElement('a');
-        a.href = path + '/thumbnail';
+        a.href = full;
         a.download = String(title || kind) + '.jpg';
         document.body.appendChild(a);
         a.click();
@@ -4374,12 +4602,20 @@ Routes.series = (v, seg) => {
     '</div>' +
     (online ? '<div class="note gold" style="margin-bottom:16px">' + ico('alert') + ' 本系列属于在线库，不能删除或整理文件；未下载的章节在首次打开时取页。</div>' : '') +
     '<div class="ph" style="margin-bottom:12px"><h2 style="font-size:16px;font-family:var(--f-disp);letter-spacing:1px">' + (online ? '章节' : '册') + '</h2>' +
-    '<div class="acts"><span class="mini">共 ' + (online ? num(s.chapters) : st.count) + ' 项</span>' +
+    '<div class="acts"><span class="mini">共 ' + (online ? num(s.chapters) : st.count) + ' 项' + (!online && volGroups(booksOf(s.id)).length > 1 ? ' · ' + volGroups(booksOf(s.id)).length + ' 卷' : '') + '</span>' +
     (online ? '<button class="btn sm" data-go="/online?tab=dl">' + ico('dl') + '下载与存档</button>' : '') + '</div></div>';
 
   if (!online) {
-    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
-      booksOf(s.id).map(b => bookRow(b)).join('') + '</tbody></table></div>');
+    const groups = volGroups(booksOf(s.id));
+    const rows = groups.map(g => {
+      if (!g.name) return g.books.map(b => bookRow(b)).join('');
+      const done = g.books.filter(b => { const p = prog(b.id); return p && p.completed; }).length;
+      return '<tr class="vol-h"><td colspan="6"><b>' + esc(g.name) + '</b>' +
+        '<span class="mini">' + g.books.length + ' 册 · 已读 ' + done + '/' + g.books.length + '</span></td></tr>' +
+        g.books.map(b => bookRow(b)).join('');
+    }).join('');
+    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl vol-tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
+      rows + '</tbody></table></div>');
   } else if (!och) {
     v.insertAdjacentHTML('beforeend', '<div class="note">正在加载章节…</div>');
     loadOnlineChapters(s.id);
@@ -5851,7 +6087,7 @@ Routes.stats = (v, seg, qs) => {
   if (S.statsTab === 'trend') B.innerHTML = stTrend();
   if (S.statsTab === 'books') B.innerHTML = stBooks();
   if (S.statsTab === 'devices') B.innerHTML = stDevices();
-  if (S.statsTab === 'sessions') B.innerHTML = stSessions();
+  if (S.statsTab === 'sessions') B.innerHTML = stSessions(), loadStActive();
   if (S.statsTab === 'offline') B.innerHTML = stOffline(), wireOffline(B);
   $$('#view [data-rng]').forEach(el => el.onclick = () => { S.statsRange = +el.dataset.rng; render(); });
   $$('#view [data-stab]').forEach(el => el.onclick = () => { S.statsTab = el.dataset.stab; render(); });
@@ -5953,9 +6189,34 @@ function stDevices() {
       '<div class="gr"><span class="mini">' + esc(u.last) + '</span><span class="badge' + (own ? ' ok' : '') + '">' + (own ? dur(SESSIONS.reduce((a, s) => a + s.dur, 0)) : '未授权代查') + '</span></div></div>'; }).join('') +
     '</div>';
 }
+function stActiveHtml(list) {
+  const rows = (list || []).slice(0, 5);
+  if (!rows.length) return '';
+  return '<div class="card" style="margin-bottom:16px">' +
+    '<div class="card-h"><h3>' + ico('clock') + ' 实时会话</h3><span class="hint">服务端内存快照 · 按最后心跳</span></div>' +
+    rows.map(x => {
+      const live = !x.endedAt;
+      return '<div class="list-i" style="border:0;padding:9px 0">' +
+        '<span class="gi">' + ico(live ? 'play' : 'pause') + '</span>' +
+        '<div style="flex:1;min-width:0"><div class="gt">' + esc(x.bookId ? sessTitle(x.bookId) : '—') + '</div>' +
+        '<div class="gs mono">' + esc(dtm(new Date(x.startedAt))) + ' 开始 · 心跳 ' + esc(ago(new Date(x.lastHeartbeatAt).getTime())) +
+        ' · 第 ' + num(x.lastPage || 0) + ' 页 · 已读 ' + num(x.pagesRead || 0) + ' 页</div></div>' +
+        '<div class="gr"><span class="badge' + (live ? ' ok' : '') + '">' + (live ? '进行中' : '已结束') + '</span>' +
+        '<span class="mono mini">' + esc(durShort(x.durationMs || 0)) + '</span></div></div>';
+    }).join('') +
+    '<div class="note" style="margin-top:10px">来自服务端实时快照，最多列 5 条；会话结束或超过 2 分钟无心跳后自动消失。</div></div>';
+}
+function loadStActive() {
+  const slot = $('#stActiveSlot');
+  if (!slot || !window.LantaiRuntime) return;
+  LantaiRuntime.request('api/lantai/v1/reading/active')
+    .then(list => { if (slot.isConnected) slot.innerHTML = stActiveHtml(list); })
+    .catch(() => { });
+}
 function stSessions() {
   const rows = ranged().slice().sort((a, b) => b.start - a.start).slice(0, 40);
-  return '<div class="card"><div class="card-h"><h3>' + ico('file') + ' 会话明细</h3>' +
+  return '<div id="stActiveSlot"></div>' +
+    '<div class="card"><div class="card-h"><h3>' + ico('file') + ' 会话明细</h3>' +
     '<div class="r"><span class="badge">' + num(rows.length) + ' 条（截近 40）</span></div></div>' +
     '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>开始</th><th>书</th><th>设备</th><th class="num">时长</th><th class="num">页</th><th>来源</th><th>状态</th></tr></thead><tbody>' +
     rows.map(s => { const live = !s.srv && !s.flushed; const when = s.dev === 'server' ? iso(new Date(s.start)).slice(5) : dtm(new Date(s.start)); return '<tr><td class="mono mini">' + esc(when) + '</td>' +
@@ -6106,6 +6367,8 @@ function scHeadHtml() {
     kpi('失败', (c.failed || 0) + '<small>册</small>', '可重试', c.failed > 0) +
     '</div>' +
     (scSettings && scSettings.trustResult ? '<div class="note gold" style="margin-bottom:14px">已开启「信任刮削结果」：冲突字段会被自动覆盖，不再进入待核对。</div>' : '') +
+    (scSettings && !scSettings.trustResult && scSettings.conflictPolicy === 'overwrite' ? '<div class="note gold" style="margin-bottom:14px">冲突处理为「用外部值覆盖」：能补的字段写完后，冲突字段直接采用外部值。</div>' : '') +
+    (scSettings && scSettings.conflictPolicy === 'keep' ? '<div class="note" style="margin-bottom:14px">冲突处理为「保留本地值，直接完成」：冲突字段保留本地值，不进待核对。</div>' : '') +
     (scErr ? '<div class="note red" style="margin-bottom:14px">' + esc(scErr) + '</div>' : '');
 }
 function scBodyHtml() {
@@ -6113,10 +6376,12 @@ function scBodyHtml() {
   if (!p && scBusy) return '<div class="card"><div class="empty" style="padding:40px"><h4>正在加载名单</h4></div></div>';
   const items = (p && p.items) || [];
   const filters = [['', '全部'], ['QUEUED', '待刮'], ['RUNNING', '刮削中'], ['REVIEW', '待核对'], ['FAILED', '失败']];
-  let html = '<div class="card"><div class="card-h"><h3>' + ico('list') + ' 刮削名单</h3>' +
+  let html = '<div class="card sc-list"><div class="card-h"><h3>' + ico('list') + ' 刮削名单</h3>' +
     '<div class="r"><div class="seg">' + filters.map(f => '<button class="' + (scFilter === f[0] ? 'on' : '') + '" data-sc-filter="' + f[0] + '">' + f[1] + '</button>').join('') + '</div>' +
     '<button class="btn xs" data-sc-export>' + ico('dl') + '导出名单</button>' +
+    '<button class="btn xs" data-sc-aiprompt>' + ico('cpu') + 'AI 提示词</button>' +
     '<button class="btn xs ghost" data-sc-import>' + ico('upload') + '导入数据</button>' +
+    '<button class="btn xs ghost" data-sc-hist>' + ico('sync') + '历史回滚</button>' +
     '<button class="btn xs ghost" data-sc-help>' + ico('file') + '说明</button>' +
     '<button class="btn xs ghost" data-sc-clear="review"' + ((scCounts().review || 0) ? '' : ' disabled') + '>清待核对</button>' +
     '<button class="btn xs danger" data-sc-clear="all"' + ((scCounts().total || 0) ? '' : ' disabled') + '>清空名单</button></div></div>';
@@ -6126,7 +6391,7 @@ function scBodyHtml() {
       '<div style="margin-top:14px"><button class="btn pri sm" data-go="/browse">去书库勾选</button></div></div></div>';
     return html;
   }
-  html += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>系列</th><th style="width:96px">状态</th><th style="width:200px">说明</th><th style="width:110px">来源</th><th style="width:120px">加入时间</th><th style="width:170px"></th></tr></thead><tbody>';
+  html += '<div class="tbl-wrap"><table class="tbl sc-tbl"><thead><tr><th>系列</th><th style="width:96px">状态</th><th style="width:200px">说明</th><th style="width:110px">来源</th><th style="width:120px">加入时间</th><th style="width:170px"></th></tr></thead><tbody>';
   items.forEach(x => {
     const st = SC_STATUS[x.status] || ['', x.status];
     const badge = x.status === 'RUNNING'
@@ -6152,10 +6417,10 @@ function scBodyHtml() {
       '<button class="btn xs danger" data-sc-del="' + esc(x.id) + '" title="从名单移除">' + ico('close') + '</button>' +
       '</td></tr>';
     if (scOpen === x.id && scPreview && scPreview.seriesId === x.seriesId) {
-      html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scDiffHtml() + '</td></tr>';
+      html += '<tr class="sc-exp"><td colspan="6" style="background:var(--bg-2);padding:0">' + scDiffHtml() + '</td></tr>';
     }
     if (scBookListFor === x.id) {
-      html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scBookListHtml() + '</td></tr>';
+      html += '<tr class="sc-exp"><td colspan="6" style="background:var(--bg-2);padding:0">' + scBookListHtml() + '</td></tr>';
     }
   });
   html += '</tbody></table></div>';
@@ -6317,6 +6582,10 @@ function wireScrape() {
   if (exp) exp.onclick = scChunkFn('scExportModal');
   const imp = $('#view [data-sc-import]');
   if (imp) imp.onclick = scChunkFn('scImportModal');
+  const aip = $('#view [data-sc-aiprompt]');
+  if (aip) aip.onclick = scChunkFn('scAiPromptModal');
+  const hist = $('#view [data-sc-hist]');
+  if (hist) hist.onclick = scChunkFn('scMatchHistoryModal');
   const hlp = $('#view [data-sc-help]');
   if (hlp) hlp.onclick = scChunkFn('scHelpModal');
   $$('#view [data-sc-filter]').forEach(el => el.onclick = () => { scFilter = el.dataset.scFilter; scOffset = 0; scOpen = null; scPreview = null; loadScrape(); });
@@ -6441,13 +6710,20 @@ function paintScSettings() {
   const box = $('#scCfg');
   if (!box) return;
   const tabs = [['general', '常规'], ['sources', '数据源'], ['token', '刮削令牌']];
-  const s = scSettings || { trustResult: false, batchSize: 20 };
+  const s = scSettings || { trustResult: false, batchSize: 20, conflictPolicy: 'review' };
+  const policy = s.conflictPolicy || 'review';
+  const policyOpts = [['review', '保留本地值，进待核对'], ['overwrite', '用外部值覆盖'], ['keep', '保留本地值，直接完成']];
   let html = '<div class="seg" style="margin-bottom:14px">' + tabs.map(t => '<button class="' + (scSettingsTab === t[0] ? 'on' : '') + '" data-sc-tab="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>';
   if (scSettingsTab === 'general') {
     html += '<label class="sw" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0"><input type="checkbox" id="scTrust"' + (s.trustResult ? ' checked' : '') + '><i></i>' +
       '<span><b>信任刮削结果</b><span class="mini" style="display:block;color:var(--tx-3)">开启后冲突字段直接采用候选值，不再进入待核对。批量刮削时省事，但可能写入大量错误数据。</span></span></label>' +
       '<div id="scTrustWarn" class="note red" style="margin:10px 0 0' + (s.trustResult ? '' : ';display:none') + '">⚠️ 开启后不会再有「待核对」拦截，冲突字段会被直接覆盖。确认候选源可信再开启。</div>' +
       '<label class="sw" id="scTrustConfirmBox" style="display:none;align-items:center;gap:10px;margin-top:8px"><input type="checkbox" id="scTrustConfirm"><i></i><span class="mini">我已了解风险，确认开启</span></label>' +
+      '<div class="field" style="margin-top:16px"><label>冲突处理</label><select class="inp" id="scConflict">' +
+      policyOpts.map(o => '<option value="' + o[0] + '"' + (policy === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+      '</select>' +
+      '<div class="mini" style="margin-top:6px;color:var(--tx-3)">外部数据与本地不一致时怎么处理。默认「进待核对」：能补的字段先写入，冲突字段留给你逐项确认，不会整条冻住。开启「信任刮削结果」时此处无效，一律按覆盖处理。</div></div>' +
+      '<label class="sw" id="scConflictConfirmBox" style="display:none;align-items:center;gap:10px;margin-top:8px"><input type="checkbox" id="scConflictConfirm"><i></i><span class="mini">我已了解风险，确认切换冲突处理方式</span></label>' +
       '<div class="field" style="margin-top:16px"><label>每批处理条数</label><input class="inp" id="scBatch" type="number" min="1" max="200" value="' + (s.batchSize || 20) + '">' +
       '<div class="mini" style="margin-top:6px;color:var(--tx-3)">每批结束刷新一次名单，过大容易出现长时间无反馈。</div></div>' +
       '<div class="rowflex" style="margin-top:16px"><button class="btn pri" data-sc-save>保存设置</button></div>';
@@ -6481,6 +6757,11 @@ function paintScSettings() {
     if (warn) warn.style.display = trust.checked ? '' : 'none';
     if (confirmBox) confirmBox.style.display = trust.checked ? 'flex' : 'none';
   };
+  const conflictSel = $('#scConflict');
+  if (conflictSel) conflictSel.onchange = () => {
+    const box = $('#scConflictConfirmBox');
+    if (box) box.style.display = conflictSel.value !== 'review' ? 'flex' : 'none';
+  };
   const save = $('#scCfg [data-sc-save]');
   if (save) save.onclick = () => {
     const nextTrust = $('#scTrust') && $('#scTrust').checked;
@@ -6488,7 +6769,16 @@ function paintScSettings() {
     const confirmed = $('#scTrustConfirm') && $('#scTrustConfirm').checked;
     const wasTrust = !!(scSettings && scSettings.trustResult);
     if (nextTrust && !wasTrust && !confirmed) return toast('先勾选「我已了解风险」', 'err');
-    LantaiRuntime.request('api/lantai/v1/scrape/settings', { method: 'PATCH', body: { trustResult: nextTrust, batchSize: batch, confirm: nextTrust } })
+    const nextPolicy = ($('#scConflict') && $('#scConflict').value) || 'review';
+    const wasPolicy = (scSettings && scSettings.conflictPolicy) || 'review';
+    const policyChanged = nextPolicy !== wasPolicy;
+    if (policyChanged && nextPolicy !== 'review' && !($('#scConflictConfirm') && $('#scConflictConfirm').checked)) {
+      return toast('先勾选「我已了解风险，确认切换冲突处理方式」', 'err');
+    }
+    LantaiRuntime.request('api/lantai/v1/scrape/settings', {
+      method: 'PATCH',
+      body: { trustResult: nextTrust, batchSize: batch, conflictPolicy: nextPolicy, confirm: nextTrust || nextPolicy !== 'review' }
+    })
       .then(v => { scSettings = v; toast('设置已保存', 'ok'); paintScSettings(); loadScrape(); })
       .catch(e => toast('保存失败：' + onlineErrText(e), 'err'));
   };
@@ -6641,7 +6931,8 @@ function scrapeLibrary(libId) {
         LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: { libraryId: libId, run: run } })
           .then(r => {
             scPage = null;
-            toast('已加入 ' + r.added + ' 个' + (r.skipped ? '，跳过 ' + r.skipped + ' 个' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
+            toast('已加入 ' + r.added + ' 个' + (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') +
+              (r.notReady ? '，' + r.notReady + ' 个未解析完成已跳过' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
             if (S.route.indexOf('/scrape') === 0) loadScrape();
           })
           .catch(e => toast('提交失败：' + onlineErrText(e), 'err', 3600));
@@ -7071,6 +7362,7 @@ function openProfileModal(u, self) {
         }).then(r => {
           const done = () => {
             if (self && window.LantaiRuntime) LantaiRuntime.me = Object.assign({}, LantaiRuntime.me, { username: r.username, email: r.email });
+            if (window.LantaiRuntime && LantaiRuntime.paintUserChip) LantaiRuntime.paintUserChip(true);
             closeModal();
             toast('资料已保存', 'ok');
             if (isAdmin()) loadAdminUsers(); else render();
@@ -10522,6 +10814,12 @@ function libModalBody(l, type) {
       '<div class="mini" style="margin-top:2px">页面哈希与 Kobo 哈希按册派生任务，库大时先把任务中心并发调高。</div></div>' +
       '<div class="field"><label>单册目录（相对根目录，留空不启用）</label>' +
       '<input class="inp mono" id="lmOne" style="font-size:11.5px" value="' + esc(l ? (l.oneshots || '') : '') + '" placeholder="单册"></div>' +
+      '<div class="field"><label>分卷（系列 → 卷 → 册）</label>' +
+      '<label class="sw" style="width:100%;justify-content:space-between;margin-bottom:8px"><span>按子目录识别分卷</span>' +
+      '<input type="checkbox" data-lma="volumeGrouping"' + (l && l.volumeGrouping ? ' checked' : '') + '><i></i></label>' +
+      '<div class="mini" style="margin-top:-2px">父目录不含书、且同层 ≥2 个子目录共享名称前缀（或都用 第N卷 / Vol N 命名）时，父目录成为系列、子目录成为卷。开启后需重扫一次才生效，系列级元数据要重新刮削。</div>' +
+      '<button class="btn sm ghost" style="margin-top:8px" data-volpreview="' + (l ? l.id : '') + '">' + ico('list') + '预演分组</button>' +
+      '<div id="volPrevOut" class="mini" style="margin-top:8px;line-height:1.7"></div></div>' +
       '<div class="field"><label>排除目录（每行一个，相对根目录）</label>' +
       '<textarea class="inp mono" id="lmExc" style="font-size:11.5px;min-height:64px" placeholder="临时&#10;回收">' + esc(l ? (l.exclusions || '') : '') + '</textarea></div>');
 }
@@ -10536,6 +10834,24 @@ function libModal(l) {
       const box = $('#modal #' + el.dataset.fsbrowse), inp = $('#modal #' + el.dataset.fsinput);
       if (!box || !inp) return;
       fsBrowse(box, inp.value.trim(), p => { inp.value = p; });
+    });
+    $$('#modal [data-volpreview]').forEach(el => el.onclick = () => {
+      const libId = el.dataset.volpreview, out = $('#modal #volPrevOut');
+      if (!out) return;
+      if (!libId) { out.textContent = '先保存这个库，再预演。'; return; }
+      el.disabled = true;
+      out.textContent = '正在扫描目录，请稍候…';
+      LantaiRuntime.request('api/lantai/v1/libraries/' + libId + '/volume-preview', { method: 'POST' })
+        .then(r => {
+          const groups = (r && r.groups) || [];
+          if (!groups.length) { out.textContent = '没有可合并的目录，现在的分组不会变化。'; return; }
+          const head = '<div>目录 <b>' + r.dirs + '</b> 个 → 系列 <b>' + r.series + '</b> 个，可合并 <b>' + groups.length + '</b> 组</div>';
+          const body = groups.slice(0, 30).map(g => '<div style="margin-top:6px"><b>' + esc(g.seriesName) + '</b> · ' + g.volumes.length + ' 卷 · ' + g.bookCount + ' 册' +
+            g.volumes.map(v => '<div style="padding-left:12px">' + esc(v.name) + ' · ' + v.bookCount + ' 册</div>').join('') + '</div>').join('');
+          out.innerHTML = head + body + (groups.length > 30 ? '<div style="margin-top:6px">…还有 ' + (groups.length - 30) + ' 组</div>' : '');
+        })
+        .catch(e => { out.textContent = '预演失败：' + onlineErrText(e); })
+        .then(() => { el.disabled = false; });
     });
     $$('#modal [data-libtype]').forEach(el => el.onclick = () => {
       if (el.dataset.libtype === type) return;

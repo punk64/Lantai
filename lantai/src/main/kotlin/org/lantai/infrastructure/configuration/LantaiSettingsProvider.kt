@@ -237,6 +237,13 @@ class LantaiSettingsProvider(
       serverSettingsDao.saveSetting(Settings.MEMORY_GC_ENABLED.name, value)
       field = value
     }
+
+  var taskProcessorPaused: Boolean =
+    serverSettingsDao.getSettingByKey(Settings.TASK_PROCESSOR_PAUSED.name, Boolean::class.java) ?: false
+    set(value) {
+      serverSettingsDao.saveSetting(Settings.TASK_PROCESSOR_PAUSED.name, value)
+      field = value
+    }
 }
 
 private enum class Settings {
@@ -263,4 +270,5 @@ private enum class Settings {
   MEMORY_RECLAIM_ENABLED,
   MEMORY_IDLE_MINUTES,
   MEMORY_GC_ENABLED,
+  TASK_PROCESSOR_PAUSED,
 }

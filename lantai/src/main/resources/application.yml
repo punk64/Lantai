@@ -203,7 +203,7 @@ server:
       - ']'
 
 management:
-  endpoints.web.exposure.include: "*"
+  endpoints.web.exposure.include: "health,info,metrics"
   endpoint:
     configprops:
       roles: ADMIN

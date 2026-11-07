@@ -39,6 +39,7 @@ data class Library(
   val oneshotsDirectory: String? = null,
   val trashMaxBytes: Long? = null,
   val unavailableDate: LocalDateTime? = null,
+  val volumeGrouping: Boolean = false,
   val id: String = TsidCreator.getTsid256().toString(),
   override val createdDate: LocalDateTime = LocalDateTime.now(),
   override val lastModifiedDate: LocalDateTime = createdDate,

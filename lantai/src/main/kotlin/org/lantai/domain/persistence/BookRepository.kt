@@ -96,4 +96,11 @@ interface BookRepository {
   fun countGroupedByLibraryId(): Map<String, Int>
 
   fun getFilesizeGroupedByLibraryId(): Map<String, BigDecimal>
+
+  fun findReadinessBySeries(seriesIds: Collection<String>): Map<String, SeriesReadiness>
 }
+
+data class SeriesReadiness(
+  val total: Int,
+  val readyBookIds: List<String>,
+)

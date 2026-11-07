@@ -87,6 +87,7 @@ class LibraryContentLifecycle(
             library.scanEpub,
             library.scanTxt,
             library.scanDirectoryExclusions,
+            volumeGrouping = library.volumeGrouping,
           )
         } catch (e: DirectoryNotFoundException) {
           library.copy(unavailableDate = LocalDateTime.now()).let {
@@ -196,6 +197,7 @@ class LibraryContentLifecycle(
                         fileLastModified = newBook.fileLastModified,
                         fileSize = newBook.fileSize,
                         fileHash = hash,
+                        volume = newBook.volume,
                       )
                     bookRepository.update(updatedBook)
                   } else {
@@ -207,6 +209,7 @@ class LibraryContentLifecycle(
                         fileSize = newBook.fileSize,
                         fileHash = hash ?: "",
                         fileHashKoreader = "",
+                        volume = newBook.volume,
                       )
                     transactionTemplate.executeWithoutResult {
                       mediaRepository.findById(existingBook.id).let {
@@ -215,8 +218,8 @@ class LibraryContentLifecycle(
                       bookRepository.update(updatedBook)
                     }
                   }
-                } else if (newBook.name.isNotBlank() && newBook.name != existingBook.name) {
-                  bookRepository.update(existingBook.copy(name = newBook.name))
+                } else if ((newBook.name.isNotBlank() && newBook.name != existingBook.name) || newBook.volume != existingBook.volume) {
+                  bookRepository.update(existingBook.copy(name = newBook.name.ifBlank { existingBook.name }, volume = newBook.volume))
                 }
               }
             }

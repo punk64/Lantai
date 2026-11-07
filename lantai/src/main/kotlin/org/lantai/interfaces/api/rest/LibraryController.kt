@@ -121,6 +121,7 @@ class LibraryController(
             hashKoreader = library.hashKoreader,
             analyzeDimensions = library.analyzeDimensions,
             oneshotsDirectory = library.oneshotsDirectory?.ifBlank { null },
+            volumeGrouping = library.volumeGrouping,
           ),
         ).toDto(includeRoot = principal.user.isAdmin)
     } catch (e: Exception) {
@@ -193,6 +194,7 @@ class LibraryController(
             hashKoreader = hashKoreader ?: existing.hashKoreader,
             analyzeDimensions = analyzeDimensions ?: existing.analyzeDimensions,
             oneshotsDirectory = if (isSet("oneshotsDirectory")) oneshotsDirectory?.ifBlank { null } else existing.oneshotsDirectory,
+            volumeGrouping = volumeGrouping ?: existing.volumeGrouping,
           )
         }
       try {

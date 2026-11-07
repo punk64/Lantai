@@ -115,6 +115,7 @@ class LibraryDao(
       .set(l.ONESHOTS_DIRECTORY, library.oneshotsDirectory)
       .set(l.TRASH_MAX_BYTES, library.trashMaxBytes)
       .set(l.UNAVAILABLE_DATE, library.unavailableDate)
+      .set(l.VOLUME_GROUPING, library.volumeGrouping)
       .execute()
 
     dslRW.insertDirectoryExclusions(library)
@@ -155,6 +156,7 @@ class LibraryDao(
       .set(l.ONESHOTS_DIRECTORY, library.oneshotsDirectory)
       .set(l.TRASH_MAX_BYTES, library.trashMaxBytes)
       .set(l.UNAVAILABLE_DATE, library.unavailableDate)
+      .set(l.VOLUME_GROUPING, library.volumeGrouping)
       .set(l.LAST_MODIFIED_DATE, LocalDateTime.now(ZoneId.of("Z")))
       .where(l.ID.eq(library.id))
       .execute()
@@ -214,6 +216,7 @@ class LibraryDao(
       oneshotsDirectory = oneshotsDirectory,
       trashMaxBytes = trashMaxBytes,
       unavailableDate = unavailableDate,
+      volumeGrouping = volumeGrouping,
       id = id,
       createdDate = createdDate.toCurrentTimeZone(),
       lastModifiedDate = lastModifiedDate.toCurrentTimeZone(),

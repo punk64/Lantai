@@ -9,9 +9,12 @@ class ScrapeBookCatalog(
   private val bookRepository: BookRepository,
   private val bookMetadataRepository: BookMetadataRepository,
 ) {
-  fun list(seriesId: String): List<ScrapeBookDto> =
-    bookRepository
-      .findAllBySeriesId(seriesId)
+  fun list(seriesId: String): List<ScrapeBookDto> {
+    val books = bookRepository.findAllBySeriesId(seriesId)
+    if (books.isEmpty()) return emptyList()
+    val ready = bookRepository.findReadinessBySeries(listOf(seriesId))[seriesId]?.readyBookIds.orEmpty().toSet()
+    return books
+      .filter { it.id in ready }
       .sortedBy { it.number }
       .map { book ->
         val metadata = runCatching { bookMetadataRepository.findByIdOrNull(book.id) }.getOrNull()
@@ -33,4 +36,5 @@ class ScrapeBookCatalog(
           authorsLock = metadata?.authorsLock ?: false,
         )
       }
+  }
 }

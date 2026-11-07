@@ -65,6 +65,7 @@ data class ScrapeQueueEnqueueResult(
   val added: Int,
   val skipped: Int,
   val running: Boolean,
+  val notReady: Int = 0,
 )
 
 @Service
@@ -91,15 +92,44 @@ class ScrapeQueueService(
   fun enqueueSeries(
     seriesIds: List<String>,
     origin: ScrapeQueueItem.Origin,
-  ): ScrapeQueueEnqueueResult = enqueue(seriesIds.distinct().associateWith { emptyList() }, origin)
+  ): ScrapeQueueEnqueueResult {
+    val distinct = seriesIds.distinct()
+    val readiness = bookRepository.findReadinessBySeries(distinct)
+    var notReady = 0
+    val scope =
+      distinct
+        .mapNotNull { seriesId ->
+          val state = readiness[seriesId]
+          when {
+            state == null || state.readyBookIds.isEmpty() -> {
+              notReady++
+              null
+            }
+
+            state.readyBookIds.size >= state.total -> seriesId to emptyList()
+            else -> seriesId to state.readyBookIds
+          }
+        }.toMap()
+    return enqueue(scope, origin).copy(notReady = notReady)
+  }
 
   fun enqueueBooks(
     bookIds: List<String>,
     origin: ScrapeQueueItem.Origin,
   ): ScrapeQueueEnqueueResult {
     val books = runCatching { bookRepository.findAllByIds(bookIds.distinct()) }.getOrDefault(emptyList())
-    val scope = books.groupBy { it.seriesId }.mapValues { (_, list) -> list.map { it.id }.distinct() }
-    return enqueue(scope, origin)
+    if (books.isEmpty()) return ScrapeQueueEnqueueResult(added = 0, skipped = 0, running = busy.get(), notReady = bookIds.distinct().size)
+    val readyIds = bookRepository.findReadinessBySeries(books.map { it.seriesId }).values.flatMap { it.readyBookIds }.toSet()
+    var notReady = 0
+    val scope =
+      books
+        .groupBy { it.seriesId }
+        .mapNotNull { (seriesId, list) ->
+          val ready = list.filter { it.id in readyIds }.map { it.id }
+          notReady += list.size - ready.size
+          if (ready.isEmpty()) null else seriesId to ready
+        }.toMap()
+    return enqueue(scope, origin).copy(notReady = notReady)
   }
 
   private fun enqueue(
@@ -359,7 +389,7 @@ class ScrapeQueueService(
           item.copy(
             status = ScrapeQueueItem.Status.REVIEW,
             progress = 100,
-            diff = engine.serializedDiff(outcome),
+            diff = engine.serializedDiff(if (outcome.applied != null) outcome.diff.unresolved() else outcome.diff),
             source = outcome.source,
             score = outcome.score,
             message = outcome.message,

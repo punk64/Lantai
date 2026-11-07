@@ -14,6 +14,7 @@ data class Book(
   val fileHash: String = "",
   val fileHashKoreader: String = "",
   val number: Int = 0,
+  val volume: String = "",
   val id: String = TsidCreator.getTsid256().toString(),
   val seriesId: String = "",
   val libraryId: String = "",

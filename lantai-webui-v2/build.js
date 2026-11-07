@@ -16,7 +16,7 @@ fs.mkdirSync(path.join(dist, 'js'), { recursive: true });
 
 const css = read(path.join(src, 'css', 'app.css')) + '\n' + read(path.join(src, 'css', 'comic.css')) + '\n' + read(path.join(src, 'css', 'ebook.css'));
 
-const I18N_SRC = ['i18n.locales.js', 'i18n.dict.js', 'i18n.extra-a.js', 'i18n.extra-b.js', 'i18n.extra-c.js', 'i18n.extra-d.js', 'i18n.greet.js'];
+const I18N_SRC = ['i18n.locales.js', 'i18n.dict.js', 'i18n.extra-a.js', 'i18n.extra-b.js', 'i18n.extra-c.js', 'i18n.extra-d.js', 'i18n.reader.js', 'i18n.greet.js'];
 const i18nBox = { window: {} };
 vm.createContext(i18nBox);
 for (const f of I18N_SRC) vm.runInContext(read(path.join(src, 'js', f)), i18nBox);

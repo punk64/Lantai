@@ -14,6 +14,7 @@
 
   let status = null, remote = null, err = '', busy = '', restartNote = '';
   let prog = null, remotePoll = null, inspectPoll = null, restartPoll = null, restartTick = null;
+  let inspectEpoch = 0, inspectSeq = 0;
   let prefs = readPrefs();
   let fileInfo = null, uploadName = '';
 
@@ -292,17 +293,22 @@
   }
 
   function stopInspectPoll() {
+    inspectEpoch++;
     if (inspectPoll) { clearInterval(inspectPoll); inspectPoll = null; }
   }
 
-  function startInspectPoll(where) {
+  function startInspectPoll(where, seq) {
     stopInspectPoll();
+    const epoch = inspectEpoch;
+    inspectSeq = seq || 0;
     let fails = 0;
     const startedAt = Date.now();
     const tick = () => LantaiRuntime.request('api/lantai/v1/system/upgrade/inspect/status')
       .then(p => {
+        if (epoch !== inspectEpoch) return;
         fails = 0;
         if (!p || p.idle || !p.phase) return;
+        if (inspectSeq && p.seq && p.seq !== inspectSeq) return;
         if (p.phase === 'error') {
           stopInspectPoll();
           busy = '';
@@ -325,6 +331,7 @@
         setProg(where, p.phase, p.pct, p.label || '');
       })
       .catch(() => {
+        if (epoch !== inspectEpoch) return;
         fails++;
         if (fails >= 3) setProg(where, 'unzip', 0, L.t('up.pollFail'));
         if (Date.now() - startedAt > 300000) {
@@ -354,6 +361,7 @@
       '<div class="upveil-ring"></div>' +
       '<h3>' + esc(L.t('up.restartTitle')) + '</h3>' +
       '<p>' + esc(L.t('up.restartMsg')) + '</p>' +
+      '<p style="margin-top:9px;color:var(--acc-2)">' + esc(L.t('up.pausedAfter')) + '</p>' +
       '<div class="uprog"><i class="indet"></i></div>' +
       '<div class="upveil-sub" id="upcVeilSub"></div>' +
       '</div>';
@@ -521,6 +529,7 @@
   }
 
   function doUpload(picked) {
+    if (busy) return;
     const f = document.getElementById('upFile');
     const file = picked || (f && f.files && f.files[0]);
     if (!file) return toast(L.t('up.dropTitle'), 'err');
@@ -539,11 +548,15 @@
       setProg('import', 'upload', pctOf(ev.loaded, ev.total));
     };
     xhr.upload.onload = () => {
-      setProg('import', 'unzip', 0);
-      startInspectPoll('import');
+      setProg('import', 'upload', 100, L.t('up.receiving'));
     };
     xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) return;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        let seq = 0;
+        try { seq = Number(JSON.parse(xhr.responseText || '{}').seq) || 0; } catch (e) { }
+        startInspectPoll('import', seq);
+        return;
+      }
       stopInspectPoll();
       busy = '';
       clearProg();
@@ -556,8 +569,15 @@
   }
 
   function doDiscard() {
-    LantaiRuntime.request('api/lantai/v1/system/upgrade/downloads', { method: 'DELETE' })
-      .then(() => { fileInfo = null; uploadName = ''; remote = null; toast(L.t('up.discardShort'), 'ok'); load(true); })
+    const kill = p => LantaiRuntime.request('api/lantai/v1/system/upgrade/' + p, { method: 'DELETE' }).catch(() => null);
+    Promise.all([kill('staged'), kill('downloads')])
+      .then(() => {
+        fileInfo = null;
+        uploadName = '';
+        remote = Object.assign({}, remote || {}, { cached: null });
+        toast(L.t('up.discardShort'), 'ok');
+        return load(true);
+      })
       .catch(e => toast(onlineErrText(e), 'err'));
   }
 
@@ -610,7 +630,7 @@
         e.preventDefault();
         if (inp && !busy) inp.click();
       };
-      if (inp) inp.onchange = () => { if (inp.files && inp.files[0]) doUpload(inp.files[0]); };
+      if (inp) inp.onchange = () => { if (!busy && inp.files && inp.files[0]) doUpload(inp.files[0]); };
       dz.ondragover = e => { e.preventDefault(); dz.classList.add('over'); };
       dz.ondragleave = () => dz.classList.remove('over');
       dz.ondrop = e => {

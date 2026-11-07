@@ -35,6 +35,7 @@ data class LibraryDto(
   val hashKoreader: Boolean,
   val analyzeDimensions: Boolean,
   val oneshotsDirectory: String?,
+  val volumeGrouping: Boolean,
   val unavailable: Boolean,
 )
 
@@ -71,5 +72,6 @@ fun Library.toDto(includeRoot: Boolean) =
     hashKoreader = hashKoreader,
     analyzeDimensions = analyzeDimensions,
     oneshotsDirectory = oneshotsDirectory,
+    volumeGrouping = volumeGrouping,
     unavailable = unavailableDate != null,
   )

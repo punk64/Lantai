@@ -3,6 +3,7 @@ package org.lantai.infrastructure.upgrade
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.lantai.application.tasks.TaskProcessor
 import org.lantai.infrastructure.runtime.install.RuntimeEnvironment
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.info.BuildProperties
@@ -19,12 +20,14 @@ import java.security.MessageDigest
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import java.util.zip.ZipInputStream
-import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
 private const val PROGRESS_STEP = 2L * 1024 * 1024
+private const val STALE_GUARD_MS = 120_000L
+private const val TASK_DRAIN_TIMEOUT_MS = 15_000L
 
 private class CountingInputStream(
   private val delegate: InputStream,
@@ -58,12 +61,17 @@ class UpgradeService(
   private val runtimeEnvironment: RuntimeEnvironment,
   private val objectMapper: ObjectMapper,
   private val buildProperties: ObjectProvider<BuildProperties>,
+  private val taskProcessorProvider: ObjectProvider<TaskProcessor>,
 ) {
   private val root: Path = runtimeEnvironment.configDir().resolve("upgrade")
   private val stagedDir: Path = root.resolve("staged")
   private val backupDir: Path = root.resolve("backup")
 
-  private val inspectGuard = Semaphore(1)
+  private val inspectGuardLock = Any()
+  @Volatile
+  private var inspectGuard = Semaphore(1)
+  private val inspectTick = AtomicLong(System.currentTimeMillis())
+  private val progressSeq = AtomicLong(0)
   private val inspectProgress = AtomicReference(UpgradeProgress(idle = true))
   private val inspectExecutor: ExecutorService =
     Executors.newSingleThreadExecutor { runnable ->
@@ -123,6 +131,29 @@ class UpgradeService(
     deleteRecursively(stagedDir)
   }
 
+  private fun acquireGuard(message: String): Semaphore {
+    val current = inspectGuard
+    if (current.tryAcquire()) {
+      inspectTick.set(System.currentTimeMillis())
+      return current
+    }
+    synchronized(inspectGuardLock) {
+      val again = inspectGuard
+      if (again.tryAcquire()) {
+        inspectTick.set(System.currentTimeMillis())
+        return again
+      }
+      val idle = System.currentTimeMillis() - inspectTick.get()
+      if (idle < STALE_GUARD_MS) throw IllegalStateException(message)
+      val fresh = Semaphore(1)
+      fresh.tryAcquire()
+      inspectGuard = fresh
+      inspectTick.set(System.currentTimeMillis())
+      logger.warn { "Upgrade guard held for ${idle}ms without progress, replaced" }
+      return fresh
+    }
+  }
+
   private fun stagedPending(manifest: UpgradeManifest): Boolean {
     val version = manifest.version?.trim()
     if (version.isNullOrBlank()) return false
@@ -134,32 +165,34 @@ class UpgradeService(
     val name = (file.originalFilename ?: "").lowercase()
     if (!name.endsWith(".zip") && !name.endsWith(".lup")) throw IllegalArgumentException("升级包必须是 .zip")
     if (file.size > 512L * 1024 * 1024) throw IllegalArgumentException("升级包超过 512MB")
-    if (!inspectGuard.tryAcquire()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
+    val guard = acquireGuard("上一个升级包仍在校验，请稍候")
+    val seq = progressSeq.incrementAndGet()
     val size = file.size
+    report("upload", 0, "正在接收 " + formatSize(size), seq = seq)
     val upload =
       try {
         val incoming = root.resolve("incoming")
         Files.createDirectories(incoming)
         val target = incoming.resolve("upload-" + System.currentTimeMillis() + ".zip")
-        file.inputStream.use { input -> Files.newOutputStream(target).use { out -> input.copyTo(out, 64 * 1024) } }
+        copyUpload(file, target, size, seq)
         target
       } catch (e: Exception) {
-        inspectGuard.release()
-        report("error", 0, e.message ?: "上传失败", error = e.message ?: "上传失败")
+        guard.release()
+        report("error", 0, e.message ?: "上传失败", error = e.message ?: "上传失败", seq = seq)
         throw e
       }
-    report("unzip", 0, "正在解压 " + formatSize(size))
+    report("unzip", 0, "正在解压 " + formatSize(size), seq = seq)
     inspectExecutor.execute {
       try {
-        stage({ Files.newInputStream(upload) }, size)
+        stage({ Files.newInputStream(upload) }, size, seq)
       } catch (e: Exception) {
         logger.warn(e) { "Upgrade inspection failed" }
       } finally {
         runCatching { Files.deleteIfExists(upload) }
-        inspectGuard.release()
+        guard.release()
       }
     }
-    return UpgradeAccepted(started = true, fileName = upload.fileName.toString())
+    return UpgradeAccepted(started = true, fileName = upload.fileName.toString(), seq = seq)
   }
 
   fun inspectFile(path: Path): UpgradeInspect {
@@ -168,32 +201,62 @@ class UpgradeService(
     if (!name.endsWith(".zip") && !name.endsWith(".lup")) throw IllegalArgumentException("升级包必须是 .zip")
     val size = Files.size(path)
     if (size > 512L * 1024 * 1024) throw IllegalArgumentException("升级包超过 512MB")
-    if (!inspectGuard.tryAcquire()) throw IllegalStateException("上一个升级包仍在校验，请稍候")
+    val guard = acquireGuard("上一个升级包仍在校验，请稍候")
+    val seq = progressSeq.incrementAndGet()
     try {
-      return stage({ Files.newInputStream(path) }, size)
+      return stage({ Files.newInputStream(path) }, size, seq)
     } finally {
-      inspectGuard.release()
+      guard.release()
     }
+  }
+
+  private fun copyUpload(
+    file: MultipartFile,
+    target: Path,
+    size: Long,
+    seq: Long,
+  ) {
+    val total = size.coerceAtLeast(1L)
+    var read = 0L
+    var mark = 0L
+    file.inputStream.use { ins ->
+      Files.newOutputStream(target).use { os ->
+        val buf = ByteArray(256 * 1024)
+        while (true) {
+          val n = ins.read(buf)
+          if (n <= 0) break
+          os.write(buf, 0, n)
+          read += n
+          if (read - mark >= PROGRESS_STEP) {
+            mark = read
+            val ratio = (read * 100 / total).toInt().coerceIn(0, 99)
+            report("upload", ratio, "正在接收 " + formatSize(read) + " / " + formatSize(total), seq = seq)
+          }
+        }
+      }
+    }
+    report("upload", 100, "正在接收 " + formatSize(read), seq = seq)
   }
 
   private fun stage(
     open: () -> InputStream,
     size: Long,
+    seq: Long,
   ): UpgradeInspect {
     try {
       discard()
       Files.createDirectories(stagedDir)
 
       val compressed = size.coerceAtLeast(1L)
-      report("unzip", 0, "正在解压 " + formatSize(compressed))
+      report("unzip", 0, "正在解压 " + formatSize(compressed), seq = seq)
       open().use { input ->
         val counting = CountingInputStream(input)
-        unzip(counting, stagedDir, compressed)
+        unzip(counting, stagedDir, compressed, seq)
         drain(counting)
       }
-      report("unzip", 100, "解压完成，正在校验包内容")
+      report("unzip", 100, "解压完成，正在校验包内容", seq = seq)
 
-      report("verify", -1, "正在读取包信息")
+      report("verify", -1, "正在读取包信息", seq = seq)
       val manifest = readManifest()
       if (!manifest.product.equals("lantai", ignoreCase = true)) throw IllegalArgumentException("不是兰台的升级包")
       val version = manifest.version?.trim()
@@ -205,15 +268,15 @@ class UpgradeService(
 
       val jar = stagedJar()
       val jarSize = Files.size(jar).coerceAtLeast(1L)
-      report("verify", 30, "正在校验 SHA-256")
+      report("verify", 30, "正在校验 SHA-256", seq = seq)
       val digest =
         sha256(jar) { read ->
-          report("verify", (read * 100 / jarSize).toInt().coerceIn(30, 95), "正在校验 SHA-256")
+          report("verify", (read * 100 / jarSize).toInt().coerceIn(30, 95), "正在校验 SHA-256", seq = seq)
         }
       if (manifest.sha256 != null && manifest.sha256.isNotBlank()) {
         if (!digest.equals(manifest.sha256.trim(), ignoreCase = true)) throw IllegalArgumentException("jar 校验失败，包可能损坏")
       }
-      report("verify", -1, "正在检查 jar 结构")
+      report("verify", -1, "正在检查 jar 结构", seq = seq)
       if (!jarStructureOk(jar)) throw IllegalArgumentException("jar 结构不合法，缺少 BOOT-INF")
 
       val result =
@@ -228,11 +291,11 @@ class UpgradeService(
           containerized = isContainerized(),
           restartMode = if (isContainerized()) "container" else "manual",
         )
-      report("done", 100, "校验通过", result = result)
+      report("done", 100, "校验通过", result = result, seq = seq)
       return result
     } catch (e: Exception) {
       runCatching { discard() }
-      report("error", 0, e.message ?: "校验失败", error = e.message ?: "校验失败")
+      report("error", 0, e.message ?: "校验失败", error = e.message ?: "校验失败", seq = seq)
       throw e
     }
   }
@@ -243,9 +306,11 @@ class UpgradeService(
     label: String,
     result: UpgradeInspect? = null,
     error: String? = null,
+    seq: Long = progressSeq.get(),
   ) {
+    inspectTick.set(System.currentTimeMillis())
     val value = if (pct < 0) -1 else pct.coerceIn(0, 100)
-    inspectProgress.set(UpgradeProgress(idle = false, phase = phase, pct = value, label = label, result = result, error = error))
+    inspectProgress.set(UpgradeProgress(idle = false, phase = phase, pct = value, label = label, result = result, error = error, seq = seq))
   }
 
   private fun formatSize(bytes: Long): String =
@@ -265,11 +330,12 @@ class UpgradeService(
   }
 
   fun apply(): UpgradeApply {
-    if (!inspectGuard.tryAcquire()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
+    val guard = acquireGuard("另一个升级任务正在进行，请稍候")
     try {
+      pauseTasks()
       return applyLocked()
     } finally {
-      inspectGuard.release()
+      guard.release()
     }
   }
 
@@ -301,16 +367,36 @@ class UpgradeService(
     report("restart", -1, "已替换，正在重启")
     runCatching { deleteRecursively(stagedDir) }
     logger.warn { "Applying upgrade $currentVersion -> $version, restart scheduled" }
+    awaitTasksIdle()
     scheduleRestart()
     return UpgradeApply(applied = true, version = version, previousVersion = currentVersion, restartMode = if (isContainerized()) "container" else "manual")
   }
 
   fun rollback(): UpgradeApply {
-    if (!inspectGuard.tryAcquire()) throw IllegalStateException("另一个升级任务正在进行，请稍候")
+    val guard = acquireGuard("另一个升级任务正在进行，请稍候")
     try {
+      pauseTasks()
       return rollbackLocked()
     } finally {
-      inspectGuard.release()
+      guard.release()
+    }
+  }
+
+  private fun pauseTasks() {
+    taskProcessorProvider.ifAvailable { processor ->
+      processor.pause()
+      logger.warn { "Task processing paused for upgrade" }
+    }
+  }
+
+  private fun awaitTasksIdle() {
+    taskProcessorProvider.ifAvailable { processor ->
+      val running = processor.awaitIdle(TASK_DRAIN_TIMEOUT_MS)
+      if (running > 0) {
+        logger.warn { "Proceeding with restart while $running task(s) still running" }
+      } else {
+        logger.info { "All running tasks finished before restart" }
+      }
     }
   }
 
@@ -329,6 +415,7 @@ class UpgradeService(
     }
     report("restart", -1, "已恢复，正在重启")
     val restored = latest.fileName.toString().removePrefix("lantai-").removeSuffix(".jar")
+    awaitTasksIdle()
     scheduleRestart()
     return UpgradeApply(applied = true, version = restored, previousVersion = currentVersion, restartMode = if (isContainerized()) "container" else "manual")
   }
@@ -378,7 +465,7 @@ class UpgradeService(
     Thread {
       Thread.sleep(1500)
       logger.warn { "Exiting for upgrade restart" }
-      exitProcess(0)
+      System.exit(0)
     }.apply {
       isDaemon = false
       name = "lantai-upgrade-restart"
@@ -428,6 +515,7 @@ class UpgradeService(
     input: CountingInputStream,
     target: Path,
     compressed: Long,
+    seq: Long,
   ) {
     var written = 0L
     var entries = 0
@@ -458,7 +546,7 @@ class UpgradeService(
             if (input.count - mark >= PROGRESS_STEP) {
               mark = input.count
               val ratio = (input.count * 100 / compressed).toInt().coerceIn(0, 99)
-              report("unzip", ratio, "正在解压 " + formatSize(written))
+              report("unzip", ratio, "正在解压 " + formatSize(written), seq = seq)
             }
           }
         }
@@ -579,9 +667,11 @@ data class UpgradeProgress(
   val label: String = "",
   val result: UpgradeInspect? = null,
   val error: String? = null,
+  val seq: Long = 0,
 )
 
 data class UpgradeAccepted(
   val started: Boolean,
   val fileName: String,
+  val seq: Long = 0,
 )

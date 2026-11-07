@@ -57,6 +57,9 @@ data class ScrapeAgentSubmitResult(
   val status: String,
   val appliedFields: List<String>,
   val message: String?,
+  val keptFields: List<String> = emptyList(),
+  val conflicts: List<String> = emptyList(),
+  val conflictPolicy: String = ScrapeSettingsProvider.CONFLICT_POLICY_REVIEW,
 )
 
 @Service
@@ -157,15 +160,27 @@ class ScrapeAgentService(
 
     return try {
       val scope = pending?.bookIds?.toSet().orEmpty()
+      val trust = overwrite || settings.trustResult
+      val policy = settings.effectivePolicy(trust)
       val bookChoices = runCatching { ScrapePayloadParser.parseBooks(objectMapper, rawPayload) }.getOrDefault(emptyList())
       val bookApplied =
         if (bookChoices.isEmpty()) {
           emptyList()
         } else {
-          runCatching { applier.applyBookValues(seriesId, bookChoices, sourceName.ifBlank { "agent" }, 1.0, scope).appliedFields }.getOrDefault(emptyList())
+          runCatching {
+            applier
+              .applyBookValues(
+                seriesId = seriesId,
+                choices = bookChoices,
+                source = sourceName.ifBlank { "agent" },
+                score = 1.0,
+                scope = scope,
+                onlyFill = policy != ScrapeSettingsProvider.CONFLICT_POLICY_OVERWRITE,
+              ).appliedFields
+          }.getOrDefault(emptyList())
         }
       val outcome =
-        runCatching { engine.externalAnalyze(seriesId, values, sourceName.ifBlank { "agent" }, 1.0, overwrite || settings.trustResult, scope) }
+        runCatching { engine.externalAnalyze(seriesId, values, sourceName.ifBlank { "agent" }, 1.0, trust, scope) }
           .getOrElse { error ->
             if (bookApplied.isEmpty()) throw error
             ScrapeOutcome(
@@ -186,7 +201,7 @@ class ScrapeAgentService(
             pending.copy(
               status = ScrapeQueueItem.Status.REVIEW,
               progress = 100,
-              diff = engine.serializedDiff(outcome),
+              diff = engine.serializedDiff(outcome.diff.unresolved()),
               source = outcome.source,
               score = outcome.score,
               message = outcome.message,
@@ -201,6 +216,9 @@ class ScrapeAgentService(
         status = outcome.status,
         appliedFields = (bookApplied + outcome.applied?.appliedFields.orEmpty()).distinct(),
         message = outcome.message,
+        keptFields = outcome.kept,
+        conflicts = outcome.diff.pendingConflicts().map { it.field }.distinct(),
+        conflictPolicy = policy,
       )
     } catch (e: Exception) {
       logger.warn(e) { "Failed to apply external scrape result for $seriesId" }

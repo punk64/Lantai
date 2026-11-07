@@ -180,6 +180,7 @@
       repairExt: !!l.repairExtensions,
       convertCbz: !!l.convertToCbz,
       oneshots: l.oneshotsDirectory || '',
+      volumeGrouping: !!l.volumeGrouping,
       exclusions: Array.isArray(l.scanDirectoryExclusions) ? l.scanDirectoryExclusions.join('\n') : '',
       unavailable: !!l.unavailable,
       updated: ''
@@ -237,6 +238,7 @@
       id: b.id,
       s: b.seriesId,
       num: b.number || 0,
+      vol: b.volume || '',
       name: b.name,
       url: b.url || '',
       mdTitle: md.title || '',
@@ -738,6 +740,37 @@
     });
   }
 
+  function paintUserChip(bust) {
+    var me = runtime.me;
+    if (!me) return;
+    var nameEl = document.querySelector('#uName');
+    var roleEl = document.querySelector('#uRole');
+    var avaEl = document.querySelector('#uAvatar');
+    var name = String(me.username || '').trim() || (me.email ? String(me.email).split('@')[0] : '') || '?';
+    var roles = Array.from(me.roles || []);
+    var isAdmin = roles.indexOf('ADMIN') >= 0;
+    if (nameEl) nameEl.textContent = name;
+    if (roleEl) {
+      var libs = (me.sharedLibrariesIds || []).length;
+      roleEl.textContent =
+        isAdmin && me.sharedAllLibraries
+          ? L.t('top.allLibs')
+          : (isAdmin ? L.t('top.admin') : (roles.length ? roles[0] : '')) + (me.sharedAllLibraries ? '' : ' · ' + libs);
+    }
+    if (!avaEl) return;
+    avaEl.textContent = name.slice(0, 1).toUpperCase();
+    avaEl.style.backgroundImage = '';
+    if (typeof Image === 'undefined') return;
+    var probe = new Image();
+    probe.onload = function () {
+      avaEl.textContent = '';
+      avaEl.style.backgroundImage = 'url("' + probe.src + '")';
+      avaEl.style.backgroundPosition = 'center';
+      avaEl.style.backgroundSize = 'cover';
+    };
+    probe.src = base + 'api/lantai/v1/user-profile/' + encodeURIComponent(me.id) + '/avatar' + (bust ? '?v=' + Date.now() : '');
+  }
+
   function showApp() {
     var boot = document.querySelector('#boot');
     var app = document.querySelector('#app');
@@ -746,6 +779,7 @@
     render();
     paintRuntime();
     paintBell();
+    paintUserChip();
     connectSse();
   }
 
@@ -968,6 +1002,7 @@
       });
     },
     showBoot: showBoot,
+    paintUserChip: paintUserChip,
     bootError: bootError
   };
 

@@ -73,20 +73,24 @@ class ReadImageService(
     if (longest <= width) return RenderedImage(bytes, sourceType)
 
     val target = pickType(sourceType, format)
-    val output = encode(bytes, sourceType, width, target) ?: return RenderedImage(bytes, sourceType)
+    val output = encode(bytes, width, target) ?: return RenderedImage(bytes, sourceType)
 
     return RenderedImage(output, target.mediaType)
   }
 
   private fun encode(
     bytes: ByteArray,
-    sourceType: String,
     width: Int,
     target: ImageType,
   ): ByteArray? =
     runCatching {
-      val source = if (target == ImageType.JPEG && sourceType != "image/jpeg") flattenOnWhite(bytes) else null
-      val builder = if (source != null) Thumbnails.of(source) else Thumbnails.of(bytes.inputStream())
+      val sampled = decodeSampled(bytes, width)
+      val builder =
+        when {
+          sampled == null -> Thumbnails.of(bytes.inputStream())
+          target == ImageType.JPEG -> Thumbnails.of(flattenOnWhite(sampled))
+          else -> Thumbnails.of(sampled)
+        }
       ByteArrayOutputStream().use { buffer ->
         builder
           .size(width, width)
@@ -98,8 +102,32 @@ class ReadImageService(
       }
     }.getOrNull()
 
-  private fun flattenOnWhite(bytes: ByteArray): BufferedImage? {
-    val source = runCatching { ImageIO.read(ByteArrayInputStream(bytes)) }.getOrNull() ?: return null
+  private fun decodeSampled(
+    bytes: ByteArray,
+    width: Int,
+  ): BufferedImage? =
+    runCatching {
+      ImageIO.createImageInputStream(ByteArrayInputStream(bytes))?.use { input ->
+        val readers = ImageIO.getImageReaders(input)
+        if (!readers.hasNext()) {
+          null
+        } else {
+          val reader = readers.next()
+          try {
+            reader.input = input
+            val longest = max(reader.getWidth(0), reader.getHeight(0))
+            val param = reader.defaultReadParam
+            val step = max(1, longest / (width * 2))
+            if (step > 1) param.setSourceSubsampling(step, step, 0, 0)
+            reader.read(0, param)
+          } finally {
+            reader.dispose()
+          }
+        }
+      }
+    }.getOrNull()
+
+  private fun flattenOnWhite(source: BufferedImage): BufferedImage {
     if (!source.colorModel.hasAlpha()) return source
     val flat = BufferedImage(source.width, source.height, BufferedImage.TYPE_INT_RGB)
     flat.createGraphics().apply {

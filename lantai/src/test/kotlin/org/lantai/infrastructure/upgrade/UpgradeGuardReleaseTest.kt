@@ -74,7 +74,7 @@ class UpgradeGuardReleaseTest {
     val build = mockk<ObjectProvider<BuildProperties>>()
     every { build.getIfAvailable() } returns
       BuildProperties(Properties().apply { setProperty("version", "0.3.21") })
-    return UpgradeService(RuntimeEnvironment(props, RuntimeProperties()), ObjectMapper(), build)
+    return UpgradeService(RuntimeEnvironment(props, RuntimeProperties()), ObjectMapper(), build, mockk(relaxed = true))
   }
 
   private fun buildJar(megabytes: Int): ByteArray {

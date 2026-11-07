@@ -157,6 +157,15 @@ function libRelPath(url, root) {
 const seriesOf = b => series(b.s) || { id: b.s || '', t: b.name || '未知系列', lib: '', online: false, genres: [], tags: [], chapters: 0, dirs: 0, status: 'ONGOING', readingDirection: 'RIGHT_TO_LEFT', year: 0, publisher: '', author: '' };
 const libOf = b => lib(seriesOf(b).lib);
 const booksOf = sid => BOOKS.filter(b => b.s === sid);
+const volGroups = list => {
+  const out = [], idx = {};
+  (list || []).slice().sort((a, b) => (a.num || 0) - (b.num || 0)).forEach(b => {
+    const key = b.vol || '';
+    if (!idx[key]) { idx[key] = { name: key, books: [] }; out.push(idx[key]); }
+    idx[key].books.push(b);
+  });
+  return out;
+};
 const prog = id => PROGRESS[id] || null;
 const isOnlineBook = b => { const s = series(b.s); return s && s.online; };
 function sysVersion() {
@@ -1660,7 +1669,8 @@ function bulkScrape(ids, run, bookIds) {
           .then(r => {
             closeModal();
             toast('已登记 ' + r.added + ' 个系列' + (byBook ? '、' + bookIds.length + ' 册' : '') +
-              (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
+              (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') +
+              (r.notReady ? '，' + r.notReady + ' 个未解析完成已跳过' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
             S.browse.sel = {};
             render();
             loadScrape();
@@ -2295,19 +2305,132 @@ function renderAllSeries(v) {
 }
 
 function bulkFill() {
+  let zipFile = null;
   openDrawer({
     title: '回填元数据', width: 760,
-    body: '<div class="note">把填写好的文本粘贴进来，先预览再写入。留空的字段不会覆盖，已锁定的字段会跳过。</div>' +
+    body: '<div class="seg" style="margin-bottom:14px">' +
+      '<button class="on" data-bulk-mode="text">粘贴文本</button>' +
+      '<button data-bulk-mode="zip">zip 包</button></div>' +
+      '<div id="bulkPaneText">' +
+      '<div class="note">把填写好的文本粘贴进来，先预览再写入。留空的字段不会覆盖，已锁定的字段会跳过。</div>' +
       '<textarea class="inp" id="bulkIn" style="height:300px;margin-top:10px" spellcheck="false" placeholder="[1] 0S3C2Q5E6XGE5&#10;标题: 迷宫饭&#10;状态: 完结&#10;出版社: 青文&#10;年份: 2015&#10;风格: 奇幻, 冒险, 美食"></textarea>' +
-      '<div style="display:flex;gap:8px;margin-top:10px"><button class="btn pri" data-preview>预览变更</button><button class="btn ghost" data-paste>从剪贴板</button></div>' +
-      '<div id="bulkDiff" style="margin-top:16px"></div>',
+      '<div class="rowflex" style="gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn pri" data-preview>预览变更</button><button class="btn ghost" data-paste>从剪贴板</button></div>' +
+      '<div id="bulkDiff" style="margin-top:16px"></div></div>' +
+      '<div id="bulkPaneZip" style="display:none">' +
+      '<div class="note">压缩包里放 <span class="mono">metadata.txt</span> 与 <span class="mono">covers/</span>，封面按系列ID或序号命名，写入后替换当前封面。先预览再确认，预览不会改动数据。</div>' +
+      '<div class="rowflex" style="gap:8px;margin-top:12px;flex-wrap:wrap">' +
+      '<button class="btn sm" data-tpl>' + ico('dl') + '下载模板</button>' +
+      '<label class="btn sm ghost" style="cursor:pointer">' + ico('upload') + '选择 zip<input type="file" accept=".zip" id="bulkZip" hidden></label>' +
+      '<span class="mini mono" id="bulkZipName">未选择文件</span></div>' +
+      '<div class="rowflex" style="gap:8px;margin-top:12px;flex-wrap:wrap">' +
+      '<button class="btn pri" data-zip-preview disabled>预览压缩包</button>' +
+      '<button class="btn" data-zip-commit disabled>确认写入</button></div>' +
+      '<div id="bulkZipOut" style="margin-top:16px"></div></div>',
     after: () => {
       const pv = $('#drawer [data-preview]');
       if (pv) pv.onclick = () => bulkSubmit(true);
       const ps = $('#drawer [data-paste]');
       if (ps) ps.onclick = () => navigator.clipboard.readText().then(t => { $('#bulkIn').value = t; toast('已粘贴 ' + t.length + ' 字符', 'ok'); }).catch(() => toast('浏览器不允许读取剪贴板，请手动粘贴', 'err'));
+      $$('#drawer [data-bulk-mode]').forEach(el => el.onclick = () => {
+        $$('#drawer [data-bulk-mode]').forEach(b => b.classList.toggle('on', b === el));
+        const zip = el.dataset.bulkMode === 'zip';
+        $('#bulkPaneText').style.display = zip ? 'none' : '';
+        $('#bulkPaneZip').style.display = zip ? '' : 'none';
+      });
+      const tpl = $('#drawer [data-tpl]');
+      if (tpl) tpl.onclick = () => bulkTemplate(tpl);
+      const file = $('#bulkZip');
+      if (file) file.onchange = () => {
+        zipFile = (file.files && file.files[0]) || null;
+        $('#bulkZipName').textContent = zipFile ? zipFile.name + ' · ' + bytes(zipFile.size) : '未选择文件';
+        const on = !!zipFile;
+        $('#drawer [data-zip-preview]').disabled = !on;
+        $('#drawer [data-zip-commit]').disabled = !on;
+        $('#bulkZipOut').innerHTML = '';
+      };
+      const zp = $('#drawer [data-zip-preview]');
+      if (zp) zp.onclick = () => bulkZipSubmit(zipFile, true);
+      const zc = $('#drawer [data-zip-commit]');
+      if (zc) zc.onclick = () => {
+        if (zc.dataset.armed !== '1') {
+          zc.dataset.armed = '1';
+          zc.textContent = '再点一次确认';
+          setTimeout(() => { if (zc.isConnected) { zc.dataset.armed = ''; zc.textContent = '确认写入'; } }, 4000);
+          return;
+        }
+        zc.dataset.armed = '';
+        zc.textContent = '确认写入';
+        bulkZipSubmit(zipFile, false);
+      };
     }
   });
+}
+
+function bulkTemplate(btn) {
+  if (btn) btn.disabled = true;
+  fetch('api/lantai/v1/series/metadata/package/template', { credentials: 'same-origin' })
+    .then(r => r.ok ? r.blob() : r.text().then(t => Promise.reject(new Error(t || 'HTTP ' + r.status))))
+    .then(b => {
+      const url = URL.createObjectURL(b);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lantai-metadata-template.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      toast('模板已下载', 'ok');
+    })
+    .catch(e => toast('下载失败：' + e.message, 'err'))
+    .then(() => { if (btn) btn.disabled = false; });
+}
+
+function bulkZipSubmit(file, dryRun) {
+  if (!file) return toast('先选一个 zip 包', 'err');
+  const out = $('#bulkZipOut');
+  const pv = $('#drawer [data-zip-preview]');
+  const cm = $('#drawer [data-zip-commit]');
+  if (out) out.innerHTML = '<div class="note">正在' + (dryRun ? '预览' : '写入') + '…</div>';
+  if (pv) pv.disabled = true;
+  if (cm) cm.disabled = true;
+  const fd = new FormData();
+  fd.append('file', file);
+  fetch('api/lantai/v1/series/metadata/package?dryRun=' + (dryRun ? 'true' : 'false'), {
+    method: 'POST', credentials: 'same-origin', body: fd
+  })
+    .then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(t || 'HTTP ' + r.status))))
+    .then(res => {
+      renderBulkPackage(res, dryRun, () => bulkZipSubmit(file, false));
+      if (!dryRun) {
+        toast('已写入 ' + ((res.metadata && res.metadata.applied) || 0) + ' 项 · 封面 ' + (res.covers || []).filter(c => c.applied).length + ' 张', 'ok');
+        LantaiRuntime.hydrate().then(() => render()).catch(() => { });
+      }
+    })
+    .catch(e => { if (out) out.innerHTML = '<div class="note red">' + esc(e.message) + '</div>'; })
+    .then(() => {
+      if (pv) pv.disabled = false;
+      if (cm) cm.disabled = false;
+    });
+}
+
+function renderBulkPackage(res, dryRun, onCommit) {
+  const el = $('#bulkZipOut');
+  if (!el) return;
+  const md = res.metadata || {};
+  const covers = res.covers || [];
+  const ignored = res.ignored || [];
+  el.innerHTML =
+    '<div class="note ' + (dryRun ? 'gold' : '') + '">' + esc(res.packageFile || '') + ' · ' + (dryRun ? '预览' : '已写入') +
+    '：元数据 ' + num(md.total || 0) + ' 项 · 写入 ' + num(md.applied || 0) + ' 项 · 跳过 ' + num(md.skipped || 0) + ' 项' +
+    (md.failed ? ' · 失败 ' + num(md.failed) : '') + '；封面 ' + num(covers.length) + ' 张</div>' +
+    (covers.length ? '<div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>系列</th><th>封面文件</th><th class="num">大小</th><th>结果</th></tr></thead><tbody>' +
+      covers.map(c => '<tr><td>' + esc(c.seriesTitle || c.seriesId) + '</td><td class="mini mono">' + esc(c.fileName) + '</td>' +
+        '<td class="num mono">' + bytes(c.sizeBytes || 0) + '</td>' +
+        '<td>' + (c.applied ? '<span class="badge ok">' + (dryRun ? '待写入' : '已应用') + '</span>' : '<span class="badge">' + esc(c.note || '跳过') + '</span>') + '</td></tr>').join('') +
+      '</tbody></table></div>' : '') +
+    (ignored.length ? '<div class="note gold" style="margin-top:12px">未匹配到系列的封面：' + ignored.map(esc).join('、') + '</div>' : '') +
+    '<div id="bulkZipDiff" style="margin-top:14px"></div>';
+  renderBulkDiff(md, dryRun, '#bulkZipDiff', onCommit);
 }
 
 function bulkSubmit(dryRun) {
@@ -2325,8 +2448,8 @@ function bulkSubmit(dryRun) {
     .catch(e => toast('提交失败：' + e.message, 'err'));
 }
 
-function renderBulkDiff(res, dryRun) {
-  const el = $('#bulkDiff');
+function renderBulkDiff(res, dryRun, sel, onCommit) {
+  const el = $(sel || '#bulkDiff');
   if (!el) return;
   if (!res.items || !res.items.length) {
     el.innerHTML = '<div class="note red">没有解析到条目，检查 [序号] 系列ID 行是否保留。</div>';
@@ -2344,7 +2467,7 @@ function renderBulkDiff(res, dryRun) {
       '</div>').join('') +
     (dryRun && res.applied ? '<button class="btn pri" style="margin-top:12px" data-commit>确认写入 ' + res.applied + ' 项</button>' : '');
   const commit = el.querySelector('[data-commit]');
-  if (commit) commit.onclick = () => bulkSubmit(false);
+  if (commit) commit.onclick = onCommit || (() => bulkSubmit(false));
 }
 
 function renderLibs(v) {
@@ -2972,24 +3095,94 @@ function coverLightbox(kind, id, title) {
   if (!window.LantaiRuntime || !id) return toast('后端不可用', 'err');
   const seg = kind === 'series' ? 'series' : 'books';
   const path = 'api/v1/' + seg + '/' + id;
-  const src = path + '/thumbnail?t=' + Date.now();
+  const stamp = Date.now();
+  const thumb = path + '/thumbnail?t=' + stamp;
+  const full = path + '/thumbnail/original?t=' + stamp;
   openModal({
     title: title || '封面',
-    width: 760,
+    width: 1120,
     body:
-      '<div style="background:var(--bg-2);border-radius:8px;padding:12px;text-align:center">' +
-      '<img src="' + src + '" alt="" style="max-width:100%;max-height:68vh;object-fit:contain;border-radius:4px">' +
+      '<div id="covStage" style="position:relative;background:var(--bg-2);border-radius:8px;height:74vh;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none">' +
+      '<img id="covImg" src="' + thumb + '" alt="" style="max-width:100%;max-height:100%;object-fit:contain;transform-origin:center center;user-select:none;-webkit-user-drag:none">' +
+      '<div class="mini" style="position:absolute;right:10px;bottom:8px;color:var(--tx-3);pointer-events:none">滚轮缩放 · 拖动平移 · 双击复位</div>' +
+      '<div class="mini" id="covLoad" style="position:absolute;left:10px;bottom:8px;color:var(--tx-3);pointer-events:none">正在载入原图…</div>' +
       '</div>' +
-      '<div class="note" style="margin-top:10px">替换封面只写库内缩略图（USER_UPLOADED），不改动原始文件；自动封面会随扫描重建。</div>',
+      '<div class="note" style="margin-top:10px">先显示缩略图，原图就位后自动替换成原始分辨率。替换封面只写库内封面（USER_UPLOADED），不改动原始文件；自动封面会随扫描重建。</div>',
     foot: '<button class="btn" data-x>关闭</button>' +
       '<button class="btn" data-save>' + ico('dl') + '保存原图</button>' +
       '<button class="btn" data-rep>' + ico('upload') + '替换封面</button>' +
       '<button class="btn ghost" data-manage>' + ico('layers') + '封面管理</button>',
     after() {
+      const stage = $('#covStage');
+      const img = $('#covImg');
+      const tip = $('#covLoad');
+      let zoom = 1, panX = 0, panY = 0, dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+      const apply = () => {
+        img.style.transform = 'translate(' + panX + 'px,' + panY + 'px) scale(' + zoom + ')';
+      };
+      const reset = () => {
+        zoom = 1;
+        panX = 0;
+        panY = 0;
+        apply();
+      };
+      if (typeof Image !== 'undefined') {
+        const probe = new Image();
+        probe.onload = () => {
+          img.src = probe.src;
+          if (tip) tip.textContent = '原图';
+        };
+        probe.onerror = () => {
+          if (tip) tip.textContent = '原始文件不可用，显示缩略图';
+        };
+        probe.src = full;
+      }
+      if (stage) {
+        stage.onwheel = e => {
+          e.preventDefault();
+          const next = Math.min(8, Math.max(1, zoom * (e.deltaY < 0 ? 1.18 : 0.85)));
+          if (next === zoom) return;
+          zoom = next;
+          if (zoom === 1) {
+            panX = 0;
+            panY = 0;
+          }
+          apply();
+        };
+        stage.onmousedown = e => {
+          if (zoom <= 1) return;
+          dragging = true;
+          sx = e.clientX;
+          sy = e.clientY;
+          ox = panX;
+          oy = panY;
+          stage.style.cursor = 'grabbing';
+        };
+        stage.onmousemove = e => {
+          if (!dragging) return;
+          panX = ox + (e.clientX - sx);
+          panY = oy + (e.clientY - sy);
+          apply();
+        };
+        const stop = () => {
+          dragging = false;
+          stage.style.cursor = zoom > 1 ? 'grab' : 'default';
+        };
+        stage.onmouseup = stop;
+        stage.onmouseleave = stop;
+        stage.ondblclick = () => {
+          if (zoom > 1) {
+            reset();
+          } else {
+            zoom = 2;
+            apply();
+          }
+        };
+      }
       $('#modal [data-x]').onclick = closeModal;
       $('#modal [data-save]').onclick = () => {
         const a = document.createElement('a');
-        a.href = path + '/thumbnail';
+        a.href = full;
         a.download = String(title || kind) + '.jpg';
         document.body.appendChild(a);
         a.click();
@@ -3073,12 +3266,20 @@ Routes.series = (v, seg) => {
     '</div>' +
     (online ? '<div class="note gold" style="margin-bottom:16px">' + ico('alert') + ' 本系列属于在线库，不能删除或整理文件；未下载的章节在首次打开时取页。</div>' : '') +
     '<div class="ph" style="margin-bottom:12px"><h2 style="font-size:16px;font-family:var(--f-disp);letter-spacing:1px">' + (online ? '章节' : '册') + '</h2>' +
-    '<div class="acts"><span class="mini">共 ' + (online ? num(s.chapters) : st.count) + ' 项</span>' +
+    '<div class="acts"><span class="mini">共 ' + (online ? num(s.chapters) : st.count) + ' 项' + (!online && volGroups(booksOf(s.id)).length > 1 ? ' · ' + volGroups(booksOf(s.id)).length + ' 卷' : '') + '</span>' +
     (online ? '<button class="btn sm" data-go="/online?tab=dl">' + ico('dl') + '下载与存档</button>' : '') + '</div></div>';
 
   if (!online) {
-    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
-      booksOf(s.id).map(b => bookRow(b)).join('') + '</tbody></table></div>');
+    const groups = volGroups(booksOf(s.id));
+    const rows = groups.map(g => {
+      if (!g.name) return g.books.map(b => bookRow(b)).join('');
+      const done = g.books.filter(b => { const p = prog(b.id); return p && p.completed; }).length;
+      return '<tr class="vol-h"><td colspan="6"><b>' + esc(g.name) + '</b>' +
+        '<span class="mini">' + g.books.length + ' 册 · 已读 ' + done + '/' + g.books.length + '</span></td></tr>' +
+        g.books.map(b => bookRow(b)).join('');
+    }).join('');
+    v.insertAdjacentHTML('beforeend', '<div class="tbl-wrap"><table class="tbl vol-tbl"><thead><tr><th></th><th>书名</th><th>状态</th><th>进度</th><th class="num">更新</th><th></th></tr></thead><tbody>' +
+      rows + '</tbody></table></div>');
   } else if (!och) {
     v.insertAdjacentHTML('beforeend', '<div class="note">正在加载章节…</div>');
     loadOnlineChapters(s.id);
@@ -4550,7 +4751,7 @@ Routes.stats = (v, seg, qs) => {
   if (S.statsTab === 'trend') B.innerHTML = stTrend();
   if (S.statsTab === 'books') B.innerHTML = stBooks();
   if (S.statsTab === 'devices') B.innerHTML = stDevices();
-  if (S.statsTab === 'sessions') B.innerHTML = stSessions();
+  if (S.statsTab === 'sessions') B.innerHTML = stSessions(), loadStActive();
   if (S.statsTab === 'offline') B.innerHTML = stOffline(), wireOffline(B);
   $$('#view [data-rng]').forEach(el => el.onclick = () => { S.statsRange = +el.dataset.rng; render(); });
   $$('#view [data-stab]').forEach(el => el.onclick = () => { S.statsTab = el.dataset.stab; render(); });
@@ -4652,9 +4853,34 @@ function stDevices() {
       '<div class="gr"><span class="mini">' + esc(u.last) + '</span><span class="badge' + (own ? ' ok' : '') + '">' + (own ? dur(SESSIONS.reduce((a, s) => a + s.dur, 0)) : '未授权代查') + '</span></div></div>'; }).join('') +
     '</div>';
 }
+function stActiveHtml(list) {
+  const rows = (list || []).slice(0, 5);
+  if (!rows.length) return '';
+  return '<div class="card" style="margin-bottom:16px">' +
+    '<div class="card-h"><h3>' + ico('clock') + ' 实时会话</h3><span class="hint">服务端内存快照 · 按最后心跳</span></div>' +
+    rows.map(x => {
+      const live = !x.endedAt;
+      return '<div class="list-i" style="border:0;padding:9px 0">' +
+        '<span class="gi">' + ico(live ? 'play' : 'pause') + '</span>' +
+        '<div style="flex:1;min-width:0"><div class="gt">' + esc(x.bookId ? sessTitle(x.bookId) : '—') + '</div>' +
+        '<div class="gs mono">' + esc(dtm(new Date(x.startedAt))) + ' 开始 · 心跳 ' + esc(ago(new Date(x.lastHeartbeatAt).getTime())) +
+        ' · 第 ' + num(x.lastPage || 0) + ' 页 · 已读 ' + num(x.pagesRead || 0) + ' 页</div></div>' +
+        '<div class="gr"><span class="badge' + (live ? ' ok' : '') + '">' + (live ? '进行中' : '已结束') + '</span>' +
+        '<span class="mono mini">' + esc(durShort(x.durationMs || 0)) + '</span></div></div>';
+    }).join('') +
+    '<div class="note" style="margin-top:10px">来自服务端实时快照，最多列 5 条；会话结束或超过 2 分钟无心跳后自动消失。</div></div>';
+}
+function loadStActive() {
+  const slot = $('#stActiveSlot');
+  if (!slot || !window.LantaiRuntime) return;
+  LantaiRuntime.request('api/lantai/v1/reading/active')
+    .then(list => { if (slot.isConnected) slot.innerHTML = stActiveHtml(list); })
+    .catch(() => { });
+}
 function stSessions() {
   const rows = ranged().slice().sort((a, b) => b.start - a.start).slice(0, 40);
-  return '<div class="card"><div class="card-h"><h3>' + ico('file') + ' 会话明细</h3>' +
+  return '<div id="stActiveSlot"></div>' +
+    '<div class="card"><div class="card-h"><h3>' + ico('file') + ' 会话明细</h3>' +
     '<div class="r"><span class="badge">' + num(rows.length) + ' 条（截近 40）</span></div></div>' +
     '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>开始</th><th>书</th><th>设备</th><th class="num">时长</th><th class="num">页</th><th>来源</th><th>状态</th></tr></thead><tbody>' +
     rows.map(s => { const live = !s.srv && !s.flushed; const when = s.dev === 'server' ? iso(new Date(s.start)).slice(5) : dtm(new Date(s.start)); return '<tr><td class="mono mini">' + esc(when) + '</td>' +
@@ -4805,6 +5031,8 @@ function scHeadHtml() {
     kpi('失败', (c.failed || 0) + '<small>册</small>', '可重试', c.failed > 0) +
     '</div>' +
     (scSettings && scSettings.trustResult ? '<div class="note gold" style="margin-bottom:14px">已开启「信任刮削结果」：冲突字段会被自动覆盖，不再进入待核对。</div>' : '') +
+    (scSettings && !scSettings.trustResult && scSettings.conflictPolicy === 'overwrite' ? '<div class="note gold" style="margin-bottom:14px">冲突处理为「用外部值覆盖」：能补的字段写完后，冲突字段直接采用外部值。</div>' : '') +
+    (scSettings && scSettings.conflictPolicy === 'keep' ? '<div class="note" style="margin-bottom:14px">冲突处理为「保留本地值，直接完成」：冲突字段保留本地值，不进待核对。</div>' : '') +
     (scErr ? '<div class="note red" style="margin-bottom:14px">' + esc(scErr) + '</div>' : '');
 }
 function scBodyHtml() {
@@ -4812,10 +5040,12 @@ function scBodyHtml() {
   if (!p && scBusy) return '<div class="card"><div class="empty" style="padding:40px"><h4>正在加载名单</h4></div></div>';
   const items = (p && p.items) || [];
   const filters = [['', '全部'], ['QUEUED', '待刮'], ['RUNNING', '刮削中'], ['REVIEW', '待核对'], ['FAILED', '失败']];
-  let html = '<div class="card"><div class="card-h"><h3>' + ico('list') + ' 刮削名单</h3>' +
+  let html = '<div class="card sc-list"><div class="card-h"><h3>' + ico('list') + ' 刮削名单</h3>' +
     '<div class="r"><div class="seg">' + filters.map(f => '<button class="' + (scFilter === f[0] ? 'on' : '') + '" data-sc-filter="' + f[0] + '">' + f[1] + '</button>').join('') + '</div>' +
     '<button class="btn xs" data-sc-export>' + ico('dl') + '导出名单</button>' +
+    '<button class="btn xs" data-sc-aiprompt>' + ico('cpu') + 'AI 提示词</button>' +
     '<button class="btn xs ghost" data-sc-import>' + ico('upload') + '导入数据</button>' +
+    '<button class="btn xs ghost" data-sc-hist>' + ico('sync') + '历史回滚</button>' +
     '<button class="btn xs ghost" data-sc-help>' + ico('file') + '说明</button>' +
     '<button class="btn xs ghost" data-sc-clear="review"' + ((scCounts().review || 0) ? '' : ' disabled') + '>清待核对</button>' +
     '<button class="btn xs danger" data-sc-clear="all"' + ((scCounts().total || 0) ? '' : ' disabled') + '>清空名单</button></div></div>';
@@ -4825,7 +5055,7 @@ function scBodyHtml() {
       '<div style="margin-top:14px"><button class="btn pri sm" data-go="/browse">去书库勾选</button></div></div></div>';
     return html;
   }
-  html += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>系列</th><th style="width:96px">状态</th><th style="width:200px">说明</th><th style="width:110px">来源</th><th style="width:120px">加入时间</th><th style="width:170px"></th></tr></thead><tbody>';
+  html += '<div class="tbl-wrap"><table class="tbl sc-tbl"><thead><tr><th>系列</th><th style="width:96px">状态</th><th style="width:200px">说明</th><th style="width:110px">来源</th><th style="width:120px">加入时间</th><th style="width:170px"></th></tr></thead><tbody>';
   items.forEach(x => {
     const st = SC_STATUS[x.status] || ['', x.status];
     const badge = x.status === 'RUNNING'
@@ -4851,10 +5081,10 @@ function scBodyHtml() {
       '<button class="btn xs danger" data-sc-del="' + esc(x.id) + '" title="从名单移除">' + ico('close') + '</button>' +
       '</td></tr>';
     if (scOpen === x.id && scPreview && scPreview.seriesId === x.seriesId) {
-      html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scDiffHtml() + '</td></tr>';
+      html += '<tr class="sc-exp"><td colspan="6" style="background:var(--bg-2);padding:0">' + scDiffHtml() + '</td></tr>';
     }
     if (scBookListFor === x.id) {
-      html += '<tr><td colspan="6" style="background:var(--bg-2);padding:0">' + scBookListHtml() + '</td></tr>';
+      html += '<tr class="sc-exp"><td colspan="6" style="background:var(--bg-2);padding:0">' + scBookListHtml() + '</td></tr>';
     }
   });
   html += '</tbody></table></div>';
@@ -5016,6 +5246,10 @@ function wireScrape() {
   if (exp) exp.onclick = scChunkFn('scExportModal');
   const imp = $('#view [data-sc-import]');
   if (imp) imp.onclick = scChunkFn('scImportModal');
+  const aip = $('#view [data-sc-aiprompt]');
+  if (aip) aip.onclick = scChunkFn('scAiPromptModal');
+  const hist = $('#view [data-sc-hist]');
+  if (hist) hist.onclick = scChunkFn('scMatchHistoryModal');
   const hlp = $('#view [data-sc-help]');
   if (hlp) hlp.onclick = scChunkFn('scHelpModal');
   $$('#view [data-sc-filter]').forEach(el => el.onclick = () => { scFilter = el.dataset.scFilter; scOffset = 0; scOpen = null; scPreview = null; loadScrape(); });
@@ -5140,13 +5374,20 @@ function paintScSettings() {
   const box = $('#scCfg');
   if (!box) return;
   const tabs = [['general', '常规'], ['sources', '数据源'], ['token', '刮削令牌']];
-  const s = scSettings || { trustResult: false, batchSize: 20 };
+  const s = scSettings || { trustResult: false, batchSize: 20, conflictPolicy: 'review' };
+  const policy = s.conflictPolicy || 'review';
+  const policyOpts = [['review', '保留本地值，进待核对'], ['overwrite', '用外部值覆盖'], ['keep', '保留本地值，直接完成']];
   let html = '<div class="seg" style="margin-bottom:14px">' + tabs.map(t => '<button class="' + (scSettingsTab === t[0] ? 'on' : '') + '" data-sc-tab="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>';
   if (scSettingsTab === 'general') {
     html += '<label class="sw" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0"><input type="checkbox" id="scTrust"' + (s.trustResult ? ' checked' : '') + '><i></i>' +
       '<span><b>信任刮削结果</b><span class="mini" style="display:block;color:var(--tx-3)">开启后冲突字段直接采用候选值，不再进入待核对。批量刮削时省事，但可能写入大量错误数据。</span></span></label>' +
       '<div id="scTrustWarn" class="note red" style="margin:10px 0 0' + (s.trustResult ? '' : ';display:none') + '">⚠️ 开启后不会再有「待核对」拦截，冲突字段会被直接覆盖。确认候选源可信再开启。</div>' +
       '<label class="sw" id="scTrustConfirmBox" style="display:none;align-items:center;gap:10px;margin-top:8px"><input type="checkbox" id="scTrustConfirm"><i></i><span class="mini">我已了解风险，确认开启</span></label>' +
+      '<div class="field" style="margin-top:16px"><label>冲突处理</label><select class="inp" id="scConflict">' +
+      policyOpts.map(o => '<option value="' + o[0] + '"' + (policy === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+      '</select>' +
+      '<div class="mini" style="margin-top:6px;color:var(--tx-3)">外部数据与本地不一致时怎么处理。默认「进待核对」：能补的字段先写入，冲突字段留给你逐项确认，不会整条冻住。开启「信任刮削结果」时此处无效，一律按覆盖处理。</div></div>' +
+      '<label class="sw" id="scConflictConfirmBox" style="display:none;align-items:center;gap:10px;margin-top:8px"><input type="checkbox" id="scConflictConfirm"><i></i><span class="mini">我已了解风险，确认切换冲突处理方式</span></label>' +
       '<div class="field" style="margin-top:16px"><label>每批处理条数</label><input class="inp" id="scBatch" type="number" min="1" max="200" value="' + (s.batchSize || 20) + '">' +
       '<div class="mini" style="margin-top:6px;color:var(--tx-3)">每批结束刷新一次名单，过大容易出现长时间无反馈。</div></div>' +
       '<div class="rowflex" style="margin-top:16px"><button class="btn pri" data-sc-save>保存设置</button></div>';
@@ -5180,6 +5421,11 @@ function paintScSettings() {
     if (warn) warn.style.display = trust.checked ? '' : 'none';
     if (confirmBox) confirmBox.style.display = trust.checked ? 'flex' : 'none';
   };
+  const conflictSel = $('#scConflict');
+  if (conflictSel) conflictSel.onchange = () => {
+    const box = $('#scConflictConfirmBox');
+    if (box) box.style.display = conflictSel.value !== 'review' ? 'flex' : 'none';
+  };
   const save = $('#scCfg [data-sc-save]');
   if (save) save.onclick = () => {
     const nextTrust = $('#scTrust') && $('#scTrust').checked;
@@ -5187,7 +5433,16 @@ function paintScSettings() {
     const confirmed = $('#scTrustConfirm') && $('#scTrustConfirm').checked;
     const wasTrust = !!(scSettings && scSettings.trustResult);
     if (nextTrust && !wasTrust && !confirmed) return toast('先勾选「我已了解风险」', 'err');
-    LantaiRuntime.request('api/lantai/v1/scrape/settings', { method: 'PATCH', body: { trustResult: nextTrust, batchSize: batch, confirm: nextTrust } })
+    const nextPolicy = ($('#scConflict') && $('#scConflict').value) || 'review';
+    const wasPolicy = (scSettings && scSettings.conflictPolicy) || 'review';
+    const policyChanged = nextPolicy !== wasPolicy;
+    if (policyChanged && nextPolicy !== 'review' && !($('#scConflictConfirm') && $('#scConflictConfirm').checked)) {
+      return toast('先勾选「我已了解风险，确认切换冲突处理方式」', 'err');
+    }
+    LantaiRuntime.request('api/lantai/v1/scrape/settings', {
+      method: 'PATCH',
+      body: { trustResult: nextTrust, batchSize: batch, conflictPolicy: nextPolicy, confirm: nextTrust || nextPolicy !== 'review' }
+    })
       .then(v => { scSettings = v; toast('设置已保存', 'ok'); paintScSettings(); loadScrape(); })
       .catch(e => toast('保存失败：' + onlineErrText(e), 'err'));
   };
@@ -5340,7 +5595,8 @@ function scrapeLibrary(libId) {
         LantaiRuntime.request('api/lantai/v1/scrape/queue', { method: 'POST', body: { libraryId: libId, run: run } })
           .then(r => {
             scPage = null;
-            toast('已加入 ' + r.added + ' 个' + (r.skipped ? '，跳过 ' + r.skipped + ' 个' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
+            toast('已加入 ' + r.added + ' 个' + (r.skipped ? '，跳过 ' + r.skipped + ' 个已在名单' : '') +
+              (r.notReady ? '，' + r.notReady + ' 个未解析完成已跳过' : '') + (run ? '，正在刮削…' : ''), 'ok', 3600);
             if (S.route.indexOf('/scrape') === 0) loadScrape();
           })
           .catch(e => toast('提交失败：' + onlineErrText(e), 'err', 3600));
@@ -5770,6 +6026,7 @@ function openProfileModal(u, self) {
         }).then(r => {
           const done = () => {
             if (self && window.LantaiRuntime) LantaiRuntime.me = Object.assign({}, LantaiRuntime.me, { username: r.username, email: r.email });
+            if (window.LantaiRuntime && LantaiRuntime.paintUserChip) LantaiRuntime.paintUserChip(true);
             closeModal();
             toast('资料已保存', 'ok');
             if (isAdmin()) loadAdminUsers(); else render();
@@ -9221,6 +9478,12 @@ function libModalBody(l, type) {
       '<div class="mini" style="margin-top:2px">页面哈希与 Kobo 哈希按册派生任务，库大时先把任务中心并发调高。</div></div>' +
       '<div class="field"><label>单册目录（相对根目录，留空不启用）</label>' +
       '<input class="inp mono" id="lmOne" style="font-size:11.5px" value="' + esc(l ? (l.oneshots || '') : '') + '" placeholder="单册"></div>' +
+      '<div class="field"><label>分卷（系列 → 卷 → 册）</label>' +
+      '<label class="sw" style="width:100%;justify-content:space-between;margin-bottom:8px"><span>按子目录识别分卷</span>' +
+      '<input type="checkbox" data-lma="volumeGrouping"' + (l && l.volumeGrouping ? ' checked' : '') + '><i></i></label>' +
+      '<div class="mini" style="margin-top:-2px">父目录不含书、且同层 ≥2 个子目录共享名称前缀（或都用 第N卷 / Vol N 命名）时，父目录成为系列、子目录成为卷。开启后需重扫一次才生效，系列级元数据要重新刮削。</div>' +
+      '<button class="btn sm ghost" style="margin-top:8px" data-volpreview="' + (l ? l.id : '') + '">' + ico('list') + '预演分组</button>' +
+      '<div id="volPrevOut" class="mini" style="margin-top:8px;line-height:1.7"></div></div>' +
       '<div class="field"><label>排除目录（每行一个，相对根目录）</label>' +
       '<textarea class="inp mono" id="lmExc" style="font-size:11.5px;min-height:64px" placeholder="临时&#10;回收">' + esc(l ? (l.exclusions || '') : '') + '</textarea></div>');
 }
@@ -9235,6 +9498,24 @@ function libModal(l) {
       const box = $('#modal #' + el.dataset.fsbrowse), inp = $('#modal #' + el.dataset.fsinput);
       if (!box || !inp) return;
       fsBrowse(box, inp.value.trim(), p => { inp.value = p; });
+    });
+    $$('#modal [data-volpreview]').forEach(el => el.onclick = () => {
+      const libId = el.dataset.volpreview, out = $('#modal #volPrevOut');
+      if (!out) return;
+      if (!libId) { out.textContent = '先保存这个库，再预演。'; return; }
+      el.disabled = true;
+      out.textContent = '正在扫描目录，请稍候…';
+      LantaiRuntime.request('api/lantai/v1/libraries/' + libId + '/volume-preview', { method: 'POST' })
+        .then(r => {
+          const groups = (r && r.groups) || [];
+          if (!groups.length) { out.textContent = '没有可合并的目录，现在的分组不会变化。'; return; }
+          const head = '<div>目录 <b>' + r.dirs + '</b> 个 → 系列 <b>' + r.series + '</b> 个，可合并 <b>' + groups.length + '</b> 组</div>';
+          const body = groups.slice(0, 30).map(g => '<div style="margin-top:6px"><b>' + esc(g.seriesName) + '</b> · ' + g.volumes.length + ' 卷 · ' + g.bookCount + ' 册' +
+            g.volumes.map(v => '<div style="padding-left:12px">' + esc(v.name) + ' · ' + v.bookCount + ' 册</div>').join('') + '</div>').join('');
+          out.innerHTML = head + body + (groups.length > 30 ? '<div style="margin-top:6px">…还有 ' + (groups.length - 30) + ' 组</div>' : '');
+        })
+        .catch(e => { out.textContent = '预演失败：' + onlineErrText(e); })
+        .then(() => { el.disabled = false; });
     });
     $$('#modal [data-libtype]').forEach(el => el.onclick = () => {
       if (el.dataset.libtype === type) return;

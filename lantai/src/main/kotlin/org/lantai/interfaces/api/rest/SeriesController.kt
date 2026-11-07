@@ -489,6 +489,26 @@ class SeriesController(
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
   }
 
+  @Operation(summary = "Get series' poster image in original resolution", tags = [OpenApiConfiguration.TagNames.SERIES_POSTER])
+  @ApiResponse(content = [Content(mediaType = "image/*", schema = Schema(type = "string", format = "binary"))])
+  @GetMapping(value = ["v1/series/{seriesId}/thumbnail/original"], produces = [MediaType.ALL_VALUE])
+  fun getSeriesThumbnailOriginal(
+    @AuthenticationPrincipal principal: LantaiPrincipal,
+    @PathVariable(name = "seriesId") seriesId: String,
+  ): ResponseEntity<ByteArray> {
+    contentRestrictionChecker.checkContentRestrictionSeries(principal.user, seriesId)
+
+    val poster =
+      runCatching { seriesLifecycle.getThumbnailBytesOriginal(seriesId, principal.user.id) }.getOrNull()
+        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+    return ResponseEntity
+      .ok()
+      .contentType(runCatching { MediaType.parseMediaType(poster.mediaType) }.getOrDefault(MediaType.APPLICATION_OCTET_STREAM))
+      .header("Cache-Control", "private, max-age=86400")
+      .body(poster.bytes)
+  }
+
   @Operation(summary = "Get series poster image", tags = [OpenApiConfiguration.TagNames.SERIES_POSTER])
   @ApiResponse(content = [Content(schema = Schema(type = "string", format = "binary"))])
   @GetMapping(value = ["v1/series/{seriesId}/thumbnails/{thumbnailId}"], produces = [MediaType.IMAGE_JPEG_VALUE])

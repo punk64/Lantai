@@ -360,6 +360,26 @@ class BookController(
     return bookLifecycle.getThumbnailBytes(bookId)?.bytes ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
   }
 
+  @Operation(summary = "Get book's poster image in original resolution", tags = [OpenApiConfiguration.TagNames.BOOK_POSTER])
+  @ApiResponse(content = [Content(mediaType = "image/*", schema = Schema(type = "string", format = "binary"))])
+  @GetMapping(value = ["api/v1/books/{bookId}/thumbnail/original"], produces = [MediaType.ALL_VALUE])
+  fun getBookThumbnailOriginal(
+    @AuthenticationPrincipal principal: LantaiPrincipal,
+    @PathVariable bookId: String,
+  ): ResponseEntity<ByteArray> {
+    contentRestrictionChecker.checkContentRestrictionBook(principal.user, bookId)
+
+    val poster =
+      runCatching { bookLifecycle.getThumbnailBytesOriginal(bookId) }.getOrNull()
+        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+    return ResponseEntity
+      .ok()
+      .contentType(runCatching { MediaType.parseMediaType(poster.mediaType) }.getOrDefault(MediaType.APPLICATION_OCTET_STREAM))
+      .header("Cache-Control", "private, max-age=86400")
+      .body(poster.bytes)
+  }
+
   @Operation(summary = "Get book poster image", tags = [OpenApiConfiguration.TagNames.BOOK_POSTER])
   @ApiResponse(content = [Content(schema = Schema(type = "string", format = "binary"))])
   @GetMapping(value = ["api/v1/books/{bookId}/thumbnails/{thumbnailId}"], produces = [MediaType.IMAGE_JPEG_VALUE])

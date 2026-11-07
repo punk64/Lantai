@@ -2,9 +2,11 @@ package org.lantai.infrastructure.jooq.main
 
 import org.lantai.application.query.isEmpty
 import org.lantai.domain.model.Book
+import org.lantai.domain.model.Media
 import org.lantai.domain.model.SearchCondition
 import org.lantai.domain.model.SearchContext
 import org.lantai.domain.persistence.BookRepository
+import org.lantai.domain.persistence.SeriesReadiness
 import org.lantai.infrastructure.jooq.BookSearchHelper
 import org.lantai.infrastructure.jooq.RequiredJoin
 import org.lantai.infrastructure.jooq.SplitDslDaoBase
@@ -361,6 +363,7 @@ class BookDao(
                 b.NAME,
                 b.URL,
                 b.NUMBER,
+                b.VOLUME,
                 b.FILE_LAST_MODIFIED,
                 b.FILE_SIZE,
                 b.FILE_HASH,
@@ -370,7 +373,7 @@ class BookDao(
                 b.DELETED_DATE,
                 b.EXCLUDED_DATE,
                 b.ONESHOT,
-              ).values(null as String?, null, null, null, null, null, null, null, null, null, null, null, null),
+              ).values(null as String?, null, null, null, null, null, null, null, null, null, null, null, null, null),
           ).also { step ->
             chunk.forEach {
               step.bind(
@@ -378,6 +381,7 @@ class BookDao(
                 it.name,
                 it.url,
                 it.number,
+                it.volume,
                 it.fileLastModified,
                 it.fileSize,
                 it.fileHash,
@@ -410,6 +414,7 @@ class BookDao(
       .set(b.NAME, book.name)
       .set(b.URL, book.url.toString())
       .set(b.NUMBER, book.number)
+      .set(b.VOLUME, book.volume)
       .set(b.FILE_LAST_MODIFIED, book.fileLastModified)
       .set(b.FILE_SIZE, book.fileSize)
       .set(b.FILE_HASH, book.fileHash)
@@ -455,6 +460,34 @@ class BookDao(
       .groupBy(b.LIBRARY_ID)
       .fetchMap(b.LIBRARY_ID, DSL.sum(b.FILE_SIZE))
 
+  override fun findReadinessBySeries(seriesIds: Collection<String>): Map<String, SeriesReadiness> {
+    if (seriesIds.isEmpty()) return emptyMap()
+    val totals = mutableMapOf<String, Int>()
+    val ready = mutableMapOf<String, MutableList<String>>()
+    seriesIds.distinct().chunked(batchSize.coerceAtLeast(1)).forEach { chunk ->
+      dslRO
+        .select(b.SERIES_ID, b.ID, m.STATUS)
+        .from(b)
+        .leftJoin(m)
+        .on(b.ID.eq(m.BOOK_ID))
+        .where(b.SERIES_ID.`in`(chunk))
+        .and(b.DELETED_DATE.isNull)
+        .fetch()
+        .forEach { row ->
+          val seriesId = row.value1()
+          totals.merge(seriesId, 1, Int::plus)
+          if (row.value3() in READABLE_STATUS) ready.getOrPut(seriesId) { mutableListOf() }.add(row.value2())
+        }
+    }
+    return totals.mapValues { (seriesId, total) ->
+      SeriesReadiness(total = total, readyBookIds = ready[seriesId].orEmpty())
+    }
+  }
+
+  private companion object {
+    private val READABLE_STATUS = setOf(Media.Status.READY.name, Media.Status.UNSUPPORTED.name)
+  }
+
   private fun BookRecord.toDomain() =
     Book(
       name = name,
@@ -472,5 +505,6 @@ class BookDao(
       createdDate = createdDate.toCurrentTimeZone(),
       lastModifiedDate = lastModifiedDate.toCurrentTimeZone(),
       number = number,
+      volume = volume,
     )
 }

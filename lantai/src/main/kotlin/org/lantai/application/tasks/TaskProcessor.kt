@@ -50,20 +50,33 @@ class TaskProcessor(
 
   fun pause() {
     processTasks = false
+    settingsProvider.taskProcessorPaused = true
   }
 
   fun resume() {
+    settingsProvider.taskProcessorPaused = false
     if (!processTasks) {
       processTasks = true
       processAvailableTask()
     }
   }
 
+  fun awaitIdle(timeoutMs: Long): Int {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+      val active = executor.activeCount
+      if (active <= 0) return 0
+      runCatching { Thread.sleep(200) }
+    }
+    return executor.activeCount
+  }
+
   override fun afterPropertiesSet() {
     val disowned = tasksRepository.disown()
     if (disowned > 0)
       logger.info { "Reset $disowned tasks that were not finished" }
-    processTasks = true
+    processTasks = !settingsProvider.taskProcessorPaused
+    if (!processTasks) logger.warn { "Task processing stays paused after restart" }
   }
 
   override fun destroy() {

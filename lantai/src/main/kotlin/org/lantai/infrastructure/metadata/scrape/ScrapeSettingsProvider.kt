@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 data class ScrapeSettings(
   val trustResult: Boolean,
   val batchSize: Int,
+  val conflictPolicy: String,
 )
 
 @Service
@@ -28,13 +29,37 @@ class ScrapeSettingsProvider(
       field = normalized
     }
 
-  fun snapshot() = ScrapeSettings(trustResult = trustResult, batchSize = batchSize)
+  var conflictPolicy: String =
+    normalizePolicy(serverSettingsDao.getSettingByKey(KEY_CONFLICT_POLICY, String::class.java))
+    set(value) {
+      val normalized = normalizePolicy(value)
+      serverSettingsDao.saveSetting(KEY_CONFLICT_POLICY, normalized)
+      field = normalized
+    }
 
-  private companion object {
-    const val KEY_TRUST_RESULT = "SCRAPE_TRUST_RESULT"
-    const val KEY_BATCH_SIZE = "SCRAPE_BATCH_SIZE"
-    const val DEFAULT_BATCH_SIZE = 20
-    const val MIN_BATCH_SIZE = 1
-    const val MAX_BATCH_SIZE = 200
+  fun snapshot() =
+    ScrapeSettings(
+      trustResult = trustResult,
+      batchSize = batchSize,
+      conflictPolicy = conflictPolicy,
+    )
+
+  fun effectivePolicy(trust: Boolean): String = if (trust) CONFLICT_POLICY_OVERWRITE else conflictPolicy
+
+  companion object {
+    const val CONFLICT_POLICY_REVIEW = "review"
+    const val CONFLICT_POLICY_OVERWRITE = "overwrite"
+    const val CONFLICT_POLICY_KEEP = "keep"
+    val CONFLICT_POLICIES = setOf(CONFLICT_POLICY_REVIEW, CONFLICT_POLICY_OVERWRITE, CONFLICT_POLICY_KEEP)
+
+    fun normalizePolicy(raw: String?): String =
+      raw?.trim()?.lowercase()?.takeIf { it in CONFLICT_POLICIES } ?: CONFLICT_POLICY_REVIEW
+
+    private const val KEY_TRUST_RESULT = "SCRAPE_TRUST_RESULT"
+    private const val KEY_BATCH_SIZE = "SCRAPE_BATCH_SIZE"
+    private const val KEY_CONFLICT_POLICY = "SCRAPE_CONFLICT_POLICY"
+    private const val DEFAULT_BATCH_SIZE = 20
+    private const val MIN_BATCH_SIZE = 1
+    private const val MAX_BATCH_SIZE = 200
   }
 }

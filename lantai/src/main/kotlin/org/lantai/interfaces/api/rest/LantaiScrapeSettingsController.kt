@@ -34,8 +34,16 @@ class LantaiScrapeSettingsController(
     if (body.trustResult == true && !body.confirm) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "开启「信任刮削结果」需要显式确认")
     }
+    val policy = body.conflictPolicy?.trim()?.lowercase()?.takeIf { it.isNotEmpty() }
+    if (policy != null && policy !in ScrapeSettingsProvider.CONFLICT_POLICIES) {
+      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "未知的冲突处理策略：$policy")
+    }
+    if (policy != null && policy != ScrapeSettingsProvider.CONFLICT_POLICY_REVIEW && !body.confirm) {
+      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "切换「冲突处理」策略需要显式确认")
+    }
     body.trustResult?.let { settings.trustResult = it }
     body.batchSize?.let { settings.batchSize = it }
+    policy?.let { settings.conflictPolicy = it }
     return settings.snapshot()
   }
 }
@@ -43,5 +51,6 @@ class LantaiScrapeSettingsController(
 data class ScrapeSettingsUpdate(
   val trustResult: Boolean? = null,
   val batchSize: Int? = null,
+  val conflictPolicy: String? = null,
   val confirm: Boolean = false,
 )

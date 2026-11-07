@@ -1,13 +1,19 @@
 (function () {
   'use strict';
 
-  var MODES = [['single', '单页', 'single'], ['dual', '双页', 'double'], ['webtoon', '长条', 'flow'], ['paged', '分页', 'snap']];
-  var FITS = [['contain', '适应'], ['width', '满宽'], ['height', '满高'], ['orig', '原始']];
-  var QS = [[0, '原图'], [1600, '高清'], [1080, '省流']];
-  var MARGIN_PRESETS = [['none', '无', 0], ['narrow', '窄', 16], ['std', '标准', 32], ['wide', '宽', 72]];
+  var L = window.LantaiI18n;
+  function T(k, vars) {
+    return L && L.t ? L.t(k, vars) : k;
+  }
+
+  var MODES = [['single', 'rd.mode.single', 'single'], ['dual', 'rd.mode.dual', 'double'], ['webtoon', 'rd.mode.webtoon', 'flow'], ['paged', 'rd.mode.paged', 'snap']];
+  var FITS = [['contain', 'rd.fit.contain'], ['width', 'rd.fit.width'], ['height', 'rd.fit.height'], ['orig', 'rd.fit.orig']];
+  var QS = [[0, 'rd.q.orig'], [1600, 'rd.q.hd'], [1080, 'rd.q.lite']];
+  var MARGIN_PRESETS = [['none', 'rd.mp.none', 0], ['narrow', 'rd.mp.narrow', 16], ['std', 'rd.mp.std', 32], ['wide', 'rd.mp.wide', 72]];
   var COLORS = ['#C9A24B', '#B0402C', '#46523F', '#2F5D8A', '#7B4F6B', '#E3C377'];
-  var MARK_CN = { highlight: '高亮', underline: '下划线', bookmark: '书签', comment: '标注' };
+  var MARKS = { highlight: 'rd.marker.highlight', underline: 'rd.marker.underline', bookmark: 'rd.marker.bookmark', comment: 'rd.marker.comment' };
   var MAX_ZIP = 300;
+  function mk(marker) { return MARKS[marker] ? T(MARKS[marker]) : String(marker || ''); }
 
   var PRE = { mode: 'single', dir: 'LTR', fit: 'contain', quality: 0, preload: 2, gap: 8, bg: 'auto', imm: false, margins: { t: 0, b: 0, l: 0, r: 0 }, marginPreset: 'none' };
   try {
@@ -28,7 +34,9 @@
     session: null, beats: 0, hbTimer: null, progTimer: null, started: false,
     lo: 0, hi: 0, flowObserver: null, scrollTimer: null, tinted: '',
     preTimer: null, preReady: false, trackDrag: false, tipAt: 0, ver: 0,
-    barHover: false, thIO: null, thTick: null, thDown: null, thMoved: 0
+    barHover: false, thBusy: false, thRush: false, thLag: 0, thVel: 0,
+    thLastX: 0, thLastT: 0, thIdle: null, thDown: null, thMoved: 0, menu: null,
+    guideStep: 0, guideOpen: false, gtSettle: null
   };
 
   function rt() { return window.LantaiRuntime; }
@@ -59,9 +67,9 @@
   }
   function imgW() { return CS.quality > 0 ? CS.quality : 0; }
   function errText(e) {
-    if (!e) return '请求失败';
-    if (e.status === 403) return '没有这个书库的阅读权限';
-    if (e.status === 404) return '书籍或页面不存在';
+    if (!e) return T('rd.err.request');
+    if (e.status === 403) return T('rd.err.noPerm');
+    if (e.status === 404) return T('rd.err.notFound');
     return e.message ? String(e.message).slice(0, 120) : 'HTTP ' + (e.status || 'err');
   }
 
@@ -88,7 +96,7 @@
     var p = req('api/lantai/v1/read/' + CS.bookId + '/chapter/' + page + '?images=url&w=0')
       .then(function (dto) {
         var ref = dto && dto.images && dto.images[0] && dto.images[0].ref;
-        if (!ref) throw new Error('这一页没有图片');
+        if (!ref) throw new Error(T('rd.err.noImage'));
         CS.refs.set(page, ref);
         CS.refq.delete(page);
         return ref;
@@ -114,7 +122,9 @@
       '<div class="cm-hint" id="cmHint"></div>' +
       '<div class="cm-toast" id="cmToast"></div>' +
       '<div class="cm-float" id="cmFloat"></div>' +
-      '<div class="cm-offline" id="cmOffline">网络已断开<br><span style="color:rgba(233,228,216,.6);font-size:11px">已载入的页面仍可继续阅读</span></div>';
+      '<div class="cm-menu" id="cmMenu"></div>' +
+      '<div class="cm-guide" id="cmGuide"></div>' +
+      '<div class="cm-offline" id="cmOffline">' + T('rd.offline') + '<br><span style="color:rgba(233,228,216,.6);font-size:11px">' + T('rd.offlineNote') + '</span></div>';
     document.body.appendChild(r);
     r.addEventListener('pointerdown', onDown);
     r.addEventListener('pointermove', onMove);
@@ -127,7 +137,7 @@
       CS.panX = 0; CS.panY = 0;
       applyVars();
     });
-    ['cmTop', 'cmBot', 'cmSide', 'cmThumbs'].forEach(function (id) {
+    ['cmTop', 'cmBot', 'cmSide', 'cmThumbs', 'cmMenu'].forEach(function (id) {
       var n = $(id); if (!n) return;
       n.addEventListener('pointerenter', function () { CS.barHover = true; clearTimeout(CS.offTimer); });
       n.addEventListener('pointerleave', function () { CS.barHover = false; bumpIdle(); });
@@ -139,15 +149,15 @@
 
   function open(bookId, opts) {
     opts = opts || {};
-    if (!rt()) return toast('后端不可用', 'err');
+    if (!rt()) return toast(T('rd.err.backend'), 'err');
     if (CS.open && CS.bookId === bookId) {
       if (opts.page) goto(opts.page);
       return;
     }
     if (CS.open) close(false);
     var b = book(bookId);
-    if (!b) return toast('这本书不在书库里', 'err');
-    if (b.status === 'UNSUPPORTED') return toast('这本书需要先转成 CBZ 才能阅读', 'err');
+    if (!b) return toast(T('rd.err.notInLib'), 'err');
+    if (b.status === 'UNSUPPORTED') return toast(T('rd.err.unsupported'), 'err');
 
     mount();
     CS.open = true; CS.bookId = bookId; CS.book = b;
@@ -161,6 +171,7 @@
     CS.beats = 0; CS.started = false; CS.ptrs.clear(); CS.pinch = null; CS.drag = null;
     CS.preReady = false; clearTimeout(CS.preTimer); CS.preTimer = null;
     CS.trackDrag = false; CS.tipAt = 0; CS.ver = 0; CS.barHover = false; CS.thumbs = false;
+    CS.menu = null; CS.guideOpen = false; CS.guideStep = 0;
     resetThumbs();
     CS.session = {
       id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'cm_' + bookId + '_' + Date.now(),
@@ -172,14 +183,15 @@
     paintTop(); paintBot(); syncMode();
     $('cmFlow').style.display = 'none';
     $('cmStage').style.display = 'flex';
-    $('cmStage').innerHTML = '<div class="cm-skel">正在读取这本书</div>';
+    $('cmStage').innerHTML = '<div class="cm-skel">' + T('rd.loading') + '</div>';
     if (location.hash !== '#/read/' + bookId) history.pushState(null, '', '#/read/' + bookId);
     var s = series(b.s);
-    document.title = (s ? s.t : b.name) + ' · 兰台阅读';
+    document.title = (s ? s.t : b.name) + ' · ' + T('rd.readingTitle');
 
     load();
     startBeat();
     wakeUp();
+    maybeGuide();
   }
 
   function load() {
@@ -204,14 +216,14 @@
       applyVars(); syncMode(); paintTop(); paintBot();
       renderAll();
       sendProgress();
-      hint('左右点击翻页 · 中间呼出工具栏 · 长按拖动也能翻');
+      hint(T('rd.hint.basics'));
       bumpIdle();
     }).catch(function (e) {
       if (!CS.open) return;
-      $('cmStage').innerHTML = '<div class="cm-fail">这本书打不开<br><span style="opacity:.7">' + esc(errText(e)) + '</span>' +
-        '<button class="cm-btn" data-retry>重试</button></div>';
+      $('cmStage').innerHTML = '<div class="cm-fail">' + T('rd.err.openFail') + '<br><span style="opacity:.7">' + esc(errText(e)) + '</span>' +
+        '<button class="cm-btn" data-retry>' + T('rd.retry') + '</button></div>';
       var rb = $('cmStage').querySelector('[data-retry]');
-      if (rb) rb.onclick = function () { $('cmStage').innerHTML = '<div class="cm-skel">正在读取这本书</div>'; load(); };
+      if (rb) rb.onclick = function () { $('cmStage').innerHTML = '<div class="cm-skel">' + T('rd.loading') + '</div>'; load(); };
     });
   }
 
@@ -231,11 +243,11 @@
     if (CS.session && settle !== false) {
       CS.session.end = Date.now();
       if (PRE.imm) {
-        toast('隐身阅读 · 本次不留记录', 'ok');
+        toast(T('rd.toast.imm'), 'ok');
       } else {
         pushSession(CS.session);
         req('api/lantai/v1/reading/stop', { method: 'POST', body: { bookId: id, deviceId: 'webui' } }).catch(function () { });
-        toast('已读 ' + dur(CS.session.dur) + ' · 停在第 ' + CS.page + ' 页', 'ok');
+        toast(T('rd.toast.closed', { dur: dur(CS.session.dur), page: CS.page }), 'ok');
       }
     }
     CS.session = null;
@@ -287,7 +299,7 @@
     var box = el('div', 'cm-page');
     box.dataset.p = page;
     var img = el('img', 'cm-img');
-    img.alt = '第 ' + page + ' 页';
+    img.alt = T('rd.pageN', { n: page });
     img.draggable = false;
     img.decoding = 'async';
     box.appendChild(img);
@@ -299,7 +311,7 @@
     if (CS.refs.has(page)) setSrc(box, page);
     else {
       img.style.display = 'none';
-      var sk = el('div', 'cm-skel', '第 ' + page + ' 页');
+      var sk = el('div', 'cm-skel', T('rd.pageN', { n: page }));
       if (inFlow) {
         var fw = $('cmFlow') ? $('cmFlow').clientWidth : innerWidth;
         sk.style.minHeight = Math.round(fw * 1.42) + 'px';
@@ -313,7 +325,7 @@
         if (!box.isConnected) return;
         if (sk.parentNode) sk.remove();
         if (img.parentNode) img.remove();
-        var f = el('div', 'cm-fail', '第 ' + page + ' 页载入失败<br><span style="opacity:.65">' + esc(errText(e)) + '</span><button class="cm-btn sm" data-re>重试</button>');
+        var f = el('div', 'cm-fail', T('rd.err.pageFail', { n: page }) + '<br><span style="opacity:.65">' + esc(errText(e)) + '</span><button class="cm-btn sm" data-re>' + T('rd.retry') + '</button>');
         box.appendChild(f);
         var rb = f.querySelector('[data-re]');
         if (rb) rb.onclick = function (ev) { ev.stopPropagation(); CS.fails.delete(page); renderAll(); };
@@ -343,7 +355,7 @@
       if (sk && sk.parentNode) sk.remove();
       img.style.display = 'none';
       if (box.querySelector('.cm-fail')) return;
-      var f = el('div', 'cm-fail', '第 ' + page + ' 页载入失败<button class="cm-btn sm" data-re>重试</button>');
+      var f = el('div', 'cm-fail', T('rd.err.pageFail', { n: page }) + '<button class="cm-btn sm" data-re>' + T('rd.retry') + '</button>');
       box.appendChild(f);
       var rb = f.querySelector('[data-re]');
       if (rb) rb.onclick = function (ev) { ev.stopPropagation(); CS.fails.delete(page); CS.refs.delete(page); renderAll(); };
@@ -525,33 +537,132 @@
     var b = CS.book || {};
     var s = b.seriesTitle || '';
     top.innerHTML =
-      '<button class="cm-btn" data-a="exit" title="返回书架">' + svg('left', 16) + '</button>' +
-      '<div class="cm-title"><b>' + esc(b.title || b.name || '漫画') + (PRE.imm ? '<i class="cm-imm">隐身</i>' : '') + '</b>' +
-      '<span>' + esc(s) + (b.profile ? ' · ' + esc(PROFILE_CN[b.profile] || b.profile) : '') + ' · ' + num(CS.total) + ' 页</span></div>' +
+      '<button class="cm-btn" data-a="exit" title="' + esc(T('rd.exit')) + '">' + svg('left', 16) + '</button>' +
+      '<div class="cm-title"><b>' + esc(b.title || b.name || T('rd.comic')) + (PRE.imm ? '<i class="cm-imm">' + esc(T('rd.imm')) + '</i>' : '') + '</b>' +
+      '<span>' + esc(s) + (b.profile ? ' · ' + esc(PROFILE_CN[b.profile] || b.profile) : '') + ' · ' + esc(T('rd.pagesN', { n: num(CS.total) })) + '</span></div>' +
       '<div class="cm-tools">' +
-      '<button class="cm-btn" data-a="thumbs" title="缩略图条 T">' + svg('grid') + '</button>' +
-      '<button class="cm-btn" data-a="anns" title="书签与标注 M">' + svg('list') + '</button>' +
-      '<button class="cm-btn" data-a="bookmark" title="加书签 B">' + svg('bookmark') + '</button>' +
-      '<button class="cm-btn" data-a="draw" title="框选标注 R">' + svg('crop') + '</button>' +
-      '<button class="cm-btn" data-a="set" title="阅读设置 S">' + svg('settings') + '</button>' +
-      '<button class="cm-btn" data-a="full" title="全屏 F">' + svg('full') + '</button>' +
+      '<button class="cm-btn" data-a="ann" title="' + esc(T('rd.tool.anns')) + '">' + svg('marker') + '</button>' +
+      '<button class="cm-btn" data-a="set" title="' + esc(T('rd.tool.set')) + '">' + svg('settings') + '</button>' +
+      '<button class="cm-btn" data-a="full" title="' + esc(T('rd.tool.full')) + '">' + svg('full') + '</button>' +
       '</div>';
     top.querySelector('[data-a="exit"]').onclick = function () { close(); };
-    top.querySelector('[data-a="thumbs"]').onclick = function () { toggleThumbs(); };
-    top.querySelector('[data-a="anns"]').onclick = function () { side('anns'); };
-    top.querySelector('[data-a="bookmark"]').onclick = function () { toggleBookmark(); };
-    top.querySelector('[data-a="draw"]').onclick = function () { setDraw(CS.drawMode ? null : 'rect'); };
-    top.querySelector('[data-a="set"]').onclick = function () { side('set'); };
+    top.querySelector('[data-a="ann"]').onclick = function (ev) { ev.stopPropagation(); openMenu(ev.currentTarget, 'ann'); };
+    top.querySelector('[data-a="set"]').onclick = function () { closeMenu(); side('set'); };
     top.querySelector('[data-a="full"]').onclick = function () { fullscreen(); };
     markToolbar();
   }
 
   function markToolbar() {
-    var t = $('cmTop'); if (!t) return;
-    t.querySelector('[data-a="thumbs"]').classList.toggle('on', CS.thumbs);
-    t.querySelector('[data-a="anns"]').classList.toggle('on', CS.side === 'anns');
-    t.querySelector('[data-a="set"]').classList.toggle('on', CS.side === 'set');
-    t.querySelector('[data-a="draw"]').classList.toggle('on', !!CS.drawMode);
+    var t = $('cmTop');
+    if (t) {
+      var ann = t.querySelector('[data-a="ann"]');
+      if (ann) ann.classList.toggle('on', CS.side === 'anns' || !!CS.drawMode);
+      var set = t.querySelector('[data-a="set"]');
+      if (set) set.classList.toggle('on', CS.side === 'set');
+    }
+    var b = $('cmBot');
+    if (b) {
+      var th = b.querySelector('[data-a="thumbs"]');
+      if (th) th.classList.toggle('on', CS.thumbs);
+      var md = b.querySelector('[data-a="mode"]');
+      if (md) md.classList.toggle('on', CS.menu === 'mode');
+      var q = b.querySelector('[data-a="quality"]');
+      if (q) q.classList.toggle('on', CS.menu === 'quality');
+    }
+  }
+
+  function menuItems(kind) {
+    if (kind === 'ann') {
+      return [
+        { icon: 'list', label: T('rd.tool.anns'), key: 'M', on: CS.side === 'anns', run: function () { side('anns'); } },
+        { icon: 'bookmark', label: T('rd.tool.bm'), key: 'B', run: function () { toggleBookmark(); } },
+        { icon: 'crop', label: T('rd.tool.rect'), key: 'R', on: CS.drawMode === 'rect', run: function () { setDraw(CS.drawMode === 'rect' ? null : 'rect'); } },
+        { icon: 'brush', label: T('rd.tool.brush'), key: 'P', on: CS.drawMode === 'brush', run: function () { setDraw(CS.drawMode === 'brush' ? null : 'brush'); } }
+      ];
+    }
+    if (kind === 'mode') {
+      var out = MODES.map(function (m) {
+        return { icon: m[2], label: T(m[1]), on: CS.mode === m[0], run: function () { setMode(m[0]); } };
+      });
+      out.push({ sep: T('rd.tool.dir') });
+      [['LTR', 'rd.dir.ltr'], ['RTL', 'rd.dir.rtl']].forEach(function (d) {
+        out.push({ icon: 'dir', label: T(d[1]), on: CS.dir === d[0], run: function () { setDir(d[0]); } });
+      });
+      return out;
+    }
+    return QS.map(function (q) {
+      return { icon: 'bolt', label: T(q[1]), on: CS.quality === q[0], run: function () { setQuality(q[0]); } };
+    });
+  }
+
+  function openMenu(anchor, kind) {
+    var m = $('cmMenu'); if (!m || !anchor) return;
+    if (CS.menu === kind) return closeMenu();
+    CS.menu = kind;
+    var items = menuItems(kind);
+    m.innerHTML = items.map(function (it, i) {
+      if (it.sep != null) return '<div class="cm-menu-sep">' + esc(it.sep) + '</div>';
+      return '<button class="cm-menu-it' + (it.on ? ' on' : '') + '" data-mi="' + i + '">' +
+        (it.icon ? svg(it.icon, 14) : '<i class="cm-menu-dot"></i>') +
+        '<span>' + esc(it.label) + '</span>' +
+        (it.key ? '<kbd>' + it.key + '</kbd>' : '') +
+        '<i class="cm-menu-tick">' + (it.on ? svg('check', 12) : '') + '</i></button>';
+    }).join('');
+    m.classList.add('on');
+    var r = anchor.getBoundingClientRect();
+    var mw = m.offsetWidth, mh = m.offsetHeight;
+    var left = clamp(r.left + r.width / 2 - mw / 2, 8, Math.max(8, innerWidth - mw - 8));
+    var top = r.top > innerHeight * 0.55 ? r.top - mh - 8 : r.bottom + 8;
+    if (top < 8) top = r.bottom + 8;
+    if (top + mh > innerHeight - 8) top = Math.max(8, innerHeight - mh - 8);
+    m.style.left = left + 'px';
+    m.style.top = top + 'px';
+    all('#cmMenu [data-mi]').forEach(function (btn) {
+      btn.onclick = function (ev) {
+        ev.stopPropagation();
+        var it = items[+btn.dataset.mi];
+        closeMenu();
+        if (it && it.run) it.run();
+      };
+    });
+    markToolbar();
+    bumpIdle();
+  }
+
+  function closeMenu() {
+    if (!CS.menu) return;
+    CS.menu = null;
+    var m = $('cmMenu');
+    if (m) m.classList.remove('on');
+    markToolbar();
+  }
+
+  function setMode(mode) {
+    CS.mode = mode; PRE.mode = mode; PRE.modeTouched = true; savePrefs();
+    syncMode(); renderAll(); paintBot();
+    if (CS.side === 'set') paintSettings($('cmSide'));
+    markToolbar();
+  }
+
+  function setDir(dir) {
+    CS.dir = dir; PRE.dir = dir; savePrefs();
+    if (CS.mode === 'webtoon' || CS.mode === 'paged') {
+      CS.mode = 'single'; PRE.mode = 'single'; PRE.modeTouched = true;
+      syncMode(); renderAll();
+      toast(T('rd.toast.single'), 'ok');
+    } else renderAll();
+    paintBot();
+    if (CS.side === 'set') paintSettings($('cmSide'));
+    toast(T('rd.toast.dir', { v: T(dir === 'RTL' ? 'rd.dir.rtl' : 'rd.dir.ltr') }), 'ok');
+  }
+
+  function setQuality(q) {
+    CS.quality = q; PRE.quality = q; savePrefs();
+    CS.refs.clear(); CS.refq.clear(); CS.fails.clear(); CS.preloaded.clear();
+    renderAll(); paintBot();
+    if (CS.side === 'set') paintSettings($('cmSide'));
+    var hit = QS.filter(function (x) { return x[0] === q; })[0] || QS[0];
+    toast(T('rd.toast.q', { v: T(hit[1]) }), 'ok');
   }
 
   function pct() { return Math.round(CS.page / (CS.total || 1) * 1000) / 10; }
@@ -568,47 +679,33 @@
     var pc = bot.querySelector('[data-pct]');
     if (pc) pc.textContent = p + '%';
     var rest = bot.querySelector('[data-rest]');
-    if (rest) rest.textContent = '剩 ' + num(Math.max(0, total - CS.page)) + ' 页';
+    if (rest) rest.textContent = T('rd.restN', { n: num(Math.max(0, total - CS.page)) });
   }
 
   function paintBot() {
     var bot = $('cmBot'); if (!bot) return;
     var total = CS.total || 1, p = pct();
     var marks = CS.anns.filter(function (a) { return a.marker === 'bookmark'; });
+    var cur = MODES.filter(function (m) { return m[0] === CS.mode; })[0] || MODES[0];
     bot.innerHTML = '<div class="cm-bar">' +
       '<span data-pos style="min-width:86px;font-variant-numeric:tabular-nums">' + CS.page + ' / ' + num(total) + '</span>' +
       '<div class="cm-track" id="cmTrack"><i style="width:' + p + '%"></i><b style="left:' + p + '%"></b>' +
       marks.map(function (a) { return '<em style="left:' + (a.page / total * 100) + '%"></em>'; }).join('') +
       '<div class="cm-tip" id="cmTip"></div></div>' +
       '<span data-pct style="min-width:48px;text-align:right;font-variant-numeric:tabular-nums">' + p + '%</span>' +
-      '<span data-rest style="opacity:.5;min-width:64px;text-align:right">剩 ' + num(Math.max(0, total - CS.page)) + ' 页</span>' +
-      MODES.map(function (m) {
-        return '<button class="cm-btn' + (CS.mode === m[0] ? ' on' : '') + '" data-m="' + m[0] + '" title="' + m[1] + '">' + svg(m[2]) + '</button>';
-      }).join('') +
-      '<button class="cm-btn" data-a="quality" title="画质">' + svg('bolt') + '<span style="font-size:10.5px">' + (CS.quality ? CS.quality + 'px' : '原图') + '</span></button>' +
-      '<button class="cm-btn" data-a="export" title="导出">' + svg('dl') + '</button>' +
-      '<button class="cm-btn" data-a="dir" title="阅读方向">' + svg('dir') + '<span style="font-size:10.5px">' + CS.dir + '</span></button>' +
-      '</div>';
-    all('#cmBot [data-m]').forEach(function (b) {
-      b.onclick = function () {
-        CS.mode = b.dataset.m; PRE.mode = CS.mode; PRE.modeTouched = true; savePrefs();
-        syncMode(); renderAll();
-      };
-    });
-    bot.querySelector('[data-a="quality"]').onclick = cycleQuality;
-    bot.querySelector('[data-a="export"]').onclick = function () { side('export'); };
-    bot.querySelector('[data-a="dir"]').onclick = function () {
-      if (CS.mode === 'webtoon' || CS.mode === 'paged') {
-        CS.mode = 'single'; PRE.mode = 'single'; PRE.modeTouched = true;
-        syncMode(); renderAll();
-        toast('滚动模式没有左右方向，已切回单页', 'info');
-        return;
-      }
-      CS.dir = CS.dir === 'LTR' ? 'RTL' : 'LTR';
-      PRE.dir = CS.dir; savePrefs(); paintBot();
-      toast('阅读方向：' + (CS.dir === 'RTL' ? '从右往左' : '从左往右'), 'ok');
-    };
+      '<span data-rest style="opacity:.5;min-width:64px;text-align:right">' + esc(T('rd.restN', { n: num(Math.max(0, total - CS.page)) })) + '</span>' +
+      '<div class="cm-btools">' +
+      '<button class="cm-btn" data-a="mode" title="' + esc(T('rd.tool.mode')) + '">' + svg(cur[2]) + '<span class="cm-bl">' + esc(T(cur[1])) + '</span>' + svg('down', 10) + '</button>' +
+      '<button class="cm-btn" data-a="quality" title="' + esc(T('rd.tool.q')) + '">' + svg('bolt') + '<span class="cm-bl">' + esc(CS.quality ? CS.quality + 'px' : T('rd.q.orig')) + '</span>' + svg('down', 10) + '</button>' +
+      '<button class="cm-btn" data-a="thumbs" title="' + esc(T('rd.tool.thumbs')) + '">' + svg('grid') + '</button>' +
+      '<button class="cm-btn" data-a="export" title="' + esc(T('rd.tool.export')) + '">' + svg('dl') + '</button>' +
+      '</div></div>';
+    bot.querySelector('[data-a="mode"]').onclick = function (ev) { ev.stopPropagation(); openMenu(ev.currentTarget, 'mode'); };
+    bot.querySelector('[data-a="quality"]').onclick = function (ev) { ev.stopPropagation(); openMenu(ev.currentTarget, 'quality'); };
+    bot.querySelector('[data-a="thumbs"]').onclick = function () { closeMenu(); toggleThumbs(); };
+    bot.querySelector('[data-a="export"]').onclick = function () { closeMenu(); side('export'); };
     bindTrack();
+    markToolbar();
   }
 
   function bindTrack() {
@@ -625,7 +722,7 @@
       tip.style.left = clamp(ev.clientX - r.left, 62, r.width - 62) + 'px';
       if (CS.tipAt === page) return;
       CS.tipAt = page;
-      tip.innerHTML = '<img src="' + base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + page + '?w=120' + verQ() + '" alt=""><span>第 ' + page + ' 页</span>';
+      tip.innerHTML = '<img src="' + base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + page + '?w=120' + verQ() + '" alt=""><span>' + esc(T('rd.pageN', { n: page })) + '</span>';
     };
     var preview = function (page, ev) {
       CS.page = page;
@@ -658,32 +755,29 @@
     tr.onmouseleave = function () { if (tip) tip.classList.remove('on'); };
   }
 
-  function cycleQuality() {
-    var i = QS.findIndex(function (x) { return x[0] === CS.quality; });
-    i = (i + 1) % QS.length;
-    CS.quality = QS[i][0]; PRE.quality = CS.quality; savePrefs();
-    CS.refs.clear(); CS.refq.clear(); CS.fails.clear(); CS.preloaded.clear();
-    renderAll(); paintBot();
-    toast('画质：' + QS[i][1] + (CS.quality ? '（宽 ' + CS.quality + 'px）' : '（原图直出）'), 'ok');
-  }
-
   function toggleThumbs(force) {
     CS.thumbs = force == null ? !CS.thumbs : force;
     $('cmThumbs').classList.toggle('on', CS.thumbs);
     $('cm').classList.toggle('thumbs-open', CS.thumbs);
-    var bot = $('cmBot');
-    if (bot) bot.classList.toggle('off', CS.thumbs);
     markToolbar();
     if (CS.thumbs) {
+      all('#cmStrip .cm-th.fail').forEach(function (c) {
+        c.classList.remove('fail');
+        delete c.dataset.dead;
+        delete c.dataset.loaded;
+      });
       paintThumbs();
-      var cur = $('cmStrip').querySelector('.cm-th.on');
+      var strip = $('cmStrip');
+      var cur = strip ? strip.querySelector('.cm-th.on') : null;
       if (cur) cur.scrollIntoView({ inline: 'center', block: 'nearest' });
+      setTimeout(function () { if (CS.thumbs) thScroll(); }, 280);
     }
     bumpIdle();
   }
 
-  var TH_PAD = 320;
-  var TH_LEAD = 8;
+  var TH_AHEAD = 0.25;
+  var TH_TAIL = 3;
+  var TH_RUSH_V = 1.6;
   var TH_DRAG_MIN = 6;
   var TH_CLICK_SLOP = 10;
 
@@ -748,70 +842,116 @@
     return base() + 'api/lantai/v1/read/' + CS.bookId + '/thumb/' + p + '?w=120' + verQ();
   }
 
-  function fillThumb(c) {
-    if (!c || c.dataset.loaded || !c.dataset.src) return;
+  function thWindow() {
+    var strip = $('cmStrip');
+    if (!strip) return null;
+    var kids = strip.children;
+    if (!kids.length) return null;
+    var x0 = kids[0].offsetLeft;
+    var step = kids.length > 1 ? kids[1].offsetLeft - x0 : 82;
+    if (!(step > 0)) step = 82;
+    var pad = Math.round(strip.clientWidth * TH_AHEAD);
+    var from = Math.max(0, Math.floor((strip.scrollLeft - pad - x0) / step));
+    var to = Math.min(kids.length - 1, Math.ceil((strip.scrollLeft + strip.clientWidth + pad - x0) / step));
+    return { strip: strip, kids: kids, from: from, to: to };
+  }
+
+  function thPlan() {
+    var w = thWindow();
+    if (!w) return [];
+    var out = [], i, c;
+    for (i = w.from; i <= w.to; i++) {
+      c = w.kids[i];
+      if (c && !c.dataset.loaded && !c.dataset.dead) out.push(c);
+    }
+    for (i = w.to + 1; i <= Math.min(w.kids.length - 1, w.to + TH_TAIL); i++) {
+      c = w.kids[i];
+      if (c && !c.dataset.loaded && !c.dataset.dead) out.push(c);
+    }
+    return out;
+  }
+
+  function thPump() {
+    if (!CS.thumbs || CS.thRush || CS.thBusy) return;
+    var plan = thPlan();
+    if (!plan.length) return;
+    thLoad(plan[0]);
+  }
+
+  function thSettle() {
+    clearTimeout(CS.thIdle);
+    CS.thIdle = setTimeout(function () {
+      CS.thIdle = null;
+      CS.thVel = 0;
+      CS.thLag = 0;
+      CS.thRush = false;
+      thPump();
+    }, 160);
+  }
+
+  function thLoad(c) {
+    if (!c || c.dataset.loaded) { thPump(); return; }
+    var idx = +c.dataset.p - 1;
+    CS.thBusy = true;
     c.dataset.loaded = '1';
     var im = el('img');
-    im.loading = 'lazy';
     im.alt = '';
-    im.onload = function () { c.classList.add('ok'); };
+    im.decoding = 'async';
+    var done = function (ok) {
+      CS.thBusy = false;
+      if (ok) c.classList.add('ok');
+      else { c.classList.add('fail'); c.dataset.dead = '1'; }
+      var w = thWindow();
+      if (w && (idx < w.from || idx > w.to)) {
+        CS.thLag++;
+        if (CS.thLag >= 2) { CS.thRush = true; thSettle(); }
+      } else {
+        CS.thLag = 0;
+      }
+      thPump();
+    };
+    im.onload = function () { done(true); };
+    im.onerror = function () { done(false); };
     im.src = c.dataset.src;
     c.insertBefore(im, c.firstChild);
   }
 
-  function primeThumbs() {
-    if (!CS.thumbs) return;
-    var strip = $('cmStrip'); if (!strip) return;
-    var kids = strip.children, n = CS.total, p = CS.page, i;
-    for (i = 0; i < TH_LEAD; i++) {
-      if (p + i <= n) fillThumb(kids[p + i - 1]);
-      if (i && p - i >= 1) fillThumb(kids[p - i - 1]);
+  function thScroll() {
+    var strip = $('cmStrip');
+    if (!strip || !CS.thumbs) return;
+    var now = Date.now();
+    var x = strip.scrollLeft;
+    if (CS.thLastT) {
+      var dt = Math.max(1, now - CS.thLastT);
+      CS.thVel = CS.thVel * 0.55 + Math.abs(x - CS.thLastX) / dt * 0.45;
     }
+    CS.thLastX = x;
+    CS.thLastT = now;
+    if (CS.thVel > TH_RUSH_V) CS.thRush = true;
+    thSettle();
+    if (!CS.thRush) thPump();
+  }
+
+  function thWatch() {
+    var strip = $('cmStrip');
+    if (!strip) return;
+    stopThumbWatch();
+    strip.addEventListener('scroll', thScroll, { passive: true });
+    window.addEventListener('resize', thScroll);
   }
 
   function stopThumbWatch() {
-    if (CS.thIO) { CS.thIO.disconnect(); CS.thIO = null; }
-    if (CS.thTick) {
-      var strip = $('cmStrip');
-      if (strip) strip.removeEventListener('scroll', CS.thTick);
-      window.removeEventListener('resize', CS.thTick);
-      CS.thTick = null;
-    }
-  }
-
-  function thumbWatch() {
-    var strip = $('cmStrip'); if (!strip) return;
-    stopThumbWatch();
-    if (typeof IntersectionObserver === 'function') {
-      var io = new IntersectionObserver(function (list) {
-        list.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          fillThumb(e.target);
-          io.unobserve(e.target);
-        });
-      }, { root: strip, rootMargin: '0px ' + TH_PAD + 'px' });
-      CS.thIO = io;
-      [].slice.call(strip.children).forEach(function (c) { io.observe(c); });
-      return;
-    }
-    var tick = null;
-    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 60); };
-    var scan = function () {
-      tick = null;
-      var kids = strip.children;
-      if (!kids.length) return;
-      var x0 = kids[0].offsetLeft;
-      var step = kids.length > 1 ? kids[1].offsetLeft - x0 : 82;
-      if (!(step > 0)) step = 82;
-      var from = Math.max(0, Math.floor((strip.scrollLeft - TH_PAD - x0) / step));
-      var to = Math.min(kids.length - 1, Math.ceil((strip.scrollLeft + strip.clientWidth + TH_PAD - x0) / step));
-      for (var i = from; i <= to; i++) fillThumb(kids[i]);
-    };
-    var queue = function () { if (!tick) tick = raf(scan); };
-    CS.thTick = queue;
-    strip.addEventListener('scroll', queue, { passive: true });
-    window.addEventListener('resize', queue);
-    queue();
+    var strip = $('cmStrip');
+    if (strip) strip.removeEventListener('scroll', thScroll);
+    window.removeEventListener('resize', thScroll);
+    clearTimeout(CS.thIdle);
+    CS.thIdle = null;
+    CS.thBusy = false;
+    CS.thRush = false;
+    CS.thLag = 0;
+    CS.thVel = 0;
+    CS.thLastX = 0;
+    CS.thLastT = 0;
   }
 
   function resetThumbs() {
@@ -833,9 +973,9 @@
       }
       strip.innerHTML = html;
       wireStrip(strip);
-      thumbWatch();
+      thWatch();
     }
-    primeThumbs();
+    thPump();
     var cur = spreadPages(CS.page);
     all('#cmStrip .cm-th').forEach(function (c) {
       var p = +c.dataset.p;
@@ -871,61 +1011,52 @@
 
   function paintSettings(P) {
     var m = PRE.margins;
-    P.innerHTML = sideHead('阅读设置') + '<div class="cm-side-b">' +
-      '<div class="cm-sec"><div class="t">阅读模式</div><div class="cm-chips">' +
-      MODES.map(function (x) { return '<span class="cm-chip' + (CS.mode === x[0] ? ' on' : '') + '" data-mode="' + x[0] + '">' + svg(x[2], 13) + x[1] + '</span>'; }).join('') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">页面适应</div><div class="cm-chips">' +
-      FITS.map(function (x) { return '<span class="cm-chip' + (CS.fit === x[0] ? ' on' : '') + '" data-fit="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">阅读方向</div><div class="cm-chips">' +
-      [['LTR', '从左往右'], ['RTL', '从右往左']].map(function (x) { return '<span class="cm-chip' + (CS.dir === x[0] ? ' on' : '') + '" data-dir="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">' + ((CS.mode === 'webtoon' || CS.mode === 'paged') ? '当前是滚动模式，左右方向不生效；点方向会切回单页' : '方向镜像翻页热区与键盘左右键') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">画质</div><div class="cm-chips">' +
-      QS.map(function (x) { return '<span class="cm-chip' + (CS.quality === x[0] ? ' on' : '') + '" data-q="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">原图零转码最快；高清 / 省流由服务端按宽度降采样，省流量</div></div>' +
-      '<div class="cm-sec"><div class="t">边距</div><div class="cm-chips" style="margin-bottom:9px">' +
-      MARGIN_PRESETS.map(function (x) { return '<span class="cm-chip' + (PRE.marginPreset === x[0] ? ' on' : '') + '" data-mp="' + x[0] + '" data-v="' + x[2] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-mg">' + mr('上', 't', m.t) + mr('下', 'b', m.b) + mr('左', 'l', m.l) + mr('右', 'r', m.r) + '</div></div>' +
-      '<div class="cm-sec"><div class="t">长条页间距</div>' + rg('gap', PRE.gap, 0, 60, 1, PRE.gap + ' px') + '</div>' +
-      '<div class="cm-sec"><div class="t">预加载</div><div class="cm-chips">' +
-      [0, 1, 2, 3, 5].map(function (n) { return '<span class="cm-chip' + (PRE.preload === n ? ' on' : '') + '" data-pre="' + n + '">' + (n ? n + ' 页' : '关闭') + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">提前取相邻页的图片，翻页时直接出图</div></div>' +
-      '<div class="cm-sec"><div class="t">背景光晕</div><div class="cm-chips">' +
-      [['auto', '跟随页面'], ['black', '纯黑']].map(function (x) { return '<span class="cm-chip' + (PRE.bg === x[0] ? ' on' : '') + '" data-bg="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div></div>' +
-      '<div class="cm-sec"><div class="t">隐身阅读</div><div class="cm-chips">' +
-      [[0, '关闭'], [1, '开启']].map(function (x) { return '<span class="cm-chip' + ((PRE.imm ? 1 : 0) === x[0] ? ' on' : '') + '" data-imm="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div>' +
-      '<div class="cm-note">开启后服务端不写阅读会话与进度，翻到哪页只存本标签页；标注照常保存</div></div>' +
-      '<div class="cm-sec"><div class="t">快捷键</div><div class="cm-keys">' +
-      '<kbd>← →</kbd><span>上一页 / 下一页</span><kbd>Space</kbd><span>下一页</span><kbd>T</kbd><span>缩略图条</span>' +
-      '<kbd>M</kbd><span>标注列表</span><kbd>B</kbd><span>加书签</span><kbd>R</kbd><span>框选标注</span>' +
-      '<kbd>F</kbd><span>全屏</span><kbd>+ −</kbd><span>缩放</span>' +
-      '</div></div></div>';
+    P.innerHTML = sideHead(T('rd.set.title')) + '<div class="cm-side-b">' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.mode') + '</div><div class="cm-chips">' +
+      MODES.map(function (x) { return '<span class="cm-chip' + (CS.mode === x[0] ? ' on' : '') + '" data-mode="' + x[0] + '">' + svg(x[2], 13) + esc(T(x[1])) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.fit') + '</div><div class="cm-chips">' +
+      FITS.map(function (x) { return '<span class="cm-chip' + (CS.fit === x[0] ? ' on' : '') + '" data-fit="' + x[0] + '">' + esc(T(x[1])) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.dir') + '</div><div class="cm-chips">' +
+      [['LTR', 'rd.dir.ltr'], ['RTL', 'rd.dir.rtl']].map(function (x) { return '<span class="cm-chip' + (CS.dir === x[0] ? ' on' : '') + '" data-dir="' + x[0] + '">' + esc(T(x[1])) + '</span>'; }).join('') + '</div>' +
+      '<div class="cm-note">' + T((CS.mode === 'webtoon' || CS.mode === 'paged') ? 'rd.set.dirScrollNote' : 'rd.set.dirNote') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.q') + '</div><div class="cm-chips">' +
+      QS.map(function (x) { return '<span class="cm-chip' + (CS.quality === x[0] ? ' on' : '') + '" data-q="' + x[0] + '">' + esc(T(x[1])) + '</span>'; }).join('') + '</div>' +
+      '<div class="cm-note">' + T('rd.set.qNote') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.margin') + '</div><div class="cm-chips" style="margin-bottom:9px">' +
+      MARGIN_PRESETS.map(function (x) { return '<span class="cm-chip' + (PRE.marginPreset === x[0] ? ' on' : '') + '" data-mp="' + x[0] + '" data-v="' + x[2] + '">' + esc(T(x[1])) + '</span>'; }).join('') + '</div>' +
+      '<div class="cm-mg">' + mr(T('rd.set.marginT'), 't', m.t) + mr(T('rd.set.marginB'), 'b', m.b) + mr(T('rd.set.marginL'), 'l', m.l) + mr(T('rd.set.marginR'), 'r', m.r) + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.gap') + '</div>' + rg('gap', PRE.gap, 0, 60, 1, PRE.gap + ' px') + '</div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.pre') + '</div><div class="cm-chips">' +
+      [0, 1, 2, 3, 5].map(function (n) { return '<span class="cm-chip' + (PRE.preload === n ? ' on' : '') + '" data-pre="' + n + '">' + (n ? esc(T('rd.set.preN', { n: n })) : T('rd.set.preOff')) + '</span>'; }).join('') + '</div>' +
+      '<div class="cm-note">' + T('rd.set.preNote') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.bg') + '</div><div class="cm-chips">' +
+      [['auto', 'rd.set.bgAuto'], ['black', 'rd.set.bgBlack']].map(function (x) { return '<span class="cm-chip' + (PRE.bg === x[0] ? ' on' : '') + '" data-bg="' + x[0] + '">' + esc(T(x[1])) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.imm') + '</div><div class="cm-chips">' +
+      [[0, 'rd.set.off'], [1, 'rd.set.on']].map(function (x) { return '<span class="cm-chip' + ((PRE.imm ? 1 : 0) === x[0] ? ' on' : '') + '" data-imm="' + x[0] + '">' + esc(T(x[1])) + '</span>'; }).join('') + '</div>' +
+      '<div class="cm-note">' + T('rd.set.immNote') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.keys') + '</div><div class="cm-keys">' +
+      '<kbd>← →</kbd><span>' + T('rd.key.prevNext') + '</span><kbd>Space</kbd><span>' + T('rd.key.next') + '</span>' +
+      '<kbd>T</kbd><span>' + T('rd.key.thumbs') + '</span><kbd>M</kbd><span>' + T('rd.key.anns') + '</span>' +
+      '<kbd>B</kbd><span>' + T('rd.key.bm') + '</span><kbd>R</kbd><span>' + T('rd.key.rect') + '</span>' +
+      '<kbd>F</kbd><span>' + T('rd.key.full') + '</span><kbd>+ −</kbd><span>' + T('rd.key.zoom') + '</span>' +
+      '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.set.help') + '</div>' +
+      '<button class="cm-btn" data-help="1" style="width:100%;height:32px">' + svg('info', 13) + '<span>' + T('rd.set.help') + '</span></button>' +
+      '<div class="cm-note">' + T('rd.set.helpNote') + '</div></div>' +
+      '</div>';
 
     P.querySelector('[data-a="close"]').onclick = closeSide;
     all('#cmSide [data-mode]').forEach(function (c) {
-      c.onclick = function () {
-        CS.mode = c.dataset.mode; PRE.mode = CS.mode; PRE.modeTouched = true; savePrefs();
-        syncMode(); renderAll(); paintSettings(P);
-      };
+      c.onclick = function () { setMode(c.dataset.mode); };
     });
     all('#cmSide [data-fit]').forEach(function (c) {
       c.onclick = function () { CS.fit = c.dataset.fit; PRE.fit = CS.fit; savePrefs(); applyVars(); paintSettings(P); };
     });
     all('#cmSide [data-dir]').forEach(function (c) {
-      c.onclick = function () {
-        CS.dir = c.dataset.dir; PRE.dir = CS.dir; savePrefs();
-        if (CS.mode === 'webtoon' || CS.mode === 'paged') {
-          CS.mode = 'single'; PRE.mode = 'single'; PRE.modeTouched = true;
-          toast('已切到单页，方向生效', 'ok');
-        }
-        syncMode(); renderAll(); paintBot(); paintSettings(P);
-      };
+      c.onclick = function () { setDir(c.dataset.dir); };
     });
     all('#cmSide [data-q]').forEach(function (c) {
-      c.onclick = function () {
-        CS.quality = +c.dataset.q; PRE.quality = CS.quality; savePrefs();
-        CS.refs.clear(); CS.refq.clear(); CS.fails.clear();
-        renderAll(); paintBot(); paintSettings(P);
-      };
+      c.onclick = function () { setQuality(+c.dataset.q); };
     });
     all('#cmSide [data-mp]').forEach(function (c) {
       c.onclick = function () {
@@ -967,9 +1098,11 @@
           else sessionStorage.removeItem(immKey());
         } catch (e) { }
         paintTop(); paintSettings(P);
-        toast(PRE.imm ? '隐身阅读已开启，本次不留记录' : '已恢复记录进度');
+        toast(PRE.imm ? T('rd.toast.immOn') : T('rd.toast.immResume'));
       };
     });
+    var hb = P.querySelector('[data-help]');
+    if (hb) hb.onclick = function () { guide(true); };
   }
 
   function mr(label, key, val) {
@@ -987,7 +1120,7 @@
       if (tab === 'bookmark' && a.marker !== 'bookmark') return false;
       if (tab === 'mark' && a.marker === 'bookmark') return false;
       if (!q) return true;
-      return (String(a.note || '') + ' ' + (MARK_CN[a.marker] || '') + ' p' + a.page).toLowerCase().indexOf(q) >= 0;
+      return (String(a.note || '') + ' ' + mk(a.marker) + ' p' + a.page).toLowerCase().indexOf(q) >= 0;
     }).sort(function (a, b) { return a.page - b.page || a.at - b.at; });
   }
 
@@ -996,21 +1129,21 @@
     var bm = CS.anns.filter(function (a) { return a.marker === 'bookmark'; }).length;
     var list = annList();
     var tab = CS.annTab || 'all';
-    P.innerHTML = sideHead('书签与标注') + '<div class="cm-side-b">' +
+    P.innerHTML = sideHead(T('rd.ann.title')) + '<div class="cm-side-b">' +
       '<div class="cm-chips" style="margin-bottom:9px">' +
-      [['all', '全部 ' + all], ['bookmark', '书签 ' + bm], ['mark', '标注 ' + (all - bm)]].map(function (x) {
-        return '<span class="cm-chip' + (tab === x[0] ? ' on' : '') + '" data-atab="' + x[0] + '">' + x[1] + '</span>';
+      [['all', T('rd.ann.tabAll', { n: all })], ['bookmark', T('rd.ann.tabBm', { n: bm })], ['mark', T('rd.ann.tabMark', { n: all - bm })]].map(function (x) {
+        return '<span class="cm-chip' + (tab === x[0] ? ' on' : '') + '" data-atab="' + x[0] + '">' + esc(x[1]) + '</span>';
       }).join('') + '</div>' +
-      '<div class="cm-annq"><input id="cmAnnQ" placeholder="搜索页码或备注" value="' + esc(CS.annQ || '') + '"></div>' +
-      '<button class="cm-btn cm-annadd" data-bmadd="1">' + svg('bookmark', 13) + '给第 ' + CS.page + ' 页加书签</button>' +
+      '<div class="cm-annq"><input id="cmAnnQ" placeholder="' + esc(T('rd.ann.searchQ')) + '" value="' + esc(CS.annQ || '') + '"></div>' +
+      '<button class="cm-btn cm-annadd" data-bmadd="1">' + svg('bookmark', 13) + esc(T('rd.ann.addPage', { n: CS.page })) + '</button>' +
       (list.length ? list.map(function (a) {
         var shapes = a.shapes || [];
-        var desc = a.marker === 'bookmark' ? '书签' : (shapes.length ? (shapes[0].t === 'p' ? '画笔' : '框选') + ' · ' + shapes.length + ' 处' : '标注');
+        var desc = a.marker === 'bookmark' ? mk('bookmark') : (shapes.length ? (shapes[0].t === 'p' ? T('rd.ann.brushTag') : T('rd.ann.rectTag')) + ' · ' + T('rd.ann.countN', { n: shapes.length }) : mk('comment'));
         return '<div class="cm-annitem" data-id="' + a.id + '" data-page="' + a.page + '"><i class="dot" style="background:' + esc(a.color) + '"></i>' +
-          '<div class="tx"><b>第 ' + a.page + ' 页 · ' + desc + '</b><span>' + (a.note ? esc(a.note) : (MARK_CN[a.marker] || '')) + '</span></div>' +
+          '<div class="tx"><b>' + esc(T('rd.ann.item', { n: a.page, desc: desc })) + '</b><span>' + (a.note ? esc(a.note) : mk(a.marker)) + '</span></div>' +
           '<span class="x" data-edit="' + a.id + '">' + svg('edit', 12) + '</span>' +
           '<span class="x" data-del="' + a.id + '">' + svg('close', 13) + '</span></div>';
-      }).join('') : '<div class="cm-note">' + (all ? '没有匹配的条目' : '还没有书签和标注。按 R 框选区域标注；按 B 给当前页加书签。') + '</div>') +
+      }).join('') : '<div class="cm-note">' + (all ? T('rd.ann.empty') : T('rd.ann.none')) + '</div>') +
       '</div>';
     P.querySelector('[data-a="close"]').onclick = closeSide;
     all('#cmSide [data-atab]').forEach(function (c) {
@@ -1050,8 +1183,8 @@
       '<div class="cm-chips">' + COLORS.map(function (c) {
         return '<span class="cm-chip' + (a.color === c ? ' on' : '') + '" data-ec="' + c + '" style="min-width:26px;padding:0 4px"><i class="dot" style="background:' + c + ';display:inline-block;width:12px;height:12px;border-radius:50%"></i></span>';
       }).join('') + '</div>' +
-      '<input id="cmAnnNote" placeholder="备注" value="' + esc(a.note || '') + '" style="width:100%;height:28px;border-radius:7px;border:1px solid var(--line);background:transparent;color:inherit;font-size:12px;padding:0 8px">' +
-      '<div class="cm-chips"><span class="cm-chip" data-ecancel="1">取消</span><span class="cm-chip on" data-esave="1">保存</span></div></div>';
+      '<input id="cmAnnNote" placeholder="' + esc(T('rd.ann.note')) + '" value="' + esc(a.note || '') + '" style="width:100%;height:28px;border-radius:7px;border:1px solid var(--line);background:transparent;color:inherit;font-size:12px;padding:0 8px">' +
+      '<div class="cm-chips"><span class="cm-chip" data-ecancel="1">' + esc(T('rd.common.cancel')) + '</span><span class="cm-chip on" data-esave="1">' + esc(T('rd.common.save')) + '</span></div></div>';
     item.onclick = null;
     all('#cmSide [data-ec]').forEach(function (b) {
       b.onclick = function () {
@@ -1067,32 +1200,32 @@
           a.color = pick; a.note = note; a.at = Date.now();
           renderAll();
           paintAnnSide(P);
-          toast('已更新标注');
-        }).catch(function (e) { toast('更新失败：' + errText(e), 'err'); });
+          toast(T('rd.toast.annUpdated'));
+        }).catch(function (e) { toast(T('rd.err.update', { e: errText(e) }), 'err'); });
     };
   }
 
   function paintExport(P) {
     var pages = spreadPages(CS.page);
-    P.innerHTML = sideHead('导出') + '<div class="cm-side-b">' +
-      '<div class="cm-sec"><div class="t">当前页</div>' +
-      '<button class="cm-btn" data-exp="cur" style="width:100%;height:34px">' + svg('dl') + '下载第 ' + pages.join('、') + ' 页（原图）</button>' +
-      '<div class="cm-note">直接取服务端原图，不经画布重编码，保留原始格式与画质</div></div>' +
-      '<div class="cm-sec"><div class="t">页区间</div><div class="cm-export">' +
+    P.innerHTML = sideHead(T('rd.exp.title')) + '<div class="cm-side-b">' +
+      '<div class="cm-sec"><div class="t">' + T('rd.exp.cur') + '</div>' +
+      '<button class="cm-btn" data-exp="cur" style="width:100%;height:34px">' + svg('dl') + esc(T('rd.exp.curBtn', { n: pages.join(', ') })) + '</button>' +
+      '<div class="cm-note">' + T('rd.exp.curNote') + '</div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.exp.range') + '</div><div class="cm-export">' +
       '<div class="row"><input type="number" id="cmFrom" min="1" max="' + CS.total + '" value="' + Math.max(1, CS.page - 9) + '">' +
-      '<span style="opacity:.6">至</span><input type="number" id="cmTo" min="1" max="' + CS.total + '" value="' + CS.page + '">' +
-      '<span style="opacity:.5;font-size:10.5px">共 ' + num(CS.total) + ' 页</span></div>' +
-      '<button class="cm-btn" data-exp="range" style="width:100%;height:34px">' + svg('dl') + '打包下载 ZIP</button>' +
-      '<div class="cm-note">服务端按原图打包，单次最多 ' + MAX_ZIP + ' 页</div></div></div>' +
-      '<div class="cm-sec"><div class="t">整本</div>' +
-      '<button class="cm-btn" data-exp="all" style="width:100%;height:34px">' + svg('dl') + '整本打包（分批）</button>' +
-      '<div class="cm-note">按 ' + MAX_ZIP + ' 页一批连续下载，浏览器可能提示允许多文件下载</div></div></div>';
+      '<span style="opacity:.6">' + T('rd.exp.to') + '</span><input type="number" id="cmTo" min="1" max="' + CS.total + '" value="' + CS.page + '">' +
+      '<span style="opacity:.5;font-size:10.5px">' + esc(T('rd.exp.total', { n: num(CS.total) })) + '</span></div>' +
+      '<button class="cm-btn" data-exp="range" style="width:100%;height:34px">' + svg('dl') + T('rd.exp.zip') + '</button>' +
+      '<div class="cm-note">' + esc(T('rd.exp.zipNote', { n: MAX_ZIP })) + '</div></div></div>' +
+      '<div class="cm-sec"><div class="t">' + T('rd.exp.all') + '</div>' +
+      '<button class="cm-btn" data-exp="all" style="width:100%;height:34px">' + svg('dl') + T('rd.exp.allBtn') + '</button>' +
+      '<div class="cm-note">' + esc(T('rd.exp.allNote', { n: MAX_ZIP })) + '</div></div></div>';
     P.querySelector('[data-a="close"]').onclick = closeSide;
     P.querySelector('[data-exp="cur"]').onclick = function () { downloadPages(pages, pages[0], pages[pages.length - 1]); };
     P.querySelector('[data-exp="range"]').onclick = function () {
       var a = clamp(+$('cmFrom').value || 1, 1, CS.total);
       var b = clamp(+$('cmTo').value || a, a, CS.total);
-      if (b - a + 1 > MAX_ZIP) return toast('一次最多 ' + MAX_ZIP + ' 页，请缩小范围', 'err');
+      if (b - a + 1 > MAX_ZIP) return toast(T('rd.exp.tooMany', { n: MAX_ZIP }), 'err');
       exportZip(a, b);
     };
     P.querySelector('[data-exp="all"]').onclick = function () { exportWhole(); };
@@ -1111,8 +1244,8 @@
       link.href = imgUrl(p, 0);
       link.download = bookName() + '-p' + p;
       document.body.appendChild(link); link.click(); link.remove();
-      toast('开始下载第 ' + p + ' 页', 'ok');
-    }).catch(function (e) { toast('导出失败：' + errText(e), 'err'); });
+      toast(T('rd.exp.start', { n: p }), 'ok');
+    }).catch(function (e) { toast(T('rd.err.export', { e: errText(e) }), 'err'); });
   }
 
   function exportZip(a, b) {
@@ -1120,7 +1253,7 @@
     link.href = base() + 'api/lantai/v1/read/' + CS.bookId + '/export?from=' + a + '&to=' + b;
     link.download = bookName() + '-' + a + '-' + b + '.zip';
     document.body.appendChild(link); link.click(); link.remove();
-    toast('正在打包第 ' + a + '–' + b + ' 页', 'ok');
+    toast(T('rd.exp.packing', { a: a, b: b }), 'ok');
   }
 
   function exportWhole() {
@@ -1167,7 +1300,9 @@
 
   function onDown(ev) {
     if (!CS.open) return;
-    if (ev.target.closest('.cm-top,.cm-bot,.cm-side,.cm-thumbs,.cm-float,.cm-btn')) return;
+    if (ev.target.closest('.cm-guide')) return;
+    if (CS.menu && !ev.target.closest('.cm-menu,[data-a="ann"],[data-a="mode"],[data-a="quality"]')) closeMenu();
+    if (ev.target.closest('.cm-top,.cm-bot,.cm-side,.cm-thumbs,.cm-float,.cm-btn,.cm-menu,.cm-guide')) return;
     if (CS.drawMode) return startDraw(ev);
     CS.ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
     if (CS.ptrs.size === 2) {
@@ -1247,6 +1382,7 @@
   }
 
   function tap(x) {
+    if (CS.guideOpen) return;
     if (CS.mode === 'webtoon' || CS.mode === 'paged') return toggleToolbar();
     if (x < innerWidth * 0.22) return turn(-1);
     if (x > innerWidth * 0.78) return turn(1);
@@ -1260,21 +1396,22 @@
     var show = force == null ? hidden : force;
     top.classList.toggle('off', !show);
     bot.classList.toggle('off', !show);
-    if (!show) { toggleThumbs(false); if (CS.side) closeSide(); }
+    if (!show) { closeMenu(); toggleThumbs(false); if (CS.side) closeSide(); }
     bumpIdle();
   }
 
   function barHold() {
-    return CS.barHover || CS.trackDrag;
+    return CS.barHover || CS.trackDrag || !!CS.menu;
   }
 
   function bumpIdle() {
     clearTimeout(CS.offTimer);
     CS.offTimer = null;
+    if (CS.guideOpen) return;
     if (barHold()) return;
     CS.offTimer = setTimeout(function () {
       CS.offTimer = null;
-      if (!CS.open || CS.thumbs || CS.side) return;
+      if (!CS.open || CS.thumbs || CS.side || CS.guideOpen) return;
       if (barHold()) return;
       var top = $('cmTop'), bot = $('cmBot');
       if (top) top.classList.add('off');
@@ -1289,7 +1426,7 @@
 
   function onWheel(ev) {
     if (!CS.open) return;
-    if (ev.target.closest('.cm-top,.cm-bot,.cm-side,.cm-thumbs')) return;
+    if (ev.target.closest('.cm-top,.cm-bot,.cm-side,.cm-thumbs,.cm-menu,.cm-guide')) return;
     if (ev.ctrlKey) {
       ev.preventDefault();
       CS.zoom = clamp(CS.zoom - ev.deltaY * 0.004, 1, 4);
@@ -1309,7 +1446,7 @@
   function setDraw(mode) {
     CS.drawMode = mode;
     all('#cm .cm-ann[data-draw]').forEach(function (n) { n.remove(); });
-    if (mode) hint(mode === 'brush' ? '自由画笔：在页面上拖动画线，松手后选颜色保存' : '框选：在页面上拖出矩形，松手后选颜色保存');
+    if (mode) hint(mode === 'brush' ? T('rd.hint.brush') : T('rd.hint.rect'));
     else hint('');
     markToolbar();
   }
@@ -1327,7 +1464,7 @@
     var box = pageAt(ev.clientX, ev.clientY);
     if (!box) return;
     var img = box.querySelector('img.cm-img');
-    if (!img || !img.complete || !img.naturalWidth) return toast('等图片载入完成再框选', 'info');
+    if (!img || !img.complete || !img.naturalWidth) return toast(T('rd.err.waitImg'), 'info');
     var r = img.getBoundingClientRect();
     var layer = el('div', 'cm-ann');
     layer.dataset.draw = '1';
@@ -1375,8 +1512,8 @@
     fl.innerHTML = COLORS.map(function (c) {
       return '<i class="cm-sw' + (c === CS.drawColor ? ' on' : '') + '" data-c="' + c + '" style="background:' + c + '"></i>';
     }).join('') +
-      '<button class="cm-btn sm" data-ok title="保存">' + svg('check', 13) + '</button>' +
-      '<button class="cm-btn sm" data-no title="取消">' + svg('close', 13) + '</button>';
+      '<button class="cm-btn sm" data-ok title="' + esc(T('rd.common.save')) + '">' + svg('check', 13) + '</button>' +
+      '<button class="cm-btn sm" data-no title="' + esc(T('rd.common.cancel')) + '">' + svg('close', 13) + '</button>';
     fl.style.left = clamp(r.left + r.width / 2 - 118, 8, innerWidth - 250) + 'px';
     fl.style.top = Math.max(58, r.top + 10) + 'px';
     fl.classList.add('on');
@@ -1410,8 +1547,8 @@
       CS.drawing = null;
       setDraw(null);
       renderAll();
-      toast('标注已保存 · 第 ' + page + ' 页', 'ok');
-    }).catch(function (e) { toast('标注保存失败：' + errText(e), 'err'); });
+      toast(T('rd.toast.annSaved', { n: page }), 'ok');
+    }).catch(function (e) { toast(T('rd.err.annSave', { e: errText(e) }), 'err'); });
   }
 
   function postAnn(o) {
@@ -1450,16 +1587,16 @@
       CS.anns = CS.anns.filter(function (a) { return a.id !== id; });
       renderAll();
       if (CS.side === 'anns') paintAnnSide($('cmSide'));
-      toast('标注已删除', 'ok');
-    }).catch(function (e) { toast('删除失败：' + errText(e), 'err'); });
+      toast(T('rd.toast.annDeleted'), 'ok');
+    }).catch(function (e) { toast(T('rd.err.del', { e: errText(e) }), 'err'); });
   }
 
   function toggleBookmark() {
     var exists = CS.anns.filter(function (a) { return a.marker === 'bookmark' && a.page === CS.page; })[0];
     if (exists) return delAnn(exists.id);
     postAnn({ page: CS.page, color: COLORS[0], marker: 'BOOKMARK', note: '', shapes: null })
-      .then(function () { renderAll(); toast('已在第 ' + CS.page + ' 页加书签', 'ok'); })
-      .catch(function (e) { toast('书签保存失败：' + errText(e), 'err'); });
+      .then(function () { renderAll(); toast(T('rd.toast.bmAdded', { n: CS.page }), 'ok'); })
+      .catch(function (e) { toast(T('rd.err.bmSave', { e: errText(e) }), 'err'); });
   }
 
   function paintPageAnns(box, page) {
@@ -1541,7 +1678,7 @@
   var wake = null;
   function wakeUp() {
     if (!navigator.wakeLock || !navigator.wakeLock.request) {
-      hint('当前环境不支持屏幕常亮（HTTPS 或 localhost 才可用）');
+      hint(T('rd.err.wake'));
       return;
     }
     var ask = function () {
@@ -1562,6 +1699,248 @@
     wake = null;
   }
 
+  var GUIDE_KEY = 'lantai-comic-guide';
+
+  function guideSeen() {
+    try { return localStorage.getItem(GUIDE_KEY) === '1'; } catch (e) { return false; }
+  }
+
+  function maybeGuide() {
+    if (guideSeen()) return;
+    setTimeout(function () { if (CS.open && !CS.guideOpen) guide(true); }, 900);
+  }
+
+  var GSTEPS = [
+    { sel: '[data-a="exit"]', t: 'rd.exit', d: 'rd.guide.d1', pos: 'bottom' },
+    { sel: '[data-a="ann"]', also: '#cmMenu', t: 'rd.tool.anns', d: 'rd.guide.d2', pos: 'bottom', open: 'ann', settle: 140 },
+    { sel: '[data-a="set"]', t: 'rd.tool.set', d: 'rd.guide.d3', pos: 'bottom' },
+    { sel: '[data-a="full"]', t: 'rd.tool.full', d: 'rd.guide.d4', pos: 'bottom' },
+    { sel: '.cm-bar', t: 'rd.guide.progress', d: 'rd.guide.d5', pos: 'top' },
+    { sel: '[data-a="mode"]', also: '#cmMenu', t: 'rd.tool.mode', d: 'rd.guide.d6', pos: 'top', open: 'mode', settle: 140 },
+    { sel: '[data-a="quality"]', also: '#cmMenu', t: 'rd.tool.q', d: 'rd.guide.d7', pos: 'top', open: 'quality', settle: 140 },
+    { sel: '[data-a="thumbs"]', also: '#cmThumbs', t: 'rd.tool.thumbs', d: 'rd.guide.d9', pos: 'top', open: 'thumbs', settle: 340 },
+    { sel: '[data-a="export"]', t: 'rd.tool.export', d: 'rd.guide.d8', pos: 'top', settle: 300 },
+    {
+      zone: [
+        { z: 'l', t: 'rd.guide.zoneL', n: 'rd.guide.zoneLNote', r: '0 – 22%' },
+        { z: 'c', t: 'rd.guide.zoneC', n: 'rd.guide.zoneCNote', r: '22% – 78%' },
+        { z: 'r', t: 'rd.guide.zoneR', n: 'rd.guide.zoneRNote', r: '78% – 100%' }
+      ], t: 'rd.guide.zoneTitle', d: 'rd.guide.zoneNote', pos: 'topbar'
+    },
+    { keys: true, t: 'rd.guide.gesTitle', d: 'rd.guide.pinch', pos: 'topbar' }
+  ];
+
+  var GKEYS = [
+    ['← →', 'rd.key.prevNext', 1], ['Space', 'rd.key.next', 1], ['+ −', 'rd.key.zoom', 1],
+    ['PgUp / PgDn', 'rd.key.prevNext', 0], ['Home / End', 'rd.key.home', 0],
+    ['T', 'rd.key.thumbs', 0], ['M', 'rd.key.anns', 0], ['B', 'rd.key.bm', 0],
+    ['R', 'rd.key.rect', 0], ['P', 'rd.key.brush', 0], ['S', 'rd.key.set', 0],
+    ['F', 'rd.key.full', 0], ['Esc', 'rd.key.esc', 0]
+  ];
+
+  function gtRect(sels) {
+    var out = null;
+    for (var i = 0; i < sels.length; i++) {
+      var nodes = document.querySelectorAll(sels[i]);
+      for (var j = 0; j < nodes.length; j++) {
+        var b = nodes[j].getBoundingClientRect();
+        if (!b.width && !b.height) continue;
+        out = out ? {
+          left: Math.min(out.left, b.left), top: Math.min(out.top, b.top),
+          right: Math.max(out.right, b.right), bottom: Math.max(out.bottom, b.bottom)
+        } : { left: b.left, top: b.top, right: b.right, bottom: b.bottom };
+      }
+    }
+    if (!out) return null;
+    out.width = out.right - out.left;
+    out.height = out.bottom - out.top;
+    return out;
+  }
+
+  function gtPlace(g, s) {
+    var bub = g.querySelector('[data-gbub]');
+    var hole = g.querySelector('[data-ghole]');
+    if (!bub || !hole) return;
+    var r = s.sel ? gtRect([s.sel].concat(s.also || [])) : null;
+    var W = innerWidth, H = innerHeight, pad = 7, gap = 22, edge = 12;
+    if (r) {
+      hole.style.left = (r.left - pad) + 'px';
+      hole.style.top = (r.top - pad) + 'px';
+      hole.style.width = (r.width + pad * 2) + 'px';
+      hole.style.height = (r.height + pad * 2) + 'px';
+      hole.classList.add('on');
+    } else {
+      hole.classList.remove('on');
+    }
+    var bw = bub.offsetWidth, bh = bub.offsetHeight;
+    var pos = s.pos || 'auto', top, left, ax, dir = pos;
+    if (pos === 'topbar') {
+      top = 74;
+      left = clamp(W / 2 - bw / 2, edge, W - bw - edge);
+      dir = 'none'; ax = '50%';
+    } else if (!r) {
+      top = H - bh - 120;
+      left = clamp(W / 2 - bw / 2, edge, W - bw - edge);
+      dir = 'none'; ax = '50%';
+    } else {
+      var below = H - r.bottom - edge, above = r.top - edge;
+      if (dir === 'auto') dir = (below >= bh + gap || below >= above) ? 'bottom' : 'top';
+      if (dir === 'bottom' && below < bh + gap && above > bh + gap) dir = 'top';
+      if (dir === 'top' && above < bh + gap && below > bh + gap) dir = 'bottom';
+      top = dir === 'bottom' ? r.bottom + gap : r.top - bh - gap;
+      left = clamp(r.left + r.width / 2 - bw / 2, edge, W - bw - edge);
+      ax = clamp(r.left + r.width / 2 - left, 22, bw - 22) + 'px';
+    }
+    top = clamp(top, edge, H - bh - edge);
+    bub.dataset.dir = dir;
+    bub.style.setProperty('--ax', ax);
+    bub.style.left = left + 'px';
+    bub.style.top = top + 'px';
+    bub.classList.add('on');
+  }
+
+  function gtBuild() {
+    var g = $('cmGuide'); if (!g) return null;
+    if (g.dataset.built) return g;
+    g.innerHTML =
+      '<div class="cm-gt-mask" data-gmask></div>' +
+      '<div class="cm-gt-hole" data-ghole></div>' +
+      '<div class="cm-gt-zone" data-gzone></div>' +
+      '<div class="cm-gt-keys" data-gkeys></div>' +
+      '<div class="cm-gt-bub" data-gbub data-dir="bottom">' +
+      '<div class="cm-gt-step" data-gstep></div>' +
+      '<b class="cm-gt-t" data-gt></b>' +
+      '<p class="cm-gt-d" data-gd></p>' +
+      '<div class="cm-gt-f"><button class="cm-gt-skip" data-gskip></button>' +
+      '<div class="cm-gt-nav"><button data-gprev></button><button class="primary" data-gnext></button></div>' +
+      '</div></div>';
+    g.dataset.built = '1';
+    var block = function (ev) { ev.stopPropagation(); };
+    ['pointerdown', 'pointerup', 'click', 'dblclick', 'wheel'].forEach(function (t) {
+      g.querySelector('[data-gmask]').addEventListener(t, block);
+      g.querySelector('[data-gbub]').addEventListener(t, block);
+      g.querySelector('[data-gzone]').addEventListener(t, block);
+    });
+    g.querySelector('[data-gzone]').addEventListener('click', gtZoneClick);
+    g.querySelector('[data-gskip]').onclick = function (ev) { ev.stopPropagation(); closeGuide(true, 'skip'); };
+    g.querySelector('[data-gprev]').onclick = function (ev) { ev.stopPropagation(); gtGo(CS.guideStep - 1); };
+    g.querySelector('[data-gnext]').onclick = function (ev) { ev.stopPropagation(); gtNext(); };
+    return g;
+  }
+
+  function gtZoneClick(ev) {
+    var z = ev.target.closest ? ev.target.closest('i') : null;
+    if (!z) return;
+    ev.stopPropagation();
+    z.classList.remove('hit');
+    void z.offsetWidth;
+    z.classList.add('hit');
+    var k = z.dataset.z;
+    if (k === 'l') return turn(-1);
+    if (k === 'r') return turn(1);
+    toggleToolbar();
+  }
+
+  function gtNext() {
+    if (CS.guideStep >= GSTEPS.length - 1) return closeGuide(true, 'done');
+    gtGo(CS.guideStep + 1);
+  }
+
+  function gtGo(i) {
+    var g = gtBuild(); if (!g) return;
+    CS.guideStep = clamp(i, 0, GSTEPS.length - 1);
+    var s = GSTEPS[CS.guideStep];
+    clearTimeout(CS.gtSettle);
+    closeMenu();
+    if (CS.thumbs) toggleThumbs(false);
+    if (CS.side) closeSide();
+    if (CS.drawMode) setDraw(null);
+    toggleToolbar(true);
+
+    var bub = g.querySelector('[data-gbub]');
+    var hole = g.querySelector('[data-ghole]');
+    var zone = g.querySelector('[data-gzone]');
+    var keys = g.querySelector('[data-gkeys]');
+    var mask = g.querySelector('[data-gmask]');
+    bub.classList.remove('on');
+    zone.classList.remove('on');
+    keys.classList.remove('on');
+    hole.classList.remove('on');
+
+    if (s.zone) {
+      zone.innerHTML = s.zone.map(function (z) {
+        return '<i class="' + z.z + '" data-z="' + z.z + '">' +
+          (z.r ? '<em>' + esc(z.r) + '</em>' : '') +
+          '<b>' + esc(T(z.t)) + '</b><span>' + esc(T(z.n)) + '</span></i>';
+      }).join('');
+      zone.classList.add('on');
+      mask.classList.add('off');
+    } else if (s.keys) {
+      keys.innerHTML = '<h5>' + esc(T('rd.guide.keysTitle')) + '</h5><div class="cm-gt-kgrid">' +
+        GKEYS.map(function (k) {
+          return '<kbd' + (k[2] ? ' class="hot"' : '') + '>' + k[0] + '</kbd><span>' + esc(T(k[1])) + '</span>';
+        }).join('') + '</div>';
+      keys.classList.add('on');
+      mask.classList.remove('off');
+    } else {
+      mask.classList.remove('off');
+      if (s.open === 'thumbs') toggleThumbs(true);
+      else if (s.open) {
+        var a = document.querySelector('[data-a="' + s.open + '"]');
+        if (a) openMenu(a, s.open);
+      }
+    }
+
+    g.querySelector('[data-gstep]').textContent = T('rd.guide.stepN', { i: CS.guideStep + 1, n: GSTEPS.length });
+    g.querySelector('[data-gt]').textContent = T(s.t);
+    g.querySelector('[data-gd]').innerHTML = T(s.d);
+    g.querySelector('[data-gskip]').textContent = T('rd.guide.skip');
+    g.querySelector('[data-gprev]').textContent = T('rd.guide.prev');
+    g.querySelector('[data-gprev]').disabled = CS.guideStep === 0;
+    g.querySelector('[data-gnext]').textContent = T(CS.guideStep >= GSTEPS.length - 1 ? 'rd.guide.start' : 'rd.guide.next');
+
+    var run = function () { if (CS.guideOpen) gtPlace(g, s); };
+    requestAnimationFrame(function () { requestAnimationFrame(run); });
+    if (s.settle) CS.gtSettle = setTimeout(run, s.settle);
+    bumpIdle();
+  }
+
+  function guide(force) {
+    var g = gtBuild(); if (!g) return;
+    if (!force && CS.guideOpen) return closeGuide(true, 'skip');
+    CS.guideOpen = true;
+    CS.guideStep = 0;
+    clearTimeout(CS.offTimer);
+    CS.offTimer = null;
+    toggleToolbar(true);
+    g.classList.add('on');
+    gtGo(0);
+  }
+
+  function closeGuide(mark, reason) {
+    var g = $('cmGuide'); if (!g) return;
+    CS.guideOpen = false;
+    clearTimeout(CS.gtSettle);
+    CS.gtSettle = null;
+    closeMenu();
+    if (CS.thumbs) toggleThumbs(false);
+    if (CS.side) closeSide();
+    g.classList.remove('on');
+    ['[data-ghole]', '[data-gbub]', '[data-gzone]', '[data-gkeys]'].forEach(function (sel) {
+      var n = g.querySelector(sel);
+      if (n) n.classList.remove('on');
+    });
+    toggleToolbar(true);
+    if (mark) { try { localStorage.setItem(GUIDE_KEY, '1'); } catch (e) { } }
+    bumpIdle();
+    if (reason === 'skip') toast(T('rd.guide.skipped'), 'ok');
+    else if (reason === 'done') toast(T('rd.guide.done'), 'ok');
+  }
+
+  window.addEventListener('resize', function () {
+    if (CS.guideOpen) gtPlace($('cmGuide'), GSTEPS[CS.guideStep]);
+  });
+
   function fullscreen() {
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(function () { });
@@ -1569,7 +1948,7 @@
     }
     var r = $('cm');
     (r || document.documentElement).requestFullscreen().catch(function () {
-      toast('浏览器拒绝了全屏请求', 'err');
+      toast(T('rd.err.fullscreen'), 'err');
     });
   }
 
@@ -1592,7 +1971,15 @@
     if (!CS.open) return;
     if (ev.target && /INPUT|TEXTAREA|SELECT/.test(ev.target.tagName)) return;
     var k = ev.key;
+    if (CS.guideOpen) {
+      if (k === 'Escape') { ev.preventDefault(); return closeGuide(true, 'skip'); }
+      if (k === 'ArrowRight') { ev.preventDefault(); return gtNext(); }
+      if (k === 'ArrowLeft') { ev.preventDefault(); return gtGo(CS.guideStep - 1); }
+      if (k === ' ' || k === 'Enter') { ev.preventDefault(); return gtNext(); }
+      return;
+    }
     if (k === 'Escape') {
+      if (CS.menu) return closeMenu();
       if ($('cmFloat').classList.contains('on')) { $('cmFloat').classList.remove('on'); setDraw(null); return; }
       if (CS.side) return closeSide();
       if (CS.drawMode) return setDraw(null);
@@ -1609,7 +1996,8 @@
     if (k === 'm' || k === 'M') return side('anns');
     if (k === 's' || k === 'S') return side('set');
     if (k === 'b' || k === 'B') return toggleBookmark();
-    if (k === 'r' || k === 'R') return setDraw(CS.drawMode ? null : 'rect');
+    if (k === 'r' || k === 'R') return setDraw(CS.drawMode === 'rect' ? null : 'rect');
+    if (k === 'p' || k === 'P') return setDraw(CS.drawMode === 'brush' ? null : 'brush');
     if (k === 'f' || k === 'F') return fullscreen();
     if (k === '+' || k === '=') { CS.zoom = clamp(CS.zoom + 0.25, 1, 4); return applyVars(); }
     if (k === '-') { CS.zoom = clamp(CS.zoom - 0.25, 1, 4); if (CS.zoom <= 1.02) CS.zoom = 1; return applyVars(); }

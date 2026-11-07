@@ -24,6 +24,7 @@ data class ScrapeOutcome(
   val score: Double?,
   val message: String?,
   val status: String,
+  val kept: List<String> = emptyList(),
 )
 
 data class ScrapePreview(
@@ -106,9 +107,11 @@ class ScrapeEngine(
     trust: Boolean,
     scope: Set<String> = emptySet(),
   ): ScrapeOutcome {
-    val conflicts = preview.diff.pendingConflicts()
-    val values = valuesOf(preview.diff)
-    if (values == null) {
+    val writable =
+      preview.diff.fields.filter {
+        it.decision == ScrapeDecision.FILL || it.decision == ScrapeDecision.CONFLICT
+      }
+    if (writable.isEmpty()) {
       return ScrapeOutcome(
         diff = preview.diff,
         applied = ScrapeApplySummary(emptyList(), emptyList(), false, null),
@@ -119,51 +122,49 @@ class ScrapeEngine(
       )
     }
 
-    if (conflicts.isNotEmpty() && !trust) {
-      return ScrapeOutcome(
-        diff = preview.diff,
-        applied = null,
-        source = preview.source,
-        score = preview.score,
-        message = "存在 ${conflicts.size} 个字段不一致",
-        status = "REVIEW",
-      )
-    }
+    val policy = settings.effectivePolicy(trust)
+    val overwrite = policy == ScrapeSettingsProvider.CONFLICT_POLICY_OVERWRITE
+    val selected = if (overwrite) writable else writable.filter { it.decision == ScrapeDecision.FILL }
+    val kept = if (overwrite) emptyList() else writable.filter { it.decision == ScrapeDecision.CONFLICT }.map { it.field }
 
-    val fields =
-      preview.diff.fields
-        .filter { it.decision == ScrapeDecision.FILL || it.decision == ScrapeDecision.CONFLICT }
-        .map { it.field }
-        .toSet()
-    if (fields.isEmpty()) {
+    if (selected.isEmpty()) {
       return ScrapeOutcome(
         diff = preview.diff,
         applied = ScrapeApplySummary(emptyList(), emptyList(), false, null),
         source = preview.source,
         score = preview.score,
-        message = "与已有信息一致",
-        status = "DONE",
+        message = "保留本地值：" + kept.joinToString("、"),
+        status = if (policy == ScrapeSettingsProvider.CONFLICT_POLICY_REVIEW) "REVIEW" else "DONE",
+        kept = kept,
       )
     }
 
     val summary =
       applier.applyValues(
         seriesId = preview.seriesId,
-        values = values,
-        fields = fields,
+        values = valuesOf(preview.diff) ?: ScrapeValues(),
+        fields = selected.map { it.field }.toSet(),
         source = preview.source.orEmpty(),
         score = preview.score,
-        overwriteConflicts = trust,
+        overwriteConflicts = overwrite,
         coverUrl = preview.coverUrl,
         scope = scope,
       )
+    val status =
+      if (policy == ScrapeSettingsProvider.CONFLICT_POLICY_REVIEW && kept.isNotEmpty()) "REVIEW" else "DONE"
+    val parts = mutableListOf<String>()
+    if (summary.appliedFields.isNotEmpty()) parts += "已写入 " + summary.appliedFields.joinToString("、")
+    if (kept.isNotEmpty()) {
+      parts += (if (status == "REVIEW") "待核对 " else "保留本地值 ") + kept.joinToString("、")
+    }
     return ScrapeOutcome(
       diff = preview.diff,
       applied = summary,
       source = preview.source,
       score = preview.score,
-      message = summary.appliedFields.joinToString("、").ifBlank { null },
-      status = "DONE",
+      message = parts.joinToString("；").ifBlank { null },
+      status = status,
+      kept = kept,
     )
   }
 
@@ -244,6 +245,8 @@ class ScrapeEngine(
   }
 
   fun serializedDiff(outcome: ScrapeOutcome): String = objectMapper.writeValueAsString(outcome.diff)
+
+  fun serializedDiff(diff: ScrapeDiff): String = objectMapper.writeValueAsString(diff)
 
   fun parseDiff(json: String?): ScrapeDiff? =
     json?.takeIf { it.isNotBlank() }?.let {

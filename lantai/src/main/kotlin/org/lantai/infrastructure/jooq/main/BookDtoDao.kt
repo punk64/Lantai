@@ -528,6 +528,7 @@ class BookDtoDao(
     name = name,
     url = URL(url).toFilePath(),
     number = number,
+    volume = volume,
     created = createdDate,
     lastModified = lastModifiedDate,
     fileLastModified = fileLastModified.toUTC(),

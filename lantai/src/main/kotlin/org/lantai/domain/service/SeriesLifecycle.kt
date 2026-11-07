@@ -17,6 +17,7 @@ import org.lantai.domain.model.ReadProgress
 import org.lantai.domain.model.Series
 import org.lantai.domain.model.SeriesMetadata
 import org.lantai.domain.model.ThumbnailSeries
+import org.lantai.domain.model.TypedBytes
 import org.lantai.domain.persistence.BookMetadataAggregationRepository
 import org.lantai.domain.persistence.BookMetadataRepository
 import org.lantai.domain.persistence.BookRepository
@@ -72,16 +73,13 @@ class SeriesLifecycle(
     logger.debug { "Existing books: $books" }
     logger.debug { "Existing metadata: $metadatas" }
 
+    val normalize = { value: String -> value.trim().stripAccents().replace(whitespacePattern, " ") }
+
     val sorted =
       books
-        .sortedWith(
-          compareBy(natSortComparator) {
-            it.name
-              .trim()
-              .stripAccents()
-              .replace(whitespacePattern, " ")
-          },
-        ).map { book -> book to metadatas.first { it.bookId == book.id } }
+        .sortedWith(Comparator<Book> { a, b -> natSortComparator.compare(normalize(a.name), normalize(b.name)) })
+        .sortedWith(Comparator<Book> { a, b -> natSortComparator.compare(normalize(a.volume), normalize(b.volume)) })
+        .map { book -> book to metadatas.first { it.bookId == book.id } }
     logger.debug { "Sorted books: $sorted" }
 
     bookRepository.update(
@@ -299,6 +297,35 @@ class SeriesLifecycle(
           Library.SeriesCover.LAST -> bookRepository.findLastIdInSeriesOrNull(seriesId)
         }
       if (bookId != null) return bookLifecycle.getThumbnailBytes(bookId)?.bytes
+    }
+
+    return null
+  }
+
+  fun getThumbnailBytesOriginal(
+    seriesId: String,
+    userId: String,
+  ): TypedBytes? {
+    getSelectedThumbnail(seriesId)?.let {
+      val bytes = getBytesFromThumbnailSeries(it) ?: return null
+      return TypedBytes(bytes, it.mediaType)
+    }
+
+    seriesRepository.findByIdOrNull(seriesId)?.let { series ->
+      val bookId =
+        when (libraryRepository.findById(series.libraryId).seriesCover) {
+          Library.SeriesCover.FIRST -> bookRepository.findFirstIdInSeriesOrNull(seriesId)
+          Library.SeriesCover.FIRST_UNREAD_OR_FIRST ->
+            bookRepository.findFirstUnreadIdInSeriesOrNull(seriesId, userId)
+              ?: bookRepository.findFirstIdInSeriesOrNull(seriesId)
+
+          Library.SeriesCover.FIRST_UNREAD_OR_LAST ->
+            bookRepository.findFirstUnreadIdInSeriesOrNull(seriesId, userId)
+              ?: bookRepository.findLastIdInSeriesOrNull(seriesId)
+
+          Library.SeriesCover.LAST -> bookRepository.findLastIdInSeriesOrNull(seriesId)
+        }
+      if (bookId != null) return bookLifecycle.getThumbnailBytesOriginal(bookId)
     }
 
     return null

@@ -36,6 +36,7 @@ import java.time.Duration
 import java.time.LocalDate
 
 private const val MAX_COVER_BYTES = 16 * 1024 * 1024
+private const val MAX_COVER_REDIRECTS = 3
 
 private val logger = KotlinLogging.logger {}
 
@@ -297,6 +298,7 @@ class ScrapeApplier(
     source: String,
     score: Double?,
     scope: Set<String> = emptySet(),
+    onlyFill: Boolean = false,
   ): ScrapeApplySummary {
     val series = seriesRepository.findByIdOrNull(seriesId) ?: throw ScrapeException("Series $seriesId does not exist")
     val metadata = seriesMetadataRepository.findById(seriesId)
@@ -326,10 +328,15 @@ class ScrapeApplier(
       fun write(
         name: String,
         locked: Boolean,
+        currentEmpty: Boolean,
         block: () -> Unit,
       ) {
         if (name !in fields) return
         if (locked) {
+          skipped += name
+          return
+        }
+        if (onlyFill && !currentEmpty) {
           skipped += name
           return
         }
@@ -338,22 +345,22 @@ class ScrapeApplier(
         touched = true
       }
 
-      write("title", current.titleLock) { if (choice.title.isNotBlank()) next = next.copy(title = choice.title.trim()) }
-      write("number", current.numberLock) { if (choice.number.isNotBlank()) next = next.copy(number = choice.number.trim()) }
-      write("summary", current.summaryLock) { if (choice.summary.isNotBlank()) next = next.copy(summary = choice.summary.trim()) }
-      write("publisher", current.publisherLock) { if (choice.publisher.isNotBlank()) next = next.copy(publisher = choice.publisher.trim()) }
-      write("language", current.languageLock) { if (choice.language.isNotBlank()) next = next.copy(language = choice.language.trim()) }
-      write("genres", current.genresLock) { if (choice.genres.isNotEmpty()) next = next.copy(genres = choice.genres.toSet()) }
-      write("authors", current.authorsLock) {
+      write("title", current.titleLock, current.title.isBlank()) { if (choice.title.isNotBlank()) next = next.copy(title = choice.title.trim()) }
+      write("number", current.numberLock, current.number.isBlank()) { if (choice.number.isNotBlank()) next = next.copy(number = choice.number.trim()) }
+      write("summary", current.summaryLock, current.summary.isBlank()) { if (choice.summary.isNotBlank()) next = next.copy(summary = choice.summary.trim()) }
+      write("publisher", current.publisherLock, current.publisher.isBlank()) { if (choice.publisher.isNotBlank()) next = next.copy(publisher = choice.publisher.trim()) }
+      write("language", current.languageLock, current.language.isBlank()) { if (choice.language.isNotBlank()) next = next.copy(language = choice.language.trim()) }
+      write("genres", current.genresLock, current.genres.isEmpty()) { if (choice.genres.isNotEmpty()) next = next.copy(genres = choice.genres.toSet()) }
+      write("authors", current.authorsLock, current.authors.isEmpty()) {
         val names = AuthorNameCleaner.cleanAll(choice.authors)
         if (names.isNotEmpty()) next = next.copy(authors = names.map { Author(it, "writer") })
       }
-      write("isbn", current.isbnLock) { if (choice.isbn.isNotBlank()) next = next.copy(isbn = choice.isbn.trim()) }
-      write("tags", current.tagsLock) {
+      write("isbn", current.isbnLock, current.isbn.isBlank()) { if (choice.isbn.isNotBlank()) next = next.copy(isbn = choice.isbn.trim()) }
+      write("tags", current.tagsLock, current.tags.isEmpty()) {
         if (choice.tags.isNotEmpty()) next = next.copy(tags = current.tags + choice.tags)
       }
       val date = parseIsoDate(choice.releaseDate)
-      if (date != null) write("releaseDate", current.releaseDateLock) { next = next.copy(releaseDate = date) }
+      if (date != null) write("releaseDate", current.releaseDateLock, current.releaseDate == null) { next = next.copy(releaseDate = date) }
 
       if (touched && next !== current) {
         bookMetadataRepository.update(next)
@@ -494,33 +501,47 @@ class ScrapeApplier(
   }
 
   private fun download(url: String): ByteArray {
-    val uri =
-      runCatching { OutboundUrlGuard.parse(url) }
-        .getOrElse { throw ScrapeException("封面地址不可用：${it.message}") }
     val client =
       HttpClient
         .newBuilder()
         .connectTimeout(Duration.ofSeconds(8))
-        .followRedirects(HttpClient.Redirect.NORMAL)
+        .followRedirects(HttpClient.Redirect.NEVER)
         .build()
-    val request =
-      HttpRequest
-        .newBuilder(uri)
-        .timeout(Duration.ofSeconds(20))
-        .header("User-Agent", "Mozilla/5.0 (compatible; Lantai/0.3)")
-        .GET()
-        .build()
-    val response = client.send(request, HttpResponse.BodyHandlers.ofInputStream())
-    if (response.statusCode() !in 200..299) {
-      response.body().close()
-      throw ScrapeException("Cover download failed with ${response.statusCode()}")
+    var target = url
+    var hop = 0
+    while (true) {
+      val uri =
+        runCatching { OutboundUrlGuard.parseStrict(target) }
+          .getOrElse { throw ScrapeException("封面地址不可用：${it.message}") }
+      val request =
+        HttpRequest
+          .newBuilder(uri)
+          .timeout(Duration.ofSeconds(20))
+          .header("User-Agent", "Mozilla/5.0 (compatible; Lantai/0.3)")
+          .GET()
+          .build()
+      val response = client.send(request, HttpResponse.BodyHandlers.ofInputStream())
+      val status = response.statusCode()
+      if (status in 300..399) {
+        val location = response.headers().firstValue("location").orElse(null)
+        response.body().close()
+        if (location.isNullOrBlank()) throw ScrapeException("封面地址重定向缺少目标")
+        if (hop >= MAX_COVER_REDIRECTS) throw ScrapeException("封面地址重定向次数过多")
+        target = runCatching { uri.resolve(location).toString() }.getOrElse { throw ScrapeException("封面地址不可用") }
+        hop++
+        continue
+      }
+      if (status !in 200..299) {
+        response.body().close()
+        throw ScrapeException("Cover download failed with $status")
+      }
+      val type = response.headers().firstValue("content-type").orElse("").lowercase()
+      if (type.isNotEmpty() && !type.startsWith("image/")) {
+        response.body().close()
+        throw ScrapeException("Cover download did not return an image")
+      }
+      return response.body().use { readLimited(it, MAX_COVER_BYTES) }
     }
-    val type = response.headers().firstValue("content-type").orElse("").lowercase()
-    if (type.isNotEmpty() && !type.startsWith("image/")) {
-      response.body().close()
-      throw ScrapeException("Cover download did not return an image")
-    }
-    return response.body().use { readLimited(it, MAX_COVER_BYTES) }
   }
 
   private fun readLimited(

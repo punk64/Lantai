@@ -49,6 +49,9 @@ data class ScrapeDiff(
   val hasChanges: Boolean get() = fields.any { it.decision == ScrapeDecision.FILL || it.decision == ScrapeDecision.CONFLICT }
 
   fun pendingConflicts(): List<ScrapeFieldChange> = fields.filter { it.decision == ScrapeDecision.CONFLICT }
+
+  fun unresolved(): ScrapeDiff =
+    ScrapeDiff(fields.filter { it.decision == ScrapeDecision.CONFLICT || it.decision == ScrapeDecision.LOCKED })
 }
 
 data class EmbeddedBook(

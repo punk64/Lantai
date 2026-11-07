@@ -68,6 +68,7 @@ class BookDtoDao(
   private val r = Tables.READ_PROGRESS
   private val a = Tables.BOOK_METADATA_AUTHOR
   private val sd = Tables.SERIES_METADATA
+  private val s = Tables.SERIES
   private val rlb = Tables.READLIST_BOOK
   private val bt = Tables.BOOK_METADATA_TAG
   private val bl = Tables.BOOK_METADATA_LINK
@@ -85,6 +86,10 @@ class BookDtoDao(
       "createdDate" to b.CREATED_DATE,
       "lastModified" to b.LAST_MODIFIED_DATE,
       "lastModifiedDate" to b.LAST_MODIFIED_DATE,
+      "seriesLastModified" to
+        DSL.field(
+          DSL.select(s.LAST_MODIFIED_DATE).from(s).where(s.ID.eq(b.SERIES_ID)),
+        ),
       "fileSize" to b.FILE_SIZE,
       "size" to b.FILE_SIZE,
       "fileHash" to b.FILE_HASH,
@@ -115,8 +120,16 @@ class BookDtoDao(
   ): Page<BookDto> {
     requireNotNull(context.userId) { "Missing userId in search context" }
 
-    val (conditions, joins) = BookSearchHelper(context).toCondition(search.condition)
-    return findAll(conditions, context.userId, pageable, search.fullTextSearch, joins)
+    val helper = BookSearchHelper(context)
+    val (conditions, joins) = helper.toCondition(search.condition)
+    val extra = if (search.collapseOnlineSeries) helper.collapseOnlineSeriesCondition() else null
+    return findAll(
+      extra?.let { conditions.and(it.first) } ?: conditions,
+      context.userId,
+      pageable,
+      search.fullTextSearch,
+      extra?.let { joins + it.second } ?: joins,
+    )
   }
 
   private fun findAll(

@@ -10,11 +10,16 @@ import org.lantai.infrastructure.online.SuwayomiCatalogPage
 import org.lantai.infrastructure.online.SuwayomiException
 import org.lantai.infrastructure.online.SuwayomiExtensionDto
 import org.lantai.infrastructure.online.SuwayomiExtensionSourceDto
+import org.lantai.infrastructure.online.ExtInstallState
+import org.lantai.infrastructure.online.ExtensionInstallRegistry
 import org.lantai.infrastructure.online.SuwayomiExtensionStore
 import org.lantai.infrastructure.online.SuwayomiReleaseDto
+import org.lantai.infrastructure.online.SuwayomiRouteDto
 import org.lantai.infrastructure.online.SuwayomiStatusDto
+import org.springframework.http.CacheControl
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -28,12 +33,14 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import java.time.Duration
 
 @RestController
 @RequestMapping("api/lantai/v1/suwayomi", produces = [MediaType.APPLICATION_JSON_VALUE])
 @Tag(name = "Lantai Suwayomi")
 class LantaiSuwayomiController(
   private val adminService: SuwayomiAdminService,
+  private val installRegistry: ExtensionInstallRegistry,
 ) {
   @GetMapping("status")
   @PreAuthorize("hasRole('ADMIN')")
@@ -82,12 +89,18 @@ class LantaiSuwayomiController(
     @RequestParam(name = "offset", defaultValue = "0") offset: Int,
     @RequestParam(name = "limit", defaultValue = "60") limit: Int,
     @RequestParam(name = "force", defaultValue = "false") force: Boolean,
-  ): SuwayomiCatalogPage = call { adminService.catalog(keyword, lang, onlyInstalled, offset, limit, force) }
+    @RequestParam(name = "store", required = false) store: String?,
+  ): SuwayomiCatalogPage = call { adminService.catalog(keyword, lang, onlyInstalled, offset, limit, force, store) }
 
   @PostMapping("extensions/fetch")
   @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "Refresh installed extension metadata")
   fun fetchExtensions(): SuwayomiActionResult = call { adminService.fetchExtensions() }
+
+  @GetMapping("extensions/routes")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "List extension package download routes")
+  fun downloadRoutes(): List<SuwayomiRouteDto> = call { adminService.downloadRoutes() }
 
   @GetMapping("extensions/{pkgName}/sources")
   @PreAuthorize("hasRole('ADMIN')")
@@ -98,10 +111,48 @@ class LantaiSuwayomiController(
 
   @PostMapping("extensions/{pkgName}/install")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Install an extension from the catalog")
+  @Operation(summary = "Queue an extension install from the catalog")
   fun installExtension(
     @PathVariable pkgName: String,
-  ): SuwayomiActionResult = call { adminService.installExtension(pkgName) }
+    @RequestBody(required = false) request: SuwayomiInstallRequest?,
+  ): SuwayomiActionResult {
+    val started = installRegistry.start(pkgName) { adminService.installExtension(pkgName, request?.route) }
+    return if (started) {
+      SuwayomiActionResult(true, "已开始安装 $pkgName")
+    } else {
+      SuwayomiActionResult(false, "$pkgName 正在安装中")
+    }
+  }
+
+  @GetMapping("install-state")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Running and recently finished extension installs")
+  fun installState(): ExtInstallState = installRegistry.state()
+
+  @DeleteMapping("install-result/{pkgName}")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Acknowledge an extension install result")
+  fun clearInstallResult(
+    @PathVariable pkgName: String,
+  ): SuwayomiActionResult {
+    installRegistry.consume(pkgName)
+    return SuwayomiActionResult(true, null)
+  }
+
+  @GetMapping("extension-icon/{pkgName}")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Proxy the icon of an installed extension")
+  fun extensionIcon(
+    @PathVariable pkgName: String,
+  ): ResponseEntity<ByteArray> {
+    val entity = call { adminService.extensionIcon(pkgName) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No icon for $pkgName")
+    val body = entity.body ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No icon for $pkgName")
+    return ResponseEntity
+      .ok()
+      .contentType(entity.headers.contentType ?: MediaType.IMAGE_PNG)
+      .cacheControl(CacheControl.maxAge(Duration.ofHours(6)).cachePublic())
+      .body(body)
+  }
 
   @PostMapping("extensions/upload", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
   @PreAuthorize("hasRole('ADMIN')")
@@ -115,7 +166,8 @@ class LantaiSuwayomiController(
   @Operation(summary = "Update an installed extension")
   fun updateExtension(
     @PathVariable pkgName: String,
-  ): SuwayomiActionResult = call { adminService.updateExtension(pkgName) }
+    @RequestBody(required = false) request: SuwayomiInstallRequest?,
+  ): SuwayomiActionResult = call { adminService.updateExtension(pkgName, request?.route) }
 
   @DeleteMapping("extensions/{pkgName}")
   @PreAuthorize("hasRole('ADMIN')")
@@ -135,6 +187,13 @@ class LantaiSuwayomiController(
   fun addStore(
     @RequestBody request: SuwayomiStoreRequest,
   ): SuwayomiActionResult = call { adminService.addStore(request.indexUrl) }
+
+  @DeleteMapping("stores")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Remove an extension store")
+  fun removeStore(
+    @RequestParam(name = "indexUrl") indexUrl: String,
+  ): SuwayomiActionResult = call { adminService.removeStore(indexUrl) }
 
   @GetMapping("release")
   @PreAuthorize("hasRole('ADMIN')")
@@ -172,4 +231,8 @@ class LantaiSuwayomiController(
 
 data class SuwayomiStoreRequest(
   val indexUrl: String,
+)
+
+data class SuwayomiInstallRequest(
+  val route: String? = null,
 )

@@ -23,7 +23,7 @@ private const val SETTINGS_QUERY =
     "autoDownloadNewChaptersLimit maxSourcesInParallel globalUpdateInterval updateMangas backupInterval backupPath } }"
 
 private const val EXTENSIONS_QUERY =
-  "{ extensions { totalCount nodes { pkgName name versionName lang isNsfw isInstalled hasUpdate isObsolete iconUrl } } }"
+  "{ extensions { totalCount nodes { pkgName name versionName lang isNsfw isInstalled hasUpdate isObsolete iconUrl storeIndexUrl apkUrl jarUrl } } }"
 
 private const val STORES_QUERY =
   "{ extensionStores { totalCount nodes { name indexUrl extensionListUrl isLegacy } } }"
@@ -105,6 +105,9 @@ class SuwayomiClient(
           hasUpdate = node.path("hasUpdate").asBoolean(false),
           isObsolete = node.path("isObsolete").asBoolean(false),
           iconUrl = node.path("iconUrl").asText(null),
+          storeIndexUrl = node.path("storeIndexUrl").asText(null),
+          apkUrl = node.path("apkUrl").asText(null),
+          jarUrl = node.path("jarUrl").asText(null),
         )
       }
 
@@ -126,6 +129,15 @@ class SuwayomiClient(
     graphQLData(
       mapOf(
         "query" to "mutation(\$input: AddExtensionStoreInput!) { addExtensionStore(input: \$input) { extensionStore { name indexUrl } } }",
+        "variables" to mapOf("input" to mapOf("indexUrl" to indexUrl)),
+      ),
+    )
+
+  fun removeExtensionStore(indexUrl: String): JsonNode =
+    graphQLData(
+      mapOf(
+        "query" to
+          "mutation(\$input: RemoveExtensionStoreInput!) { removeExtensionStore(input: \$input) { extensionStore { indexUrl } } }",
         "variables" to mapOf("input" to mapOf("indexUrl" to indexUrl)),
       ),
     )
@@ -364,6 +376,19 @@ class SuwayomiClient(
         .body(ByteArray::class.java)
     } catch (e: RestClientResponseException) {
       logger.warn { "Suwayomi thumbnail for manga $mangaId failed: ${e.statusCode}" }
+      null
+    }
+
+  fun extensionIcon(pkgName: String): org.springframework.http.ResponseEntity<ByteArray>? =
+    try {
+      client
+        .get()
+        .uri(uri("/api/v1/extension/icon/$pkgName"))
+        .withAuth()
+        .retrieve()
+        .toEntity(ByteArray::class.java)
+    } catch (e: RestClientResponseException) {
+      logger.warn { "Suwayomi extension icon for $pkgName failed: ${e.statusCode}" }
       null
     }
 

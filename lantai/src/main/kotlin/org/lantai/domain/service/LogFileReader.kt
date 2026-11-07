@@ -39,6 +39,7 @@ data class LogPage(
   val nextCursor: Long,
   val hasMore: Boolean,
   val entries: List<LogEntry>,
+  val prevCursor: Long? = null,
 )
 
 @Service
@@ -133,12 +134,12 @@ class LogFileReader(
 
     if (path.name.endsWith(".gz")) {
       val entries = readCompressed(path, maxEntries, filter)
-      return LogPage(file = path.name, nextCursor = 0, hasMore = false, entries = entries)
+      return LogPage(file = name, nextCursor = 0, hasMore = false, entries = entries)
     }
 
     val start = (cursor ?: 0L).coerceAtLeast(0L)
     val length = Files.size(path)
-    if (start >= length) return LogPage(file = path.name, nextCursor = length, hasMore = false, entries = emptyList())
+    if (start >= length) return LogPage(file = name, nextCursor = length, hasMore = false, entries = emptyList())
 
     val matched = mutableListOf<Pair<LogEntry, Long>>()
     var scannedTo = start
@@ -180,7 +181,88 @@ class LogFileReader(
 
     val page = matched.take(maxEntries).map { it.first }
     val nextCursor = if (matched.size > maxEntries) matched[maxEntries - 1].second else scannedTo
-    return LogPage(file = path.name, nextCursor = nextCursor, hasMore = nextCursor < length, entries = page)
+    return LogPage(file = name, nextCursor = nextCursor, hasMore = nextCursor < length, entries = page)
+  }
+
+  fun readBackward(
+    name: String,
+    before: Long?,
+    limit: Int?,
+    level: String?,
+    keyword: String?,
+    from: String?,
+    to: String?,
+  ): LogPage {
+    val path = resolve(name)
+    val maxEntries = (limit ?: DEFAULT_LIMIT).coerceIn(1, MAX_LIMIT)
+    val filter = Filter.of(level, keyword, from, to)
+    val parse = parserFor(name)
+
+    if (path.name.endsWith(".gz")) {
+      val all = readCompressed(path, Int.MAX_VALUE, filter)
+      val page = all.takeLast(maxEntries)
+      return LogPage(file = name, nextCursor = 0, hasMore = false, entries = page, prevCursor = 0)
+    }
+
+    val length = Files.size(path)
+    val end = (before ?: length).coerceIn(0L, length)
+    if (end <= 0L) return LogPage(file = name, nextCursor = 0, hasMore = false, entries = emptyList(), prevCursor = 0)
+
+    val collected = mutableListOf<Pair<String, Long>>()
+    val buf = ByteArrayOutputStream()
+    RandomAccessFile(path.toFile(), "r").use { raf ->
+      var pos = end
+      var scannedBytes = 0L
+      var scannedLines = 0
+      while (pos > 0 && collected.size <= (maxEntries + 1) * 2 && scannedBytes < MAX_TAIL_BYTES && scannedLines < MAX_SCAN_LINES) {
+        pos--
+        raf.seek(pos)
+        val b = raf.read()
+        if (b == -1) break
+        scannedBytes++
+        if (b == '\n'.code) {
+          if (buf.size() > 0) {
+            collected.add(String(buf.toByteArray().reversedArray(), StandardCharsets.UTF_8).trimEnd('\r') to (pos + 1))
+            buf.reset()
+          }
+          scannedLines++
+        } else {
+          buf.write(b)
+        }
+      }
+      if (pos == 0L && buf.size() > 0) {
+        collected.add(String(buf.toByteArray().reversedArray(), StandardCharsets.UTF_8).trimEnd('\r') to 0L)
+      }
+    }
+
+    val ordered = collected.reversed()
+    val entries = mutableListOf<Pair<LogEntry, Long>>()
+    var current: LogEntry? = null
+    var currentStart = 0L
+    ordered.forEach { (line, start) ->
+      val parsed = parse(line)
+      val open = current
+      if (parsed != null) {
+        if (open != null) entries.add(open to currentStart)
+        current = parsed
+        currentStart = start
+      } else if (open != null) {
+        current = open.copy(message = open.message + "\n" + line)
+      }
+    }
+    current?.let { entries.add(it to currentStart) }
+
+    val matched = entries.filter { filter.matches(it.first) }
+    val page = matched.takeLast(maxEntries)
+    val earliest = ordered.firstOrNull()?.second ?: end
+    val prevCursor = page.firstOrNull()?.second ?: earliest
+    return LogPage(
+      file = name,
+      nextCursor = end,
+      hasMore = prevCursor > 0L,
+      entries = page.map { it.first },
+      prevCursor = prevCursor,
+    )
   }
 
   private fun readCompressed(
@@ -288,6 +370,7 @@ class LogFileReader(
     private const val DEFAULT_LIMIT = 200
     private const val MAX_LIMIT = 2000
     private const val MAX_SCAN_LINES = 20000
+    private const val MAX_TAIL_BYTES = 8_000_000L
     private const val MASK = "***"
     private const val EXTENSION_LOG_PREFIX = "extensions"
 

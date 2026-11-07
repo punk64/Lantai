@@ -8,6 +8,7 @@ private val logger = KotlinLogging.logger {}
 
 private const val EXTENSION_PACKAGE_LIMIT_BYTES = 64L * 1024 * 1024
 private const val DEFAULT_EXTENSION_PACKAGE_NAME = "extension.jar"
+private const val LEGACY_EXTENSION_STORE_PREFIX = "https://github.com/keiyoushi/extensions/raw"
 
 data class SuwayomiStatusDto(
   val running: Boolean,
@@ -81,6 +82,11 @@ data class SuwayomiActionResult(
   val message: String?,
 )
 
+data class SuwayomiRouteDto(
+  val id: String,
+  val name: String,
+)
+
 @Service
 class SuwayomiAdminService(
   private val processManager: SuwayomiProcessManager,
@@ -90,9 +96,11 @@ class SuwayomiAdminService(
   private val properties: OnlineProperties,
   private val extLog: ExtensionLog,
 ) {
+  fun extensionIcon(pkgName: String): org.springframework.http.ResponseEntity<ByteArray>? = client.extensionIcon(pkgName)
+
   fun status(): SuwayomiStatusDto {
     val runtime = processManager.status()
-    val installed = if (runtime.running) runCatching { client.listExtensions() }.getOrDefault(emptyList()) else emptyList()
+    val installed = if (runtime.running) runCatching { client.listExtensions() }.getOrDefault(emptyList()).filter { it.isInstalled } else emptyList()
     return SuwayomiStatusDto(
       running = runtime.running,
       managed = runtime.managed,
@@ -138,7 +146,7 @@ class SuwayomiAdminService(
   }
 
   fun listExtensions(): List<SuwayomiExtensionDto> =
-    client.listExtensions().map {
+    client.listExtensions().filter { it.isInstalled }.map {
       SuwayomiExtensionDto(
         pkgName = it.pkgName,
         name = it.name,
@@ -161,18 +169,32 @@ class SuwayomiAdminService(
     offset: Int,
     limit: Int,
     force: Boolean,
+    store: String?,
   ): SuwayomiCatalogPage {
-    val entries = installer.catalog(force)
-    val installed =
+    if (force) {
+      runCatching { client.fetchExtensions() }
+        .onFailure { extLog.warn("刷新扩展仓库清单失败：${it.javaClass.simpleName}: ${it.message}") }
+    }
+    var remote =
       runCatching { client.listExtensions() }
-        .onFailure { extLog.warn("读取已装插件失败：${it.javaClass.simpleName}: ${it.message}") }
-        .getOrDefault(emptyList())
-        .associateBy { it.pkgName }
+        .onFailure { extLog.warn("读取扩展仓库清单失败：${it.javaClass.simpleName}: ${it.message}") }
+        .getOrElse { throw SuwayomiException("读取扩展仓库清单失败：${it.message}", it) }
+    if (remote.isEmpty() && !force) {
+      runCatching { client.fetchExtensions() }
+        .onFailure { extLog.warn("首次刷新扩展仓库清单失败：${it.javaClass.simpleName}: ${it.message}") }
+      remote = runCatching { client.listExtensions() }.getOrDefault(emptyList())
+    }
+    val byPkg = remote.associateBy { it.pkgName }
+    val wantedStore = store?.takeIf { it.isNotBlank() && it != "all" }
+    val entries =
+      remote
+        .filter { wantedStore == null || it.storeIndexUrl == wantedStore }
+        .map { it.toCatalogEntry() }
     val keywordFiltered =
       entries
         .asSequence()
         .filter { entry ->
-          if (onlyInstalled) installed.containsKey(entry.pkgName) else true
+          if (onlyInstalled) byPkg[entry.pkgName]?.isInstalled == true else true
         }.filter { entry ->
           keyword.isNullOrBlank() ||
             entry.name.contains(keyword, ignoreCase = true) ||
@@ -191,14 +213,14 @@ class SuwayomiAdminService(
       total = filtered.size,
       items =
         page.map { entry ->
-          val match = installed[entry.pkgName]
+          val match = byPkg[entry.pkgName]
           SuwayomiCatalogDto(
             pkgName = entry.pkgName,
             name = entry.name,
             versionName = entry.versionName,
             lang = entry.lang,
             iconUrl = entry.iconUrl,
-            installed = match != null,
+            installed = match?.isInstalled == true,
             installedVersion = match?.versionName,
             hasUpdate = match?.hasUpdate == true && compareVersions(entry.versionName, match.versionName) > 0,
           )
@@ -210,16 +232,19 @@ class SuwayomiAdminService(
     )
   }
 
-  fun installExtension(pkgName: String): SuwayomiActionResult {
+  fun installExtension(
+    pkgName: String,
+    route: String? = null,
+  ): SuwayomiActionResult {
     val started = System.currentTimeMillis()
-    val entry =
-      installer.catalog().firstOrNull { it.pkgName == pkgName }
-        ?: throw SuwayomiException("Extension $pkgName not found in catalog")
-    val bytes = installer.downloadExtensionJar(entry)
-    val fileName = entry.jarUrl?.substringAfterLast('/') ?: "$pkgName.jar"
-    client.installExternalExtension(bytes, fileName)
+    val entry = remoteEntry(pkgName)
+    if ((route.isNullOrBlank() || route == "auto") && selfInstall(pkgName, entry, update = false)) {
+      return SuwayomiActionResult(true, "Installed ${entry.name} ${entry.versionName} by Suwayomi")
+    }
+    val bytes = installer.downloadExtensionJar(entry, route)
+    client.installExternalExtension(bytes, extensionFileName(entry))
     logger.info { "Installed extension $pkgName (${bytes.size} bytes)" }
-    extLog.info("安装插件 $pkgName ${entry.versionName}（${bytes.size} 字节，耗时 ${System.currentTimeMillis() - started}ms）")
+    extLog.info("安装插件 $pkgName ${entry.versionName}（兰台代下载 ${bytes.size} 字节，耗时 ${System.currentTimeMillis() - started}ms）")
     return SuwayomiActionResult(true, "Installed ${entry.name} ${entry.versionName}")
   }
 
@@ -251,25 +276,113 @@ class SuwayomiAdminService(
     return SuwayomiActionResult(true, "Uninstalled $pkgName")
   }
 
-  fun updateExtension(pkgName: String): SuwayomiActionResult {
-    client.patchExtension(pkgName, update = true)
-    extLog.info("更新插件 $pkgName")
-    return SuwayomiActionResult(true, "Updated $pkgName")
+  fun updateExtension(
+    pkgName: String,
+    route: String? = null,
+  ): SuwayomiActionResult {
+    val entry = runCatching { remoteEntry(pkgName) }.getOrNull()
+    if (entry == null) {
+      client.patchExtension(pkgName, update = true)
+      extLog.info("更新插件 $pkgName（交给服务端自行下载）")
+      return SuwayomiActionResult(true, "Updated $pkgName")
+    }
+    if ((route.isNullOrBlank() || route == "auto") && selfInstall(pkgName, entry, update = true)) {
+      return SuwayomiActionResult(true, "Updated ${entry.name} ${entry.versionName} by Suwayomi")
+    }
+    val bytes = installer.downloadExtensionJar(entry, route)
+    client.installExternalExtension(bytes, extensionFileName(entry))
+    extLog.info("更新插件 $pkgName → ${entry.versionName}（兰台代下载 ${bytes.size} 字节）")
+    return SuwayomiActionResult(true, "Updated ${entry.name} ${entry.versionName}")
   }
 
   fun fetchExtensions(): SuwayomiActionResult {
+    val repaired = repairStores()
     val node = client.fetchExtensions()
     val count = node.path("fetchExtensions").path("extensions").size()
-    extLog.info("刷新已装插件列表，返回 $count 条")
+    extLog.info("刷新已装插件列表，返回 $count 条" + if (repaired > 0) "，已修正 $repaired 个旧仓库地址" else "")
     return SuwayomiActionResult(true, "Refreshed $count installed extensions")
+  }
+
+  private fun repairStores(): Int {
+    val urls =
+      runCatching { client.listExtensionStores() }
+        .onFailure { extLog.warn("读取扩展仓库失败：${it.message}") }
+        .getOrDefault(emptyList())
+        .mapNotNull { it.indexUrl }
+    val legacy = urls.filter { it.startsWith(LEGACY_EXTENSION_STORE_PREFIX) }
+    legacy.forEach { url ->
+      runCatching { client.removeExtensionStore(url) }
+        .onFailure { extLog.warn("移除旧扩展仓库失败 $url：${it.message}") }
+    }
+    if (legacy.isNotEmpty()) extLog.info("移除 ${legacy.size} 个旧扩展仓库地址")
+    val target = properties.extensionIndexUrl.trim()
+    if (target.isNotBlank() && target !in urls) {
+      runCatching { client.addExtensionStore(target) }
+        .onFailure { extLog.warn("添加默认扩展仓库失败 $target：${it.message}") }
+    }
+    return legacy.size
   }
 
   fun stores(): List<SuwayomiExtensionStore> = client.listExtensionStores()
 
   fun addStore(indexUrl: String): SuwayomiActionResult {
     client.addExtensionStore(indexUrl)
+    extLog.info("添加扩展仓库 $indexUrl")
     return SuwayomiActionResult(true, "Added store $indexUrl")
   }
+
+  fun removeStore(indexUrl: String): SuwayomiActionResult {
+    client.removeExtensionStore(indexUrl)
+    extLog.info("移除扩展仓库 $indexUrl")
+    return SuwayomiActionResult(true, "Removed store $indexUrl")
+  }
+
+  fun downloadRoutes(): List<SuwayomiRouteDto> {
+    val routes = mutableListOf(SuwayomiRouteDto("auto", "自动：优先 Suwayomi，失败依次回退"))
+    properties.extensionDownloadMirrors
+      .map { it.trim() }
+      .filter { it.startsWith("http") }
+      .forEachIndexed { index, prefix -> routes.add(SuwayomiRouteDto("mirror-${index + 1}", "镜像 ${index + 1} · ${hostOf(prefix)}")) }
+    routes.add(SuwayomiRouteDto("github-api", "GitHub 资产直链"))
+    routes.add(SuwayomiRouteDto("original", "原始地址"))
+    return routes
+  }
+
+  private fun remoteEntry(pkgName: String): SuwayomiCatalogEntry =
+    client.listExtensions().firstOrNull { it.pkgName == pkgName }?.toCatalogEntry()
+      ?: throw SuwayomiException("Extension $pkgName not found in Suwayomi stores")
+
+  private fun selfInstall(
+    pkgName: String,
+    entry: SuwayomiCatalogEntry,
+    update: Boolean,
+  ): Boolean {
+    val url = entry.jarUrl ?: entry.apkUrl ?: return false
+    if (!installer.canSuwayomiFetch(url)) return false
+    val attempt =
+      runCatching {
+        if (update) client.patchExtension(pkgName, update = true) else client.patchExtension(pkgName, install = true)
+      }
+    if (attempt.isFailure) {
+      extLog.warn("Suwayomi 自行下载插件 $pkgName 失败，转兰台代下载：${attempt.exceptionOrNull()?.message}")
+      return false
+    }
+    val installed =
+      runCatching { client.listExtensions().firstOrNull { it.pkgName == pkgName }?.isInstalled == true }
+        .getOrDefault(false)
+    if (!installed) {
+      extLog.warn("Suwayomi 自行安装 $pkgName 后仍未标记为已装，转兰台代下载")
+      return false
+    }
+    extLog.info("插件 $pkgName 由 Suwayomi 自行下载安装（${hostOf(url)}）")
+    return true
+  }
+
+  private fun extensionFileName(entry: SuwayomiCatalogEntry): String =
+    (entry.jarUrl ?: entry.apkUrl)?.substringAfterLast('/')?.substringBefore('?')
+      ?: "${entry.pkgName}.jar"
+
+  private fun hostOf(url: String): String = runCatching { java.net.URI(url).host }.getOrNull() ?: url
 
   fun start(): SuwayomiStatusDto {
     extLog.info("请求启动 Suwayomi")
@@ -427,3 +540,15 @@ private fun matchesLanguage(
   if (parts.contains(target)) return true
   return target == "multi" && (parts.contains("all") || parts.contains("multi"))
 }
+
+private fun SuwayomiExtension.toCatalogEntry() =
+  SuwayomiCatalogEntry(
+    pkgName = pkgName,
+    name = name ?: pkgName,
+    versionName = versionName.orEmpty(),
+    lang = lang.orEmpty(),
+    versionCode = 0,
+    jarUrl = jarUrl,
+    apkUrl = apkUrl,
+    iconUrl = iconUrl,
+  )

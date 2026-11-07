@@ -45,7 +45,7 @@ class SuwayomiAdminServiceTest {
 
   @Test
   fun `loads catalog from remote index`() {
-    val page = adminService.catalog("kuaikan", null, false, 0, 20, true)
+    val page = adminService.catalog("kuaikan", null, false, 0, 20, true, null)
 
     assertThat(page.total).isGreaterThan(0)
     assertThat(page.items).isNotEmpty()
@@ -55,7 +55,7 @@ class SuwayomiAdminServiceTest {
 
   @Test
   fun `filters catalog by language`() {
-    val page = adminService.catalog(null, "zh", false, 0, 30, false)
+    val page = adminService.catalog(null, "zh", false, 0, 30, false, null)
 
     assertThat(page.total).isGreaterThan(0)
     assertThat(page.items).isNotEmpty()

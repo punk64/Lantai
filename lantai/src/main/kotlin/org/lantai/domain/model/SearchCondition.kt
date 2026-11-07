@@ -8,14 +8,14 @@ import io.swagger.v3.oas.annotations.media.Schema
 class SearchCondition {
   @Schema(
     name = "SearchConditionBook",
-    oneOf = [AnyOfBook::class, AllOfBook::class, LibraryId::class, ReadListId::class, SeriesId::class, Deleted::class, OneShot::class, Title::class, ReleaseDate::class, Tag::class, NumberSort::class, ReadStatus::class, MediaStatus::class, MediaProfile::class, Author::class, NotableEntity::class, Poster::class],
+    oneOf = [AnyOfBook::class, AllOfBook::class, LibraryId::class, ReadListId::class, SeriesId::class, Deleted::class, OneShot::class, Title::class, ReleaseDate::class, Tag::class, NumberSort::class, ReadStatus::class, MediaStatus::class, MediaProfile::class, Author::class, NotableEntity::class, Poster::class, BookSeriesFilter::class],
   )
   @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
   sealed interface Book
 
   @Schema(
     name = "SearchConditionSeries",
-    oneOf = [AnyOfSeries::class, AllOfSeries::class, LibraryId::class, CollectionId::class, Deleted::class, Complete::class, OneShot::class, Title::class, TitleSort::class, ReleaseDate::class, Tag::class, SharingLabel::class, Publisher::class, Language::class, Genre::class, AgeRating::class, ReadStatus::class, SeriesStatus::class, Author::class, NotableEntity::class],
+    oneOf = [AnyOfSeries::class, AllOfSeries::class, LibraryId::class, CollectionId::class, Deleted::class, Complete::class, OneShot::class, Title::class, TitleSort::class, ReleaseDate::class, Tag::class, SharingLabel::class, Publisher::class, Language::class, Genre::class, AgeRating::class, ReadStatus::class, SeriesStatus::class, Author::class, NotableEntity::class, FirstLetter::class, SeriesMediaProfile::class, Region::class, ScrapeState::class],
   )
   @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
   sealed interface Series
@@ -83,6 +83,23 @@ class SearchCondition {
     val operator: SearchOperator.Boolean,
   ) : Book,
     Series
+
+  @Schema(name = "SearchConditionBookSeriesFilter")
+  data class BookSeriesFilter(
+    @JsonProperty("bookSeriesFilter")
+    val spec: BookSeriesFilterSpec,
+  ) : Book
+
+  @Schema(name = "SearchConditionBookSeriesFilterSpec")
+  data class BookSeriesFilterSpec(
+    val publisher: String? = null,
+    val genre: String? = null,
+    val region: String? = null,
+    val regionUnknown: Boolean = false,
+    val seriesStatus: String? = null,
+    val scrapeState: String? = null,
+    val firstLetter: String? = null,
+  )
 
   @Schema(name = "SearchConditionComplete")
   data class Complete(
@@ -184,6 +201,30 @@ class SearchCondition {
     @JsonProperty("mediaProfile")
     val operator: SearchOperator.Equality<org.lantai.domain.model.MediaProfile>,
   ) : Book
+
+  @Schema(name = "SearchConditionSeriesMediaProfile")
+  data class SeriesMediaProfile(
+    @JsonProperty("seriesMediaProfile")
+    val operator: SearchOperator.Equality<org.lantai.domain.model.MediaProfile>,
+  ) : Series
+
+  @Schema(name = "SearchConditionFirstLetter")
+  data class FirstLetter(
+    @JsonProperty("firstLetter")
+    val operator: SearchOperator.Equality<String>,
+  ) : Series
+
+  @Schema(name = "SearchConditionRegion")
+  data class Region(
+    @JsonProperty("region")
+    val operator: SearchOperator.EqualityNullable<String>,
+  ) : Series
+
+  @Schema(name = "SearchConditionScrapeState")
+  data class ScrapeState(
+    @JsonProperty("scrapeState")
+    val operator: SearchOperator.Equality<String>,
+  ) : Series
 
   @Schema(name = "SearchConditionAuthor")
   data class Author(

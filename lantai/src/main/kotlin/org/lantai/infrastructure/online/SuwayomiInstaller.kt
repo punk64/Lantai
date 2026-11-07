@@ -9,15 +9,18 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientResponseException
+import java.io.ByteArrayInputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
+import java.util.zip.ZipInputStream
 
 private val logger = KotlinLogging.logger {}
 private const val RELEASES_API = "https://api.github.com/repos/Suwayomi/Suwayomi-Server/releases/latest"
+private val GITHUB_RELEASE_REGEX = Regex("""https://github\.com/([^/]+)/([^/]+)/releases/download/([^/]+)/([^/?#]+)""")
 
 data class SuwayomiRelease(
   val tag: String,
@@ -25,6 +28,12 @@ data class SuwayomiRelease(
   val assetName: String?,
   val assetUrl: String?,
   val size: Long,
+)
+
+data class SuwayomiDownloadRoute(
+  val id: String,
+  val name: String,
+  val url: String,
 )
 
 @Service
@@ -51,6 +60,17 @@ class SuwayomiInstaller(
         SimpleClientHttpRequestFactory().apply {
           setConnectTimeout(Duration.ofSeconds(5))
           setReadTimeout(Duration.ofSeconds(15))
+        },
+      ).build()
+  }
+
+  private val pluginClient: RestClient by lazy {
+    RestClient
+      .builder()
+      .requestFactory(
+        SimpleClientHttpRequestFactory().apply {
+          setConnectTimeout(Duration.ofSeconds(5))
+          setReadTimeout(Duration.ofSeconds(60))
         },
       ).build()
   }
@@ -174,25 +194,107 @@ class SuwayomiInstaller(
     throw SuwayomiException("Unable to load extension index: ${lastError?.message ?: "no source reachable"}", lastError)
   }
 
-  fun downloadExtensionJar(entry: SuwayomiCatalogEntry): ByteArray {
+  fun downloadRoutes(url: String): List<SuwayomiDownloadRoute> {
+    val target = url.trim()
+    if (hostOf(target) != "github.com") return listOf(SuwayomiDownloadRoute("original", "原始地址", target))
+    val routes = mutableListOf<SuwayomiDownloadRoute>()
+    properties.extensionDownloadMirrors
+      .map { it.trim() }
+      .filter { it.startsWith("http") }
+      .forEachIndexed { index, prefix ->
+        routes.add(
+          SuwayomiDownloadRoute(
+            "mirror-${index + 1}",
+            "镜像 ${index + 1} · ${hostOf(prefix)}",
+            prefix.trimEnd('/') + "/" + target,
+          ),
+        )
+      }
+    githubAssetUrl(target)?.let { routes.add(SuwayomiDownloadRoute("github-api", "GitHub 资产直链", it)) }
+    routes.add(SuwayomiDownloadRoute("original", "原始地址", target))
+    return routes
+  }
+
+  fun canSuwayomiFetch(url: String): Boolean = hostOf(url.trim()) != "github.com"
+
+  fun downloadExtensionJar(
+    entry: SuwayomiCatalogEntry,
+    route: String? = null,
+  ): ByteArray {
     val url = entry.jarUrl ?: entry.apkUrl ?: throw SuwayomiException("Extension ${entry.pkgName} has no downloadable jar")
-    val bytes =
-      try {
-        client
+    val all = downloadRoutes(url)
+    val candidates =
+      if (route.isNullOrBlank() || route == "auto") {
+        all
+      } else {
+        listOf(all.firstOrNull { it.id == route } ?: throw SuwayomiException("未知下载线路：$route"))
+      }
+    val failures = mutableListOf<String>()
+    candidates.forEachIndexed { index, candidate ->
+      val started = System.currentTimeMillis()
+      val bytes =
+        runCatching {
+          pluginClient
+            .get()
+            .uri(candidate.url)
+            .header(HttpHeaders.ACCEPT, "application/octet-stream")
+            .header(HttpHeaders.USER_AGENT, "lantai")
+            .retrieve()
+            .body(ByteArray::class.java)
+        }.onFailure { e ->
+          failures.add("${candidate.name} ${e.javaClass.simpleName}: ${e.message}")
+          extLog.warn("插件包下载失败 ${entry.pkgName} 第${index + 1}/${candidates.size}路 ${candidate.name}（${hostOf(candidate.url)}），耗时 ${System.currentTimeMillis() - started}ms：${e.javaClass.simpleName}: ${e.message}")
+        }.getOrNull()
+      if (bytes == null || !isZipArchive(bytes)) {
+        if (bytes != null) {
+          failures.add("${candidate.name} 返回内容不是有效 ZIP（${bytes.size} 字节）")
+          extLog.warn("插件包下载失败 ${entry.pkgName} 第${index + 1}/${candidates.size}路 ${candidate.name}：内容不是有效 ZIP（${bytes.size} 字节）")
+        }
+        return@forEachIndexed
+      }
+      extLog.info("插件包下载成功 ${entry.pkgName} 第${index + 1}/${candidates.size}路 ${candidate.name}，${bytes.size} 字节，耗时 ${System.currentTimeMillis() - started}ms")
+      return bytes
+    }
+    throw SuwayomiException("下载插件包失败（${entry.pkgName}）：${failures.joinToString("；").ifEmpty { "所有下载路径均不可用" }}")
+  }
+
+  private fun githubAssetUrl(url: String): String? {
+    val match = GITHUB_RELEASE_REGEX.find(url) ?: return null
+    val owner = match.groupValues[1]
+    val repo = match.groupValues[2]
+    val tag = match.groupValues[3]
+    val assetName = match.groupValues[4]
+    val node =
+      runCatching {
+        indexClient
           .get()
-          .uri(url)
-          .header(HttpHeaders.ACCEPT, "application/octet-stream")
+          .uri("https://api.github.com/repos/$owner/$repo/releases/tags/$tag")
+          .header(HttpHeaders.ACCEPT, "application/vnd.github+json")
           .header(HttpHeaders.USER_AGENT, "lantai")
           .retrieve()
-          .body(ByteArray::class.java)
-      } catch (e: Exception) {
-        throw SuwayomiException("Downloading extension ${entry.pkgName} failed: ${e.message}", e)
-      } ?: throw SuwayomiException("Empty download for extension ${entry.pkgName}")
-    if (bytes.size < 4 || bytes[0] != 'P'.code.toByte() || bytes[1] != 'K'.code.toByte()) {
-      throw SuwayomiException("Downloaded extension ${entry.pkgName} is not a valid archive")
-    }
-    return bytes
+          .body(JsonNode::class.java)
+      }.onFailure {
+        extLog.warn("GitHub 资产接口查询失败 $owner/$repo@$tag：${it.javaClass.simpleName}: ${it.message}")
+      }.getOrNull() ?: return null
+    return node
+      .path("assets")
+      .firstOrNull { it.path("name").asText("") == assetName }
+      ?.path("url")
+      ?.asText(null)
   }
+
+  private fun isZipArchive(bytes: ByteArray): Boolean {
+    if (bytes.size < 4 || bytes[0] != 'P'.code.toByte() || bytes[1] != 'K'.code.toByte()) return false
+    return runCatching {
+      ZipInputStream(ByteArrayInputStream(bytes)).use { zip ->
+        var entries = 0
+        while (zip.nextEntry != null) entries++
+        entries > 0
+      }
+    }.getOrDefault(false)
+  }
+
+  private fun hostOf(url: String): String = runCatching { java.net.URI(url).host }.getOrNull() ?: url
 
   private fun downloadTo(
     url: String,

@@ -142,6 +142,7 @@ class BookController(
     @RequestParam(name = "deleted", required = false) deleted: Boolean? = null,
     @RequestParam(name = "readerView", required = false) readerView: Boolean = false,
     @RequestParam(name = "unpaged", required = false) unpaged: Boolean = false,
+    @RequestParam(name = "collapse_online_series", required = false) collapseOnlineSeries: Boolean = false,
     @Parameter(hidden = true) page: Pageable,
   ): Page<BookDto> {
     val sort =
@@ -174,6 +175,7 @@ class BookController(
           },
         ),
         searchTerm,
+        collapseOnlineSeries = collapseOnlineSeries,
       )
 
     return bookDtoRepository
@@ -189,6 +191,7 @@ class BookController(
     @RequestBody search: BookSearch,
     @RequestParam(name = "readerView", required = false) readerView: Boolean = false,
     @RequestParam(name = "unpaged", required = false) unpaged: Boolean = false,
+    @RequestParam(name = "collapse_online_series", required = false) collapseOnlineSeries: Boolean = false,
     @Parameter(hidden = true) page: Pageable,
   ): Page<BookDto> {
     val sort =
@@ -209,7 +212,11 @@ class BookController(
         )
 
     return bookDtoRepository
-      .findAll(search, SearchContext(principal.user, readerView), pageRequest)
+      .findAll(
+        if (collapseOnlineSeries) search.copy(collapseOnlineSeries = true) else search,
+        SearchContext(principal.user, readerView),
+        pageRequest,
+      )
       .map { it.restrictUrl(!principal.user.isAdmin) }
   }
 
@@ -223,7 +230,6 @@ class BookController(
     @Parameter(hidden = true) page: Pageable,
   ): Page<BookDto> {
     val sort = Sort.by(Sort.Order.desc("lastModifiedDate"))
-
     val pageRequest =
       if (unpaged)
         UnpagedSorted(sort)

@@ -26,4 +26,5 @@ class OnlineProperties {
   var extensionIndexUrl: String = "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb"
   var extensionIndexMirrorUrl: String = "https://cdn.jsdelivr.net/gh/keiyoushi/extensions@repo/index.pb"
   var extensionIndexCacheMinutes: Long = 720
+  var extensionDownloadMirrors: List<String> = listOf("https://ghfast.top/", "https://gh-proxy.com/")
 }

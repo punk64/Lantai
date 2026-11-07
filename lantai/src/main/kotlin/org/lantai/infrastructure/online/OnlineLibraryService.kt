@@ -23,6 +23,7 @@ class OnlineLibraryService(
   private val libraryLifecycle: LibraryLifecycle,
   private val libraryRepository: LibraryRepository,
   private val processManager: SuwayomiProcessManager,
+  private val adminService: SuwayomiAdminService,
 ) {
   fun findByType(): Library? = libraryRepository.findAll().firstOrNull { it.type == Library.Type.ONLINE }
 
@@ -93,6 +94,8 @@ class OnlineLibraryService(
       thread(isDaemon = true, name = "suwayomi-bootstrap") {
         try {
           processManager.ensureRunning()
+          runCatching { adminService.fetchExtensions() }
+            .onFailure { logger.warn(it) { "Unable to refresh Suwayomi extension stores" } }
         } catch (e: Exception) {
           logger.warn(e) { "Unable to start Suwayomi automatically" }
         }

@@ -14,6 +14,8 @@ import kotlin.io.path.writeText
 
 private val logger = KotlinLogging.logger {}
 private const val DEFAULT_USERNAME = "lantai"
+private const val DEFAULT_EXTENSION_STORE = "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb"
+private const val LEGACY_EXTENSION_STORE = "https://github.com/keiyoushi/extensions/raw/repo/index.pb"
 
 data class SuwayomiCredentials(
   val username: String,
@@ -79,8 +81,9 @@ class SuwayomiConfigWriter(
     upsert(lines, "server.webUIChannel", "BUNDLED")
     upsert(lines, "server.downloadAsCbz", "true")
     upsert(lines, "server.downloadsPath", "\"${effectiveDownloadsDir().toString().replace("\\", "/")}\"")
-    if (lines.none { it.startsWith("server.extensionStores") } || lines.any { it.trimStart().startsWith("server.extensionStores") && it.contains("[]") }) {
-      upsert(lines, "server.extensionStores", "[\"https://github.com/keiyoushi/extensions/raw/repo/index.pb\"]")
+    val storeLine = lines.indexOfFirst { it.trimStart().startsWith("server.extensionStores") }
+    if (storeLine < 0 || lines[storeLine].contains("[]") || lines[storeLine].contains(LEGACY_EXTENSION_STORE)) {
+      upsert(lines, "server.extensionStores", "[\"$DEFAULT_EXTENSION_STORE\"]")
     }
 
     file.writeText(lines.joinToString("\n", postfix = "\n"))

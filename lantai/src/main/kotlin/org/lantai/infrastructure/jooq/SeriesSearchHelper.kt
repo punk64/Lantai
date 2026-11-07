@@ -1,6 +1,8 @@
 package org.lantai.infrastructure.jooq
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.lantai.domain.model.Media
+import org.lantai.domain.model.MediaType
 import org.lantai.domain.model.ReadStatus
 import org.lantai.domain.model.SearchCondition
 import org.lantai.domain.model.SearchContext
@@ -265,6 +267,80 @@ class SeriesSearchHelper(
       is SearchCondition.Language -> searchCondition.operator.toCondition(Tables.SERIES_METADATA.LANGUAGE, true) to setOf(RequiredJoin.SeriesMetadata)
 
       is SearchCondition.Publisher -> searchCondition.operator.toCondition(Tables.SERIES_METADATA.PUBLISHER, true) to setOf(RequiredJoin.SeriesMetadata)
+
+      is SearchCondition.FirstLetter ->
+        searchCondition.operator.toCondition(Tables.SERIES_METADATA.FIRST_LETTER, true) to setOf(RequiredJoin.SeriesMetadata)
+
+      is SearchCondition.Region ->
+        Tables.SERIES_METADATA.REGION.let { field ->
+          when (val op = searchCondition.operator) {
+            is SearchOperator.Is -> field.eq(op.value)
+            is SearchOperator.IsNot -> field.ne(op.value)
+            is SearchOperator.IsNullT<*> -> field.eq("")
+            is SearchOperator.IsNotNullT<*> -> field.ne("")
+          }
+        } to setOf(RequiredJoin.SeriesMetadata)
+
+      is SearchCondition.SeriesMediaProfile ->
+        Tables.SERIES.ID.let { seriesField ->
+          val profile =
+            when (val op = searchCondition.operator) {
+              is SearchOperator.Is -> op.value
+              is SearchOperator.IsNot -> op.value
+            }
+          val types = MediaType.matchingMediaProfile(profile).map { it.type }.toSet()
+          val inner =
+            DSL
+              .select(DSL.one())
+              .from(Tables.BOOK)
+              .join(Tables.MEDIA)
+              .on(Tables.MEDIA.BOOK_ID.eq(Tables.BOOK.ID))
+              .where(Tables.BOOK.SERIES_ID.eq(seriesField))
+              .and(Tables.MEDIA.MEDIA_TYPE.`in`(types))
+          when (searchCondition.operator) {
+            is SearchOperator.Is -> DSL.exists(inner)
+            is SearchOperator.IsNot -> DSL.notExists(inner)
+          }
+        } to emptySet()
+
+      is SearchCondition.ScrapeState ->
+        Tables.SERIES.ID.let { seriesField ->
+          val mediaBad =
+            DSL
+              .select(DSL.one())
+              .from(Tables.BOOK)
+              .join(Tables.MEDIA)
+              .on(Tables.MEDIA.BOOK_ID.eq(Tables.BOOK.ID))
+              .where(Tables.BOOK.SERIES_ID.eq(seriesField))
+              .and(Tables.MEDIA.STATUS.notIn(Media.Status.READY.name, Media.Status.OUTDATED.name))
+          val bad = DSL.exists(mediaBad)
+          val filled =
+            Tables.SERIES_METADATA.PUBLISHER
+              .ne("")
+              .or(Tables.SERIES_METADATA.REGION.ne(""))
+              .or(Tables.SERIES_METADATA.LANGUAGE.ne(""))
+              .or(Tables.SERIES_METADATA.SUMMARY.ne(""))
+              .or(
+                DSL.exists(
+                  DSL
+                    .select(DSL.one())
+                    .from(Tables.SERIES_METADATA_GENRE)
+                    .where(Tables.SERIES_METADATA_GENRE.SERIES_ID.eq(seriesField)),
+                ),
+              )
+          val done = bad.not().and(filled)
+          val state =
+            when (val op = searchCondition.operator) {
+              is SearchOperator.Is -> op.value
+              is SearchOperator.IsNot -> op.value
+            }
+          when (state) {
+            "bad" -> bad
+            "done" -> done
+            "none" -> done.not().and(bad.not())
+            else -> DSL.noCondition()
+          }
+        } to setOf(RequiredJoin.SeriesMetadata)
 
       is SearchCondition.SharingLabel ->
         Tables.SERIES.ID.let { field ->

@@ -1,5 +1,6 @@
 package org.lantai.interfaces.api.rest
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
@@ -12,6 +13,7 @@ import org.lantai.domain.persistence.BookRepository
 import org.lantai.domain.persistence.MediaRepository
 import org.lantai.domain.persistence.ReadProgressRepository
 import org.lantai.domain.persistence.SeriesMetadataRepository
+import org.lantai.infrastructure.online.SuwayomiException
 import org.lantai.infrastructure.read.ChapterBundleDto
 import org.lantai.infrastructure.read.BookSearchResultDto
 import org.lantai.infrastructure.read.BookSearchService
@@ -37,6 +39,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -50,6 +53,8 @@ import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+
+private val logger = KotlinLogging.logger {}
 
 @RestController
 @RequestMapping("api/lantai/v1/read")
@@ -257,6 +262,15 @@ class LantaiReadController(
       .contentType(MediaType.parseMediaType(rendered.mediaType))
       .cacheControl(CacheControl.maxAge(365, TimeUnit.DAYS).cachePrivate().immutable())
       .body(rendered.bytes)
+  }
+
+  @ExceptionHandler(SuwayomiException::class)
+  fun onlinePageUnavailable(ex: SuwayomiException): ResponseEntity<Void> {
+    logger.warn(ex) { "Online page unavailable" }
+    return ResponseEntity
+      .status(HttpStatus.SERVICE_UNAVAILABLE)
+      .header(HttpHeaders.RETRY_AFTER, "30")
+      .build()
   }
 
   @GetMapping("{bookId}/thumb/{page}", produces = ["image/*"])

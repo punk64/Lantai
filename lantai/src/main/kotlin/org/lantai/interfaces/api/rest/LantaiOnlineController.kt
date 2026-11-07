@@ -3,6 +3,10 @@ package org.lantai.interfaces.api.rest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import com.fasterxml.jackson.databind.JsonNode
+import org.lantai.domain.model.OnlineCacheItem
+import org.lantai.domain.model.OnlineCacheJob
+import org.lantai.infrastructure.online.OnlineCacheEvictor
+import org.lantai.infrastructure.online.OnlineCacheJobService
 import org.lantai.infrastructure.online.OnlineException
 import org.lantai.infrastructure.online.OnlineLibraryService
 import org.lantai.infrastructure.online.OnlineMangaInfo
@@ -28,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("api/lantai/v1/online", produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -37,6 +42,8 @@ class LantaiOnlineController(
   private val client: SuwayomiClient,
   private val syncService: OnlineSyncService,
   private val libraryService: OnlineLibraryService,
+  private val cacheJobService: OnlineCacheJobService,
+  private val cacheEvictor: OnlineCacheEvictor,
 ) {
   @PostMapping("library")
   @PreAuthorize("hasRole('ADMIN')")
@@ -217,6 +224,99 @@ class LantaiOnlineController(
     }
   }
 
+  @PostMapping("series/{seriesId}/cache-jobs")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Queue a batch cache job for the chapters of a subscription")
+  fun createCacheJob(
+    @PathVariable seriesId: String,
+    @RequestBody(required = false) request: OnlineCacheCreateDto? = null,
+  ): OnlineCacheJobDto =
+    call {
+      cacheJobService.create(seriesId, request?.bookIds).let { it.toDto() }
+    }
+
+  @GetMapping("series/{seriesId}/cache-jobs")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "List cache jobs of a subscription")
+  fun cacheJobs(
+    @PathVariable seriesId: String,
+  ): List<OnlineCacheJobDto> =
+    call {
+      cacheJobService.list(seriesId).map { it.toDto() }
+    }
+
+  @GetMapping("cache-jobs/{jobId}")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Read a cache job")
+  fun cacheJob(
+    @PathVariable jobId: String,
+  ): OnlineCacheJobDto =
+    call { cacheJobService.get(jobId).toDto() }
+
+  @GetMapping("cache-jobs/{jobId}/items")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Page the chapters of a cache job")
+  fun cacheJobItems(
+    @PathVariable jobId: String,
+    @RequestParam(name = "page", required = false, defaultValue = "0") page: Int,
+    @RequestParam(name = "size", required = false, defaultValue = "100") size: Int,
+  ): OnlineCacheItemsDto =
+    call {
+      val (total, items) = cacheJobService.items(jobId, maxOf(page, 0), size.coerceIn(1, 500))
+      OnlineCacheItemsDto(total, items.map { it.toDto() })
+    }
+
+  @PostMapping("cache-jobs/{jobId}/pause")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Pause a cache job")
+  fun pauseCacheJob(
+    @PathVariable jobId: String,
+  ): OnlineCacheJobDto =
+    call {
+      cacheJobService.pause(jobId)
+      cacheJobService.get(jobId).toDto()
+    }
+
+  @PostMapping("cache-jobs/{jobId}/resume")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Resume a paused cache job")
+  fun resumeCacheJob(
+    @PathVariable jobId: String,
+  ): OnlineCacheJobDto =
+    call {
+      cacheJobService.resume(jobId)
+      cacheJobService.get(jobId).toDto()
+    }
+
+  @PostMapping("cache-jobs/{jobId}/cancel")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Cancel a cache job")
+  fun cancelCacheJob(
+    @PathVariable jobId: String,
+  ): OnlineCacheJobDto =
+    call {
+      cacheJobService.cancel(jobId)
+      cacheJobService.get(jobId).toDto()
+    }
+
+  @PostMapping("cache-jobs/{jobId}/retry")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Retry the failed chapters of a cache job")
+  fun retryCacheJob(
+    @PathVariable jobId: String,
+  ): OnlineCacheJobDto =
+    call {
+      cacheJobService.retry(jobId)
+      cacheJobService.get(jobId).toDto()
+    }
+
+  @DeleteMapping("books/{bookId}/cache")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Delete the downloaded cache of a single online chapter")
+  fun evictBookCache(
+    @PathVariable bookId: String,
+  ): OnlineCacheEvictDto = OnlineCacheEvictDto(bookId, cacheEvictor.evictBook(bookId))
+
   @GetMapping("manga/{mangaId}")
   @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "Read the remote detail of a single manga")
@@ -338,6 +438,42 @@ data class OnlineChapterDto(
   val downloaded: Boolean,
 )
 
+data class OnlineCacheCreateDto(
+  val bookIds: List<String>? = null,
+)
+
+data class OnlineCacheJobDto(
+  val id: String,
+  val seriesId: String,
+  val status: String,
+  val total: Int,
+  val done: Int,
+  val failed: Int,
+  val createdDate: LocalDateTime,
+  val lastModifiedDate: LocalDateTime,
+)
+
+data class OnlineCacheItemDto(
+  val id: String,
+  val bookId: String,
+  val index: Int,
+  val title: String,
+  val status: String,
+  val error: String,
+  val pageCount: Int,
+  val sizeBytes: Long,
+)
+
+data class OnlineCacheItemsDto(
+  val total: Long,
+  val items: List<OnlineCacheItemDto>,
+)
+
+data class OnlineCacheEvictDto(
+  val bookId: String,
+  val evicted: Boolean,
+)
+
 data class OnlineMangaPageDto(
   val items: List<OnlineMangaDto>,
   val hasNextPage: Boolean,
@@ -382,6 +518,30 @@ data class OnlinePreferenceChangeRequest(
   val listState: String? = null,
   val multiSelectState: List<String>? = null,
 )
+
+private fun OnlineCacheJob.toDto() =
+  OnlineCacheJobDto(
+    id = id,
+    seriesId = seriesId,
+    status = status.name,
+    total = total,
+    done = done,
+    failed = failed,
+    createdDate = createdDate,
+    lastModifiedDate = lastModifiedDate,
+  )
+
+private fun OnlineCacheItem.toDto() =
+  OnlineCacheItemDto(
+    id = id,
+    bookId = bookId,
+    index = chapIndex,
+    title = title,
+    status = status.name,
+    error = error,
+    pageCount = pageCount,
+    sizeBytes = sizeBytes,
+  )
 
 private fun SuwayomiFilter.toDto(): OnlineFilterDto =
   OnlineFilterDto(

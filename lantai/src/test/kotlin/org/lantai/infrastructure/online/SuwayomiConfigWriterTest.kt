@@ -31,7 +31,7 @@ class SuwayomiConfigWriterTest {
     assertThat(content).contains("server.kcefEnabled = false")
     assertThat(content).contains("server.initialOpenInBrowserEnabled = false")
     assertThat(content).contains("server.webUIChannel = BUNDLED")
-    assertThat(content).contains("server.extensionStores = [\"https://github.com/keiyoushi/extensions/raw/repo/index.pb\"]")
+    assertThat(content).contains("server.extensionStores = [\"https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb\"]")
     assertThat(content).contains("server.downloadsPath = \"${tempDir.resolve("suwayomi").resolve("data").resolve("downloads").toString().replace("\\", "/")}\"")
   }
 

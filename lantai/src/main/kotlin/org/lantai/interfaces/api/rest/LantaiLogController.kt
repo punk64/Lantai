@@ -71,6 +71,19 @@ class LantaiLogController(
     @RequestParam(name = "to", required = false) to: String?,
   ): LogPage = logFileReader.read(resolveFile(file), cursor, limit, level, q, from, to)
 
+  @GetMapping("entries/tail")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Read structured log entries from the end of the file, newest first")
+  fun tail(
+    @RequestParam(name = "file", required = false) file: String?,
+    @RequestParam(name = "before", required = false) before: Long?,
+    @RequestParam(name = "limit", required = false) limit: Int?,
+    @RequestParam(name = "level", required = false) level: String?,
+    @RequestParam(name = "q", required = false) q: String?,
+    @RequestParam(name = "from", required = false) from: String?,
+    @RequestParam(name = "to", required = false) to: String?,
+  ): LogPage = logFileReader.readBackward(resolveFile(file), before, limit, level, q, from, to)
+
   @GetMapping("files/{name}/download")
   @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "Download a raw log file")

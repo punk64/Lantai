@@ -1,12 +1,14 @@
 package org.lantai.infrastructure.jooq
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.lantai.domain.model.Library
 import org.lantai.domain.model.Media
 import org.lantai.domain.model.MediaType
 import org.lantai.domain.model.ReadStatus
 import org.lantai.domain.model.SearchCondition
 import org.lantai.domain.model.SearchContext
 import org.lantai.domain.model.SearchOperator
+import org.lantai.domain.model.SeriesMetadata
 import org.lantai.infrastructure.jooq.RequiredJoin.ReadProgress
 import org.lantai.jooq.main.Tables
 import org.jooq.Condition
@@ -34,6 +36,29 @@ class BookSearchHelper(
       Tables.MEDIA.STATUS.`in`(Media.Status.READY.name, Media.Status.UNSUPPORTED.name) to setOf(RequiredJoin.Media)
     }
 
+  fun collapseOnlineSeriesCondition(): Pair<Condition, Set<RequiredJoin>> {
+    val onlineLibraries =
+      DSL
+        .select(Tables.LIBRARY.ID)
+        .from(Tables.LIBRARY)
+        .where(Tables.LIBRARY.TYPE.eq(Library.Type.ONLINE.name))
+    val sibling = Tables.BOOK.`as`("collapse_sibling")
+    val singleBook =
+      DSL
+        .field(
+          DSL
+            .selectCount()
+            .from(sibling)
+            .where(sibling.SERIES_ID.eq(Tables.BOOK.SERIES_ID)),
+        ).eq(1)
+    val condition =
+      Tables.BOOK.LIBRARY_ID
+        .notIn(onlineLibraries)
+        .or(Tables.BOOK_METADATA.NUMBER_SORT.eq(1f))
+        .or(singleBook)
+    return condition to setOf(RequiredJoin.BookMetadata)
+  }
+
   fun toCondition(): Pair<Condition, Set<RequiredJoin>> {
     val restrictions = ContentRestrictionsSearchHelper(context.restrictions).toCondition()
     val authorizedLibraries = toConditionInternal(context.libraryIds)
@@ -44,6 +69,35 @@ class BookSearchHelper(
     if (libraryIds == null) return DSL.noCondition() to emptySet()
     if (libraryIds.isEmpty()) return DSL.falseCondition() to emptySet()
     return toConditionInternal(SearchCondition.AnyOfBook(libraryIds.map { SearchCondition.LibraryId(SearchOperator.Is(it)) }))
+  }
+
+  private fun bookSeriesFilterCondition(spec: SearchCondition.BookSeriesFilterSpec): Condition {
+    val parts = mutableListOf<SearchCondition.Series>()
+    spec.publisher?.takeIf { it.isNotBlank() }?.let { parts.add(SearchCondition.Publisher(SearchOperator.Is(it))) }
+    spec.genre?.takeIf { it.isNotBlank() }?.let { parts.add(SearchCondition.Genre(SearchOperator.Is(it))) }
+    if (spec.regionUnknown) {
+      parts.add(SearchCondition.Region(SearchOperator.IsNullT()))
+    } else {
+      spec.region?.takeIf { it.isNotBlank() }?.let { parts.add(SearchCondition.Region(SearchOperator.Is(it))) }
+    }
+    spec.seriesStatus?.takeIf { it.isNotBlank() }?.let { raw ->
+      val status = SeriesMetadata.Status.entries.firstOrNull { it.name.equals(raw.trim(), ignoreCase = true) }
+      if (status != null) parts.add(SearchCondition.SeriesStatus(SearchOperator.Is(status)))
+    }
+    spec.scrapeState?.takeIf { it.isNotBlank() }?.let { parts.add(SearchCondition.ScrapeState(SearchOperator.Is(it.trim().lowercase()))) }
+    spec.firstLetter?.takeIf { it.isNotBlank() }?.let { parts.add(SearchCondition.FirstLetter(SearchOperator.Is(it))) }
+    if (parts.isEmpty()) return DSL.noCondition()
+    val seriesCondition = SeriesSearchHelper(context).toCondition(SearchCondition.AllOfSeries(parts)).first
+    val s = Tables.SERIES
+    val sd = Tables.SERIES_METADATA
+    val subquery =
+      DSL
+        .select(s.ID)
+        .from(s)
+        .leftJoin(sd)
+        .on(sd.SERIES_ID.eq(s.ID))
+        .where(seriesCondition)
+    return Tables.BOOK.SERIES_ID.`in`(subquery)
   }
 
   private fun toConditionInternal(searchCondition: SearchCondition.Book?): Pair<Condition, Set<RequiredJoin>> =
@@ -63,6 +117,8 @@ class BookSearchHelper(
       is SearchCondition.LibraryId -> searchCondition.operator.toCondition(Tables.BOOK.LIBRARY_ID) to emptySet()
 
       is SearchCondition.SeriesId -> searchCondition.operator.toCondition(Tables.BOOK.SERIES_ID) to emptySet()
+
+      is SearchCondition.BookSeriesFilter -> bookSeriesFilterCondition(searchCondition.spec) to emptySet()
 
       is SearchCondition.ReadListId ->
         when (searchCondition.operator) {

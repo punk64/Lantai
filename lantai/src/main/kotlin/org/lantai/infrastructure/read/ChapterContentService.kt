@@ -18,6 +18,7 @@ import org.lantai.domain.persistence.MediaRepository
 import org.lantai.domain.service.BookAnalyzer
 import org.lantai.infrastructure.mediacontainer.ContentDetector
 import org.lantai.infrastructure.mediacontainer.txt.TxtExtractor
+import org.lantai.infrastructure.online.OnlineReadService
 import org.springframework.stereotype.Service
 import java.net.URLDecoder
 import java.nio.charset.Charset
@@ -46,6 +47,7 @@ class ChapterContentService(
   private val contentDetector: ContentDetector,
   private val readImageService: ReadImageService,
   private val readProperties: ReadProperties,
+  private val onlineReadService: OnlineReadService,
 ) {
   companion object {
     private const val SVG_PLACEHOLDER =
@@ -59,6 +61,7 @@ class ChapterContentService(
       )
     private const val MAX_PARAGRAPH = 600
     private const val INDEX_CACHE_BOOKS = 4
+    private const val ONLINE_MEDIA_COMMENT = "online"
   }
 
   private val headingCache = ConcurrentHashMap<String, String>()
@@ -237,7 +240,12 @@ class ChapterContentService(
     book: Book,
     media: Media,
     page: Int,
-  ): ByteArray = bookAnalyzer.getPageContent(BookWithMedia(book, media), page)
+  ): ByteArray {
+    if (media.comment == ONLINE_MEDIA_COMMENT) {
+      onlineReadService.pageOrNull(book.id, page)?.let { return it.bytes }
+    }
+    return bookAnalyzer.getPageContent(BookWithMedia(book, media), page)
+  }
 
   private fun epubBundle(
     book: Book,
@@ -339,7 +347,7 @@ class ChapterContentService(
         next = next,
       )
     }
-    val bytes = bookAnalyzer.getPageContent(BookWithMedia(book, media), number)
+    val bytes = pageBytes(book, media, number)
     val rendered = readImageService.render(bytes, width, format)
     val src =
       when (mode) {

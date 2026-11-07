@@ -108,6 +108,9 @@ data class SuwayomiExtension(
   val hasUpdate: Boolean = false,
   val isObsolete: Boolean = false,
   val iconUrl: String? = null,
+  val storeIndexUrl: String? = null,
+  val apkUrl: String? = null,
+  val jarUrl: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

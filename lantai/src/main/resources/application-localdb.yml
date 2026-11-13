@@ -1,0 +1,10 @@
+lantai:
+  workspace: localdb
+  database:
+    file: \${lantai.config-dir}/\${lantai.workspace}.sqlite
+  lucene:
+    data-directory: \${lantai.config-dir}/lucene/\${lantai.workspace}
+  tasks-db:
+    file: \${lantai.config-dir}/\${lantai.workspace}-tasks.sqlite
+  sessions-db:
+    file: \${lantai.config-dir}/\${lantai.workspace}-sessions.sqlite

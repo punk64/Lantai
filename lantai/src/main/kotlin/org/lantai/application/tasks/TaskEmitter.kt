@@ -1,0 +1,316 @@
+package org.lantai.application.tasks
+
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.lantai.domain.model.Book
+import org.lantai.domain.model.BookMetadataPatchCapability
+import org.lantai.domain.model.BookPageNumbered
+import org.lantai.domain.model.CopyMode
+import org.lantai.domain.model.Library
+import org.lantai.domain.model.Media
+import org.lantai.domain.model.SearchCondition
+import org.lantai.domain.model.SearchContext
+import org.lantai.domain.model.SearchOperator
+import org.lantai.domain.persistence.BookRepository
+import org.lantai.domain.service.BookConverter
+import org.lantai.infrastructure.search.LuceneEntity
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.stereotype.Service
+
+private val logger = KotlinLogging.logger {}
+
+private const val PENDING_ANALYZE_PAGE_SIZE = 5000
+
+@Service
+class TaskEmitter(
+  private val bookRepository: BookRepository,
+  private val bookConverter: BookConverter,
+  private val tasksRepository: TasksRepository,
+  private val eventPublisher: ApplicationEventPublisher,
+) {
+  fun scanLibrary(
+    libraryId: String,
+    scanDeep: Boolean = false,
+    priority: Int = HIGH_PRIORITY,
+  ) {
+    submitTask(Task.ScanLibrary(libraryId, scanDeep, priority))
+  }
+
+  fun emptyTrash(
+    libraryId: String,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.EmptyTrash(libraryId, priority))
+  }
+
+  fun analyzeUnknownAndOutdatedBooks(library: Library) {
+    analyzePendingBooks(library.id, LOW_PRIORITY)
+  }
+
+  fun analyzeNextBook(
+    libraryId: String,
+    priority: Int = LOW_PRIORITY,
+  ) {
+    analyzePendingBooks(libraryId, priority)
+  }
+
+  private fun analyzePendingBooks(
+    libraryId: String,
+    priority: Int,
+  ) {
+    if (libraryId.isBlank()) return
+    val condition =
+      SearchCondition.AllOfBook(
+        SearchCondition.LibraryId(SearchOperator.Is(libraryId)),
+        SearchCondition.AnyOfBook(
+          SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.UNKNOWN)),
+          SearchCondition.MediaStatus(SearchOperator.Is(Media.Status.OUTDATED)),
+        ),
+      )
+    val sort = Sort.by(Sort.Order.asc("seriesId"), Sort.Order.asc("number"))
+    val tasks = mutableListOf<Task>()
+    var page = 0
+    while (true) {
+      val result = bookRepository.findAll(condition, SearchContext.empty(), PageRequest.of(page, PENDING_ANALYZE_PAGE_SIZE, sort))
+      result.content.mapTo(tasks) { Task.AnalyzeBook(it.id, priority, it.seriesId, libraryId) }
+      if (result.content.isEmpty() || tasks.size.toLong() >= result.totalElements) break
+      page++
+    }
+    if (tasks.isNotEmpty()) submitTasks(tasks)
+  }
+
+  fun hashBooksWithoutHash(library: Library) {
+    if (library.hashFiles)
+      bookRepository
+        .findAllByLibraryIdAndWithEmptyHash(library.id)
+        .map { Task.HashBook(it.id, LOWEST_PRIORITY) }
+        .let { submitTasks(it) }
+  }
+
+  fun hashBooksWithoutHashKoreader(library: Library) {
+    if (library.hashKoreader)
+      bookRepository
+        .findAllByLibraryIdAndWithEmptyHashKoreader(library.id)
+        .map { Task.HashBookKoreader(it.id, LOWEST_PRIORITY) }
+        .let { submitTasks(it) }
+  }
+
+  fun findBooksWithMissingPageHash(
+    library: Library,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.FindBooksWithMissingPageHash(library.id, priority))
+  }
+
+  fun hashBookPages(
+    bookIdToSeriesId: Collection<String>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    bookIdToSeriesId
+      .map { Task.HashBookPages(it, priority) }
+      .let { submitTasks(it) }
+  }
+
+  fun findBooksToConvert(
+    library: Library,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.FindBooksToConvert(library.id, priority))
+  }
+
+  fun convertBookToCbz(
+    books: Collection<Book>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    books
+      .map { Task.ConvertBook(it.id, priority, it.seriesId) }
+      .let { submitTasks(it) }
+  }
+
+  fun repairExtensions(
+    library: Library,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    if (library.repairExtensions)
+      bookConverter
+        .getMismatchedExtensionBooks(library)
+        .map { Task.RepairExtension(it.id, priority, it.seriesId) }
+        .let { submitTasks(it) }
+  }
+
+  fun findDuplicatePagesToDelete(
+    library: Library,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.FindDuplicatePagesToDelete(library.id, priority))
+  }
+
+  fun removeDuplicatePages(
+    bookId: String,
+    pages: Collection<BookPageNumbered>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.RemoveHashedPages(bookId, pages, priority))
+  }
+
+  fun removeDuplicatePages(
+    bookIdToPages: Map<String, Collection<BookPageNumbered>>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    bookIdToPages
+      .map { Task.RemoveHashedPages(it.key, it.value, priority) }
+      .let { submitTasks(it) }
+  }
+
+  fun analyzeBook(
+    book: Book,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.AnalyzeBook(book.id, priority, book.seriesId, book.libraryId))
+  }
+
+  fun analyzeBook(
+    books: Collection<Book>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    books
+      .map { Task.AnalyzeBook(it.id, priority, it.seriesId, it.libraryId) }
+      .let { submitTasks(it) }
+  }
+
+  fun generateBookThumbnail(
+    bookId: String,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.GenerateBookThumbnail(bookId, priority))
+  }
+
+  fun generateBookThumbnail(
+    bookIds: Collection<String>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    bookIds
+      .map { Task.GenerateBookThumbnail(it, priority) }
+      .let { submitTasks(it) }
+  }
+
+  fun refreshBookMetadata(
+    book: Book,
+    capabilities: Set<BookMetadataPatchCapability> = BookMetadataPatchCapability.entries.toSet(),
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.RefreshBookMetadata(book.id, capabilities, priority, book.seriesId))
+  }
+
+  fun refreshBookMetadata(
+    books: Collection<Book>,
+    capabilities: Set<BookMetadataPatchCapability> = BookMetadataPatchCapability.entries.toSet(),
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    books
+      .map { Task.RefreshBookMetadata(it.id, capabilities, priority, it.seriesId) }
+      .let { submitTasks(it) }
+  }
+
+  fun refreshSeriesMetadata(
+    seriesId: String,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.RefreshSeriesMetadata(seriesId, priority))
+  }
+
+  fun aggregateSeriesMetadata(
+    seriesId: String,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.AggregateSeriesMetadata(seriesId, priority))
+  }
+
+  fun refreshBookLocalArtwork(
+    book: Book,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.RefreshBookLocalArtwork(book.id, priority))
+  }
+
+  fun refreshBookLocalArtwork(
+    books: Collection<Book>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    books
+      .map { Task.RefreshBookLocalArtwork(it.id, priority) }
+      .let { submitTasks(it) }
+  }
+
+  fun refreshSeriesLocalArtwork(
+    seriesId: String,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.RefreshSeriesLocalArtwork(seriesId, priority))
+  }
+
+  fun refreshSeriesLocalArtwork(
+    seriesIds: Collection<String>,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    seriesIds
+      .map { Task.RefreshSeriesLocalArtwork(it, priority) }
+      .let { submitTasks(it) }
+  }
+
+  fun importBook(
+    sourceFile: String,
+    seriesId: String,
+    copyMode: CopyMode,
+    destinationName: String?,
+    upgradeBookId: String?,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.ImportBook(sourceFile, seriesId, copyMode, destinationName, upgradeBookId, priority))
+  }
+
+  fun rebuildIndex(
+    priority: Int = DEFAULT_PRIORITY,
+    entities: Set<LuceneEntity>? = null,
+  ) {
+    submitTask(Task.RebuildIndex(entities, priority))
+  }
+
+  fun upgradeIndex(priority: Int = DEFAULT_PRIORITY) {
+    submitTask(Task.UpgradeIndex(priority))
+  }
+
+  fun deleteBook(
+    bookId: String,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.DeleteBook(bookId, priority))
+  }
+
+  fun deleteSeries(
+    seriesId: String,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.DeleteSeries(seriesId, priority))
+  }
+
+  fun findBookThumbnailsToRegenerate(
+    forBiggerResultOnly: Boolean,
+    priority: Int = DEFAULT_PRIORITY,
+  ) {
+    submitTask(Task.FindBookThumbnailsToRegenerate(forBiggerResultOnly, priority))
+  }
+
+  private fun submitTask(task: Task) {
+    logger.info { "Sending task: $task" }
+    tasksRepository.save(task)
+    eventPublisher.publishEvent(TaskAddedEvent)
+  }
+
+  private fun submitTasks(tasks: Collection<Task>) {
+    logger.info { "Sending ${tasks.size} tasks: ${tasks.groupingBy { it.javaClass.simpleName }.eachCount()}" }
+    tasksRepository.save(tasks)
+    eventPublisher.publishEvent(TaskAddedEvent)
+  }
+}

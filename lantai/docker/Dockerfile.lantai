@@ -1,0 +1,54 @@
+FROM ubuntu:26.04
+
+ARG VERSION
+ARG TARGETARCH
+ARG JRE_PACKAGE=openjdk-21-jre-headless
+ARG JXL_PACKAGE=libjxl0.11
+ARG WITH_KEPUBIFY=true
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=C.UTF-8 \
+    QT_QPA_PLATFORM=offscreen \
+    QTWEBENGINE_DISABLE_SANDBOX=1 \
+    JAVA_HOME=/usr/lib/jvm/java-21-lantai \
+    LANTAI_CONFIGDIR=/config \
+    PATH=/usr/lib/jvm/java-21-lantai/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN set -eux; \
+    arch="$(dpkg --print-architecture)"; \
+    case "$arch" in \
+      arm64) jre_dir="java-21-openjdk-arm64"; kepubify="kepubify-linux-arm64" ;; \
+      armhf) jre_dir="java-21-openjdk-armhf"; kepubify="kepubify-linux-armv6" ;; \
+      *)     jre_dir="java-21-openjdk-amd64"; kepubify="kepubify-linux-64bit" ;; \
+    esac; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      ca-certificates curl \
+      ${JRE_PACKAGE} \
+      python3 python3-xdg \
+      libnss3 libopengl0 libqpdf30 \
+      libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-image0 \
+      libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 \
+      libxcb-xkb1 libxkbfile1 \
+      libgl1 libegl1 libxcomposite1 libxdamage1 libxrandr2 libxtst6 libxi6 \
+      libxcursor1 libxinerama1 libfontconfig1 libasound2t64 \
+      poppler-utils dbus xz-utils \
+      ${JXL_PACKAGE} libheif1 libwebp7; \
+    ln -sfn "/usr/lib/jvm/$jre_dir" /usr/lib/jvm/java-21-lantai; \
+    if [ "$WITH_KEPUBIFY" = "true" ]; then \
+      curl -fsSL "https://github.com/pgaskin/kepubify/releases/latest/download/$kepubify" \
+        -o /usr/bin/kepubify; \
+      chmod +x /usr/bin/kepubify; \
+    fi; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+WORKDIR /app
+COPY build/libs/lantai-${VERSION}.jar application.jar
+
+VOLUME /config
+EXPOSE 25600
+
+ENTRYPOINT ["java", "-XX:+ExplicitGCInvokesConcurrent", "-Dspring.profiles.include=docker", "--enable-native-access=ALL-UNNAMED", "-jar", "/app/application.jar"]

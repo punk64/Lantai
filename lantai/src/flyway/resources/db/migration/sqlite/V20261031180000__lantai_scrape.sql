@@ -1,0 +1,31 @@
+CREATE TABLE "SCRAPE_QUOTA"
+(
+  "SOURCE"  VARCHAR(64) NOT NULL,
+  "DAY"     VARCHAR(10) NOT NULL,
+  "PURPOSE" VARCHAR(16) NOT NULL,
+  "COUNT"   INTEGER     NOT NULL DEFAULT 0,
+  PRIMARY KEY ("SOURCE", "DAY", "PURPOSE")
+);
+
+CREATE INDEX "idx__scrape_quota_day" ON "SCRAPE_QUOTA" ("DAY");
+
+CREATE TABLE "SCRAPE_MATCH"
+(
+  "ID"                 VARCHAR(32)  NOT NULL,
+  "SERIES_ID"          VARCHAR(32)  NOT NULL,
+  "SERIES_TITLE"       VARCHAR(512) NOT NULL,
+  "SOURCE"             VARCHAR(64)  NOT NULL,
+  "SOURCE_ID"          VARCHAR(256) NOT NULL,
+  "SCORE"              REAL         NOT NULL,
+  "STATUS"             VARCHAR(16)  NOT NULL,
+  "CANDIDATE"          TEXT         NOT NULL,
+  "SNAPSHOT"           TEXT,
+  "APPLIED_FIELDS"     TEXT,
+  "CREATED_DATE"       DATETIME     NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME     NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE INDEX "idx__scrape_match_status" ON "SCRAPE_MATCH" ("STATUS");
+
+CREATE INDEX "idx__scrape_match_series_id" ON "SCRAPE_MATCH" ("SERIES_ID");

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>兰台 Lantai</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/lantai.4f1cba00d5.css" th:href="@{/css/lantai.4f1cba00d5.css}">
+<script th:inline="javascript">window.resourceBaseUrl = /*[[${baseUrl}]]*/ '/';</script>
+
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="i-library" viewBox="0 0 24 24"><path d="M4 4h3v16H4zM10 4h3v16h-3zM16.5 4.6l3 .8-3.6 15.2-3-.8z"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19v18H5.5A1.5 1.5 0 0 1 4 19.5zM4 17h15"/></symbol>
+<symbol id="i-collection" viewBox="0 0 24 24"><path d="M3 6h8l2 2h8v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM3 6V5a1 1 0 0 1 1-1h4"/></symbol>
+<symbol id="i-readlist" viewBox="0 0 24 24"><path d="M4 6h11M4 11h11M4 16h7M18 8v10M15 15l3 3 3-3"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></symbol>
+<symbol id="i-wand" viewBox="0 0 24 24"><path d="M4 20 16 8M14 4l1.4 2.6L18 8l-2.6 1.4L14 12l-1.4-2.6L10 8l2.6-1.4zM19 14l.9 1.7 1.6.8-1.6.9-.9 1.6-.9-1.6-1.6-.9 1.6-.8z"/></symbol>
+<symbol id="i-marker" viewBox="0 0 24 24"><path d="M9 13l6-6 4 4-6 6H9zM5 19h8M9 13l-3 3v3h3"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h9M18 7h2M4 17h2M11 17h9M15 4v6M7 14v6"/></symbol>
+<symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01M11 7.5h4M11 16.5h4"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5 9 17.5 20 6.5"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5 19 12 7 19.5z"/></symbol>
+<symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></symbol>
+<symbol id="i-sync" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16zM14 6l4 4"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.4 8.2-8 9-4.6-.8-8-4-8-9V6zM9 12l2 2 4-4"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l4 2"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5 22 20H2zM12 9.5v5M12 17h.01"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></symbol>
+<symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8.5 8.5M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-toc" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h8M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+<symbol id="i-type" viewBox="0 0 24 24"><path d="M4 18 9 5l5 13M6 14h6M16 18l3-8 3 8M17 16h4"/></symbol>
+<symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M14 4v16"/></symbol>
+<symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9M6.5 6.5a8 8 0 1 0 11 0"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6M10 19a2 2 0 0 0 4 0"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="14" r="4"/><path d="M11 11l9-9M17 5l2 2M14 8l2 2"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M9 1.5V3M15 1.5V3M9 21v1.5M15 21v1.5M1.5 9H3M1.5 15H3M21 9h1.5M21 15h1.5"/></symbol>
+<symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21M8 11h6M11 8v6"/></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.5 2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.9l6.1-.8z"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M15 8l4 4-4 4M19 12H9"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zM3 13l9 5 9-5M3 17.5 12 22l9-4.5"/></symbol>
+<symbol id="i-disk" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/><path d="M12 3a9 9 0 0 1 6.4 2.6"/></symbol>
+<symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M9.2 3.6h1.9a1.7 1.7 0 0 1 1.7 1.7v1.1h2.1a.9.9 0 0 1 .9.9v2.2h1.2a1.8 1.8 0 0 1 0 3.6h-1.2v2.2a.9.9 0 0 1-.9.9h-2.1v1.2a1.8 1.8 0 0 1-3.6 0v-1.2H6.9a.9.9 0 0 1-.9-.9v-2.2H4.8a1.8 1.8 0 0 1 0-3.6h1.2V8.2a.9.9 0 0 1 .9-.9h2.1V5.3a1.7 1.7 0 0 1 1.7-1.7z"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 2.5v5M15 2.5v5M6.5 7.5h11v3.5a5.5 5.5 0 0 1-11 0zM12 16.5v5"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 20V8M7 12l5-5 5 5M4 21h16"/></symbol>
+<symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+<symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z"/><path d="M16.5 8.6a5 5 0 0 1 0 6.8M19.2 6a8.5 8.5 0 0 1 0 12"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="1.6"/><path d="M15 5.5V4H4v11h1.6"/></symbol>
+<symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4.5L6 21z"/></symbol>
+<symbol id="i-crop" viewBox="0 0 24 24"><path d="M6 2v16h16M2 6h16v16"/></symbol>
+<symbol id="i-brush" viewBox="0 0 24 24"><path d="M4 20c3 0 4-2 4-4l9-9 3 3-9 9c-2 2-4 1-4 1zM15 6l3 3"/></symbol>
+<symbol id="i-single" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="1.5"/></symbol>
+<symbol id="i-double" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="1.2"/><rect x="13" y="4" width="8" height="16" rx="1.2"/></symbol>
+<symbol id="i-flow" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="7" rx="1.2"/><rect x="6" y="12" width="12" height="9" rx="1.2"/></symbol>
+<symbol id="i-snap" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="8" rx="1.2"/><path d="M4 15h16M4 19h10"/></symbol>
+<symbol id="i-dir" viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></symbol>
+</svg>
+
+<div id="boot">
+  <div class="boot-card">
+    <svg class="mark" viewBox="0 0 512 512"><use href="#logo-full"/></svg>
+    <h1>兰台</h1>
+    <div class="en" data-i18n="brand.tagline">个人书库 · 阅读与归档</div>
+    <div id="bootBody"></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg viewBox="0 0 512 512"><use href="#logo-full"/></svg>
+      <div class="brand-txt"><b>兰台</b><span th:text="${version}">0.1.0</span></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="pulse"><i class="dot" id="dServer"></i><span id="svText">25600 · 运行中</span></div>
+      <div class="pulse"><i class="dot idle" id="dSwy"></i><span id="swyText">在线源服务未启动</span></div>
+      <div class="side-tools">
+        <button class="btn ghost sm" id="aboutBtn" title="关于" data-i18n-title="nav.about"><svg class="ic"><use href="#i-info"/></svg><span class="lb" data-i18n="nav.about">关于</span></button>
+        <button class="btn ghost sm" id="notifyBtn" title="通知" data-i18n-title="nav.notify"><svg class="ic"><use href="#i-bell"/></svg><span class="lb" data-i18n="nav.notify">通知</span><i class="ndot" id="notifyDot" style="display:none"></i></button>
+      </div>
+      <button class="btn ghost sm blk" id="collapseBtn"><svg class="ic"><use href="#i-left"/></svg><span class="lb">收起导航</span></button>
+    </div>
+  </aside>
+  <section class="main">
+    <header class="topbar">
+      <button class="icon-btn" id="mobNav" title="导航" data-i18n-title="top.nav"><svg><use href="#i-list"/></svg></button>
+      <div class="gsearch">
+        <span class="s-ic"><svg width="16" height="16"><use href="#i-search"/></svg></span>
+        <input id="gInput" placeholder="搜索系列、书籍、合集、在线源…" data-i18n-ph="top.search" autocomplete="off">
+        <kbd>Ctrl K</kbd>
+      </div>
+      <div class="top-right">
+        <div id="liveReading"></div>
+        <button class="icon-btn" id="taskBtn" title="任务队列" data-i18n-title="top.tasks"><svg><use href="#i-bolt"/></svg></button>
+        <button class="icon-btn" id="notifyTop" title="通知" data-i18n-title="nav.notify"><svg><use href="#i-bell"/></svg><i class="ndot" id="notifyDotTop" style="display:none"></i></button>
+        <button class="icon-btn" id="themeBtn" title="切换主题" data-i18n-title="top.theme"><svg><use href="#i-sun"/></svg></button>
+        <div class="userchip" id="userChip">
+          <span class="avatar" id="uAvatar"></span>
+          <div><div class="u-n" id="uName"></div><div class="u-r" id="uRole"></div></div>
+        </div>
+      </div>
+    </header>
+    <div class="page" id="view"></div>
+  </section>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="modal" id="modal"><div class="modal-h"><h3 id="mTitle"></h3><div class="r" id="mHead"></div></div>
+  <div class="modal-b" id="mBody"></div><div class="modal-f" id="mFoot"></div></div>
+<div class="drawer" id="drawer"><div class="drawer-h"><h3 id="dTitle"></h3><div class="r" style="margin-left:auto" id="dHead"></div></div>
+  <div class="drawer-b" id="dBody"></div></div>
+<button class="to-top" id="toTop" title="返回顶部" data-i18n-title="返回顶部"><svg><use href="#i-up"/></svg></button>
+<div id="toasts"></div>
+<div id="palette"><div class="pal"><input id="palInput" placeholder="跳转页面、打开书籍、执行操作…" data-i18n-ph="跳转页面、打开书籍、执行操作…"><div class="pal-list" id="palList"></div></div></div>
+
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="logo-full" viewBox="0 0 512 512">
+  <rect x="0" y="0" width="512" height="512" rx="88" fill="#121313"/>
+  <g fill="none" stroke="#C9A24B" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke-width="5"><path fill="#121313" d="M112 152c-24-28-36-56-38-86 18 24 34 54 38 86zM112 152c-4-36 0-66 12-92 2 32-4 64-12 92zM112 152c20-32 46-54 74-64-24 22-50 44-74 64z"/></g>
+    <g fill="#B0402C" stroke="none"><circle cx="196" cy="51" r="11"/><circle cx="209" cy="61" r="11"/><circle cx="204" cy="76" r="11"/><circle cx="188" cy="76" r="11"/><circle cx="183" cy="61" r="11"/><circle cx="196" cy="64" r="5.5" fill="#E3C377"/></g>
+    <g stroke-width="6"><path d="M128 232v172M384 232v172M256 232v172"/><path d="M124 288h264M124 344h264M120 404h272"/></g>
+    <g stroke="none"><g fill="#C9A24B"><rect x="134" y="250" width="18" height="38"/><rect x="164" y="246" width="18" height="42"/><rect x="224" y="254" width="18" height="34"/><rect x="268" y="248" width="18" height="40"/><rect x="328" y="244" width="18" height="44"/><rect x="194" y="306" width="18" height="38"/><rect x="224" y="302" width="18" height="42"/><rect x="298" y="310" width="18" height="34"/><rect x="358" y="304" width="18" height="40"/><rect x="134" y="362" width="18" height="42"/><rect x="194" y="358" width="18" height="46"/><rect x="268" y="366" width="18" height="38"/><rect x="328" y="360" width="18" height="44"/></g>
+      <g fill="#B0402C"><rect x="194" y="248" width="18" height="40"/><rect x="358" y="254" width="18" height="34"/><rect x="134" y="304" width="18" height="40"/><rect x="268" y="304" width="18" height="40"/><rect x="164" y="360" width="18" height="44"/><rect x="224" y="364" width="18" height="40"/><rect x="358" y="358" width="18" height="46"/></g>
+      <g fill="#46523F"><rect x="164" y="254" width="18" height="34"/><rect x="298" y="246" width="18" height="42"/><rect x="164" y="308" width="18" height="36"/><rect x="328" y="306" width="18" height="38"/><rect x="298" y="362" width="18" height="42"/></g>
+      <rect x="134" y="246" width="18" height="42" fill="#C9A24B" transform="rotate(-7 143 267)"/><rect x="298" y="248" width="18" height="40" fill="#C9A24B" transform="rotate(8 307 268)"/></g>
+    <g stroke-width="5"><rect x="120" y="406" width="272" height="24" rx="4"/><path d="M142 409v18M180 409v18M218 409v18M256 409v18M294 409v18M332 409v18M370 409v18"/></g>
+    <g stroke-width="6"><rect x="112" y="432" width="288" height="14" rx="3"/><rect x="128" y="448" width="256" height="12" rx="3"/></g>
+    <path stroke-width="7" fill="#121313" d="M46 156c14 16 32 20 50 12 36-18 80-44 114-52h92c34 8 78 34 114 52 18 8 36 4 50-12l-18 16c-12 12-28 15-44 8-34-16-74-38-102-44H210c-28 6-68 28-102 44-16 7-32 4-44-8z"/>
+    <path stroke-width="7" fill="#121313" d="M26 246c8 12 22 16 38 10 36-12 84-34 118-42h160c34 8 82 30 118 42 16 6 30 2 38-10l-12 18c-8 10-22 13-36 8-34-12-78-32-108-38H182c-30 6-74 26-108 38-14 5-28 2-36-8z"/>
+    <circle cx="46" cy="156" r="5.5" fill="#C9A24B" stroke="none"/><circle cx="466" cy="156" r="5.5" fill="#C9A24B" stroke="none"/>
+    <circle cx="26" cy="246" r="5.5" fill="#C9A24B" stroke="none"/><circle cx="486" cy="246" r="5.5" fill="#C9A24B" stroke="none"/>
+    <g stroke-width="4" opacity=".85"><path d="M232 120c-2 8-4 12-6 18M256 118v20M280 120c2 8 4 12 6 18"/><path d="M230 218c-2 8-3 12-4 18M256 216v20M282 218c2 8 3 12 4 18"/></g>
+    <rect x="220" y="144" width="72" height="62" rx="5" stroke-width="6"/>
+    <g stroke-width="5"><path d="M238 160h36M234 174h44M240 188h32M234 200h40"/></g>
+    <circle cx="256" cy="88" r="12" stroke-width="7"/><path stroke-width="7" d="M256 100v14"/>
+  </g>
+</symbol>
+</svg>
+<script>window.__LANTAI_CHUNKS__ = {"reader":"js/reader.edbb3c5b76.js","docs":"js/docs.ef7960c34c.js","sysx":"js/sysx.a9791283b9.js","plugins":"js/plugins.bdb29b42f3.js"};</script>
+<script>window.__LANTAI_LANGS__ = {"en":"js/lang-en.2578cf7b6f.js","zh-Hant":"js/lang-zh-Hant.f0956f2eec.js","ja":"js/lang-ja.9d404924b5.js","ko":"js/lang-ko.87ee206ff6.js","fr":"js/lang-fr.5afe585181.js","de":"js/lang-de.4dbb625e97.js","es":"js/lang-es.361b41e90f.js","it":"js/lang-it.a5b32611b5.js","pt-BR":"js/lang-pt-BR.e345e322d1.js","ru":"js/lang-ru.521beff2bc.js","vi":"js/lang-vi.ac911d2cdd.js","ar":"js/lang-ar.d939a7568c.js","bg":"js/lang-bg.fe8fc60892.js","ca":"js/lang-ca.24b2ab454b.js","cs":"js/lang-cs.c68a620311.js","da":"js/lang-da.9470383d09.js","el":"js/lang-el.952d48796e.js","eo":"js/lang-eo.238a1424e2.js","fa":"js/lang-fa.a96b806982.js","fi":"js/lang-fi.249bdca6be.js","gl":"js/lang-gl.d509d18c38.js","he":"js/lang-he.1294902ac0.js","hr":"js/lang-hr.40e3173c4b.js","hu":"js/lang-hu.8380d18e6c.js","id":"js/lang-id.ddb0f0531f.js","ml":"js/lang-ml.911db27090.js","nb":"js/lang-nb.7a61a4f837.js","nl":"js/lang-nl.ad959c32e6.js","pl":"js/lang-pl.873f8d01ce.js","pt":"js/lang-pt.b878fccacd.js","sk":"js/lang-sk.446e206d43.js","sl":"js/lang-sl.db475abbb7.js","sv":"js/lang-sv.2b27351fca.js","ta":"js/lang-ta.231c08b747.js","th":"js/lang-th.fa83dc3d57.js","ti":"js/lang-ti.11fdb8e7fe.js","tr":"js/lang-tr.c59782e070.js","uk":"js/lang-uk.4bc5da95ba.js"};</script>
+<script>(function () {
+  var m = window.__LANTAI_LANGS__, k = 'zh-Hans';
+  try { var s = localStorage.getItem('lantai.lang'); if (s && m[s]) k = s; } catch (e) { }
+  var full = ['zh-Hans', 'en', 'zh-Hant', 'ja', 'ko', 'fr', 'de', 'es', 'it', 'pt-BR', 'ru', 'vi'];
+  if (k !== 'zh-Hans' && k !== 'en' && full.indexOf(k) < 0 && m['en']) document.write('<script src="' + m['en'] + '"><\/script>');
+  if (k !== 'zh-Hans') document.write('<script src="' + m[k] + '"><\/script>');
+})();</script>
+<script src="js/lantai.bf0b8de7bf.js" th:src="@{/js/lantai.bf0b8de7bf.js}"></script>
+</body>
+</html>

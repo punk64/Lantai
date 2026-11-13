@@ -1,0 +1,21 @@
+name: lantai
+
+services:
+  lantai:
+    image: lantai:dev
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.slim
+      args:
+        VERSION: ${LANTAI_VERSION:-0.7.6}
+        WITH_KEPUBIFY: "false"
+    container_name: lantai
+    network_mode: host
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: ${LANTAI_PORT:-25600}
+      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true"
+    volumes:
+      - ../../RunData/docker/config:/config
+      - ../../RunData/docker/books:/books
+    restart: unless-stopped

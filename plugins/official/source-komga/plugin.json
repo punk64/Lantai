@@ -1,0 +1,46 @@
+{
+  "id": "lantai.source-komga",
+  "name": "Komga 书库源",
+  "version": "0.1.8",
+  "protocol": 2,
+  "minHost": "0.6.30",
+  "runtime": "jvm",
+  "entry": "bin/plugin.jar",
+  "memoryMb": 256,
+  "description": "把自部署的 Komga（或兰台等 Komga 兼容服务端）接成兰台在线源。插件内登录后读取该实例的书库、系列、章节与页图，不预置、不分发任何来源。",
+  "capabilities": [
+    { "name": "source.provide", "note": "把 Komga 实例的系列以插件源形式提供给兰台" },
+    { "name": "ui.panel", "note": "登录与连接控制台" }
+  ],
+  "panels": [
+    {
+      "id": "console",
+      "title": "Komga 连接",
+      "icon": "server",
+      "group": "library",
+      "path": "/",
+      "roles": ["ADMIN"],
+      "titleI18n": { "en": "Komga connection" }
+    }
+  ],
+  "scopes": ["source.provide"],
+  "ui": {
+    "card": {
+      "actions": ["toggle", "panel", "upgrade"],
+      "badges": ["engine"]
+    }
+  },
+  "config": {
+    "type": "object",
+    "properties": {
+      "timeoutSeconds": {
+        "type": "integer",
+        "title": "请求超时（秒）",
+        "description": "单次访问上游 Komga 的超时，默认 20 秒。",
+        "default": 20,
+        "minimum": 5,
+        "maximum": 120
+      }
+    }
+  }
+}

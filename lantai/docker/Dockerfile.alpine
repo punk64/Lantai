@@ -1,0 +1,26 @@
+FROM eclipse-temurin:21-jre-alpine
+
+ARG VERSION
+
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    TZ=Asia/Shanghai \
+    LANTAI_CONFIGDIR=/config \
+    JAVA_TOOL_OPTIONS="-Djava.net.preferIPv4Stack=true -XX:MaxRAMPercentage=70"
+
+RUN set -eux; \
+    apk add --no-cache \
+      tzdata fontconfig ttf-dejavu libstdc++ \
+      libwebp libheif jpeg libpng; \
+    mkdir -p /config /books /packages
+
+WORKDIR /app
+COPY build/libs/lantai-${VERSION}.jar application.jar
+
+VOLUME /config
+EXPOSE 25600
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+  CMD wget -q --spider http://127.0.0.1:25600/ || exit 1
+
+ENTRYPOINT ["java", "-XX:+ExplicitGCInvokesConcurrent", "-Dspring.profiles.include=docker", "-jar", "/app/application.jar"]

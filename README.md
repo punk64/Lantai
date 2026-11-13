@@ -19,6 +19,10 @@
 
 **V1.0.0 之前均为测试版本。** 期间的功能升级与调整会尽量不破坏已有数据结构，改动重点放在界面修复与使用体验优化；确需跨版本的破坏性变更时会单独说明并提供迁移路径。
 
+当前版本 **0.7.6**，仓库首个公开发行版。三种安装形态：升级包 `Lantai-0.7.6-upgrade.zip`（在线升级或替换 jar）、镜像 `lantai:0.7.6-alpine` / `lantai:0.7.6-ubuntu`（`docker load -i` 后由 compose 引用）、单文件 `lantai-0.7.6.jar`。两个镜像的 ENTRYPOINT 都写死了 `-Djava.net.preferIPv4Stack=true`，ubuntu 版内置 `ENV TZ=Asia/Shanghai`。
+
+从 0.7.3 及更早版本升级：启动时会自动对齐 `flyway_schema_history` 中 `20261113090000` 的旧校验和，无需手工改库。反向降级到 0.7.5 或更早版本会因该校验和已被改写而启动失败。
+
 ## 与 Komga 的关系
 
 | 项 | 说明 |

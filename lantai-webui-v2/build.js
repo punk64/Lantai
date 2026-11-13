@@ -16,7 +16,7 @@ fs.mkdirSync(path.join(dist, 'js'), { recursive: true });
 
 const css = read(path.join(src, 'css', 'app.css')) + '\n' + read(path.join(src, 'css', 'comic.css')) + '\n' + read(path.join(src, 'css', 'ebook.css'));
 
-const I18N_SRC = ['i18n.locales.js', 'i18n.dict.js', 'i18n.extra-a.js', 'i18n.extra-b.js', 'i18n.extra-c.js', 'i18n.extra-d.js', 'i18n.reader.js', 'i18n.greet.js', 'i18n.zh-base.js', 'i18n.tr-01.js', 'i18n.tr-02.js', 'i18n.tr-03.js', 'i18n.tr-04.js', 'i18n.tr-05.js', 'i18n.tr-06.js', 'i18n.tr-07.js', 'i18n.tr-08.js', 'i18n.tr-09.js', 'i18n.tr-10.js', 'i18n.tr-11.js', 'i18n.tr-edge.js', 'i18n.tr-title.js', 'i18n.tr-ar.js', 'i18n.tr-bg.js', 'i18n.tr-ca.js', 'i18n.tr-cs.js', 'i18n.tr-da.js', 'i18n.tr-el.js', 'i18n.tr-eo.js', 'i18n.tr-fa.js', 'i18n.tr-fi.js', 'i18n.zh-align.js', 'i18n.server.js', 'i18n.server-tpl.js'];
+const I18N_SRC = ['i18n.locales.js', 'i18n.dict.js', 'i18n.extra-a.js', 'i18n.extra-b.js', 'i18n.extra-c.js', 'i18n.extra-d.js', 'i18n.reader.js', 'i18n.greet.js', 'i18n.zh-base.js', 'i18n.tr-01.js', 'i18n.tr-02.js', 'i18n.tr-03.js', 'i18n.tr-04.js', 'i18n.tr-05.js', 'i18n.tr-06.js', 'i18n.tr-07.js', 'i18n.tr-08.js', 'i18n.tr-09.js', 'i18n.tr-10.js', 'i18n.tr-11.js', 'i18n.tr-edge.js', 'i18n.tr-title.js', 'i18n.tr-ar.js', 'i18n.tr-bg.js', 'i18n.tr-ca.js', 'i18n.tr-cs.js', 'i18n.tr-da.js', 'i18n.tr-el.js', 'i18n.tr-eo.js', 'i18n.tr-fa.js', 'i18n.tr-fi.js', 'i18n.tr-gl.js', 'i18n.zh-align.js', 'i18n.server.js', 'i18n.server-tpl.js'];
 const i18nBox = { window: {} };
 vm.createContext(i18nBox);
 for (const f of I18N_SRC) vm.runInContext(read(path.join(src, 'js', f)), i18nBox);

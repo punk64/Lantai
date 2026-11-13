@@ -55,6 +55,7 @@ class LantaiFlywayMigrationStrategy : FlywayMigrationStrategy {
       listOf(
         LegacyChecksum("20261031071500", -1596119447, -1930239595, "lantai online library"),
         LegacyChecksum("20261112093000", 1640805236, 570569561, "lantai online drop legacy sources"),
+        LegacyChecksum("20261113090000", 1353011722, -1474351630, "lantai online source kind default"),
       )
   }
 }

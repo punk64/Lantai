@@ -1,0 +1,36 @@
+CREATE TABLE "ONLINE_CACHE_JOB"
+(
+  "ID"                 VARCHAR(32)  NOT NULL,
+  "SERIES_ID"          VARCHAR(32)  NOT NULL,
+  "STATUS"             VARCHAR(16)  NOT NULL,
+  "TOTAL"              INTEGER      NOT NULL DEFAULT 0,
+  "DONE"               INTEGER      NOT NULL DEFAULT 0,
+  "FAILED"             INTEGER      NOT NULL DEFAULT 0,
+  "CREATED_DATE"       DATETIME     NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME     NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE INDEX "idx__online_cache_job_series_id" ON "ONLINE_CACHE_JOB" ("SERIES_ID", "CREATED_DATE");
+
+CREATE INDEX "idx__online_cache_job_status" ON "ONLINE_CACHE_JOB" ("STATUS");
+
+CREATE TABLE "ONLINE_CACHE_ITEM"
+(
+  "ID"                 VARCHAR(32)  NOT NULL,
+  "JOB_ID"             VARCHAR(32)  NOT NULL,
+  "BOOK_ID"            VARCHAR(32)  NOT NULL,
+  "CHAP_INDEX"         INTEGER      NOT NULL DEFAULT 0,
+  "TITLE"              VARCHAR(512) NOT NULL DEFAULT '',
+  "STATUS"             VARCHAR(16)  NOT NULL,
+  "ERROR"              VARCHAR(512) NOT NULL DEFAULT '',
+  "PAGE_COUNT"         INTEGER      NOT NULL DEFAULT 0,
+  "SIZE_BYTES"         BIGINT       NOT NULL DEFAULT 0,
+  "CREATED_DATE"       DATETIME     NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME     NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE INDEX "idx__online_cache_item_job_id" ON "ONLINE_CACHE_ITEM" ("JOB_ID", "CHAP_INDEX");
+
+CREATE INDEX "idx__online_cache_item_status" ON "ONLINE_CACHE_ITEM" ("STATUS");

@@ -1,0 +1,10 @@
+{
+  "id": "sample.notify-digest",
+  "name": "通知与摘要示例",
+  "version": "1.0.0",
+  "protocol": 2,
+  "minHost": "0.6.23",
+  "runtime": "command",
+  "memoryMb": 64,
+  "description": "把宿主发来的通知写入本地日志，累加计数，并按 cron 每日汇总一次。示例覆盖 notify.send、storage.blob、task.schedule、event.observe 四项能力。"
+}

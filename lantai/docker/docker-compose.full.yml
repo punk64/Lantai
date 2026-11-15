@@ -1,0 +1,31 @@
+name: lantai
+
+services:
+  lantai:
+    image: lantai:${LANTAI_VERSION:-0.7.6}-ubuntu
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.lantai
+      args:
+        VERSION: ${LANTAI_VERSION:-0.7.6}
+        WITH_KEPUBIFY: "true"
+    container_name: lantai
+    network_mode: host
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: ${LANTAI_PORT:-25600}
+      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true"
+      LANTAI_CONFIGDIR: /config
+    volumes:
+      - ./config:/config
+      - ./books:/books
+    restart: unless-stopped
+    stop_grace_period: 40s
+    shm_size: 256m
+    mem_limit: 3g
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:25600/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 3

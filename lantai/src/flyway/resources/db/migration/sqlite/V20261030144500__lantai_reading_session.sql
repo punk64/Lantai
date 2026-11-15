@@ -1,0 +1,24 @@
+CREATE TABLE READING_SESSION
+(
+    ID                varchar  NOT NULL PRIMARY KEY,
+    USER_ID           varchar  NOT NULL,
+    BOOK_ID           varchar  NOT NULL,
+    SERIES_ID         varchar  NOT NULL,
+    LIBRARY_ID        varchar  NOT NULL,
+    STARTED_AT        datetime NOT NULL,
+    LAST_HEARTBEAT_AT datetime NOT NULL,
+    ENDED_AT          datetime NULL,
+    DURATION_MS       bigint   NOT NULL DEFAULT 0,
+    START_PAGE        int      NOT NULL DEFAULT 0,
+    LAST_PAGE         int      NOT NULL DEFAULT 0,
+    PAGES_READ        int      NOT NULL DEFAULT 0,
+    DEVICE_ID         varchar  DEFAULT '',
+    DEVICE_NAME       varchar  DEFAULT '',
+    CLIENT            varchar  DEFAULT ''
+);
+
+CREATE INDEX IDX__READING_SESSION__USER_STARTED ON READING_SESSION (USER_ID, STARTED_AT);
+
+CREATE INDEX IDX__READING_SESSION__BOOK ON READING_SESSION (BOOK_ID);
+
+CREATE INDEX IDX__READING_SESSION__SERIES ON READING_SESSION (SERIES_ID);

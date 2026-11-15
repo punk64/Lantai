@@ -1,0 +1,215 @@
+{
+  "count": 10,
+  "items": [
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2008-1 / 23.00",
+      "abstract_2": "",
+      "cover_url": "https://img3.doubanio.com/view/subject/m/public/s2768378.jpg",
+      "extra_actions": [],
+      "id": 2567698,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'2567698',query:'%E4%B8%89%E4%BD%93',i:'0',cat_id:'1001'})\"",
+      "rating": {
+        "count": 519035,
+        "rating_info": "",
+        "star_count": 4.5,
+        "value": 8.9
+      },
+      "title": "三体 : “地球往事”三部曲之一",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/2567698/"
+    },
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2008-5 / 32.00",
+      "abstract_2": "",
+      "cover_url": "https://img3.doubanio.com/view/subject/m/public/s3078482.jpg",
+      "extra_actions": [],
+      "id": 3066477,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'3066477',query:'%E4%B8%89%E4%BD%93',i:'1',cat_id:'1001'})\"",
+      "rating": {
+        "count": 319444,
+        "rating_info": "",
+        "star_count": 4.5,
+        "value": 9.3
+      },
+      "title": "三体Ⅱ : 黑暗森林",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/3066477/"
+    },
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2010-11 / 38.00元",
+      "abstract_2": "",
+      "cover_url": "https://img9.doubanio.com/view/subject/m/public/s26012674.jpg",
+      "extra_actions": [],
+      "id": 5363767,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'5363767',query:'%E4%B8%89%E4%BD%93',i:'2',cat_id:'1001'})\"",
+      "rating": {
+        "count": 297545,
+        "rating_info": "",
+        "star_count": 4.5,
+        "value": 9.2
+      },
+      "title": "三体Ⅲ : 死神永生",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/5363767/"
+    },
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2012-1 / 168.00元",
+      "abstract_2": "",
+      "cover_url": "https://img9.doubanio.com/view/subject/m/public/s28357056.jpg",
+      "extra_actions": [],
+      "id": 6518605,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'6518605',query:'%E4%B8%89%E4%BD%93',i:'3',cat_id:'1001'})\"",
+      "rating": {
+        "count": 221035,
+        "rating_info": "",
+        "star_count": 5.0,
+        "value": 9.5
+      },
+      "title": "三体全集 : 地球往事三部曲",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/6518605/"
+    },
+    {
+      "abstract": "刘慈欣 / 读客文化 / 2018-11-26",
+      "abstract_2": "",
+      "cover_url": "https://img3.doubanio.com/view/subject/m/public/s33460607.jpg",
+      "extra_actions": [],
+      "id": 33420947,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'33420947',query:'%E4%B8%89%E4%BD%93',i:'4',cat_id:'1001'})\"",
+      "rating": {
+        "count": 20022,
+        "rating_info": "",
+        "star_count": 4.5,
+        "value": 9.3
+      },
+      "title": "三体全集",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/33420947/"
+    },
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2022-12 / 42.00",
+      "abstract_2": "",
+      "cover_url": "https://img3.doubanio.com/view/subject/m/public/s34280832.jpg",
+      "extra_actions": [],
+      "id": 35870665,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'35870665',query:'%E4%B8%89%E4%BD%93',i:'5',cat_id:'1001'})\"",
+      "rating": {
+        "count": 1206,
+        "rating_info": "",
+        "star_count": 4.5,
+        "value": 9.2
+      },
+      "title": "三体",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/35870665/"
+    },
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2017-8 / 288.00元",
+      "abstract_2": "",
+      "cover_url": "https://img3.doubanio.com/view/subject/m/public/s29512502.jpg",
+      "extra_actions": [],
+      "id": 27077612,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'27077612',query:'%E4%B8%89%E4%BD%93',i:'6',cat_id:'1001'})\"",
+      "rating": {
+        "count": 3704,
+        "rating_info": "",
+        "star_count": 5.0,
+        "value": 9.6
+      },
+      "title": "三体 : 十周年纪念版",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/27077612/"
+    },
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2016-6 / CNY 26.00",
+      "abstract_2": "",
+      "cover_url": "https://img3.doubanio.com/view/subject/m/public/s29407682.jpg",
+      "extra_actions": [],
+      "id": 26427702,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'26427702',query:'%E4%B8%89%E4%BD%93',i:'7',cat_id:'1001'})\"",
+      "rating": {
+        "count": 4263,
+        "rating_info": "",
+        "star_count": 4.5,
+        "value": 8.8
+      },
+      "title": "三体 : 典藏本",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/26427702/"
+    },
+    {
+      "abstract": "刘慈欣 / 重庆出版社 / 2008-1 / 93.00",
+      "abstract_2": "",
+      "cover_url": "https://img3.doubanio.com/view/subject/m/public/s29857148.jpg",
+      "extra_actions": [],
+      "id": 30306441,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'30306441',query:'%E4%B8%89%E4%BD%93',i:'8',cat_id:'1001'})\"",
+      "rating": {
+        "count": 7994,
+        "rating_info": "",
+        "star_count": 5.0,
+        "value": 9.5
+      },
+      "title": "中国科幻基石丛书·三体（全三册）",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/30306441/"
+    },
+    {
+      "abstract": "刘慈欣 / 读客文化 / 2018-12 / 12.09元",
+      "abstract_2": "",
+      "cover_url": "https://img2.doubanio.com/view/subject/m/public/s33661751.jpg",
+      "extra_actions": [],
+      "id": 35092665,
+      "interest": null,
+      "label_actions": [],
+      "labels": [],
+      "more_url": "onclick=\"moreurl(this,{from:'book_subject_search',subject_id:'35092665',query:'%E4%B8%89%E4%BD%93',i:'9',cat_id:'1001'})\"",
+      "rating": {
+        "count": 3605,
+        "rating_info": "",
+        "star_count": 4.5,
+        "value": 8.8
+      },
+      "title": "三体 1",
+      "topics": [],
+      "tpl_name": "search_subject",
+      "url": "https://book.douban.com/subject/35092665/"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+CREATE TABLE AUDIT_LOG
+(
+    ID           varchar  NOT NULL PRIMARY KEY,
+    ACTOR_ID     varchar  NULL,
+    ACTOR_EMAIL  varchar  NULL,
+    ACTION       varchar  NOT NULL,
+    TARGET_TYPE  varchar  NULL,
+    TARGET_ID    varchar  NULL,
+    METHOD       varchar  NOT NULL,
+    PATH         varchar  NOT NULL,
+    QUERY        varchar  NULL,
+    STATUS       integer  NOT NULL,
+    SUCCESS      boolean  NOT NULL,
+    IP           varchar  NULL,
+    USER_AGENT   varchar  NULL,
+    CREATED_DATE datetime NOT NULL
+);
+
+CREATE INDEX IDX__AUDIT_LOG__CREATED_DATE ON AUDIT_LOG (CREATED_DATE);
+
+CREATE INDEX IDX__AUDIT_LOG__ACTOR_ID ON AUDIT_LOG (ACTOR_ID);
+
+CREATE INDEX IDX__AUDIT_LOG__ACTION ON AUDIT_LOG (ACTION);
+
+CREATE INDEX IDX__AUDIT_LOG__TARGET_ID ON AUDIT_LOG (TARGET_ID);

@@ -1,0 +1,18 @@
+application.version: BENCHMARK
+
+lantai:
+  config-dir: ${rootDir}/config-dir
+  workspace: diesel
+  database:
+    file: \${lantai.config-dir}/\${lantai.workspace}.sqlite
+  lucene:
+    data-directory: \${lantai.config-dir}/lucene/\${lantai.workspace}
+  tasks-db:
+    file: \${lantai.config-dir}/\${lantai.workspace}-tasks.sqlite
+spring:
+  flyway:
+    enabled: true
+#logging:
+#  level:
+#    root: ERROR
+#    org.jooq.tools.LoggerListener: DEBUG

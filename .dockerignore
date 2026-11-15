@@ -1,0 +1,8 @@
+.gradle/
+**/.gradle/
+**/build/
+node_modules/
+**/node_modules/
+.tmp/
+RunData/
+**/*.log

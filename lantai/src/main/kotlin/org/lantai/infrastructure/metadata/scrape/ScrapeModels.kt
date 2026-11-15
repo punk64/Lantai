@@ -1,0 +1,106 @@
+package org.lantai.infrastructure.metadata.scrape
+
+import java.time.LocalDate
+
+enum class ScrapeTarget {
+  SERIES,
+  BOOK,
+  COVER,
+}
+
+enum class ScrapeDecision {
+  FILL,
+  SAME,
+  CONFLICT,
+  LOCKED,
+  EMPTY,
+}
+
+data class ScrapeValues(
+  val title: String = "",
+  val summary: String = "",
+  val publisher: String = "",
+  val region: String = "",
+  val language: String = "",
+  val ageRating: Int? = null,
+  val genres: List<String> = emptyList(),
+  val authors: List<String> = emptyList(),
+  val releaseDate: LocalDate? = null,
+  val isbn: String = "",
+  val tags: List<String> = emptyList(),
+  val coverUrl: String = "",
+)
+
+data class ScrapeFieldChange(
+  val field: String,
+  val target: ScrapeTarget,
+  val current: String,
+  val embedded: String,
+  val candidate: String,
+  val chosen: String,
+  val decision: ScrapeDecision,
+)
+
+data class ScrapeDiff(
+  val fields: List<ScrapeFieldChange> = emptyList(),
+) {
+  val conflicts: Int get() = fields.count { it.decision == ScrapeDecision.CONFLICT }
+  val fills: Int get() = fields.count { it.decision == ScrapeDecision.FILL }
+  val hasChanges: Boolean get() = fields.any { it.decision == ScrapeDecision.FILL || it.decision == ScrapeDecision.CONFLICT }
+
+  fun pendingConflicts(): List<ScrapeFieldChange> = fields.filter { it.decision == ScrapeDecision.CONFLICT }
+
+  fun unresolved(): ScrapeDiff =
+    ScrapeDiff(fields.filter { it.decision == ScrapeDecision.CONFLICT || it.decision == ScrapeDecision.LOCKED })
+}
+
+data class EmbeddedBook(
+  val bookId: String,
+  val values: ScrapeValues,
+)
+
+data class ScrapeBookDto(
+  val bookId: String,
+  val fileName: String,
+  val title: String,
+  val number: String,
+  val authors: List<String> = emptyList(),
+  val releaseDate: String? = null,
+  val isbn: String = "",
+  val tags: List<String> = emptyList(),
+  val summary: String = "",
+  val publisher: String = "",
+  val genres: List<String> = emptyList(),
+  val language: String = "",
+  val titleLock: Boolean = false,
+  val numberLock: Boolean = false,
+  val authorsLock: Boolean = false,
+)
+
+data class ScrapeBookChoice(
+  val bookId: String = "",
+  val fields: List<String> = emptyList(),
+  val title: String = "",
+  val number: String = "",
+  val authors: List<String> = emptyList(),
+  val releaseDate: String = "",
+  val isbn: String = "",
+  val tags: List<String> = emptyList(),
+  val summary: String = "",
+  val publisher: String = "",
+  val genres: List<String> = emptyList(),
+  val language: String = "",
+)
+
+data class EmbeddedRead(
+  val series: ScrapeValues = ScrapeValues(),
+  val books: List<EmbeddedBook> = emptyList(),
+  val hasCoverFile: Boolean = false,
+) {
+  fun firstBookValues(): ScrapeValues =
+    books
+      .map { it.values }
+      .firstOrNull { it.authors.isNotEmpty() || it.releaseDate != null || it.isbn.isNotBlank() }
+      ?: books.firstOrNull()?.values
+      ?: ScrapeValues()
+}

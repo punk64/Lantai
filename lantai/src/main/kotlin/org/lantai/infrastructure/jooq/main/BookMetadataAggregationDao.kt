@@ -1,0 +1,204 @@
+package org.lantai.infrastructure.jooq.main
+
+import org.lantai.domain.model.Author
+import org.lantai.domain.model.BookMetadataAggregation
+import org.lantai.domain.model.NotableEntity
+import org.lantai.domain.persistence.BookMetadataAggregationRepository
+import org.lantai.infrastructure.jooq.SplitDslDaoBase
+import org.lantai.infrastructure.jooq.TempTable.Companion.withTempTable
+import org.lantai.jooq.main.Tables
+import org.lantai.jooq.main.tables.records.BookMetadataAggregationRecord
+import org.lantai.language.toCurrentTimeZone
+import org.jooq.DSLContext
+import org.jooq.impl.DSL.multiset
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.time.ZoneId
+
+@Component
+class BookMetadataAggregationDao(
+  dslRW: DSLContext,
+  @Qualifier("dslContextRO") dslRO: DSLContext,
+  @param:Value("#{@lantaiProperties.database.batchChunkSize}") private val batchSize: Int,
+) : SplitDslDaoBase(dslRW, dslRO),
+  BookMetadataAggregationRepository {
+  private val d = Tables.BOOK_METADATA_AGGREGATION
+  private val a = Tables.BOOK_METADATA_AGGREGATION_AUTHOR
+  private val t = Tables.BOOK_METADATA_AGGREGATION_TAG
+  private val ne = Tables.BOOK_METADATA_AGGREGATION_NOTABLE_ENTITIES
+
+  override fun findById(seriesId: String): BookMetadataAggregation = dslRO.findOne(listOf(seriesId)).first()
+
+  override fun findByIdOrNull(seriesId: String): BookMetadataAggregation? = dslRO.findOne(listOf(seriesId)).firstOrNull()
+
+  private fun DSLContext.findOne(seriesIds: Collection<String>) =
+    this
+      .select(
+        d,
+        // authors
+        multiset(
+          select(a.NAME, a.ROLE)
+            .from(a)
+            .where(a.SERIES_ID.eq(d.SERIES_ID)),
+        ).convertFrom { results ->
+          results.into(a).mapNotNull {
+            Author(
+              name = it.name,
+              role = it.role,
+            )
+          }
+        },
+        // tags
+        multiset(
+          select(t.TAG)
+            .from(t)
+            .where(t.SERIES_ID.eq(d.SERIES_ID)),
+        ).convertFrom { result -> result.into(t).mapNotNull { it.tag }.toSet() },
+        // notable entities
+        multiset(
+          select(ne.KIND, ne.NAME)
+            .from(ne)
+            .where(ne.SERIES_ID.eq(d.SERIES_ID)),
+        ).convertFrom { result -> result.into(ne).mapNotNull { NotableEntity(it.kind, it.name) } },
+      ).from(d)
+      .where(d.SERIES_ID.`in`(seriesIds))
+      .fetch { record ->
+        record.value1().toDomain(record.value2(), record.value3(), record.value4())
+      }
+
+  @Transactional
+  override fun insert(metadata: BookMetadataAggregation) {
+    dslRW
+      .insertInto(d)
+      .set(d.SERIES_ID, metadata.seriesId)
+      .set(d.RELEASE_DATE, metadata.releaseDate)
+      .set(d.SUMMARY, metadata.summary)
+      .set(d.SUMMARY_NUMBER, metadata.summaryNumber)
+      .execute()
+
+    dslRW.insertAuthors(metadata)
+    dslRW.insertNotableEntities(metadata)
+    dslRW.insertTags(metadata)
+  }
+
+  @Transactional
+  override fun update(metadata: BookMetadataAggregation) {
+    dslRW
+      .update(d)
+      .set(d.SUMMARY, metadata.summary)
+      .set(d.SUMMARY_NUMBER, metadata.summaryNumber)
+      .set(d.RELEASE_DATE, metadata.releaseDate)
+      .set(d.LAST_MODIFIED_DATE, LocalDateTime.now(ZoneId.of("Z")))
+      .where(d.SERIES_ID.eq(metadata.seriesId))
+      .execute()
+
+    dslRW
+      .deleteFrom(a)
+      .where(a.SERIES_ID.eq(metadata.seriesId))
+      .execute()
+
+    dslRW
+      .deleteFrom(ne)
+      .where(ne.SERIES_ID.eq(metadata.seriesId))
+      .execute()
+
+    dslRW
+      .deleteFrom(t)
+      .where(t.SERIES_ID.eq(metadata.seriesId))
+      .execute()
+
+    dslRW.insertAuthors(metadata)
+    dslRW.insertNotableEntities(metadata)
+    dslRW.insertTags(metadata)
+  }
+
+  private fun DSLContext.insertAuthors(metadata: BookMetadataAggregation) {
+    if (metadata.authors.isNotEmpty()) {
+      metadata.authors.chunked(batchSize).forEach { chunk ->
+        this
+          .batch(
+            this
+              .insertInto(a, a.SERIES_ID, a.NAME, a.ROLE)
+              .values(null as String?, null, null),
+          ).also { step ->
+            chunk.forEach {
+              step.bind(metadata.seriesId, it.name, it.role)
+            }
+          }.execute()
+      }
+    }
+  }
+
+  private fun DSLContext.insertNotableEntities(metadata: BookMetadataAggregation) {
+    if (metadata.notableEntities.isNotEmpty()) {
+      metadata.notableEntities.chunked(batchSize).forEach { chunk ->
+        this
+          .batch(
+            this
+              .insertInto(ne, ne.SERIES_ID, ne.KIND, ne.NAME)
+              .values(null as String?, null, null),
+          ).also { step ->
+            chunk.forEach {
+              step.bind(metadata.seriesId, it.kind, it.name)
+            }
+          }.execute()
+      }
+    }
+  }
+
+  private fun DSLContext.insertTags(metadata: BookMetadataAggregation) {
+    if (metadata.tags.isNotEmpty()) {
+      metadata.tags.chunked(batchSize).forEach { chunk ->
+        this
+          .batch(
+            this
+              .insertInto(t, t.SERIES_ID, t.TAG)
+              .values(null as String?, null),
+          ).also { step ->
+            chunk.forEach {
+              step.bind(metadata.seriesId, it)
+            }
+          }.execute()
+      }
+    }
+  }
+
+  @Transactional
+  override fun delete(seriesId: String) {
+    dslRW.deleteFrom(a).where(a.SERIES_ID.eq(seriesId)).execute()
+    dslRW.deleteFrom(ne).where(ne.SERIES_ID.eq(seriesId)).execute()
+    dslRW.deleteFrom(t).where(t.SERIES_ID.eq(seriesId)).execute()
+    dslRW.deleteFrom(d).where(d.SERIES_ID.eq(seriesId)).execute()
+  }
+
+  @Transactional
+  override fun delete(seriesIds: Collection<String>) {
+    dslRW.withTempTable(batchSize, seriesIds).use {
+      dslRW.deleteFrom(a).where(a.SERIES_ID.`in`(it.selectTempStrings())).execute()
+      dslRW.deleteFrom(ne).where(ne.SERIES_ID.`in`(it.selectTempStrings())).execute()
+      dslRW.deleteFrom(t).where(t.SERIES_ID.`in`(it.selectTempStrings())).execute()
+      dslRW.deleteFrom(d).where(d.SERIES_ID.`in`(it.selectTempStrings())).execute()
+    }
+  }
+
+  override fun count(): Long = dslRO.fetchCount(d).toLong()
+
+  private fun BookMetadataAggregationRecord.toDomain(
+    authors: List<Author>,
+    tags: Set<String>,
+    notableEntities: List<NotableEntity>,
+  ) = BookMetadataAggregation(
+    authors = authors,
+    notableEntities = notableEntities,
+    tags = tags,
+    releaseDate = releaseDate,
+    summary = summary,
+    summaryNumber = summaryNumber,
+    seriesId = seriesId,
+    createdDate = createdDate.toCurrentTimeZone(),
+    lastModifiedDate = lastModifiedDate.toCurrentTimeZone(),
+  )
+}

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Komga 连接</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #161a21; --panel2: #1b2029; --border: #262c36;
+    --text: #e6e9ee; --dim: #8b94a3; --accent: #5b8def; --ok: #3fb950;
+    --warn: #d29922; --err: #f85149; --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f7f9; --panel: #ffffff; --panel2: #f0f2f5; --border: #e2e5ea;
+      --text: #1c2026; --dim: #6b7480; --accent: #2f6feb; --ok: #1a7f37;
+      --warn: #9a6700; --err: #cf222e;
+    }
+  }
+  html[data-theme="dark"] {
+    --bg: #0f1115; --panel: #161a21; --panel2: #1b2029; --border: #262c36;
+    --text: #e6e9ee; --dim: #8b94a3; --accent: #5b8def; --ok: #3fb950;
+    --warn: #d29922; --err: #f85149;
+  }
+  html[data-theme="light"] {
+    --bg: #f6f7f9; --panel: #ffffff; --panel2: #f0f2f5; --border: #e2e5ea;
+    --text: #1c2026; --dim: #6b7480; --accent: #2f6feb; --ok: #1a7f37;
+    --warn: #9a6700; --err: #cf222e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 18px; background: var(--bg); color: var(--text);
+    font: 13px/1.55 system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+  h1 { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; margin-bottom: 14px;
+  }
+  .card h2 {
+    margin: 0 0 10px; font-size: 12px; font-weight: 600; color: var(--dim);
+    text-transform: uppercase; letter-spacing: .6px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .kv { display: grid; grid-template-columns: 88px 1fr; gap: 6px 10px; font-size: 12.5px; margin: 0; }
+  .kv dt { color: var(--dim); }
+  .kv dd { margin: 0; font-family: var(--mono); word-break: break-all; }
+  .pill {
+    display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px;
+    border: 1px solid currentColor;
+  }
+  .s-running { color: var(--ok); }
+  .s-error { color: var(--err); }
+  .s-empty { color: var(--dim); }
+  .field { display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .field label { color: var(--dim); font-size: 12.5px; }
+  input {
+    font: inherit; font-size: 12.5px; padding: 6px 9px; border-radius: 7px;
+    border: 1px solid var(--border); background: var(--panel2); color: var(--text); min-width: 0;
+  }
+  input:focus { outline: none; border-color: var(--accent); }
+  button {
+    font: inherit; font-size: 12.5px; padding: 6px 12px; border-radius: 7px;
+    border: 1px solid var(--border); background: var(--panel2); color: var(--text);
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.small { padding: 2px 8px; font-size: 11.5px; }
+  button:disabled { opacity: .5; cursor: default; }
+  .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .hint { margin: 10px 0 0; color: var(--dim); font-size: 11.5px; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li {
+    display: flex; justify-content: space-between; gap: 10px; padding: 6px 0;
+    border-top: 1px solid var(--border); font-size: 12.5px;
+  }
+  li:first-child { border-top: 0; }
+  li span { color: var(--dim); font-family: var(--mono); font-size: 11.5px; }
+  pre {
+    margin: 0; max-height: 220px; overflow: auto; font-family: var(--mono);
+    font-size: 11.5px; color: var(--dim); white-space: pre-wrap; word-break: break-all;
+  }
+  .msg { margin-top: 10px; font-size: 12px; min-height: 18px; }
+  .msg.ok { color: var(--ok); }
+  .msg.err { color: var(--err); }
+</style>
+</head>
+<body>
+<h1>Komga 连接</h1>
+
+<div class="card">
+  <h2>状态</h2>
+  <dl class="kv">
+    <dt>连接</dt><dd id="state"><span class="pill s-empty">未配置</span></dd>
+    <dt>地址</dt><dd id="base">—</dd>
+    <dt>用户</dt><dd id="user">—</dd>
+    <dt>书库</dt><dd id="libs">—</dd>
+    <dt>检查时间</dt><dd id="checked">—</dd>
+  </dl>
+</div>
+
+<div class="card">
+  <h2>登录</h2>
+  <div class="field"><label>Komga 地址</label><input id="baseUrl" placeholder="http://192.168.1.10:25600" spellcheck="false"></div>
+  <div class="field"><label>邮箱</label><input id="email" autocomplete="username" spellcheck="false"></div>
+  <div class="field"><label>密码</label><input id="password" type="password" autocomplete="current-password" placeholder="留空则沿用已保存的密码"></div>
+  <div class="field"><label>API Key</label><input id="apiKey" placeholder="留空则沿用已保存的 API Key" spellcheck="false"></div>
+  <div class="actions">
+    <button class="primary" id="login">保存并连接</button>
+    <button id="test">测试连接</button>
+    <button id="logout">断开</button>
+  </div>
+  <div class="msg" id="msg"></div>
+  <p class="hint">凭据只保存在本插件的数据目录，不会同步到宿主数据库。</p>
+</div>
+
+<div class="card">
+  <h2>书库 <button class="small" id="reload">刷新</button></h2>
+  <ul id="list"><li><span>尚未加载</span></li></ul>
+</div>
+
+<div class="card">
+  <h2>日志</h2>
+  <pre id="log">—</pre>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let ticking = 0;
+const base = location.origin + (location.pathname.endsWith("/") ? location.pathname : location.pathname + "/");
+const apiUrl = (p) => new URL(String(p).replace(/^\/v1\/panel\/?/, ""), base).toString();
+
+async function call(path, options) {
+  const response = await fetch(apiUrl(path), options);
+  const text = await response.text();
+  let data = null;
+  if (text) {
+    try { data = JSON.parse(text); } catch (error) { data = { message: text }; }
+  }
+  if (!response.ok) {
+    const detail = data && data.error;
+    const message = detail && typeof detail === "object" ? detail.message : detail;
+    throw new Error(message || data && data.message || ("HTTP " + response.status));
+  }
+  return data;
+}
+
+function say(text, kind) {
+  const box = $("msg");
+  box.textContent = text || "";
+  box.className = "msg" + (kind ? " " + kind : "");
+}
+
+function setState(state, ready) {
+  const map = {
+    running: ["已连接", "s-running"],
+    error: ["连接异常", "s-error"],
+    empty: ["未配置", "s-empty"]
+  };
+  const item = map[state] || ["未知", "s-empty"];
+  $("state").innerHTML = '<span class="pill ' + item[1] + '">' + (ready ? item[0] : item[0]) + "</span>";
+}
+
+function setBusy(busy) {
+  ["login", "test", "logout", "reload"].forEach((id) => { $(id).disabled = busy; });
+}
+
+async function refreshStatus() {
+  try {
+    const data = await call("/v1/panel/status");
+    setState(data.state, data.ready);
+    $("base").textContent = data.baseUrl || "—";
+    $("user").textContent = data.user || (data.apiKeySet ? "API Key" : "—");
+    $("libs").textContent = data.ready ? String(data.libraries || 0) : "—";
+    $("checked").textContent = data.lastChecked ? new Date(data.lastChecked).toLocaleString() : "—";
+    if (!$("baseUrl").value && data.baseUrl) $("baseUrl").value = data.baseUrl;
+    $("apiKey").placeholder = data.apiKeySet ? "已保存，留空保持不变" : "填写后忽略邮箱与密码";
+    $("password").placeholder = data.passwordSet ? "已保存，留空保持不变" : "";
+  } catch (error) {
+    setState("error", false);
+    $("base").textContent = error.message;
+  }
+}
+
+async function refreshLibraries() {
+  try {
+    const data = await call("/v1/panel/libraries");
+    const items = data.items || [];
+    if (!items.length) {
+      $("list").innerHTML = "<li><span>没有可用的书库</span></li>";
+      return;
+    }
+    $("list").innerHTML = items.map((item) => {
+      const name = item.name || item.id || "未命名";
+      const kind = item.contentType || item.type || "";
+      const count = item.booksCount != null ? item.booksCount + " 本" : "";
+      return "<li><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml([kind, count].filter(Boolean).join(" · ")) + "</span></li>";
+    }).join("");
+  } catch (error) {
+    $("list").innerHTML = "<li><span>" + escapeHtml(error.message) + "</span></li>";
+  }
+}
+
+async function refreshLog() {
+  try {
+    const data = await call("/v1/panel/log");
+    const lines = data.lines || [];
+    $("log").textContent = lines.length ? lines.join("\n") : "—";
+  } catch (error) {
+    $("log").textContent = error.message;
+  }
+}
+
+function escapeHtml(text) {
+  return String(text == null ? "" : text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+$("login").addEventListener("click", async () => {
+  setBusy(true);
+  say("正在连接…");
+  try {
+    const data = await call("/v1/panel/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        baseUrl: $("baseUrl").value.trim(),
+        email: $("email").value.trim(),
+        password: $("password").value,
+        apiKey: $("apiKey").value.trim()
+      })
+    });
+    $("password").value = "";
+    say("已连接：" + (data.user || "Komga") + "，书库 " + data.libraries + " 个", "ok");
+    await refreshStatus();
+    await refreshLibraries();
+  } catch (error) {
+    say(error.message, "err");
+    await refreshStatus();
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("test").addEventListener("click", async () => {
+  setBusy(true);
+  say("正在测试…");
+  try {
+    const data = await call("/v1/panel/test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        baseUrl: $("baseUrl").value.trim(),
+        email: $("email").value.trim(),
+        password: $("password").value,
+        apiKey: $("apiKey").value.trim()
+      })
+    });
+    say(data.ok ? "连接正常，书库 " + (data.libraries || 0) + " 个" : "连接失败：" + (data.error || ""), data.ok ? "ok" : "err");
+    await refreshStatus();
+  } catch (error) {
+    say(error.message, "err");
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("logout").addEventListener("click", async () => {
+  setBusy(true);
+  try {
+    await call("/v1/panel/logout", { method: "POST" });
+    $("password").value = "";
+    $("apiKey").value = "";
+    say("已断开", "ok");
+    $("list").innerHTML = "<li><span>尚未加载</span></li>";
+    await refreshStatus();
+  } catch (error) {
+    say(error.message, "err");
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("reload").addEventListener("click", async () => {
+  setBusy(true);
+  await refreshLibraries();
+  setBusy(false);
+});
+
+refreshStatus();
+refreshLibraries();
+refreshLog();
+ticking = setInterval(() => {
+  refreshStatus();
+  refreshLog();
+}, 8000);
+</script>
+</body>
+</html>

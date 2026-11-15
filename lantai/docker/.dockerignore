@@ -1,0 +1,14 @@
+build/classes
+build/resources
+build/tmp
+build/generated
+build/reports
+build/test-results
+build/distributions
+src
+flyway
+node_modules
+.git
+.gradle
+*.gradle.kts
+*.log

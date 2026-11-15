@@ -1,0 +1,416 @@
+
+import nu.studer.gradle.jooq.JooqGenerate
+import org.flywaydb.gradle.task.FlywayMigrateTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.util.prefixIfNot
+import org.jooq.meta.kotlin.database
+import org.jooq.meta.kotlin.generator
+import org.jooq.meta.kotlin.jdbc
+import org.jooq.meta.kotlin.target
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+  kotlin("jvm")
+  kotlin("plugin.spring")
+  kotlin("kapt")
+  id("org.springframework.boot") version libs.versions.springboot.get()
+  alias(libs.plugins.gradleGitProperties)
+  id("nu.studer.jooq") version "10.2.1"
+  id("org.flywaydb.flyway") version "13.1.0"
+  id("com.github.johnrengelman.processes") version "0.5.0"
+  id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
+  id("com.google.devtools.ksp") version "2.3.1"
+  jacoco
+}
+
+val benchmarkSourceSet =
+  sourceSets.create("benchmark") {
+    java {
+      compileClasspath += sourceSets.main.get().output
+      runtimeClasspath += sourceSets.main.get().runtimeClasspath
+    }
+  }
+
+sourceSets {
+  // add a flyway sourceSet
+  val flyway =
+    create("flyway") {
+      compileClasspath += sourceSets.main.get().compileClasspath
+      runtimeClasspath += sourceSets.main.get().runtimeClasspath
+    }
+  // main sourceSet depends on the output of flyway sourceSet, and generated jooq classes
+  main {
+    java {
+      output.dir(flyway.output)
+      srcDir("build/generated-src/jooq/tasks")
+    }
+  }
+}
+
+val benchmarkImplementation =
+  configurations.getByName("benchmarkImplementation") {
+    extendsFrom(configurations.testImplementation.get())
+  }
+val kaptBenchmark =
+  configurations.getByName("kaptBenchmark") {
+    extendsFrom(configurations.kaptTest.get())
+  }
+
+dependencies {
+  implementation(kotlin("stdlib"))
+  implementation(kotlin("reflect"))
+
+  api(platform(SpringBootPlugin.BOM_COORDINATES))
+
+  api("org.springframework.boot:spring-boot-starter-web")
+  implementation("org.springframework.boot:spring-boot-starter-webflux")
+  implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+  implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+  implementation("org.springframework.boot:spring-boot-starter-jooq")
+  implementation("org.springframework.session:spring-session-core")
+  implementation("org.springframework.session:spring-session-jdbc")
+  implementation("com.github.gotson:spring-session-caffeine:2.1.0")
+  implementation("org.springframework.data:spring-data-commons")
+
+  kapt("org.springframework.boot:spring-boot-configuration-processor:${libs.versions.springboot.get()}")
+
+  implementation("org.flywaydb:flyway-core")
+
+  api("io.github.oshai:kotlin-logging-jvm:8.0.4")
+
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
+
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+
+  implementation("commons-io:commons-io:2.22.0")
+  implementation("org.apache.commons:commons-lang3:3.21.0")
+  implementation("commons-validator:commons-validator:1.11.0")
+
+  implementation("org.apache.lucene:lucene-core:${libs.versions.lucene.get()}")
+  implementation("org.apache.lucene:lucene-analysis-common:${libs.versions.lucene.get()}")
+  implementation("org.apache.lucene:lucene-queryparser:${libs.versions.lucene.get()}")
+  implementation("org.apache.lucene:lucene-backward-codecs:${libs.versions.lucene.get()}")
+
+  implementation("com.ibm.icu:icu4j:78.3")
+
+  implementation("com.appmattus.crypto:cryptohash:1.0.2")
+
+  implementation("org.apache.tika:tika-core:3.3.2")
+  implementation("org.apache.commons:commons-compress:1.28.0")
+  implementation("org.tukaani:xz:1.10")
+  implementation("com.github.junrar:junrar:8.1.2")
+  implementation("org.apache.pdfbox:pdfbox:3.0.8")
+  implementation("net.grey-panther:natural-comparator:1.1")
+  implementation("org.jsoup:jsoup:1.23.2")
+
+  implementation("net.coobird:thumbnailator:0.4.21")
+  runtimeOnly("com.twelvemonkeys.imageio:imageio-jpeg:${libs.versions.twelvemonkeys.get()}")
+  runtimeOnly("com.twelvemonkeys.imageio:imageio-tiff:${libs.versions.twelvemonkeys.get()}")
+  runtimeOnly("com.twelvemonkeys.imageio:imageio-webp:${libs.versions.twelvemonkeys.get()}")
+  runtimeOnly("com.github.gotson.nightmonkeys:imageio-jxl:${libs.versions.nightmonkeys.get()}")
+  runtimeOnly("com.github.gotson.nightmonkeys:imageio-heif:${libs.versions.nightmonkeys.get()}")
+  runtimeOnly("com.github.gotson.nightmonkeys:imageio-webp:${libs.versions.nightmonkeys.get()}")
+  // support for jpeg2000
+  runtimeOnly("com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0")
+  runtimeOnly("org.apache.pdfbox:jbig2-imageio:3.0.5")
+
+  // barcode scanning
+  implementation("com.google.zxing:core:3.5.4")
+
+  implementation("com.jakewharton.byteunits:byteunits:0.9.1")
+
+  implementation("com.github.f4b6a3:tsid-creator:5.2.6")
+
+  implementation("com.github.ben-manes.caffeine:caffeine")
+
+  implementation("org.xerial:sqlite-jdbc:${libs.versions.sqliteJdbc.get()}")
+  jooqGenerator("org.xerial:sqlite-jdbc:${libs.versions.sqliteJdbc.get()}")
+
+  if (version.toString().endsWith(".0.0")) {
+    ksp("com.github.gotson.bestbefore:bestbefore-processor-kotlin:0.2.0")
+  }
+
+  testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    exclude(module = "mockito-core")
+  }
+  testImplementation("org.springframework.security:spring-security-test")
+  testImplementation("com.ninja-squad:springmockk:4.0.2") // v5 needs Spring Framework v7
+  testImplementation("io.mockk:mockk:1.14.11")
+  testImplementation("com.google.jimfs:jimfs:1.3.2")
+
+  testImplementation("com.tngtech.archunit:archunit-junit5:1.5.1")
+
+  benchmarkImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+  benchmarkImplementation("org.openjdk.jmh:jmh-core:1.37")
+  kaptBenchmark("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+  kaptBenchmark("org.springframework.boot:spring-boot-configuration-processor:${libs.versions.springboot.get()}")
+
+  developmentOnly("org.springframework.boot:spring-boot-devtools:${libs.versions.springboot.get()}")
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget = JvmTarget.JVM_17
+    freeCompilerArgs =
+      listOf(
+        "-Xjsr305=strict",
+        "-Xemit-jvm-type-annotations",
+        "-opt-in=kotlin.time.ExperimentalTime",
+      )
+  }
+}
+
+val lantaiUi = "$rootDir/lantai-webui-v2"
+tasks {
+  withType<JavaCompile> {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+  }
+
+  withType<Test> {
+    useJUnitPlatform()
+    systemProperty("spring.profiles.active", "test")
+    maxHeapSize = "1G"
+  }
+
+  withType<Jar> {
+    manifest {
+      attributes("Enable-Native-Access" to "ALL-UNNAMED")
+    }
+  }
+
+  getByName<Jar>("jar") {
+    enabled = true
+  }
+
+  register<Copy>("lantaiuiCopyDist") {
+    description = "Copies the Lantai WebUI v2 build into resources/public"
+    group = "web"
+    from("$lantaiUi/dist/")
+    into("$projectDir/src/main/resources/public/")
+    excludes.add("index.html")
+    doFirst {
+      fileTree("$projectDir/src/main/resources/public") {
+        include("js/lantai.*.js", "js/reader.*.js", "js/docs.*.js", "js/sysx.*.js", "js/plugins.*.js", "js/lang-*.*.js", "css/lantai.*.css", "index-lantai.html")
+      }.forEach { it.delete() }
+    }
+  }
+
+  register<Copy>("lantaiuiCopyIndex") {
+    description = "Copies the Lantai WebUI v2 index.html into resources/public/index-lantai.html and injects Thymeleaf tags"
+    group = "web"
+    dependsOn("lantaiuiCopyDist")
+    from("$lantaiUi/dist/index.html")
+    into("$projectDir/src/main/resources/public/")
+    filter { line ->
+      line.replace("((?:src|content|href)=\")([\\w]*/.*?)(\")".toRegex()) {
+        it.groups[0]?.value + " th:" + it.groups[1]?.value + "@{" + it.groups[2]?.value?.prefixIfNot("/") + "}" + it.groups[3]?.value
+      }
+    }
+    rename("index.html", "index-lantai.html")
+  }
+
+  withType<ProcessResources> {
+    filesMatching("application*.yml") {
+      expand(
+        mapOf(
+          "version" to project.version.toString(),
+          "rootDir" to project.rootDir.absolutePath,
+        ),
+      )
+    }
+    mustRunAfter(getByName("lantaiuiCopyIndex"))
+  }
+
+  register<Test>("benchmark") {
+    group = "benchmark"
+    inputs.files(benchmarkSourceSet.output)
+    testClassesDirs = benchmarkSourceSet.output.classesDirs
+    classpath = benchmarkSourceSet.runtimeClasspath
+
+    systemProperty(
+      "jmh.resultFolder",
+      layout.buildDirectory
+        .dir("reports/benchmarks")
+        .get()
+        .asFile.absolutePath,
+    )
+  }
+}
+
+springBoot {
+  buildInfo {
+    // prevent task bootBuildInfo to rerun every time
+    excludes = setOf("time")
+    properties {
+      // but rerun if the gradle.properties file changed
+      inputs.file("$rootDir/gradle.properties")
+    }
+  }
+}
+
+val sqliteUrls =
+  mapOf(
+    "main" to "jdbc:sqlite:${project.layout.buildDirectory.get()}/generated/flyway/main/database.sqlite",
+    "tasks" to "jdbc:sqlite:${project.layout.buildDirectory.get()}/generated/flyway/tasks/tasks.sqlite",
+  )
+val sqliteMigrationDirs =
+  mapOf(
+    "main" to
+      listOf(
+        "$projectDir/src/flyway/resources/db/migration/sqlite",
+        "$projectDir/src/flyway/kotlin/db/migration/sqlite",
+      ),
+    "tasks" to
+      listOf(
+        "$projectDir/src/flyway/resources/tasks/migration/sqlite",
+      ),
+  )
+
+tasks.register("flywayMigrateMain", FlywayMigrateTask::class) {
+  val id = "main"
+  url = sqliteUrls[id]
+  locations = arrayOf("classpath:db/migration/sqlite")
+  placeholders =
+    mapOf(
+      "library-file-hashing" to "true",
+      "library-scan-startup" to "false",
+      "delete-empty-collections" to "true",
+      "delete-empty-read-lists" to "true",
+    )
+  // in order to include the Java migrations, flywayClasses must be run before flywayMigrate
+  dependsOn("flywayClasses")
+  sqliteMigrationDirs[id]?.forEach { inputs.dir(it) }
+  outputs.dir("${project.layout.buildDirectory.get()}/generated/flyway/$id")
+  doFirst {
+    delete(outputs.files)
+    mkdir("${project.layout.buildDirectory.get()}/generated/flyway/$id")
+  }
+  mixed = true
+}
+
+tasks.register("flywayMigrateTasks", FlywayMigrateTask::class) {
+  val id = "tasks"
+  url = sqliteUrls[id]
+  locations = arrayOf("classpath:tasks/migration/sqlite")
+  // in order to include the Java migrations, flywayClasses must be run before flywayMigrate
+  dependsOn("flywayClasses")
+  sqliteMigrationDirs[id]?.forEach { inputs.dir(it) }
+  outputs.dir("${project.layout.buildDirectory.get()}/generated/flyway/$id")
+  doFirst {
+    delete(outputs.files)
+    mkdir("${project.layout.buildDirectory.get()}/generated/flyway/$id")
+  }
+  mixed = true
+}
+
+buildscript {
+  configurations["classpath"].resolutionStrategy.eachDependency {
+    if (requested.group.startsWith("org.jooq") && requested.name.startsWith("jooq")) {
+      useVersion(libs.versions.jooq.get())
+    }
+  }
+}
+
+jooq {
+  version.set(libs.versions.jooq.get())
+  configurations {
+    create("main") {
+      jooqConfiguration {
+        logging = org.jooq.meta.jaxb.Logging.WARN
+        jdbc {
+          driver = "org.sqlite.JDBC"
+          url = sqliteUrls["main"]
+        }
+        generator {
+          database {
+            name = "org.jooq.meta.sqlite.SQLiteDatabase"
+          }
+          target {
+            packageName = "org.lantai.jooq.main"
+          }
+        }
+      }
+    }
+    create("tasks") {
+      jooqConfiguration {
+        logging = org.jooq.meta.jaxb.Logging.WARN
+        jdbc {
+          driver = "org.sqlite.JDBC"
+          url = sqliteUrls["tasks"]
+        }
+        generator {
+          database {
+            name = "org.jooq.meta.sqlite.SQLiteDatabase"
+          }
+          target {
+            packageName = "org.lantai.jooq.tasks"
+          }
+        }
+      }
+    }
+  }
+}
+tasks.named<JooqGenerate>("generateJooq") {
+  sqliteMigrationDirs["main"]?.forEach { inputs.dir(it) }
+  allInputsDeclared = true
+  dependsOn("flywayMigrateMain")
+}
+tasks.named<JooqGenerate>("generateTasksJooq") {
+  sqliteMigrationDirs["tasks"]?.forEach { inputs.dir(it) }
+  allInputsDeclared = true
+  dependsOn("flywayMigrateTasks")
+}
+
+tasks.whenTaskAdded {
+  if (name == "kaptGenerateStubsKotlin") {
+    dependsOn("generateTasksJooq")
+  }
+}
+
+tasks.runKtlintFormatOverMainSourceSet {
+  dependsOn("generateTasksJooq")
+}
+tasks.runKtlintCheckOverMainSourceSet {
+  dependsOn("generateTasksJooq")
+}
+tasks.compileKotlin {
+  dependsOn("generateTasksJooq")
+}
+
+openApi {
+  outputDir = file("$projectDir/docs")
+  customBootRun {
+    args.add("--spring.profiles.active=claim,generate-openapi")
+    args.add("--server.port=8080")
+  }
+  waitTimeInSeconds.set(60)
+}
+
+tasks.jacocoTestReport {
+  dependsOn(tasks.test)
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+  filter {
+    exclude("**/db/migration/**")
+  }
+}
+
+project.afterEvaluate {
+  tasks.named("forkedSpringBootRun") {
+    mustRunAfter(tasks.bootJar)
+    mustRunAfter(tasks.jar)
+  }
+}
+
+tasks.bootJar {
+  archiveBaseName.set("lantai")
+  from(project.rootDir) {
+    include("LICENSE")
+  }
+}

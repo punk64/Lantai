@@ -1,0 +1,88 @@
+CREATE TABLE "PLUGIN_REPOSITORY"
+(
+  "ID"                 VARCHAR(32)   NOT NULL,
+  "URL"                VARCHAR(1024) NOT NULL,
+  "NAME"               VARCHAR(255)  NOT NULL,
+  "ENABLED"            BOOLEAN       NOT NULL DEFAULT 1,
+  "LAST_SYNC_DATE"     DATETIME,
+  "LAST_SYNC_MESSAGE"  VARCHAR(1024),
+  "CREATED_DATE"       DATETIME      NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME      NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE UNIQUE INDEX "idx__plugin_repository_url" ON "PLUGIN_REPOSITORY" ("URL");
+
+CREATE TABLE "PLUGIN_INSTANCE"
+(
+  "ID"                 VARCHAR(32)   NOT NULL,
+  "PLUGIN_ID"          VARCHAR(255)  NOT NULL,
+  "NAME"               VARCHAR(255)  NOT NULL,
+  "VERSION"            VARCHAR(64)   NOT NULL,
+  "API_VERSION"        INTEGER       NOT NULL,
+  "MODE"               VARCHAR(16)   NOT NULL,
+  "RUNTIME_KIND"       VARCHAR(16)   NOT NULL,
+  "ENTRY"              VARCHAR(512)  NOT NULL,
+  "ENDPOINT"           VARCHAR(512),
+  "PORT"               INTEGER,
+  "HOST_KEY"           VARCHAR(128),
+  "TOKEN_ID"           VARCHAR(32),
+  "TOKEN_VALUE"        VARCHAR(512),
+  "STATE"              VARCHAR(32)   NOT NULL,
+  "STATUS_MESSAGE"     VARCHAR(1024),
+  "CAPABILITIES"       TEXT          NOT NULL,
+  "MANIFEST"           TEXT          NOT NULL,
+  "HOME_DIR"           VARCHAR(1024) NOT NULL,
+  "MEMORY_MB"          INTEGER       NOT NULL DEFAULT 0,
+  "ENABLED"            BOOLEAN       NOT NULL DEFAULT 1,
+  "LAST_HEALTH_DATE"   DATETIME,
+  "CREATED_DATE"       DATETIME      NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME      NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE UNIQUE INDEX "idx__plugin_instance_plugin" ON "PLUGIN_INSTANCE" ("PLUGIN_ID");
+
+CREATE UNIQUE INDEX "idx__plugin_instance_port" ON "PLUGIN_INSTANCE" ("PORT");
+
+CREATE TABLE "PLUGIN_GRANT"
+(
+  "ID"                 VARCHAR(32) NOT NULL,
+  "PLUGIN_ID"          VARCHAR(255) NOT NULL,
+  "CAPABILITY"         VARCHAR(64) NOT NULL,
+  "IS_DEFAULT"         BOOLEAN     NOT NULL DEFAULT 0,
+  "GRANTED_BY"         VARCHAR(32),
+  "CREATED_DATE"       DATETIME    NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME    NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE UNIQUE INDEX "idx__plugin_grant_plugin_capability" ON "PLUGIN_GRANT" ("PLUGIN_ID", "CAPABILITY");
+
+CREATE UNIQUE INDEX "idx__plugin_grant_default" ON "PLUGIN_GRANT" ("CAPABILITY") WHERE "IS_DEFAULT" = 1;
+
+CREATE TABLE "PLUGIN_CREDENTIAL"
+(
+  "ID"                 VARCHAR(32)   NOT NULL,
+  "PLUGIN_ID"          VARCHAR(255)  NOT NULL,
+  "NAME"               VARCHAR(128)  NOT NULL,
+  "VALUE"              VARCHAR(8192) NOT NULL,
+  "CREATED_DATE"       DATETIME      NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME      NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE UNIQUE INDEX "idx__plugin_credential_plugin_name" ON "PLUGIN_CREDENTIAL" ("PLUGIN_ID", "NAME");
+
+CREATE TABLE "PLUGIN_KV"
+(
+  "ID"                 VARCHAR(32)  NOT NULL,
+  "PLUGIN_ID"          VARCHAR(255) NOT NULL,
+  "KEY"                VARCHAR(255) NOT NULL,
+  "VALUE"              TEXT         NOT NULL,
+  "CREATED_DATE"       DATETIME     NOT NULL,
+  "LAST_MODIFIED_DATE" DATETIME     NOT NULL,
+  PRIMARY KEY ("ID")
+);
+
+CREATE UNIQUE INDEX "idx__plugin_kv_plugin_key" ON "PLUGIN_KV" ("PLUGIN_ID", "KEY");

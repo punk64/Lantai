@@ -1,0 +1,30 @@
+FROM ubuntu:24.04
+
+ARG VERSION
+ARG WITH_KEPUBIFY=false
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=C.UTF-8 \
+    JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 \
+    LANTAI_CONFIGDIR=/config \
+    PATH=/usr/lib/jvm/java-21-openjdk-amd64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl fontconfig \
+      openjdk-21-jre-headless \
+      libjxl0.7 libheif1 libwebp7 \
+    && if [ "$WITH_KEPUBIFY" = "true" ]; then \
+         curl -fsSL "https://github.com/pgaskin/kepubify/releases/latest/download/kepubify-linux-64bit" \
+           -o /usr/bin/kepubify && chmod +x /usr/bin/kepubify; \
+       fi \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY build/libs/lantai-${VERSION}.jar application.jar
+
+VOLUME /config
+EXPOSE 25600
+
+ENTRYPOINT ["java", "-Dspring.profiles.include=docker", "-jar", "/app/application.jar", "--spring.config.additional-location=file:/config/"]

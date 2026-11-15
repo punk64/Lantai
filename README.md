@@ -223,7 +223,7 @@ docker build -f docker/Dockerfile.lantai --build-arg VERSION=<version> -t lantai
 
 #### 完整版 `docker-compose.full.yml`
 
-Host 网络，在线源可用；镜像不含任何插件，接入的服务端地址由使用者自行填写。卷分两份。
+Host 网络；镜像不含任何插件与在线内容，扩展能力由使用者自行安装。卷分两份：数据目录与书库。逐行注释见 `lantai/docker/docker-compose.full.yml`。
 
 > `network_mode: host` 让服务直接监听宿主机的全部网络接口。宿主机若有公网地址，请自行用防火墙或反向代理限制来源，并确认符合[使用边界](#使用边界)。
 
@@ -244,8 +244,7 @@ services:
     environment:
       TZ: Asia/Shanghai
       SERVER_PORT: ${LANTAI_PORT:-25600}
-      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true"
-      LANTAI_CONFIGDIR: /config
+      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true -Dlantai.config-dir=/config"
     volumes:
       - ./config:/config
       - ./books:/books
@@ -263,7 +262,7 @@ services:
 
 #### 精简版 `docker-compose.slim.yml`
 
-Bridge 网络 + 端口映射，只挂数据目录与书库，关闭在线源，内存上限 1.5 GB，适合小内存机器或纯离线阅读。
+Bridge 网络 + 端口映射，数据目录与书库分开挂载，书库只读，内存上限 1.5 GB，适合小内存机器或纯本地阅读。逐行注释见 `lantai/docker/docker-compose.slim.yml`。
 
 ```yaml
 name: lantai
@@ -281,9 +280,7 @@ services:
       - "${LANTAI_PORT:-25600}:25600"
     environment:
       TZ: Asia/Shanghai
-      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true"
-      LANTAI_CONFIGDIR: /config
-      LANTAI_ONLINE_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true -Dlantai.config-dir=/config"
     volumes:
       - ./config:/config
       - ./books:/books:ro
@@ -298,7 +295,6 @@ services:
       retries: 3
 ```
 
-```bash
 docker compose -f docker-compose.slim.yml up -d
 docker compose -f docker-compose.full.yml logs -f lantai
 ```

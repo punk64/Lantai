@@ -1,31 +1,91 @@
+# 兰台完整版部署文件（docker-compose.full.yml）
+#
+# 形态：基于 ubuntu:26.04 的 ubuntu 镜像，约 1.09 GB
+# 附加：poppler、kepubify、libjxl / libheif / libwebp 与 Qt 运行库，
+#       支持 KEPUB 转换与更多图片格式解码
+# 网络：host 模式，容器直接使用宿主机网络栈，无端口映射
+# 书库：/books 以读写方式挂载，服务端可写入转换结果与缓存
+# 内存：JVM 堆 2 GB，容器上限 3 GB
+#
+# 用法：
+#   1) 导入镜像：docker load -i lantai-0.8.0-ubuntu.tar.gz
+#   2) 启动：    docker compose -f docker-compose.full.yml up -d
+#   3) 查看日志：docker compose -f docker-compose.full.yml logs -f lantai
+#   4) 停止：    docker compose -f docker-compose.full.yml down
+#
+# 安全提示：host 模式让服务监听宿主机全部网络接口。若宿主机有公网地址，
+# 请自行用防火墙或反向代理限制来源，并先阅读项目 README 的「使用边界」一节。
+# 首次启动会在日志里打印随机生成的管理员账号与密码，请及时保存并修改。
+
+# 项目名，决定容器与网络的前缀，避免与宿主机上其他 compose 项目重名
 name: lantai
 
 services:
+  # 唯一服务：兰台服务端
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.7.6}-ubuntu
+    # 镜像标签；版本号由 LANTAI_VERSION 控制，默认 0.8.0
+    # 用发布镜像时不会触发构建；改用其他版本只需导出 LANTAI_VERSION
+    image: lantai:${LANTAI_VERSION:-0.8.0}-ubuntu
+
+    # 构建段仅在自行从源码打包镜像时使用；直接导入发布镜像可忽略
     build:
+      # 构建上下文指向模块目录 lantai/，镜像内需要 build/libs 下的 jar
       context: ..
+      # ubuntu 版构建文件，额外带 poppler、kepubify 与多种图像解码库
       dockerfile: docker/Dockerfile.lantai
       args:
-        VERSION: ${LANTAI_VERSION:-0.7.6}
+        # 传入版本号，用于定位 build/libs/lantai-<版本>.jar
+        VERSION: ${LANTAI_VERSION:-0.8.0}
+        # 是否在构建阶段装入 kepubify（KEPUB 转换器）；官方发布镜像已内置
         WITH_KEPUBIFY: "true"
+
+    # 固定容器名，方便 docker logs / docker exec 直接引用
     container_name: lantai
+
+    # host 模式：容器与宿主机共用网络栈，端口由服务自身监听
+    # 好处是局域网设备可直接按宿主机地址访问；代价是没有网络隔离
     network_mode: host
+
     environment:
+      # 容器时区，影响日志时间与「今日」类统计的边界
       TZ: Asia/Shanghai
+
+      # 监听端口，Spring Boot 会把它作为 server.port 的覆盖值
       SERVER_PORT: ${LANTAI_PORT:-25600}
-      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true"
-      LANTAI_CONFIGDIR: /config
+
+      # JVM 参数：堆上限 2 GB；强制 IPv4，避免容器内 IPv6 解析导致的连接超时
+      # lantai.config-dir 显式指向挂载点，确保数据库与索引落在 /config 而不是容器临时层
+      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true -Dlantai.config-dir=/config"
+
     volumes:
+      # 数据目录：SQLite 数据库、Lucene 索引、字体、头像、升级缓存
+      # 必须持久化，删掉即等于清空书库记录与阅读进度
       - ./config:/config
+
+      # 书库目录：宿主机 ./books 对应容器内 /books
+      # 完整版以读写方式挂载，便于写入格式转换结果与新导入的文件
       - ./books:/books
+
+    # 容器退出后自动重启；手动 docker compose stop 不会触发
     restart: unless-stopped
+
+    # 停止前等待 40 秒，留给 SQLite 事务收尾与索引落盘，避免断电式截断
     stop_grace_period: 40s
+
+    # 共享内存大小；图像与 PDF 解码会用到，过小在批量处理时可能报错
     shm_size: 256m
+
+    # 容器内存硬上限；超限会被内核 OOM 终止，3 GB 对应 2 GB 堆的余量
     mem_limit: 3g
+
+    # 健康检查：访问首页，返回非 2xx/3xx 视为异常
     healthcheck:
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:25600/"]
+      # 每 30 秒探测一次
       interval: 30s
+      # 单次探测 5 秒超时
       timeout: 5s
+      # 启动后 120 秒内不判定失败，完整版组件更多，初始化更慢
       start_period: 120s
+      # 连续 3 次失败才标记为 unhealthy
       retries: 3

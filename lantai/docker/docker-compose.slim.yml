@@ -1,30 +1,82 @@
+# 兰台精简版部署文件（docker-compose.slim.yml）
+#
+# 形态：基于 eclipse-temurin:21-jre-alpine 的 alpine 镜像，约 531 MB
+# 网络：bridge + 端口映射，只把 25600 暴露到宿主机
+# 书库：/books 以只读方式挂载，容器无法改写原始文件
+# 内存：JVM 堆 1 GB，容器上限 1.5 GB，适合 2 GB 内存的小机器
+# 转换：镜像不含 kepubify 与 Calibre，KEPUB / MOBI / AZW3 需外部转换器处理
+#
+# 用法：
+#   1) 导入镜像：docker load -i lantai-0.8.0-alpine.tar.gz
+#   2) 启动：    docker compose -f docker-compose.slim.yml up -d
+#   3) 查看日志：docker compose -f docker-compose.slim.yml logs -f lantai
+#   4) 停止：    docker compose -f docker-compose.slim.yml down
+#
+# 首次启动会在日志里打印随机生成的管理员账号与密码，请及时保存并修改。
+# 数据全部落在本文件同级目录的 ./config 下（SQLite、索引、头像、缓存）。
+
+# 项目名，决定容器与网络的前缀，避免与宿主机上其他 compose 项目重名
 name: lantai
 
 services:
+  # 唯一服务：兰台服务端
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.7.6}-alpine
+    # 镜像标签；版本号由 LANTAI_VERSION 控制，默认 0.8.0
+    # 用发布镜像时不会触发构建；改用其他版本只需导出 LANTAI_VERSION
+    image: lantai:${LANTAI_VERSION:-0.8.0}-alpine
+
+    # 构建段仅在自行从源码打包镜像时使用；直接导入发布镜像可忽略
     build:
+      # 构建上下文指向模块目录 lantai/，镜像内需要 build/libs 下的 jar
       context: ..
+      # alpine 版构建文件，仅含 JRE、字体、时区与图像解码库
       dockerfile: docker/Dockerfile.alpine
       args:
-        VERSION: ${LANTAI_VERSION:-0.7.6}
+        # 传入版本号，用于定位 build/libs/lantai-<版本>.jar
+        VERSION: ${LANTAI_VERSION:-0.8.0}
+
+    # 固定容器名，方便 docker logs / docker exec 直接引用
     container_name: lantai
+
+    # 端口映射：宿主机 LANTAI_PORT（默认 25600）映射到容器内 25600
+    # 只想本机访问可改成 "127.0.0.1:${LANTAI_PORT:-25600}:25600"
     ports:
       - "${LANTAI_PORT:-25600}:25600"
+
     environment:
+      # 容器时区，影响日志时间与「今日」类统计的边界
       TZ: Asia/Shanghai
-      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true"
-      LANTAI_CONFIGDIR: /config
-      LANTAI_ONLINE_ENABLED: "false"
+
+      # JVM 参数：堆上限 1 GB；强制 IPv4，避免容器内 IPv6 解析导致的连接超时
+      # lantai.config-dir 显式指向挂载点，确保数据库与索引落在 /config 而不是容器临时层
+      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true -Dlantai.config-dir=/config"
+
     volumes:
+      # 数据目录：SQLite 数据库、Lucene 索引、字体、头像、升级缓存
+      # 必须持久化，删掉即等于清空书库记录与阅读进度
       - ./config:/config
+
+      # 书库目录：宿主机 ./books 对应容器内 /books
+      # 末尾的 :ro 表示只读挂载，删除书籍请直接在宿主机操作
       - ./books:/books:ro
+
+    # 容器退出后自动重启；手动 docker compose stop 不会触发
     restart: unless-stopped
+
+    # 停止前等待 40 秒，留给 SQLite 事务收尾与索引落盘，避免断电式截断
     stop_grace_period: 40s
+
+    # 容器内存硬上限；超限会被内核 OOM 终止，1.5 GB 对应 1 GB 堆的余量
     mem_limit: 1536m
+
+    # 健康检查：访问首页，返回非 2xx/3xx 视为异常
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:25600/"]
+      # 每 30 秒探测一次
       interval: 30s
+      # 单次探测 5 秒超时
       timeout: 5s
+      # 启动后 90 秒内不判定失败，给首次建库与索引初始化的时间
       start_period: 90s
+      # 连续 3 次失败才标记为 unhealthy
       retries: 3

@@ -215,7 +215,7 @@ Inside the container the data directory is fixed at `/config` (SQLite, Lucene in
 
 #### Full `docker-compose.full.yml`
 
-Host networking, online sources available; the image ships no plugin, and the server address is filled in by the user. Two volumes.
+Host networking; the image ships no plugin and no online content, and any extension is installed by the user. Two volumes: data directory and library. See `lantai/docker/docker-compose.full.yml` for line-by-line comments.
 
 > `network_mode: host` makes the service listen on every network interface of the host. If the host has a public address, restrict access with a firewall or reverse proxy yourself, and confirm it fits the [terms of use](#terms-of-use).
 
@@ -224,20 +224,19 @@ name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.7.6}-ubuntu
+    image: lantai:${LANTAI_VERSION:-0.8.0}-ubuntu
     build:
       context: ..
       dockerfile: docker/Dockerfile.lantai
       args:
-        VERSION: ${LANTAI_VERSION:-0.7.6}
+        VERSION: ${LANTAI_VERSION:-0.8.0}
         WITH_KEPUBIFY: "true"
     container_name: lantai
     network_mode: host
     environment:
       TZ: Asia/Shanghai
       SERVER_PORT: ${LANTAI_PORT:-25600}
-      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true"
-      LANTAI_CONFIGDIR: /config
+      JAVA_TOOL_OPTIONS: "-Xmx2g -Djava.net.preferIPv4Stack=true -Dlantai.config-dir=/config"
     volumes:
       - ./config:/config
       - ./books:/books
@@ -255,27 +254,25 @@ services:
 
 #### Slim `docker-compose.slim.yml`
 
-Bridge network with a port mapping, only the data directory and library mounted, online sources disabled, 1.5 GB memory cap — suited to small machines or purely offline reading.
+Bridge network with a port mapping, data directory and library mounted separately, library read-only, 1.5 GB memory cap - suited to small machines or purely local reading. See `lantai/docker/docker-compose.slim.yml` for line-by-line comments.
 
 ```yaml
 name: lantai
 
 services:
   lantai:
-    image: lantai:${LANTAI_VERSION:-0.7.6}-alpine
+    image: lantai:${LANTAI_VERSION:-0.8.0}-alpine
     build:
       context: ..
       dockerfile: docker/Dockerfile.alpine
       args:
-        VERSION: ${LANTAI_VERSION:-0.7.6}
+        VERSION: ${LANTAI_VERSION:-0.8.0}
     container_name: lantai
     ports:
       - "${LANTAI_PORT:-25600}:25600"
     environment:
       TZ: Asia/Shanghai
-      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true"
-      LANTAI_CONFIGDIR: /config
-      LANTAI_ONLINE_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: "-Xmx1g -Djava.net.preferIPv4Stack=true -Dlantai.config-dir=/config"
     volumes:
       - ./config:/config
       - ./books:/books:ro
@@ -290,7 +287,6 @@ services:
       retries: 3
 ```
 
-```bash
 docker compose -f docker-compose.slim.yml up -d
 docker compose -f docker-compose.full.yml logs -f lantai
 ```

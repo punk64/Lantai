@@ -301,6 +301,17 @@ docker compose -f docker-compose.full.yml logs -f lantai
 
 首次启动仍会在日志里打印随机管理员账号。`./config` 若由 Docker 自动创建，属主是 root，容器以 root 运行可直接写入；改用非 root 运行需自行 `chown`。
 
+## 客户端
+
+手机端与鸿蒙端各自独立成库，不随本仓库分发：
+
+| 端 | 仓库 | 技术栈 |
+|---|---|---|
+| 安卓 | [punk64/LantaiReader-Android](https://github.com/punk64/LantaiReader-Android) | Kotlin · Jetpack Compose |
+| 鸿蒙 | [punk64/LantaiReader-hmos](https://github.com/punk64/LantaiReader-hmos) | ArkTS · ArkUI |
+
+两端通过 `api/lantai/v1/**` 与本文档所述服务端通信。
+
 ## 不在本仓库的内容
 
 以下几类文件有意排除：

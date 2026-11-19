@@ -293,6 +293,17 @@ docker compose -f docker-compose.full.yml logs -f lantai
 
 The first start still prints the random administrator account to the log. If `./config` is auto-created by Docker it is owned by root; the container runs as root and can write directly. Running as non-root requires a manual `chown`.
 
+## Clients
+
+The mobile clients live in their own repositories and are not distributed with this one:
+
+| Platform | Repository | Stack |
+|---|---|---|
+| Android | [punk64/LantaiReader-Android](https://github.com/punk64/LantaiReader-Android) | Kotlin · Jetpack Compose |
+| HarmonyOS | [punk64/LantaiReader-hmos](https://github.com/punk64/LantaiReader-hmos) | ArkTS · ArkUI |
+
+Both talk to the server described here over `api/lantai/v1/**`.
+
 ## Not in this repository
 
 The following are intentionally excluded:

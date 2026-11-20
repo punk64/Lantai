@@ -19,6 +19,8 @@ The name comes from *Lantai* (兰台), the imperial library and archive of Han-d
 
 **Every release before V1.0.0 is a test build.** Feature updates during this period aim to avoid breaking the existing data structures; the focus is on interface fixes and experience improvements. Any breaking change across versions will be documented separately with a migration path.
 
+**Feature work is close to finished.** Further development is unlikely to introduce changes that break existing data structures, and the project is moving into a long-term testing phase: confirming stability and fixing existing defects. During this phase, contributions to third-party plugin repositories are welcome — provided they respect the laws of your jurisdiction and the [terms of use](#terms-of-use) below — to extend the project's capabilities. Plugins are maintained by their own authors; this project does not provide, review or distribute them.
+
 ## Relationship with Komga
 
 | Item | Detail |
@@ -89,6 +91,8 @@ gradle/                  Gradle wrapper
 ```
 
 The frontend uses no framework and no npm packages; the build script is `lantai-webui-v2/build.js` inside the repo.
+
+The mobile clients (Android / HarmonyOS) are not in this repository; see [Clients](#clients).
 
 ## Requirements
 

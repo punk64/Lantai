@@ -1,5 +1,10 @@
 # 兰台 Lantai
 
+<h3 align="center">
+  <a href="https://github.com/punk64/LantaiReader-Android">安卓客户端 · https://github.com/punk64/LantaiReader-Android</a><br>
+  <a href="https://github.com/punk64/LantaiReader-hmos">鸿蒙客户端 · https://github.com/punk64/LantaiReader-hmos</a>
+</h3>
+
 > 官方仓库：<https://github.com/punk64/Lantai>
 
 **兰台是基于 [Komga](https://github.com/gotson/komga) 的独立开源发行版。** 在 Komga 1.29.2 的基础上深度定制，保留其数据模型、扫描引擎、页流与客户端协议，替换网页前端，并补上电子书格式、上游 Komga 服务端接入、元数据刮削、阅读统计、全文搜索与 TTS 朗读。

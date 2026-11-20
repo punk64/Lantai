@@ -1,5 +1,10 @@
 # Lantai (兰台)
 
+<h3 align="center">
+  <a href="https://github.com/punk64/LantaiReader-Android">Android client · https://github.com/punk64/LantaiReader-Android</a><br>
+  <a href="https://github.com/punk64/LantaiReader-hmos">HarmonyOS client · https://github.com/punk64/LantaiReader-hmos</a>
+</h3>
+
 > Official repository: <https://github.com/punk64/Lantai>
 >
 > 中文文档：[README.md](README.md)

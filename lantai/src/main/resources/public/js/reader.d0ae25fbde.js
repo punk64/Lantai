@@ -23,6 +23,7 @@
   var PRE = {
     theme: 'paper', size: 18, lh: 1.85, para: 0.9, font: 'serif', measure: 38, indent: true,
     pubcss: true, wake: false, imm: false, ttsRate: 1, ttsVoice: '', sink: 0,
+    ttsStyle: 'plain', ttsPitch: 'std', ttsAuto: false, ttsGap: 'normal',
     layout: 'scroll', dir: 'LTR', tapAny: true
   };
   try { Object.assign(PRE, JSON.parse(localStorage.getItem('lantai-ebook') || '{}')); } catch (e) { }
@@ -39,7 +40,7 @@
     panel: null, shadow: null, docEl: null, view: null,
     shadowSeeded: false, progTimer: null, hbTimer: null, session: null, beats: 0,
     restore: -1, restoreT: null, idle: null, raf: 0, bootAt: 0,
-    sel: null, tts: null, ttsIdx: 0, ttsOn: false, wakeLock: null,
+    sel: null, tts: null, ttsIdx: 0, ttsOn: false, wakeLock: null, ttsTimer: null, ttsPending: false,
     toastT: null, lastCh: 0, ready: false, warmF: false, warmB: false,
     page: 0, pages: 1, annTab: 'all', annQ: '', annQT: 0,
     findQ: '', findMark: '', fontFams: null,
@@ -1950,6 +1951,20 @@
       [[0.8, L.t('慢')], [1, L.t('常')], [1.2, L.t('快')], [1.5, L.t('极快')]].map(function (x) {
         return '<button class="eb-chip' + (Math.abs(PRE.ttsRate - x[0]) < .01 ? ' on' : '') + '" data-tr="' + x[0] + '">' + x[1] + '</button>';
       }).join('') + '</div></div>' +
+      '<div class="eb-row"><label>' + L.t('语气') + '</label><div class="grow">' +
+      [['plain', L.t('平实')], ['calm', L.t('沉稳')], ['lively', L.t('轻快')], ['story', L.t('讲述')]].map(function (x) {
+        return '<button class="eb-chip' + (PRE.ttsStyle === x[0] ? ' on' : '') + '" data-ts="' + x[0] + '">' + x[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="eb-row"><label>' + L.t('语调') + '</label><div class="grow">' +
+      [['low', L.t('低')], ['std', L.t('标准')], ['high', L.t('高')]].map(function (x) {
+        return '<button class="eb-chip' + (PRE.ttsPitch === x[0] ? ' on' : '') + '" data-tp="' + x[0] + '">' + x[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="eb-row"><label>' + L.t('自动语气') + '</label><div class="grow"><button class="eb-sw' + (PRE.ttsAuto ? ' on' : '') + '" data-sw="ttsAuto"></button></div></div>' +
+      '<div class="eb-row"><label>' + L.t('间隙') + '</label><div class="grow">' +
+      [['tight', L.t('紧')], ['normal', L.t('标准')], ['loose', L.t('松')]].map(function (x) {
+        return '<button class="eb-chip' + (PRE.ttsGap === x[0] ? ' on' : '') + '" data-tg="' + x[0] + '">' + x[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="eb-note">' + L.t('自动语气按标点、句长与段落结构调节停顿和起伏，关闭时保持原样。') + '</div>' +
       '<div class="eb-row"><label>' + L.t('音色') + '</label><div class="grow"><select id="ebVoice" style="width:100%;height:28px;border-radius:7px;border:1px solid var(--eb-line);background:var(--eb-sunk);color:var(--eb-tx);font-size:11.5px;padding:0 6px"></select></div></div>' +
       '<div class="eb-group">' + L.t('阅读') + '</div>' +
       '<div class="eb-row"><label>' + L.t('屏幕常亮') + '</label><div class="grow"><button class="eb-sw' + (PRE.wake ? ' on' : '') + '" data-sw="wake"></button></div></div>' +
@@ -1996,6 +2011,24 @@
         if (EB.ttsOn) ttsRestart();
       };
     });
+    [].slice.call(P.querySelectorAll('[data-ts]')).forEach(function (b) {
+      b.onclick = function () {
+        PRE.ttsStyle = b.dataset.ts; savePrefs(); paintSet('set');
+        if (EB.ttsOn) ttsRestart();
+      };
+    });
+    [].slice.call(P.querySelectorAll('[data-tp]')).forEach(function (b) {
+      b.onclick = function () {
+        PRE.ttsPitch = b.dataset.tp; savePrefs(); paintSet('set');
+        if (EB.ttsOn) ttsRestart();
+      };
+    });
+    [].slice.call(P.querySelectorAll('[data-tg]')).forEach(function (b) {
+      b.onclick = function () {
+        PRE.ttsGap = b.dataset.tg; savePrefs(); paintSet('set');
+        if (EB.ttsOn) ttsRestart();
+      };
+    });
     [].slice.call(P.querySelectorAll('[data-sw]')).forEach(function (b) {
       b.onclick = function () {
         var k = b.dataset.sw;
@@ -2003,6 +2036,7 @@
         savePrefs();
         b.classList.toggle('on', PRE[k]);
         if (k === 'pubcss') syncPub();
+        if (k === 'ttsAuto' && EB.ttsOn) ttsRestart();
         if (k === 'wake') PRE.wake ? wakeOn() : wakeOff();
         if (k === 'imm') {
           try {
@@ -2487,10 +2521,117 @@
         if (buf.trim()) out.push(buf.trim());
         buf = '';
       }
-      if (buf.length > 220) { if (buf.trim()) out.push(buf.trim()); buf = ''; }
+      if (buf.length > 210) {
+        var cut = ttsCutRange(buf, 0, buf.length - 1);
+        if (buf.slice(0, cut).trim()) out.push(buf.slice(0, cut).trim());
+        buf = buf.slice(cut);
+      }
     }
     if (buf.trim()) out.push(buf.trim());
     return out.filter(function (s) { return s.length > 0; });
+  }
+
+  var TTS_STYLES = {
+    plain: { speed: 1, pitch: 1, volume: 1, gap: 200 },
+    calm: { speed: 0.92, pitch: 0.94, volume: 1, gap: 300 },
+    lively: { speed: 1.1, pitch: 1.06, volume: 1.04, gap: 240 },
+    story: { speed: 0.96, pitch: 1.1, volume: 1.06, gap: 380 }
+  };
+  var TTS_PITCHES = { low: 0.9, std: 1, high: 1.1 };
+  var TTS_GAPS = { tight: 0.8, normal: 1, loose: 1.25 };
+  var TTS_VOL_BASE = 0.95;
+  var TTS_SELF_GAP = 0.45;
+  var TTS_CN_DIGITS = '零一二三四五六七八九';
+  var TTS_BREAK_CHARS = '，、；：';
+
+  function ttsHash(str) {
+    var h = 2166136261;
+    for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return ((h >>> 0) / 4294967295) * 2 - 1;
+  }
+
+  function ttsDigits(s) {
+    return s.replace(/\d/g, function (d) { return TTS_CN_DIGITS.charAt(+d); });
+  }
+
+  function ttsClean(s) {
+    var t = String(s || '');
+    t = t.replace(/[！!]{2,}/g, '！').replace(/[？?]{2,}/g, '？');
+    t = t.replace(/。{2,}/g, '……').replace(/\.{3,}/g, '……');
+    t = t.replace(/\[\d{1,3}\]/g, '');
+    t = t.replace(/https?:\/\/\S+/gi, '');
+    t = t.replace(/^[\s]*(?:[-*=]\s*){3,}$/g, '');
+    t = t.replace(/[\u200b-\u200f\u202a-\u202e\u2060\ufeff\ufe00-\ufe0f]/g, '');
+    t = t.replace(/[\u2600-\u27bf\u2b00-\u2bff]/g, '');
+    t = t.replace(/[\s\u00a0\u3000]+/g, ' ');
+    t = t.replace(/((?:19|20)\d{2})年/g, function (_, y) { return ttsDigits(y) + '年'; });
+    t = t.replace(/\d{7,}/g, function (n) { return ttsDigits(n); });
+    return t.trim();
+  }
+
+  function ttsScore(text) {
+    var s = 0;
+    if (/[！!]/.test(text)) s += 3;
+    if (/[？?]/.test(text)) s += 2;
+    if (/[“”「」『』]/.test(text)) s += 1;
+    return s;
+  }
+
+  function ttsModsOf(list) {
+    var st = TTS_STYLES[PRE.ttsStyle] || TTS_STYLES.plain;
+    var pitchBase = TTS_PITCHES[PRE.ttsPitch] || 1;
+    var gapScale = TTS_GAPS[PRE.ttsGap] || 1;
+    var groups = new Map();
+    var keyOf = function (seg, i) { return seg.el || '#' + Math.floor(i / 5); };
+    for (var i = 0; i < list.length; i++) {
+      var g = groups.get(keyOf(list[i], i));
+      if (!g) { g = { rich: -1, best: 0, quote: 0, chars: 0 }; groups.set(keyOf(list[i], i), g); }
+      var t = list[i].text || '';
+      var sc = ttsScore(t);
+      if (sc > g.best) { g.best = sc; g.rich = i; }
+      var pairs = t.match(/[“「『][^”」』]*[”」』]/g) || [];
+      for (var p = 0; p < pairs.length; p++) g.quote += pairs[p].length;
+      g.chars += t.replace(/\s/g, '').length;
+    }
+    groups.forEach(function (g) { g.dialogue = g.chars > 0 && g.quote / g.chars > 0.6; });
+    for (var k = 0; k < list.length; k++) {
+      var seg = list[k];
+      var grp = groups.get(keyOf(seg, k));
+      var text = seg.text || '';
+      var rich = grp && grp.rich === k && grp.best >= 2;
+      var aSpeed = 1, aPitch = 1, aVol = 1, aGap = 0;
+      if (PRE.ttsAuto) {
+        var tail = text.replace(/[」』”’"）)\]]+$/, '').slice(-1);
+        if (tail === '？' || tail === '?') { aPitch += 0.04; aSpeed -= 0.02; aGap += 40; }
+        if (tail === '！' || tail === '!') { aVol += 0.05; aPitch += 0.03; }
+        if (/……|——/.test(text)) { aGap += 180; aSpeed -= 0.03; }
+        var n = text.replace(/\s/g, '').length;
+        if (n >= 45) aSpeed -= 0.04; else if (n > 0 && n <= 12) aSpeed += 0.02;
+      }
+      var gap = (st.gap + aGap) * gapScale;
+      if (PRE.ttsAuto) {
+        gap *= 1 + ttsHash(EB.ch + ':' + k + ':g') * 0.15;
+        if (k === list.length - 1) gap += 400;
+      }
+      gap = clamp(gap, 120, 1200);
+      var speed = PRE.ttsRate * st.speed * aSpeed * (grp && grp.dialogue ? 1.04 : 1);
+      seg.mods = {
+        speed: clamp(speed, 0.5, 2),
+        pitch: clamp(pitchBase * st.pitch * (rich ? aPitch : 1), 0.8, 1.25),
+        volume: clamp(TTS_VOL_BASE * st.volume * (rich ? aVol : 1), 0.3, 1),
+        gap: gap,
+        delay: Math.round(gap * (1 - TTS_SELF_GAP))
+      };
+    }
+    return list;
+  }
+
+  function ttsCutRange(text, start, i) {
+    var back = -1;
+    for (var q = i; q > i - 12 && q > start; q--) {
+      if (TTS_BREAK_CHARS.indexOf(text.charAt(q)) >= 0) { back = q; break; }
+    }
+    return back > 0 ? back + 1 : i + 1;
   }
 
   var BLOCK_SEL = 'p,div,h1,h2,h3,h4,h5,h6,li,td,blockquote,section,article,figcaption,pre';
@@ -2526,9 +2667,10 @@
       if (/[。！？!?；;…]/.test(text[i]) || (text[i] === '.' && i + 1 < text.length && /\s/.test(text[i + 1]))) {
         if (text.slice(start, i + 1).trim()) out.push([start, i + 1]);
         start = i + 1; buf = 0;
-      } else if (buf > 220) {
-        if (text.slice(start, i + 1).trim()) out.push([start, i + 1]);
-        start = i + 1; buf = 0;
+      } else if (buf > 210) {
+        var cut = ttsCutRange(text, start, i);
+        if (text.slice(start, cut).trim()) out.push([start, cut]);
+        start = cut; buf = i + 1 - cut;
       }
     }
     if (text.slice(start).trim()) out.push([start, text.length]);
@@ -2549,7 +2691,7 @@
       nodes.forEach(function (x) { flat += x.node.nodeValue; });
       if (!flat.replace(/[\s\u00a0\u3000]+/g, '')) return;
       sentenceRanges(flat).forEach(function (r) {
-        var t = flat.slice(r[0], r[1]).replace(/[\s\u00a0\u3000]+/g, ' ').trim();
+        var t = ttsClean(flat.slice(r[0], r[1]));
         if (!t) return;
         out.push({ text: t, el: el, s: r[0], e: r[1], nodes: nodes });
       });
@@ -2616,9 +2758,14 @@
     if (!list || !list.length) {
       var body = text || chapterText(EB.ch);
       if (!body) return toast(L.t('这一章没有可朗读的文字'), 'err');
-      list = splitSentences(body).map(function (t) { return { text: t }; });
+      list = [];
+      splitSentences(body).forEach(function (t) {
+        var c = ttsClean(t);
+        if (c) list.push({ text: c });
+      });
     }
     if (!list.length) return toast(L.t('这一章没有可朗读的文字'), 'err');
+    ttsModsOf(list);
     EB.tts = { list: list, idx: 0 };
     EB.ttsOn = true;
     $('ebTts').classList.add('on');
@@ -2646,15 +2793,19 @@
     if (window.speechSynthesis.paused) {
       window.speechSynthesis.resume();
       btn.innerHTML = ico('pause');
+      if (EB.ttsPending) { EB.ttsPending = false; speakCurrent(); }
     } else {
       window.speechSynthesis.pause();
       btn.innerHTML = ico('play');
+      if (EB.ttsTimer) { clearTimeout(EB.ttsTimer); EB.ttsTimer = null; EB.ttsPending = true; }
     }
   }
 
   function ttsSeek(i) {
     if (!EB.tts) return;
     EB.tts.idx = i;
+    EB.ttsPending = false;
+    if (EB.ttsTimer) { clearTimeout(EB.ttsTimer); EB.ttsTimer = null; }
     window.speechSynthesis.cancel();
     setTimeout(speakCurrent, 60);
   }
@@ -2668,13 +2819,16 @@
     if (tx) tx.textContent = (EB.tts.idx + 1) + '/' + EB.tts.list.length + ' ' + text.slice(0, 40);
     if (s && s.el) ttsPaint(s);
     var u = new SpeechSynthesisUtterance(text);
-    u.rate = PRE.ttsRate;
-    u.pitch = 1;
+    var mine = EB.tts.idx;
+    var m = s.mods || { speed: PRE.ttsRate, pitch: 1, volume: TTS_VOL_BASE, delay: 0 };
+    u.rate = m.speed;
+    u.pitch = m.pitch;
+    u.volume = m.volume;
     var v = pickVoice();
     if (v) { u.voice = v; u.lang = v.lang; }
     else u.lang = 'zh-CN';
     u.onend = function () {
-      if (!EB.ttsOn || !EB.tts) return;
+      if (!EB.ttsOn || !EB.tts || EB.tts.idx !== mine) return;
       if (EB.tts.idx >= EB.tts.list.length - 1) {
         if (EB.ch < EB.total) {
           gotoChapter(EB.ch + 1, 0);
@@ -2689,7 +2843,12 @@
         return ttsStop();
       }
       EB.tts.idx++;
-      speakCurrent();
+      var wait = m.delay || 0;
+      if (wait > 0) {
+        EB.ttsTimer = setTimeout(function () { EB.ttsTimer = null; speakCurrent(); }, wait);
+      } else {
+        speakCurrent();
+      }
     };
     u.onerror = function (ev) {
       if (!EB.ttsOn) return;
@@ -2703,18 +2862,26 @@
   function speakText(text) {
     if (!window.speechSynthesis) return toast(L.t('当前浏览器不支持朗读'), 'err');
     window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.rate = PRE.ttsRate;
+    var seg = { text: ttsClean(text) };
+    if (!seg.text) return toast(L.t('这段没有可朗读的文字'), 'err');
+    ttsModsOf([seg]);
+    var u = new SpeechSynthesisUtterance(seg.text);
+    u.rate = seg.mods.speed;
+    u.pitch = seg.mods.pitch;
+    u.volume = seg.mods.volume;
     u.lang = 'zh-CN';
     var v = pickVoice();
     if (v) { u.voice = v; u.lang = v.lang; }
     window.speechSynthesis.speak(u);
-    toast(L.t('正在朗读选中的 ') + text.length + L.t(' 字'));
+    toast(L.t('正在朗读选中的 ') + seg.text.length + L.t(' 字'));
   }
 
   function ttsRestart() {
     if (!EB.ttsOn || !EB.tts) return;
     var i = EB.tts.idx;
+    EB.ttsPending = false;
+    if (EB.ttsTimer) { clearTimeout(EB.ttsTimer); EB.ttsTimer = null; }
+    ttsModsOf(EB.tts.list);
     window.speechSynthesis.cancel();
     setTimeout(function () {
       if (!EB.tts) return;
@@ -2726,6 +2893,8 @@
   function ttsStop() {
     EB.ttsOn = false;
     EB.tts = null;
+    EB.ttsPending = false;
+    if (EB.ttsTimer) { clearTimeout(EB.ttsTimer); EB.ttsTimer = null; }
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     ttsClear();
     var p = $('ebTts'); if (p) { p.classList.remove('on'); p.innerHTML = ''; }
